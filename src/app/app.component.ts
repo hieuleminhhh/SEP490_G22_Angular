@@ -1,5 +1,5 @@
 // src/app/app.component.ts
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { HomeComponent } from './home/home.component';
@@ -11,7 +11,6 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   imports: [CommonModule, IonicModule, HomeComponent, RouterOutlet], 
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]  
 })
 export class AppComponent {
   title = 'ManageRestaurant';
