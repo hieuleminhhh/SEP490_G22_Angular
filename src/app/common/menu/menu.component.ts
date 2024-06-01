@@ -1,59 +1,31 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core'; // Import ViewChild và ElementRef
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Component, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Dish } from '../../../models/dish.model';
+import { AsyncPipe, CommonModule } from '@angular/common';
+import { CartService } from '../../../service/cart.service';
 
 @Component({
   selector: 'app-menu',
+  standalone: true,
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.css'],
+  imports:[HttpClientModule, AsyncPipe, CommonModule]
 })
-export class MenuComponent implements AfterViewInit {
-  constructor(private http: HttpClient) { } // Dependency injection through the constructor
+export class MenuComponent{
+  http = inject(HttpClient);
 
-  gets: any[] = [];
-  @ViewChild('productGrid') productGridRef!: ElementRef;
+  dishs$ = this.getDish();
 
-  ngAfterViewInit() {
-    setTimeout(() => {
-      this.getAll();
-    });
+  private getDish(): Observable<Dish[]>{
+    return this.http.get<Dish[]>('https://localhost:7188/api/Dish');
   }
 
-  getAll() {
-    this.fetchData();
+  constructor(private cartService: CartService) { }
+  addToCart(dish: any) {
+    this.cartService.addToCart(dish);
   }
 
-  fetchData() {
-    this.http.get<any[]>('https://localhost:7188/api/Dish')
-      .subscribe(
-        (data: any[]) => {
-          if (!this.productGridRef || !this.productGridRef.nativeElement) {
-            console.error('Product grid element not found');
-            return;
-          }
-          console.log(data);
-          const productGrid = this.productGridRef.nativeElement;
-
-          data.forEach(product => {
-            const productElement = document.createElement('div');
-            productElement.classList.add('grid-product');
-            productElement.innerHTML = `
-            <div class="grid-product square">
-            <div class="img-name">
-            <img src="${product.imageUrl}" alt="${product.itemName}" width="220" height="200">
-            <h4>${product.itemName}</h4>
-          </div>
-          <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
-          <span>$${product.price}</span>
-          <button class="add-to-cart js-add-to-cart btn" style="margin-left: 10px; border: 2px solid red;">Order Now</button>
-        </p>
-            `;
-
-            productGrid.appendChild(productElement);
-          });
-        },
-        error => {
-          console.error('Error:', error);
-        }
-      );
-  }
 }
+
+
