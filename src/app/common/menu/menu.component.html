@@ -1,95 +1,71 @@
-<br>
-<div class="section" id="menu">
-  <div class="container">
-    <ul class="category">
-      <li class="active">All</li>
-      <li>Biryani</li>
-      <li>Chicken</li>
-      <li>Pizza</li>
-      <li>Burger</li>
-      <li>Pasta</li>
-    </ul>
 
-    <div class="container">
-      <div class="restaurant-menu">
-        <div class="menu-item">
-          <img src="https://raw.githubusercontent.com/programmercloud/foodlover/main/img/menu-1.jpg" alt="" />
-
-          <div class="title">Food Restaurant | Chineese & Thai</div>
-
-          <div class="location">Lahore, Pakistan</div>
-
-          <div class="order flex">
-            <div class="price">$25.00</div>
-            <a href="#" class="btn btn-menu">Order Now</a>
-          </div>
-        </div>
-
-        <div class="menu-item">
-          <img src="https://raw.githubusercontent.com/programmercloud/foodlover/main/img/menu-2.jpg" alt="" />
-
-          <div class="title">Food Restaurant | Chineese & Thai</div>
-
-          <div class="location">Lahore, Pakistan</div>
-
-          <div class="order flex">
-            <div class="price">$25.00</div>
-            <a href="#" class="btn btn-menu">Order Now</a>
-          </div>
-        </div>
-
-        <div class="menu-item">
-          <img src="https://raw.githubusercontent.com/programmercloud/foodlover/main/img/menu-3.jpg" alt="" />
-
-          <div class="title">Food Restaurant | Chineese & Thai</div>
-
-          <div class="location">Lahore, Pakistan</div>
-
-          <div class="order flex">
-            <div class="price">$25.00</div>
-            <a href="#" class="btn btn-menu">Order Now</a>
-          </div>
-        </div>
-
-        <div class="menu-item">
-          <img src="https://raw.githubusercontent.com/programmercloud/foodlover/main/img/menu-4.jpg" alt="" />
-
-          <div class="title">Food Restaurant | Chineese & Thai</div>
-
-          <div class="location">Lahore, Pakistan</div>
-
-          <div class="order flex">
-            <div class="price">$25.00</div>
-            <a href="#" class="btn btn-menu">Order Now</a>
-          </div>
-        </div>
-
-        <div class="menu-item">
-          <img src="https://raw.githubusercontent.com/programmercloud/foodlover/main/img/menu-5.jpg" alt="" />
-
-          <div class="title">Food Restaurant | Chineese & Thai</div>
-
-          <div class="location">Lahore, Pakistan</div>
-
-          <div class="order flex">
-            <div class="price">$25.00</div>
-            <a href="#" class="btn btn-menu">Order Now</a>
-          </div>
-        </div>
-
-        <div class="menu-item">
-          <img src="https://raw.githubusercontent.com/programmercloud/foodlover/main/img/menu-6.jpg" alt="" />
-
-          <div class="title">Food Restaurant | Chineese & Thai</div>
-
-          <div class="location">Lahore, Pakistan</div>
-
-          <div class="order flex">
-            <div class="price">$25.00</div>
-            <a href="#" class="btn btn-menu">Order Now</a>
-          </div>
-        </div>
+<div class="wrapper">
+  <div class="notifications">
+    <!-- Đây là nơi thông báo sẽ xuất hiện -->
+  </div>
+  <div class="filter-grid">
+    <div class="inner-wrap">
+      <div class="filter-cell">
+        <select class="form-control">
+          <option value="*">Category</option>
+          <option value="fav">Favorites</option>
+        </select>
+      </div>
+      <div class="filter-cell">
+        <select class="form-control">
+          <option value="*">Product Type</option>
+          <option value="square">Square</option>
+          <option value="circular">Circular</option>
+        </select>
+      </div>
+      <div class="filter-cell">
+        <select class="form-control" disabled="true">
+          <option>Price</option>
+        </select>
+      </div>
+      <div class="filter-cell">
+        <select class="form-control" disabled="true">
+          <option>Brand</option>
+        </select>
       </div>
     </div>
+  </div>
+
+  <div class="inner-wrap content-wrap">
+    <div class="product-grid" #productGrid id="product-grid">
+      <!-- Products will be dynamically added here -->
+    </div>
+
+  </div>
+  <div class="sticky"></div>
+
+</div>
+
+<footer class="site-footer">
+  <div class="inner-wrap">
+
+    Footer Info
+
+  </div>
+</footer>
+
+<div class="cart">
+  <div class="inner-wrap">
+    <h2>Your Cart</h2>
+
+    <table class="cart-table">
+      <thead>
+        <tr>
+          <th class="product-remove">Remove Items</th>
+          <th class="product-name">Product</th>
+          <th class="product-price">Price</th>
+          <th class="product-quantity">Quantity</th>
+          <th class="product-line-total">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody id="cart-items">
+        <!-- Sản phẩm sẽ được thêm vào đây -->
+      </tbody>
+    </table>
   </div>
 </div>
