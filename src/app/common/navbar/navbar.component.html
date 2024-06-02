@@ -1,9 +1,6 @@
 <div class="menu">
   <nav>
-    <input type="checkbox" id="check" />
-    <label for="check" class="checkbtn">
-      <!-- <ion-icon name="grid-outline"></ion-icon>  -->
-    </label>
+
 
     <label class="logo">FoodLover</label>
 
@@ -12,7 +9,11 @@
       <li><a routerLink="/news" routerLinkActive="äctive">News</a></li>
       <li><a routerLink="/menu" routerLinkActive="äctive">Menu</a></li>
       <li><a routerLink="/booking" routerLinkActive="äctive">Booking</a></li>
-      <li><a routerLink="/order" routerLinkActive="äctive">Order Now</a></li>
+      <li>
+        <a routerLink="/cart" routerLinkActive="active">
+          Cart <span class="item-count">{{ itemCount }}</span>
+        </a>
+      </li>
     </ul>
   </nav>
 </div>

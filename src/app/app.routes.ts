@@ -1,14 +1,16 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './home/home.component';
-import { MenuComponent } from './menu/menu.component';
-import { NewsComponent } from './news/news.component';
-import { BookingComponent } from './booking/booking.component';
-import { OrderComponent } from './order/order.component';
+import { HomeComponent } from './common/home/home.component';
+import { MenuComponent } from './common/menu/menu.component';
+import { NewsComponent } from './common/news/news.component';
+import { BookingComponent } from './common/booking/booking.component';
+import { CartComponent } from './common/cart/cart.component';
+import { DashboardComponent } from './staff/dashboard/dashboard.component';
 
 export const routes: Routes = [
     {'path': '', component:HomeComponent},
     {'path': 'menu', component:MenuComponent},
     {'path': 'news', component:NewsComponent},
     {'path': 'booking', component:BookingComponent},
-    {'path': 'order', component:OrderComponent}
+    {'path': 'cart', component:CartComponent},
+    {'path': 'dashboard', component:DashboardComponent}
 ];

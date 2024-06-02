@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Page Title</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="notifications">
+        <!-- Đây là nơi thông báo sẽ xuất hiện -->
+      </div>
+      <div class="filter-grid">
+        <div class="inner-wrap">
+          <div class="filter-cell">
+            <select class="form-control">
+              <option value="*">Category</option>
+              <option value="fav">Favorites</option>
+            </select>
+          </div>
+          <div class="filter-cell">
+            <select class="form-control">
+              <option value="*">Product Type</option>
+              <option value="square">Square</option>
+              <option value="circular">Circular</option>
+            </select>
+          </div>
+          <div class="filter-cell">
+            <select class="form-control" disabled="true">
+              <option>Price</option>
+            </select>
+          </div>
+          <div class="filter-cell">
+            <select class="form-control" disabled="true">
+              <option>Brand</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-wrap content-wrap">
+        <div class="product-grid" #productGrid id="product-grid">
+          <ng-container *ngIf="dishs$ | async as dishs">
+            <ng-container *ngIf="dishs.length > 0; else noDishes">
+              <div *ngFor="let item of dishs; let i = index" class="grid-product square" style="width: auto;border: 2px solid rgb(0, 0, 0);">
+                <div class="img-name">
+                  <img [src]="item.imageUrl" [alt]="item.itemName" width="auto" height="200">
+                  <h4>{{ item.itemName }}</h4>
+                </div>
+                <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>${{ item.price }}</span>
+                  <button (click)="addToCart(item)" class="add-to-cart js-add-to-cart btn" style="margin-left: 10px; border: 2px solid red;">Order Now</button>
+                </p>
+              </div>
+            </ng-container>
+            <ng-template #noDishes>
+              <p>No dishes found ...</p>
+            </ng-template>
+          </ng-container>
+        </div>
+      </div>
+
+
+      <div class="sticky"></div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="inner-wrap"></div>
+    </footer>
+
+
+  </body>
+</html>
