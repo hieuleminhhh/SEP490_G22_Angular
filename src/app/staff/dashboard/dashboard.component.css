@@ -1,0 +1,35 @@
+.nav {
+  background-color: purple;
+  justify-content: center;
+}
+
+.nav-link {
+  color: white;
+}
+
+.container {
+  padding-top: 5rem;
+}
+
+.card {
+  padding: 1rem;
+  box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
+  background-color: rgb(234, 241, 239);
+  text-align: center;
+  border: none;
+}
+
+.card-body {
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: rgb(13, 10, 10);
+}
+
+hr {
+  border-top: 0.1rem solid white;
+  margin: 1rem 0;
+}

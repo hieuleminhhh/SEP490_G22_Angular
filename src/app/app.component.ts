@@ -3,8 +3,9 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { RouterOutlet } from '@angular/router';
-import { NavbarComponent } from './navbar/navbar.component';
-import { FooterComponent } from './footer/footer.component';
+import { NavbarComponent } from './common/navbar/navbar.component';
+import { FooterComponent } from './common/footer/footer.component';
+import { CartService } from '../service/cart.service';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,7 @@ import { FooterComponent } from './footer/footer.component';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   imports: [CommonModule, IonicModule, NavbarComponent,FooterComponent, RouterOutlet],
+  providers: [CartService],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppComponent {
