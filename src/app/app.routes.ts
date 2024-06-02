@@ -6,9 +6,11 @@ import { BookingComponent } from './common/booking/booking.component';
 import { CartComponent } from './common/cart/cart.component';
 import { DashboardComponent } from './staff/dashboard/dashboard.component';
 import { PaymentComponent } from './common/payment/payment.component';
+import { LoginComponent } from './common/login/login.component';
 
 export const routes: Routes = [
     {'path': '', component:HomeComponent},
+    {'path': 'login', component: LoginComponent},
     {'path': 'menu', component:MenuComponent},
     {'path': 'news', component:NewsComponent},
     {'path': 'booking', component:BookingComponent},
