@@ -5,10 +5,15 @@ import { NewsComponent } from './common/news/news.component';
 import { BookingComponent } from './common/booking/booking.component';
 import { CartComponent } from './common/cart/cart.component';
 import { DashboardComponent } from './staff/dashboard/dashboard.component';
+<<<<<<< Updated upstream
 import { PaymentComponent } from './common/payment/payment.component';
+=======
+import { LoginComponent } from './common/login/login.component';
+>>>>>>> Stashed changes
 
 export const routes: Routes = [
     {'path': '', component:HomeComponent},
+    {'path': 'login', component: LoginComponent},
     {'path': 'menu', component:MenuComponent},
     {'path': 'news', component:NewsComponent},
     {'path': 'booking', component:BookingComponent},
