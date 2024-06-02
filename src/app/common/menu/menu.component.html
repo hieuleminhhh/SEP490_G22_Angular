@@ -10,32 +10,26 @@
 
   <body>
     <div class="wrapper">
-      <div class="notifications">
-        <!-- Đây là nơi thông báo sẽ xuất hiện -->
-      </div>
       <div class="filter-grid">
         <div class="inner-wrap">
           <div class="filter-cell">
-            <select class="form-control">
-              <option value="*">Category</option>
-              <option value="fav">Favorites</option>
+            <select class="form-control" (change)="onCategoryChange($event)" *ngIf="category$ | async as categories">
+              <option value="*">All</option>
+              <option *ngFor="let category of categories" [value]="category.categoryName">
+                {{ category.categoryName }}
+              </option>
             </select>
           </div>
-          <div class="filter-cell">
-            <select class="form-control">
-              <option value="*">Product Type</option>
-              <option value="square">Square</option>
-              <option value="circular">Circular</option>
-            </select>
-          </div>
+
           <div class="filter-cell">
             <select class="form-control" disabled="true">
-              <option>Price</option>
+              <option>Sort</option>
             </select>
           </div>
+
           <div class="filter-cell">
             <select class="form-control" disabled="true">
-              <option>Brand</option>
+              <option>Search</option>
             </select>
           </div>
         </div>
@@ -47,7 +41,7 @@
             <ng-container *ngIf="dishs.length > 0; else noDishes">
               <div *ngFor="let item of dishs; let i = index" class="grid-product square" style="width: auto;border: 2px solid rgb(0, 0, 0);">
                 <div class="img-name">
-                  <img [src]="item.imageUrl" [alt]="item.itemName" width="auto" height="200">
+                  <img [src]="item.imageUrl" [alt]="item.itemName" width="200" height="200">
                   <h4>{{ item.itemName }}</h4>
                 </div>
                 <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
@@ -64,12 +58,28 @@
       </div>
 
 
+
       <div class="sticky"></div>
     </div>
 
     <footer class="site-footer">
       <div class="inner-wrap"></div>
     </footer>
+
+    <div class="modal-dialog" *ngFor="let message of successMessages; let i = index">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Success!</h5>
+          <button type="button" class="close" aria-label="Close" (click)="closeModal(i)">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{ message }}
+        </div>
+      </div>
+    </div>
+
 
 
   </body>

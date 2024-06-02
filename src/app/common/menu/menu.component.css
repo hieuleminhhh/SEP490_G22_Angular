@@ -351,7 +351,7 @@ html,
  }
  .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   grid-gap: 20px;
   margin-top: -70px;
 }
@@ -364,3 +364,25 @@ html,
 .add-to-cart {
   margin-left: 10px;
 }
+.modal-dialog {
+  position: fixed;
+  right: 20px;
+  top: 20%; /* Thay đổi vị trí lên cao hơn */
+  transform: translateY(-50%);
+  width: 300px;
+  max-width: calc(100% - 40px);
+  background-color: #2ecc71; /* Thay đổi màu nền thành màu xanh lá cây */
+  border: 1px solid #27ae60; /* Thay đổi màu viền */
+  border-radius: 10px;
+}
+
+/* Thêm animation để modal hiện ra từ phải sang */
+@keyframes slideInFromRight {
+  from { right: -400px; }
+  to { right: 20px; }
+}
+
+.modal-dialog {
+  animation: slideInFromRight 0.5s ease-out forwards;
+}
+

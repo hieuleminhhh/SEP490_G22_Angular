@@ -3,13 +3,14 @@ import { CartService } from '../../../service/cart.service';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Dish } from '../../../models/dish.model';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
   standalone:true,
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css'],
-  imports: [CommonModule]
+  imports: [CommonModule, RouterLink, RouterLinkActive]
 })
 export class CartComponent implements OnDestroy {
   cartItems: Dish[] = [];
@@ -39,6 +40,13 @@ export class CartComponent implements OnDestroy {
     } else {
         return 0;
     }
+}
+getTotalCartPrice(): number {
+  let totalPrice = 0;
+  this.cartItems.forEach(item => {
+    totalPrice += item.price * item.quantity;
+  });
+  return totalPrice;
 }
 
   getItemNames(): string[] {

@@ -5,76 +5,109 @@
 
 <div class="card">
   <div class="row">
-      <div class="col-md-8 cart">
-          <div class="title">
-              <div class="row">
-                  <div class="col"><h4><b>My Cart</b></h4></div>
-                  <div class="col align-self-center text-right text-muted"></div>
-              </div>
+    <div class="col-md-8 cart">
+      <div class="title">
+        <div class="row">
+          <div class="col">
+            <h4><b>My Cart</b></h4>
           </div>
-
-          <div *ngIf="cartItems && cartItems.length > 0; else noItems">
-            <div class="cart-items">
-              <div class="row border-top border-bottom" *ngFor="let item of cartItems">
-                <div class="row main align-items-center">
-                  <div class="col-2">
-                    <img class="img-fluid" [src]="item.imageUrl" alt="Item Image">
-                  </div>
-                  <div class="col">
-                    <div>{{ item.itemName }}</div>
-                    <div class="row">{{ item.itemDescription }}</div>
-                  </div>
-                  <div class="col">
-                    <button (click)="decreaseQuantity(item)">-</button>
-                    <span class="border">{{ item.quantity }}</span>
-                    <button (click)="increaseQuantity(item)">+</button>
-                  </div>
-                  <div class="col">&dollar; {{ getTotalPrice(item.itemName) }}
-                    <span class="close" (click)="removeItem(item)">&#10005;</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <ng-template #noItems>
-            <div class="empty-cart" style="text-align: center;">
-              <p>Your cart is empty</p>
-            </div>
-          </ng-template>
-          
-          
-          <div class="back-to-shop">
-            <a href="/menu">&leftarrow;</a>
-            <span class="text-muted">Back to shop</span>
+          <div class="col align-self-center text-right text-muted"></div>
         </div>
-        
       </div>
-      <div class="col-md-4 summary" *ngFor="let item of cartItems">
-          <div><h5><b>Order Information</b></h5></div>
-          <hr>
-          <form>
-              <p>Name</p>
-              <input id="name" placeholder="Enter your name">
-              <p>Delivery address</p>
-              <input id="address" placeholder="Enter your address">
-              <p>Phone</p>
-              <input id="phone" placeholder="Enter your phone">
-              <p>Receiving Date</p>
-              <input id="date" type="date" placeholder="Enter the date">
-              <p>Receiving Time</p>
-              <input id="time" placeholder="Enter your time">
-              <p>Note</p>
-              <textarea id="note" placeholder="Enter your note" rows="10" cols="30"></textarea>
-              <span>Receiving Invoice
-                <input id="invoice" type="checkbox">
-              </span>
-          </form>
-          <div class="row" style="border-top: 1px solid rgba(0,0,0,.1); padding: 2vh 0;">
-              <div class="col">TOTAL PRICE</div>
-              <div class="col text-right">&euro; 137.00</div>
+
+      <div *ngIf="cartItems && cartItems.length > 0; else noItems">
+        <div class="cart-items">
+          <!-- Đây là vị trí của tiêu đề Quantity -->
+          <div class="row">
+            <div class="col-2"></div>
+            <div class="col"></div>
+            <div class="col">
+              <h5><b>Quantity</b></h5>
+            </div>
+            <div class="col">
+              <h5><b>Total Money</b></h5>
+            </div>
           </div>
-          <button class="btn">CHECKOUT</button>
+          <div class="row border-top border-bottom" *ngFor="let item of cartItems">
+            <div class="row main align-items-center">
+              <div class="col-2">
+                <img class="img-fluid" [src]="item.imageUrl" alt="Item Image">
+              </div>
+              <div class="col">
+                <div>{{ item.itemName }}</div>
+              </div>
+              <div class="col">
+                <a (click)="decreaseQuantity(item)" class="icon">
+                  <i class="fas fa-minus"></i>
+                </a>
+                <span>{{ item.quantity }}</span>
+                <a (click)="increaseQuantity(item)" class="icon">
+                  <i class="fas fa-plus"></i>
+                </a>
+              </div>
+
+              <div class="col price-close" style="align-items:center;">
+                <span class="price">&dollar; {{ getTotalPrice(item.itemName) }}</span>
+                <span class="close" (click)="removeItem(item)">&#10005;</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
       </div>
+      <ng-template #noItems>
+        <div class="empty-cart" style="text-align: center;">
+          <p>Cart is empty</p>
+        </div>
+      </ng-template>
+
+
+      <ng-template #no>
+        <!-- Nội dung trống, không hiển thị gì cả -->
+      </ng-template>
+      <div class="back-to-shop">
+        <a routerLink="/menu" routerLinkActive="äctive"><i class="fas fa-arrow-left"></i></a>
+        <span class="text-muted">Go to menu</span>
+      </div>
+    </div>
+    <div class="col-md-4 summary" *ngIf="cartItems && cartItems.length > 0; else no">
+      <div>
+        <h5><b>Order Information</b></h5>
+      </div>
+      <hr>
+      <form>
+        <div class="row">
+          <div class="col-md-6">
+            <p>Name</p>
+            <input id="name" placeholder="Enter your name">
+            <p>Delivery address</p>
+            <input id="address" placeholder="Enter your address">
+            <p>Phone</p>
+            <input id="phone" placeholder="Enter your phone">
+          </div>
+          <div class="col-md-6">
+            <p>Receiving Date</p>
+            <input id="date" type="date" placeholder="Enter the date">
+            <p>Receiving Time</p>
+            <input id="time" placeholder="Enter your time">
+            <p>Note</p>
+            <textarea id="note" placeholder="Enter your note" rows="5" cols="23"></textarea>
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="checkbox">
+            <label for="invoice">Receiving Invoice</label>
+            <input id="invoice" type="checkbox">
+          </div>
+        </div>
+
+      </form>
+
+      <div class="row" style="border-top: 1px solid rgba(0,0,0,.1); padding: 2vh 0;">
+        <div class="total-price">Total Amount: ${{ getTotalCartPrice() }}</div>
+
+      </div>
+      <button class="btn">CHECKOUT</button>
+    </div>
   </div>
-
-
