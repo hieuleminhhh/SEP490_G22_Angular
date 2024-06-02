@@ -1,0 +1,88 @@
+<br>
+<br>
+<br>
+<br>
+<br>
+<div class="order-info">
+  <div class="row">
+    <div class="col-md-4">
+      <div>
+        <h5><b>Order Information</b></h5>
+      </div>
+      <hr>
+      <div class="order-details">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" class="form-control" id="name" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+          <label for="address">Delivery address</label>
+          <input type="text" class="form-control" id="address" placeholder="Enter your address">
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input type="text" class="form-control" id="phone" placeholder="Enter your phone">
+        </div>
+        <div class="form-group">
+          <label for="date">Receiving Date</label>
+          <input type="date" class="form-control" id="date" placeholder="Enter the date">
+        </div>
+        <div class="form-group">
+          <label for="time">Receiving Time</label>
+          <input type="text" class="form-control" id="time" placeholder="Enter your time">
+        </div>
+        <div class="form-group">
+          <label for="note">Note</label>
+          <textarea class="form-control" id="note" placeholder="Enter your note" rows="5"></textarea>
+        </div>
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" id="invoice">
+          <label class="form-check-label" for="invoice">Receiving Invoice</label>
+        </div>
+        <div class="form-group">
+          <label for="payment-method">Payment Method</label>
+          <select class="form-control" id="payment-method">
+            <option value="cash-on-delivery">Cash on Delivery</option>
+            <option value="prepaid">Prepaid</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card">
+        <div class="row">
+          <div class="col-md-7 cart">
+            <div class="title">
+              <div class="row">
+                <div class="col">
+                  <h4><b>My Cart</b></h4>
+                </div>
+                <div class="col align-self-center text-right text-muted"></div>
+              </div>
+            </div>
+            <div>
+              <div class="cart-items">
+                <!-- Cart items -->
+              </div>
+            </div>
+            <div class="col-12 panel-footer basket-footer">
+              <!-- Cart summary -->
+            </div>
+            <ng-template #noItems>
+              <div class="empty-cart" style="text-align: center;">
+                <p>Cart is empty</p>
+              </div>
+            </ng-template>
+            <ng-template #no>
+              <!-- Empty content -->
+            </ng-template>
+            <div class="back-to-shop">
+              <a routerLink="/menu" routerLinkActive="äctive"><i class="fas fa-arrow-left"></i></a>
+              <span class="text-muted">Go to menu</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
