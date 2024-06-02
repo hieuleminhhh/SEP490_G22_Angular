@@ -55,6 +55,29 @@
           </div>
         </div>
       </div>
+
+      <div class="col-12 panel-footer basket-footer" *ngIf="cartItems && cartItems.length > 0; else no">
+        <hr>
+        <div class="row">
+            <div class="col-8 align-right description"><div class="dive">Subtotal</div></div>
+            <div class="col-4 align-right"><span class="emphasized"></span>&dollar; {{ getTotalCartPrice() }}</div>
+        </div>
+        <div class="row">
+            <div class="col-8 align-right description"><div class="dive">Taxes</div></div>
+            <div class="col-4 align-right"><span class="emphasized"></span>&dollar;{{ getTotalCartPrice() * 0.1 }}</div>
+        </div>
+        <div class="row">
+            <div class="col-8 align-right description"><div class="dive">Shipping</div></div>
+            <div class="col-4 align-right"><span class="emphasized"></span>&dollar; 5</div> <!-- You may replace '5' with the actual shipping cost variable -->
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-8 align-right description"><div class="dive">Total</div></div>
+            <div class="col-4 align-right"><span class="very emphasized"></span>&dollar;{{ getTotalCartPrice() + (getTotalCartPrice() * 0.1) + 5 }}</div> <!-- Update the calculation accordingly -->
+        </div>
+    </div>
+
+
       <ng-template #noItems>
         <div class="empty-cart" style="text-align: center;">
           <p>Cart is empty</p>
@@ -101,13 +124,15 @@
             <input id="invoice" type="checkbox">
           </div>
         </div>
-
+        <p>Phương thức thanh toán</p>
+        <div class="filter-cell">
+          <select class="form-control" >
+            <option value="*">thanh toán khi nhận hàng</option>
+            <option value="*">thanh toán trước</option>
+          </select>
+        </div>
       </form>
 
-      <div class="row" style="border-top: 1px solid rgba(0,0,0,.1); padding: 2vh 0;">
-        <div class="total-price">Total Amount: ${{ getTotalCartPrice() }}</div>
-
-      </div>
       <button class="btn">CHECKOUT</button>
     </div>
   </div>

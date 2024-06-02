@@ -14,7 +14,7 @@
         <div class="inner-wrap">
           <div class="filter-cell">
             <select class="form-control" (change)="onCategoryChange($event)" *ngIf="category$ | async as categories">
-              <option value="*">All</option>
+              <option value="*">Category</option>
               <option *ngFor="let category of categories" [value]="category.categoryName">
                 {{ category.categoryName }}
               </option>
@@ -22,13 +22,19 @@
           </div>
 
           <div class="filter-cell">
-            <select class="form-control" disabled="true">
+            <select class="form-control" >
+              <option>Combo</option>
+            </select>
+          </div>
+
+          <div class="filter-cell">
+            <select class="form-control" >
               <option>Sort</option>
             </select>
           </div>
 
           <div class="filter-cell">
-            <select class="form-control" disabled="true">
+            <select class="form-control" >
               <option>Search</option>
             </select>
           </div>
