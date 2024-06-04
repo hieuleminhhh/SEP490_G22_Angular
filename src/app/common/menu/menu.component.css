@@ -386,3 +386,24 @@ html,
   animation: slideInFromRight 0.5s ease-out forwards;
 }
 
+.sort-button {
+  appearance: none;
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 6.5px 10px;
+  font-size: 15px;
+  font-weight: bold;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+.sort-button:hover {
+  background-color: #e9ecef;
+}
+
+.sort-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #007bff;
+}

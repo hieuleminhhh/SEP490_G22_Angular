@@ -22,9 +22,7 @@
           </div>
 
           <div class="filter-cell">
-            <select class="form-control" >
-              <option>Combo</option>
-            </select>
+            <button (click)="selectedFilter = 'Combo'" class="sort-button">Combo</button>
           </div>
 
           <div class="filter-cell">
@@ -43,23 +41,44 @@
 
       <div class="inner-wrap content-wrap">
         <div class="product-grid" #productGrid id="product-grid">
-          <ng-container *ngIf="dishs$ | async as dishs">
-            <ng-container *ngIf="dishs.length > 0; else noDishes">
-              <div *ngFor="let item of dishs; let i = index" class="grid-product square" style="width: auto;border: 2px solid rgb(0, 0, 0);">
-                <div class="img-name">
-                  <img [src]="item.imageUrl" [alt]="item.itemName" width="200" height="200">
-                  <h4>{{ item.itemName }}</h4>
+          <ng-container *ngIf="selectedFilter === 'Combo'; else dishesView">
+            <ng-container *ngIf="combo$ | async as combos">
+              <ng-container *ngIf="combos.length > 0; else noItems">
+                <div *ngFor="let item of combos; let i = index" class="grid-product square" style="width: auto;border: 2px solid rgb(0, 0, 0);">
+                  <div class="img-name">
+                    <!-- <img [src]="item.imageUrl" [alt]="item.itemName" width="200" height="200"> -->
+                    <h4>{{ item.nameCombo }}</h4>
+                  </div>
+                  <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>${{ item.price }}</span>
+                    <button (click)="addToCart(item, 'combo')" class="add-to-cart js-add-to-cart btn" style="margin-left: 10px; border: 2px solid red;">Order Now</button>
+                  </p>
                 </div>
-                <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
-                  <span>${{ item.price }}</span>
-                  <button (click)="addToCart(item)" class="add-to-cart js-add-to-cart btn" style="margin-left: 10px; border: 2px solid red;">Order Now</button>
-                </p>
-              </div>
+              </ng-container>
+              <ng-template #noItems>
+                <p>No combos found ...</p>
+              </ng-template>
             </ng-container>
-            <ng-template #noDishes>
-              <p>No dishes found ...</p>
-            </ng-template>
           </ng-container>
+          <ng-template #dishesView>
+            <ng-container *ngIf="dishs$ | async as dishs">
+              <ng-container *ngIf="dishs.length > 0; else noDishes">
+                <div *ngFor="let item of dishs; let i = index" class="grid-product square" style="width: auto;border: 2px solid rgb(0, 0, 0);">
+                  <div class="img-name">
+                    <img [src]="item.imageUrl" [alt]="item.itemName" width="200" height="200">
+                    <h4>{{ item.itemName }}</h4>
+                  </div>
+                  <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>${{ item.price }}</span>
+                    <button (click)="addToCart(item, 'dish')" class="add-to-cart js-add-to-cart btn" style="margin-left: 10px; border: 2px solid red;">Order Now</button>
+                  </p>
+                </div>
+              </ng-container>
+              <ng-template #noDishes>
+                <p>No dishes found ...</p>
+              </ng-template>
+            </ng-container>
+          </ng-template>
         </div>
       </div>
 

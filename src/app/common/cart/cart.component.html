@@ -8,10 +8,9 @@
     <div class="col-md-8 cart">
       <div class="title">
         <div class="row">
-          <div class="col">
+          <div class="col-md-6">
             <h4><b>My Cart</b></h4>
           </div>
-          <div class="col align-self-center text-right text-muted"></div>
         </div>
       </div>
 
@@ -34,7 +33,7 @@
                 <img class="img-fluid" [src]="item.imageUrl" alt="Item Image">
               </div>
               <div class="col">
-                <div>{{ item.itemName }}</div>
+                <div>{{ item.itemName||item.nameCombo }}</div>
               </div>
               <div class="col">
                 <a (click)="decreaseQuantity(item)" class="icon">
@@ -47,7 +46,7 @@
               </div>
 
               <div class="col price-close" style="align-items:center;">
-                <span class="price">&dollar; {{ getTotalPrice(item.itemName) }}</span>
+                <span class="price">&dollar; {{ getTotalPrice(item) }}</span>
                 <span class="close" (click)="removeItem(item)">&#10005;</span>
               </div>
 
@@ -57,26 +56,27 @@
       </div>
 
       <div class="col-12 panel-footer basket-footer" *ngIf="cartItems && cartItems.length > 0; else no">
-        <hr>
-        <div class="row">
-            <div class="col-8 align-right description"><div class="dive">Subtotal</div></div>
-            <div class="col-4 align-right"><span class="emphasized"></span>&dollar; {{ getTotalCartPrice() }}</div>
-        </div>
-        <div class="row">
-            <div class="col-8 align-right description"><div class="dive">Taxes</div></div>
-            <div class="col-4 align-right"><span class="emphasized"></span>&dollar;{{ getTotalCartPrice() * 0.1 }}</div>
-        </div>
-        <div class="row">
-            <div class="col-8 align-right description"><div class="dive">Shipping</div></div>
-            <div class="col-4 align-right"><span class="emphasized"></span>&dollar; 5</div> <!-- You may replace '5' with the actual shipping cost variable -->
-        </div>
-        <hr>
-        <div class="row">
-            <div class="col-8 align-right description"><div class="dive">Total</div></div>
-            <div class="col-4 align-right"><span class="very emphasized"></span>&dollar;{{ getTotalCartPrice() + (getTotalCartPrice() * 0.1) + 5 }}</div> <!-- Update the calculation accordingly -->
-        </div>
-    </div>
 
+        <div class="row">
+          <div class="col-8 align-left description">
+            <div class="dive">Subtotal</div>
+          </div>
+          <div class="col-8 align-right"><span class="emphasized"></span>&dollar; {{ getTotalCartPrice() }}</div>
+        </div>
+        <div class="row">
+          <div class="col-8 align-left description">
+            <div class="dive">Discount</div>
+          </div>
+          <div class="col-4 align-right"><span class="emphasized"></span>&dollar; 0</div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-8 align-left description">
+            <div class="dive">Total</div>
+          </div>
+          <div class="col-4 align-right"><span class="very emphasized"></span>&dollar;{{ getTotalCartPrice()}}</div>
+        </div>
+      </div>
 
       <ng-template #noItems>
         <div class="empty-cart" style="text-align: center;">
@@ -94,45 +94,86 @@
       </div>
     </div>
     <div class="col-md-4 summary" *ngIf="cartItems && cartItems.length > 0; else no">
+
       <div>
         <h5><b>Order Information</b></h5>
       </div>
       <hr>
-      <form>
+      <form (ngSubmit)="navigateToPayment()">
         <div class="row">
           <div class="col-md-6">
-            <p>Name</p>
-            <input id="name" placeholder="Enter your name">
-            <p>Delivery address</p>
-            <input id="address" placeholder="Enter your address">
-            <p>Phone</p>
-            <input id="phone" placeholder="Enter your phone">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input id="name" [(ngModel)]="consigneeName" name="consigneeName" class="form-control form-control-sm" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+              <label for="date">Receiving Date</label>
+              <input id="date" [(ngModel)]="date" name="date" class="form-control form-control-sm" type="date">
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone</label>
+              <input id="phone" [(ngModel)]="guestPhone" name="guestPhone" class="form-control form-control-sm" placeholder="Enter your phone">
+            </div>
           </div>
           <div class="col-md-6">
-            <p>Receiving Date</p>
-            <input id="date" type="date" placeholder="Enter the date">
-            <p>Receiving Time</p>
-            <input id="time" placeholder="Enter your time">
-            <p>Note</p>
-            <textarea id="note" placeholder="Enter your note" rows="5" cols="23"></textarea>
+            <div class="form-group">
+              <label for="address">Delivery address</label>
+              <input id="address" [(ngModel)]="address" name="address" class="form-control form-control-sm" placeholder="Enter your address">
+            </div>
+            <div class="form-group">
+              <label for="time">Receiving Time</label>
+              <input id="time" [(ngModel)]="time" name="time" class="form-control form-control-sm" type="time">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="note">Note</label>
+            <textarea id="note" [(ngModel)]="note" name="note" class="form-control form-control-lg" placeholder="Enter your note" ></textarea>
+          </div>
+        </div>
 
+        <hr>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="payment-method">Payment Method:</label>
+              <div>
+                <label class="radio-label">
+                  <input type="radio" name="paymentMethod" value="cash-on-delivery" [(ngModel)]="selectedPaymentMethod" checked>
+                  <span class="radio-text">Cash on delivery</span>
+                </label>
+              </div>
+              <div>
+                <label class="radio-label">
+                  <input type="radio" name="paymentMethod" value="banking" [(ngModel)]="selectedPaymentMethod">
+                  <span class="radio-text">Paying through bank</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="selectedPaymentMethod === 'banking'" class="split-container">
+          <div class="left-column">
+            <div class="form-group">
+              <label for="bank-name">BANK: BIDV</label>
+            </div>
+            <div class="form-group">
+              <label for="account-number">Number: 66668888</label>
+            </div>
+            <div class="form-group">
+              <label for="account-number">Name: FPT</label>
+            </div>
+          </div>
+          <div class="right-column">
+            <img src="https://th.bing.com/th/id/OIP.sjOCKD28ijkr5S0DpuB_XAHaHa?rs=1&pid=ImgDetMain" alt="Bank Image" class="bank-image">
           </div>
         </div>
         <div class="row">
-          <div class="checkbox">
-            <label for="invoice">Receiving Invoice</label>
-            <input id="invoice" type="checkbox">
+          <div class="col-md-12">
+            <button type="submit" class="btn btn-primary">CHECKOUT</button>
           </div>
-        </div>
-        <p>Phương thức thanh toán</p>
-        <div class="filter-cell">
-          <select class="form-control" >
-            <option value="*">thanh toán khi nhận hàng</option>
-            <option value="*">thanh toán trước</option>
-          </select>
         </div>
       </form>
 
-      <button class="btn">CHECKOUT</button>
     </div>
   </div>
+</div>
