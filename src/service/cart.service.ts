@@ -7,13 +7,15 @@ import { Dish } from '../models/dish.model';
 })
 export class CartService {
   private cartItems: Dish[] = [];
-  private cartSubject = new BehaviorSubject<any[]>([]);
+  private cartSubject = new BehaviorSubject<Dish[]>([]);
   private itemCountSubject = new BehaviorSubject<number>(0);
 
   constructor() { }
 
-  addToCart(item: Dish) {
-    const existingItem = this.cartItems.find(cartItem => cartItem.dishId === item.dishId);
+  addToCart(item: any, itemType: string) {
+    const existingItem = itemType === 'Dish' ? this.cartItems.find
+    (cartItem => cartItem.dishId === item.dishId) : this.cartItems.find
+    (cartItem => cartItem.comboId === item.comboId);
 
     if (existingItem) {
       existingItem.quantity++;
@@ -21,12 +23,11 @@ export class CartService {
       item.quantity = 1;
       this.cartItems.push(item);
     }
-    this.cartSubject.next([...this.cartItems]);
-    this.itemCountSubject.next(this.cartItems.length);
+
+    this.updateCartState();
   }
 
-
-  getCart() {
+  getCart(): Observable<Dish[]> {
     return this.cartSubject.asObservable();
   }
 
@@ -34,8 +35,30 @@ export class CartService {
     return this.itemCountSubject.asObservable();
   }
 
-  updateCart(cartItems: Dish[]) {
-    this.cartSubject.next([...cartItems]);
-    this.itemCountSubject.next(cartItems.reduce((total, item) => total + item.quantity, 0));
+  updateCart(cartItems: any[]) {
+    this.cartItems = cartItems;
+    this.updateCartState();
   }
+
+  removeFromCart(itemId: number, itemType: string) {
+    if (itemType === 'Dish') {
+      this.cartItems = this.cartItems.filter(item => item.dishId !== itemId);
+    } else if (itemType === 'Combo') {
+      this.cartItems = this.cartItems.filter(item => item.comboId !== itemId);
+    }
+
+    this.updateCartState();
+  }
+
+  clearCart() {
+    this.cartItems = [];
+    this.updateCartState();
+  }
+
+  private updateCartState() {
+    this.cartSubject.next([...this.cartItems]);
+    const itemCount = this.cartItems.length;  // Đếm số loại item
+    this.itemCountSubject.next(itemCount);
+  }
+
 }

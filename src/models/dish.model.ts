@@ -1,8 +1,12 @@
 export interface Dish{
-  dishId: string;
+  dishId: number;
   itemName:string;
   itemDescription:string;
   price:number;
   imageUrl:string;
+  categoryId:number;
+  discountId:number;
+  comboId:number;
+  nameCombo:string;
   quantity:number;
 }
