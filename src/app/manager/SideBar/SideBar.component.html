@@ -1,0 +1,42 @@
+<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+  <div class="position-sticky pt-3">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link active" [routerLink]="['/manager']" routerLinkActive="active">
+          <span data-feather="home"></span>
+          Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/managerdish']" routerLinkActive="active">
+          <span data-feather="file"></span>
+          Manager Menu
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/products']" routerLinkActive="active">
+          <span data-feather="shopping-cart"></span>
+          Products
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/customers']" routerLinkActive="active">
+          <span data-feather="users"></span>
+          Customers
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/reports']" routerLinkActive="active">
+          <span data-feather="bar-chart-2"></span>
+          Reports
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/integrations']" routerLinkActive="active">
+          <span data-feather="layers"></span>
+          Integrations
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
