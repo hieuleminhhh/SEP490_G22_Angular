@@ -1,0 +1,24 @@
+/* Custom button style */
+.btn-custom {
+    border-radius: 0; /* Optional: Adjust button border radius */
+    border: 2px solid #ccc; /* Increase border width */
+    background-color: #fff; /* Default background color (white) */
+    color: #007bff; /* Default text color (blue) */
+  }
+  
+  /* Highlight active button */
+  .btn-custom.active,
+  .btn-custom:focus {
+    background-color: #007bff; /* Active and focus background color (blue) */
+    color: #fff; /* Text color */
+  }
+  
+  /* Border between buttons */
+  .btn-group > .btn {
+    border-right: none; /* Remove right border for all buttons */
+  }
+  
+  .btn-group > .btn:last-child {
+    border-right: 2px solid rgba(0, 0, 0, 0.1); /* Add right border for last button */
+  }
+  

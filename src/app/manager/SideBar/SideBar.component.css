@@ -1,0 +1,37 @@
+#sidebarMenu {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding-top: 20px;
+  border-right: none;
+}
+
+#sidebarMenu .nav-item {
+  margin-bottom: 10px;
+}
+
+#sidebarMenu .nav-link {
+  color: #333;
+  font-weight: 500;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease;
+  border-radius: 5px; 
+}
+
+#sidebarMenu .nav-link:hover {
+  background-color: #e9ecef;
+  color: #007bff;
+}
+
+#sidebarMenu .nav-link.active {
+  background-color: #007bff;
+  color: white;
+}
+
+#sidebarMenu .nav-link span[data-feather] {
+  margin-right: 10px;
+  color: #6c757d;
+}
+
+#sidebarMenu .nav-link.active span[data-feather] {
+  color: white;
+}
