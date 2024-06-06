@@ -1,0 +1,179 @@
+<br>
+<br>
+<br>
+<br>
+
+<div class="card">
+  <div class="row">
+    <div class="col-md-8 cart">
+      <div class="title">
+        <div class="row">
+          <div class="col-md-6">
+            <h4><b>My Cart</b></h4>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="cartItems && cartItems.length > 0; else noItems">
+        <div class="cart-items">
+          <!-- Đây là vị trí của tiêu đề Quantity -->
+          <div class="row">
+            <div class="col-2"></div>
+            <div class="col"></div>
+            <div class="col">
+              <h5><b>Quantity</b></h5>
+            </div>
+            <div class="col">
+              <h5><b>Total Money</b></h5>
+            </div>
+          </div>
+          <div class="row border-top border-bottom" *ngFor="let item of cartItems">
+            <div class="row main align-items-center">
+              <div class="col-2">
+                <img class="img-fluid" [src]="item.imageUrl" alt="Item Image">
+              </div>
+              <div class="col">
+                <div>{{ item.itemName||item.nameCombo }}</div>
+              </div>
+              <div class="col">
+                <a (click)="decreaseQuantity(item)" class="icon">
+                  <i class="fas fa-minus"></i>
+                </a>
+                <span>{{ item.quantity }}</span>
+                <a (click)="increaseQuantity(item)" class="icon">
+                  <i class="fas fa-plus"></i>
+                </a>
+              </div>
+
+              <div class="col price-close" style="align-items:center;">
+                <span class="price">&dollar; {{ getTotalPrice(item) }}</span>
+                <span class="close" (click)="removeItem(item)">&#10005;</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 panel-footer basket-footer" *ngIf="cartItems && cartItems.length > 0; else no">
+
+        <div class="row">
+          <div class="col-8 align-left description">
+            <div class="dive">Subtotal</div>
+          </div>
+          <div class="col-8 align-right"><span class="emphasized"></span>&dollar; {{ getTotalCartPrice() }}</div>
+        </div>
+        <div class="row">
+          <div class="col-8 align-left description">
+            <div class="dive">Discount</div>
+          </div>
+          <div class="col-4 align-right"><span class="emphasized"></span>&dollar; 0</div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-8 align-left description">
+            <div class="dive">Total</div>
+          </div>
+          <div class="col-4 align-right"><span class="very emphasized"></span>&dollar;{{ getTotalCartPrice()}}</div>
+        </div>
+      </div>
+
+      <ng-template #noItems>
+        <div class="empty-cart" style="text-align: center;">
+          <p>Cart is empty</p>
+        </div>
+      </ng-template>
+
+
+      <ng-template #no>
+        <!-- Nội dung trống, không hiển thị gì cả -->
+      </ng-template>
+      <div class="back-to-shop">
+        <a routerLink="/menu" routerLinkActive="äctive"><i class="fas fa-arrow-left"></i></a>
+        <span class="text-muted">Go to menu</span>
+      </div>
+    </div>
+    <div class="col-md-4 summary" *ngIf="cartItems && cartItems.length > 0; else no">
+
+      <div>
+        <h5><b>Order Information</b></h5>
+      </div>
+      <hr>
+      <form (ngSubmit)="navigateToPayment()">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input id="name" [(ngModel)]="consigneeName" name="consigneeName" class="form-control form-control-sm" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+              <label for="date">Receiving Date</label>
+              <input id="date" [(ngModel)]="date" name="date" class="form-control form-control-sm" type="date">
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone</label>
+              <input id="phone" [(ngModel)]="guestPhone" name="guestPhone" class="form-control form-control-sm" placeholder="Enter your phone">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="address">Delivery address</label>
+              <input id="address" [(ngModel)]="address" name="address" class="form-control form-control-sm" placeholder="Enter your address">
+            </div>
+            <div class="form-group">
+              <label for="time">Receiving Time</label>
+              <input id="time" [(ngModel)]="time" name="time" class="form-control form-control-sm" type="time">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="note">Note</label>
+            <textarea id="note" [(ngModel)]="note" name="note" class="form-control form-control-lg" placeholder="Enter your note" ></textarea>
+          </div>
+        </div>
+
+        <hr>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="payment-method">Payment Method:</label>
+              <div>
+                <label class="radio-label">
+                  <input type="radio" name="paymentMethod" value="cash-on-delivery" [(ngModel)]="selectedPaymentMethod" checked>
+                  <span class="radio-text">Cash on delivery</span>
+                </label>
+              </div>
+              <div>
+                <label class="radio-label">
+                  <input type="radio" name="paymentMethod" value="banking" [(ngModel)]="selectedPaymentMethod">
+                  <span class="radio-text">Paying through bank</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="selectedPaymentMethod === 'banking'" class="split-container">
+          <div class="left-column">
+            <div class="form-group">
+              <label for="bank-name">BANK: BIDV</label>
+            </div>
+            <div class="form-group">
+              <label for="account-number">Number: 66668888</label>
+            </div>
+            <div class="form-group">
+              <label for="account-number">Name: FPT</label>
+            </div>
+          </div>
+          <div class="right-column">
+            <img src="https://th.bing.com/th/id/OIP.sjOCKD28ijkr5S0DpuB_XAHaHa?rs=1&pid=ImgDetMain" alt="Bank Image" class="bank-image">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" class="btn btn-primary">CHECKOUT</button>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

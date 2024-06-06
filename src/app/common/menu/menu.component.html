@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Page Title</title>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="filter-grid">
+        <div class="inner-wrap">
+          <div class="filter-cell">
+            <select class="form-control" (change)="onCategoryChange($event)" *ngIf="category$ | async as categories">
+              <option value="*">Category</option>
+              <option *ngFor="let category of categories" [value]="category.categoryName">
+                {{ category.categoryName }}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-cell">
+            <button (click)="selectedFilter = 'Combo'" class="sort-button">Combo</button>
+          </div>
+
+          <div class="filter-cell">
+            <select class="form-control">
+              <option>Sort</option>
+            </select>
+          </div>
+
+          <div class="filter-cell">
+            <select class="form-control">
+              <option>Search</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-wrap content-wrap">
+        <div class="product-grid" #productGrid id="product-grid">
+          <ng-container *ngIf="selectedFilter === 'Combo'; else dishesView">
+            <ng-container *ngIf="combo$ | async as combos">
+              <ng-container *ngIf="combos.length > 0; else noItems">
+                <div *ngFor="let item of combos; let i = index" class="grid-product square" style="width: auto;border: 2px solid rgb(0, 0, 0);">
+                  <div class="img-name" (click)="showDetails(item, 'combo')">
+                    <img [src]="item.imageUrl" [alt]="item.nameCombo" width="200" height="200">
+                    <h4>{{ item.nameCombo }}</h4>
+                  </div>
+                  <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>${{ item.price }}</span>
+                    <button (click)="addToCart(item, 'combo')" class="add-to-cart js-add-to-cart btn" >Order Now</button>
+                  </p>
+                </div>
+              </ng-container>
+              <ng-template #noItems>
+                <p>No combos found ...</p>
+              </ng-template>
+            </ng-container>
+          </ng-container>
+          <ng-template #dishesView>
+            <ng-container *ngIf="dishs$ | async as dishs">
+              <ng-container *ngIf="dishs.length > 0; else noDishes">
+                <div *ngFor="let item of dishs; let i = index" class="grid-product square" style="width: auto;border: 2px solid rgb(0, 0, 0);">
+                  <div class="img-name" (click)="showDetails(item, 'dish')">
+                    <img [src]="item.imageUrl" [alt]="item.itemName" width="200" height="200">
+                    <h4>{{ item.itemName }}</h4>
+                  </div>
+                  <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>${{ item.price }}</span>
+                    <button (click)="addToCart(item, 'dish')" class="add-to-cart js-add-to-cart btn" >Order Now</button>
+                  </p>
+                </div>
+              </ng-container>
+              <ng-template #noDishes>
+                <p>No dishes found ...</p>
+              </ng-template>
+            </ng-container>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="pagination">
+        <button (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
+        <span>Page {{ currentPage }}</span>
+        <button (click)="nextPage()">Next</button>
+      </div>
+
+      <div class="sticky"></div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="inner-wrap"></div>
+    </footer>
+
+    <div *ngFor="let message of successMessages; let i = index" class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Success!</h5>
+          <button type="button" class="close" aria-label="Close" (click)="closeModal(i)">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{ message }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Popup for item details -->
+<div *ngIf="selectedItem" class="popup" (click)="closePopup()">
+  <div class="popup-content" (click)="$event.stopPropagation()">
+    <span class="close" (click)="closePopup()">&times;</span>
+    <div class="details-container">
+      <div class="image-container">
+        <img *ngIf="selectedItem.imageUrl" [src]="selectedItem.imageUrl" alt="{{ selectedItem.nameCombo || selectedItem.itemName }}" width="200" height="200">
+      </div>
+      <div class="info-container">
+        <h2>{{ selectedItem.nameCombo || selectedItem.itemName }}</h2>
+        <p> ${{ selectedItem.price }}</p>
+        <p>{{ selectedItem.itemDescription }}</p>
+        <!-- Add more detailed information as needed -->
+        <button (click)="addToCart(selectedItem, 'dish')" class="add-to-cart btn" style="margin-left: 200px;">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </body>
+</html>

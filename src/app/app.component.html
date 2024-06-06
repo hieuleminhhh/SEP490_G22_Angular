@@ -1,0 +1,10 @@
+<div *ngIf="loggedIn$ | async; else notLoggedIn">
+    <router-outlet></router-outlet>
+  </div>
+  
+  <ng-template #notLoggedIn>
+    <app-navbar></app-navbar>
+    <router-outlet></router-outlet>
+    <app-footer></app-footer>
+  </ng-template>
+  
