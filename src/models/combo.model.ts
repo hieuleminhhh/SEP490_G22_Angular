@@ -3,4 +3,5 @@ export interface Combo{
   nameCombo:string;
   price:number;
   note:string;
+  imageUrl:string;
 }
