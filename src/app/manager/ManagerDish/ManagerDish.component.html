@@ -1,0 +1,189 @@
+<br>
+<br>
+<br>
+<br>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <app-SideBar></app-SideBar>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+              <app-Header></app-Header>
+                <h2 class="h2">Manager Dish</h2>
+                
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="input-group">
+                      <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="button-addon2" [(ngModel)]="search">
+                        <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="onSearch()">Search</button>
+                    </div>
+                    
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addDishModal">Add New Dish <i class="bi bi-plus"></i></button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Item Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Image</th>
+                    <th>Category Name</th>
+                    <th>Active</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let list of dishes">
+                    <tr *ngFor="let dish of list.items">
+                      <td>{{ dish.itemName }}</td>
+                      <td>{{ dish.itemDescription }}</td>
+                      <td>{{ dish.price }}</td>
+                      <td><img [src]="dish.imageUrl" [alt]="dish.itemName" *ngIf="dish.imageUrl"></td>
+                      <td>{{ dish.categoryName }}</td>
+                      <td>
+                        <input type="checkbox" (change)="onCheckboxChange($event, dish.dishId)" [checked]="dish.isActive">
+                        {{ dish.isActive ? 'Enable' : 'Disable' }}
+                      </td>
+                      <td>
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateDishModal">Update</button>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+                
+              
+              </table>
+              <nav aria-label="Page navigation">
+                <ul class="pagination">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <a class="page-link" (click)="onPageChange(currentPage - 1)">Previous</a>
+                  </li>
+                  <li class="page-item" *ngFor="let page of totalPagesArray" [class.active]="page === currentPage">
+                    <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
+                  </li>
+                  <li class="page-item" [class.disabled]="currentPage === totalPagesArray.length">
+                    <a class="page-link" (click)="onPageChange(currentPage + 1)">Next</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+            
+        </main>
+    </div>
+</div>
+
+<!-- Add Dish Modal -->
+<div class="modal fade" id="addDishModal" tabindex="-1" aria-labelledby="addDishModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addDishModalLabel">Add New Dish</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="createDish()">
+          <div class="mb-3">
+            <label for="itemName" class="form-label">Item Name</label>
+            <input type="text" class="form-control" id="itemName" placeholder="Enter item name" [(ngModel)]="addNew.itemName" name="itemName">
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" rows="3" placeholder="Enter description" [(ngModel)]="addNew.itemDescription" name="itemDescription"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="price" class="form-label">Price</label>
+            <input type="text" class="form-control" id="price" placeholder="Enter price" [(ngModel)]="addNew.price" name="price">
+          </div>
+          <div class="mb-3">
+            <label for="image" class="form-label">Image</label>
+            <input type="file" class="form-control" id="image" (change)="onImageSelect($event)">
+          </div>
+          <div class="mb-3 custom-select">
+            <label for="category" class="form-label">Category Name</label>
+            <div class="select-wrapper">
+              <select class="form-control" id="category" [(ngModel)]="addNew.categoryId" name="categoryName">
+                <option disabled [selected]="addNew.categoryId === null" value="">-- Select a category --</option>
+                <option *ngFor="let category of categories" [value]="category.categoryId">{{ category.categoryName }}</option>
+              </select>
+              <div class="select-arrow"></div>
+            </div>
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" checked="true" id="isActive" [(ngModel)]="addNew.isActive" name="isActive" class="form-check-input">
+            <label for="isActive" class="form-check-label">Active</label>
+        </div>
+        
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div>
+  
+</div>
+  
+  
+  <!-- Update Dish Modal -->
+<div class="modal fade" id="updateDishModal" tabindex="-1" aria-labelledby="updateDishModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addDishModalLabel">Add New Dish</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="itemName" class="form-label">Item Name</label>
+              <input type="text" class="form-control" id="itemName" placeholder="Enter item name">
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea class="form-control" id="description" rows="3" placeholder="Enter description"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="price" class="form-label">Price</label>
+              <input type="text" class="form-control" id="price" placeholder="Enter price">
+            </div>
+            <div class="mb-3">
+              <label for="image" class="form-label">Image</label>
+              <input type="file" class="form-control" id="image">
+            </div>
+            <div class="mb-3">
+              <label for="category" class="form-label">Category Name</label>
+              <input type="text" class="form-control" id="category" placeholder="Enter category name">
+            </div>
+            <div class="mb-3">
+              <label for="discountStatus" class="form-label">Discount Status</label>
+              <select class="form-select" id="discountStatus">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+
+
