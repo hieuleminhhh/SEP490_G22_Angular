@@ -25,10 +25,8 @@ export class MenuComponent{
   category$ = this.getCategory();
   dishService: any;
   selectedItem: any;
-
-  // Phân trang
-  currentPage: number = 1;
-  itemsPerPage: number = 4;
+  selectedSortOption: string = '';
+  selectedCategory: string = '';
 
   constructor(private cartService: CartService, private categoryService: CategoryService, private cdr: ChangeDetectorRef) {
     this.dishs$ = this.getDish();
@@ -36,9 +34,54 @@ export class MenuComponent{
     this.combo$ = this.getCombo();
   }
 
-  private getDish(): Observable<Dish[]>{
-    return this.http.get<Dish[]>('https://localhost:7188/api/Dish');
+  private getDish(categoryName?: string, sortOption?: string): Observable<Dish[]> {
+    let apiUrl = 'https://localhost:7188/api/Dish';
+
+    // Xây dựng URL API dựa trên category và sortOption
+    if (categoryName) {
+      apiUrl += `?category=${categoryName}`;
+      if (sortOption) {
+        switch (sortOption) {
+          case 'From A to Z':
+            apiUrl += '&sort=asc';
+            break;
+          case 'From Z to A':
+            apiUrl += '&sort=desc';
+            break;
+          case 'Descending Price':
+            apiUrl += '&sort=priceDesc';
+            break;
+          case 'Ascending Price':
+            apiUrl += '&sort=priceAsc';
+            break;
+          default:
+            break;
+        }
+      }
+    } else if (sortOption) {
+      // Nếu không có category nhưng có sortOption, chỉ áp dụng sắp xếp
+      switch (sortOption) {
+        case 'From A to Z':
+          apiUrl += '/sorted?sortField=0&sortOrder=0';
+          break;
+        case 'From Z to A':
+          apiUrl += '/sorted?sortField=0&sortOrder=1';
+          break;
+        case 'Descending Price':
+          apiUrl += '/sorted?sortField=1&sortOrder=1';
+          break;
+        case 'Ascending Price':
+          apiUrl += '/sorted?sortField=1&sortOrder=0';
+          break;
+        default:
+          break;
+      }
+    }
+
+    return this.http.get<Dish[]>(apiUrl);
   }
+
+
 
   private getCombo(): Observable<Combo[]>{
     return this.http.get<Combo[]>('https://localhost:7188/api/Combo');
@@ -46,6 +89,25 @@ export class MenuComponent{
 
   private getCategory():Observable<Category[]>{
     return this.http.get<Category[]>('https://localhost:7188/api/Category');
+  }
+
+  // onSortChange(event: Event) {
+  //   const target = event.target as HTMLSelectElement;
+  //   const sortOption = target.value;
+
+  //   // Gọi lại getDish với tùy chọn sắp xếp mới
+  //   this.dishs$ = this.getDish(sortOption);
+  // }
+
+  onSortChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const sortOption = target.value;
+
+    // Lưu sortOption để sử dụng khi gọi lại getDish
+    this.selectedSortOption = sortOption;
+
+    // Gọi lại getDish với sortOption mới và category hiện tại
+    this.dishs$ = this.getDish(this.selectedCategory, sortOption);
   }
 
   addToCart(item: any, itemType: string) {
@@ -93,29 +155,6 @@ export class MenuComponent{
 
   closePopup() {
     this.selectedItem = null;
-  }
-
-  // Các hàm xử lý phân trang
-  get pagedDishes$(): Observable<Dish[]> {
-    return this.dishs$.pipe(
-      map(dishes => dishes.slice((this.currentPage - 1) * this.itemsPerPage, this.currentPage * this.itemsPerPage))
-    );
-  }
-
-  get pagedCombos$(): Observable<Combo[]> {
-    return this.combo$.pipe(
-      map(combos => combos.slice((this.currentPage - 1) * this.itemsPerPage, this.currentPage * this.itemsPerPage))
-    );
-  }
-
-  nextPage() {
-    this.currentPage++;
-  }
-
-  prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-    }
   }
 
 }

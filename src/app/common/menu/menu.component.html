@@ -24,10 +24,15 @@
           </div>
 
           <div class="filter-cell">
-            <select class="form-control">
+            <select class="form-control" (change)="onSortChange($event)">
               <option>Sort</option>
+              <option>From A to Z</option>
+              <option>From Z to A</option>
+              <option>Descending Price</option>
+              <option>Ascending Price</option>
             </select>
           </div>
+
 
           <div class="filter-cell">
             <select class="form-control">
@@ -67,8 +72,9 @@
                     <h4>{{ item.itemName }}</h4>
                   </div>
                   <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>${{ item.price }}</span>
-                    <button (click)="addToCart(item, 'dish')" class="add-to-cart js-add-to-cart btn" >Order Now</button>
+                    <span *ngIf="item.discountedPrice" class="discounted-price">${{ item.discountedPrice }}</span>
+                    <span [class]="item.discountedPrice ? 'original-price' : 'no-discount'">${{ item.price }}</span>
+                    <button (click)="addToCart(item, 'dish')" class="add-to-cart js-add-to-cart btn small-btn">Order Now</button>
                   </p>
                 </div>
               </ng-container>
@@ -78,12 +84,6 @@
             </ng-container>
           </ng-template>
         </div>
-      </div>
-
-      <div class="pagination">
-        <button (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
-        <span>Page {{ currentPage }}</span>
-        <button (click)="nextPage()">Next</button>
       </div>
 
       <div class="sticky"></div>
