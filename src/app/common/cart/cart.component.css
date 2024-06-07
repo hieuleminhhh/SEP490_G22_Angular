@@ -194,7 +194,6 @@ span {
 #date,
 #time {
   display: inline-block;
-  width: 80%;
   margin-right: 4%;
 }
 .form-group {

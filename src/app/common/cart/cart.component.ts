@@ -95,12 +95,6 @@ export class CartComponent implements OnInit, OnDestroy {
 
   navigateToPayment(): void {
     const receivingTime = this.formatDateTime(this.date, this.time);
-    let pay = '';
-    if (this.selectedPaymentMethod === 'banking') {
-      pay = 'chờ xác nhận';
-    }else{
-      pay = 'unpaid';
-    }
     const request = {
       guestPhone: this.guestPhone,
       email: this.email,
@@ -108,10 +102,10 @@ export class CartComponent implements OnInit, OnDestroy {
       guestAddress: this.address,
       consigneeName: this.consigneeName,
       orderDate: new Date().toISOString(),
-      status: 'pending',
-      paymentStatus: pay,
+      status: 0,
       recevingOrder: receivingTime,
       totalAmount: 0,
+      deposits: 0,
       cartItems: this.cartItems.map(item => ({
         unitPrice: 0,
         quantity: item.quantity,
@@ -119,15 +113,21 @@ export class CartComponent implements OnInit, OnDestroy {
         dishId: item.dishId,
         orderId: 0,
         dishesServed: 0,
-        comboId: 0
+        comboId: item.comboId
       }))
     };
+    console.log(request);
       this.checkoutService.submitOrder(request).subscribe({
         next: response => {
           console.log('Order submitted successfully', response);
           this.cartService.clearCart();
-          // Chuyển hướng đến trang thanh toán
-          this.router.navigate(['/payment'], { queryParams: { phone: this.guestPhone } });
+          if (this.selectedPaymentMethod === 'banking') {
+            // Chuyển hướng đến trang quét mã nếu chọn "Paying through bank"
+            this.router.navigate(['/payment-scan'], { queryParams: { phone: this.guestPhone } });
+          } else {
+            // Chuyển hướng đến trang thanh toán thông thường
+            this.router.navigate(['/payment'], { queryParams: { phone: this.guestPhone } });
+          }
         },
         error: error => {
           console.error('Error submitting order', error);
