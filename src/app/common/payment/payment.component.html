@@ -3,122 +3,123 @@
 <br>
 <br>
 <br>
-<div class="order-info">
-  <div class="row">
-    <div class="col-md-4">
-      <div class="card">
-        <div>
-          <h5 style="text-align: center;"><b>Order Information</b></h5>
-        </div>
-        <hr>
-        <div class="order-details">
-          <div class="row">
-            <div class="form-group">
-              <label for="name">Name : </label>
-            </div>
-            <div class="form-group">
-              <label for="address">Delivery address: </label>
-            </div>
-            <div class="form-group">
-              <label for="phone">Phone: </label>
-            </div>
 
-            <div class="form-group">
-              <label for="time">Receiving Time: </label>
-            </div>
-            <div class="form-group">
-              <label for="note">Note:</label>
+<div>
+  <div class="order-info">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card">
+          <div>
+            <h5 style="text-align: center;"><b>Order Information</b></h5>
+          </div>
+          <hr>
+          <div class="order-details" *ngIf="data">
+            <div class="row">
+              <div class="form-group">
+                <label for="name">Name :</label>
+                <span style="float: right; font-weight: bold;" >{{data?.consigneeName}}</span>
+              </div>
+              <div class="form-group">
+                <label for="email">Email :</label>
+                <span style="float: right; font-weight: bold;">{{data?.email}}</span>
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone:</label>
+                <span style="float: right; font-weight: bold;">{{data?.guestPhone}}</span>
+              </div>
+              <div class="form-group">
+                <label for="time">Receiving Time:</label>
+                <span style="float: right; font-weight: bold;">{{data?.receivingTime | date:'dd/MM/yyyy'}} at {{data?.receivingTime | date:'shortTime'}}</span>
+              </div>
+              <div class="form-group">
+                <label for="address">Delivery Address:</label>
+              </div>
+              <div class="form-group">
+                <span style="font-weight: bold;">{{data?.guestAddress}}</span>
+              </div>
+              <div class="form-group">
+                <label for="address">Note:</label>
+              </div>
+              <div class="form-group">
+                <span style="font-weight: bold;">{{data?.orderDetails[0]?.note}}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="col-md-8">
-      <div class="card">
-        <div class="title">
-          <div class="row">
-            <h4 style="text-align: center;"><b>Order Successfully</b></h4>
-            <h2 style="text-align: center;"><b>Chung toi se lien lac voi ban sau it phut de xac nhan don hang</b></h2>
-            <h4 style="text-align: center;"><b>Thanh you!</b></h4>
-            <div class="col align-self-center text-right text-muted"></div>
-          </div>
-        </div>
-        <div>
-          <div class="cart-items">
-            <!-- Đây là vị trí của tiêu đề Quantity -->
+      <div class="col-md-8">
+        <div class="card">
+          <div class="title">
             <div class="row">
-              <div class="col-2"></div>
-              <div class="col"></div>
-              <div class="col">
-                <h5><b>Quantity</b></h5>
-              </div>
-              <div class="col">
-                <h5><b>Total Money</b></h5>
-              </div>
+              <h4 style="text-align: center;"><b>Order Successfully</b></h4>
+              <h4 style="text-align: center;"><b>Thank you!</b></h4>
+              <div class="col align-self-center text-right text-muted"></div>
             </div>
-            <div class="row border-top border-bottom">
-              <div class="row main align-items-center">
-                <div class="col-2">
-                  <img class="img-fluid" alt="Item Image">
+          </div>
+          <div>
+            <div class="cart-items">
+              <!-- Đây là vị trí của tiêu đề Quantity -->
+              <div class="row">
+                <div class="col-2"></div>
+                <div class="col"></div>
+                <div class="col">
+                  <h5><b>Quantity</b></h5>
                 </div>
                 <div class="col">
-                  <div></div>
+                  <h5><b>Total Money</b></h5>
                 </div>
-                <div class="col">
-                  <span></span>
-                </div>
+              </div>
 
-                <div class="col price-close" style="align-items:center;">
-                  <span class="price">&dollar; </span>
+              <!-- Iterate over the orderDetails array -->
+              <div *ngFor="let item of data?.orderDetails" class="row border-top border-bottom">
+                <div class="row main align-items-center">
+                  <div class="col-2">
+                    <img class="img-fluid" [src]="item.imageUrl" alt="Item Image" style="max-width: 100%; height: 56px;">
+                  </div>
+                  <div class="col">
+                    <div>{{ item.itemName || item.nameCombo }}</div>
+                  </div>
+                  <div class="col">
+                    <span>{{ item.quantity }}</span>
+                  </div>
+                  <div class="col price-close" style="align-items:center;">
+                    <span class="price">&dollar; {{ item.unitPrice}}</span>
+                  </div>
                 </div>
-
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="col-12 panel-footer basket-footer">
-          <hr>
-          <div class="row">
-            <div class="col-8 align-right description">
-              <div class="dive">Subtotal</div>
-            </div>
-            <div class="col-4 align-right"><span class="emphasized"></span>&dollar; </div>
-          </div>
-          <div class="row">
-            <div class="col-8 align-right description">
-              <div class="dive">Taxes</div>
-            </div>
-            <div class="col-4 align-right"><span class="emphasized"></span>&dollar;</div>
-          </div>
-          <div class="row">
-            <div class="col-8 align-right description">
-              <div class="dive">Shipping</div>
-            </div>
-            <div class="col-4 align-right"><span class="emphasized"></span>&dollar; 5</div>
+          <div class="col-12 panel-footer basket-footer" *ngIf="data">
             <hr>
-            <div class="row">
+            <div class="row align-items-start">
+              <div class="col-8 align-right description">
+                <div class="dive">Subtotal</div>
+              </div>
+              <div class="col-4 align-right" style="text-align: right;"><span class="emphasized"></span>&dollar; {{data?.totalAmount}}</div>
+            </div>
+            <div class="row align-items-start">
+              <div class="col-8 align-right description">
+                <div class="dive">Shipping</div>
+              </div>
+              <div class="col-4 align-right" style="text-align: right;"><span class="emphasized"></span> Store will call to confirm the delivery fee</div>
+            </div>
+            <hr>
+            <div class="row align-items-start">
               <div class="col-8 align-right description">
                 <div class="dive">Total</div>
               </div>
-              <div class="col-4 align-right"><span class="very emphasized"></span>&dollar;</div>
+              <div class="col-4 align-right" style="text-align: right;"><span class="very emphasized"></span>&dollar; {{data?.totalAmount}}</div>
             </div>
-            <ng-template #noItems>
-              <div class="empty-cart" style="text-align: center;">
-                <p>Cart is empty</p>
-              </div>
-            </ng-template>
-            <ng-template #no>
-              <!-- Empty content -->
-            </ng-template>
-
           </div>
-        </div>
 
-        <div class="back-to-shop">
-          <a routerLink="/menu" routerLinkActive="äctive"><i class="fas fa-arrow-left"></i></a>
-          <span class="text-muted">Go to menu</span>
+          <div class="back-to-shop">
+            <a routerLink="/menu" routerLinkActive="active"><i class="fas fa-arrow-left"></i>Go to menu</a>
+            <button class="btn btn-danger">Cancel Your Order</button>
+          </div>
+
         </div>
       </div>
     </div>
   </div>
+</div>

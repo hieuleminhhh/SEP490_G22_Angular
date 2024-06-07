@@ -292,3 +292,24 @@ button.add-to-cart {
 button.add-to-cart:hover {
   background-color: #45a049;
 }
+.discounted-price {
+  color: red; /* Màu đỏ cho giá đã giảm */
+  font-weight: bold; /* In đậm giá đã giảm */
+}
+
+.original-price {
+  text-decoration: line-through; /* Gạch ngang giá gốc */
+  color: gray; /* Màu xám cho giá gốc */
+}
+
+.no-discount {
+  text-decoration: none; /* Bỏ gạch ngang nếu không có giá giảm */
+  color: black; /* Màu đen cho giá gốc nếu không có giá giảm */
+}
+
+.small-btn {
+  padding: 5px 10px; /* Điều chỉnh padding để làm nhỏ nút */
+  font-size: 12px; /* Điều chỉnh kích thước chữ */
+  line-height: 1.5; /* Điều chỉnh line-height để căn chỉnh chữ */
+}
+
