@@ -54,13 +54,19 @@ export class CartComponent implements OnInit, OnDestroy {
     });
   }
 
-  getTotalPrice(item: any): number {
-    return item.quantity * item.price;
-  }
+   getTotalPrice(item: any): number {
+    const price = item.discountedPrice != null ? item.discountedPrice : item.price;
+    return item.quantity * price;
+}
+
 
   getTotalCartPrice(): number {
-    return this.cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-  }
+  return this.cartItems.reduce((total, item) => {
+      const price = item.discountedPrice != null ? item.discountedPrice : item.price;
+      return total + (price * item.quantity);
+  }, 0);
+}
+
 
   getItemNames(): string[] {
     return Object.keys(this.itemQuantityMap);
@@ -91,8 +97,6 @@ export class CartComponent implements OnInit, OnDestroy {
     this.itemCountSubscription.unsubscribe();
   }
 
-
-
   navigateToPayment(): void {
     const receivingTime = this.formatDateTime(this.date, this.time);
     const request = {
@@ -107,7 +111,7 @@ export class CartComponent implements OnInit, OnDestroy {
       totalAmount: 0,
       deposits: 0,
       cartItems: this.cartItems.map(item => ({
-        unitPrice: 0,
+        unitPrice: this.getTotalPrice(item),
         quantity: item.quantity,
         note: this.note,
         dishId: item.dishId,
@@ -123,10 +127,10 @@ export class CartComponent implements OnInit, OnDestroy {
           this.cartService.clearCart();
           if (this.selectedPaymentMethod === 'banking') {
             // Chuyển hướng đến trang quét mã nếu chọn "Paying through bank"
-            this.router.navigate(['/payment-scan'], { queryParams: { phone: this.guestPhone } });
+            this.router.navigate(['/payment-scan'], { queryParams: { guestPhone: this.guestPhone } });
           } else {
             // Chuyển hướng đến trang thanh toán thông thường
-            this.router.navigate(['/payment'], { queryParams: { phone: this.guestPhone } });
+            this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone } });
           }
         },
         error: error => {

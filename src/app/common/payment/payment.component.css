@@ -79,9 +79,24 @@ a{
 img{
   width: 3.5rem;
 }
-.back-to-shop{
-  margin-top: 4.5rem;
+.back-to-shop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+
+.back-to-shop button {
+  background-color: red;
+  flex-grow: 0; /* Không cho phép nút mở rộng */
+  width: auto; /* Đảm bảo kích thước tự động phù hợp với nội dung */
+  margin-right: 10px;
+  margin-bottom: 30px;
+  font-size: 15px
+}
+.back-to-shop a  {
+  font-size: 20px; /* Kích thước chữ mong muốn */
+}
+
 h5{
   margin-top: 4vh;
 }
