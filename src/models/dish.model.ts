@@ -10,6 +10,7 @@ export interface Dish{
   comboId:number;
   nameCombo:string;
   quantity:number;
+  unitPrice:number;
   isActive:boolean;
 }
 export interface AddNewDish{
