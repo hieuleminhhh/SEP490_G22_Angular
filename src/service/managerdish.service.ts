@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { AddNewDish, ListAllDishes, ManagerDish } from '../models/dish.model';
+import { Observable, catchError, throwError } from 'rxjs';
+import { AddNewDish, ListAllDishes, ManagerDish, UpdateDish } from '../models/dish.model';
 import { Category } from '../models/category.model';
 
 const httpOptions = {
@@ -25,16 +25,22 @@ export class ManagerDishService {
         console.log('Request URL:', url, 'Params:', params.toString());  
     return this.http.get<ListAllDishes>(`${this.apiUrl}/Dish/ListDishes`, { params });
   }
+    getDishById(dishId: number): Observable<UpdateDish> {
+    const url = `${this.apiUrl}/Dish/${dishId}`; 
+    return this.http.get<UpdateDish>(url);
+    } 
     AddNewDish(newDish: AddNewDish): Observable<AddNewDish> {
-      return this.http.post<AddNewDish>(this.apiUrl+'/Dish', newDish, httpOptions);
+      return this.http.post<AddNewDish>(this.apiUrl+'/Dish', newDish, httpOptions)
+        .pipe(
+          catchError((error: any) => { 
+            console.error('An error occurred:', error);
+            return throwError(error);
+          })
+        );
     }
-    UpdateDish(updatedDish: ManagerDish): Observable<ManagerDish> {
-      const url = '${this.apiUrl}/${updatedDish.id}';
-      return this.http.put<ManagerDish>(url, updatedDish, httpOptions);
-    }
-    DeleteDish(dishId: number): Observable<void> {
-      const url = '${this.apiUrl}/${dishId}';
-      return this.http.delete<void>(url, httpOptions);
+    UpdateDish(updatedDish: UpdateDish): Observable<UpdateDish> {
+      const url = `${this.apiUrl}/Dish/${updatedDish.dishId}`;
+      return this.http.put<UpdateDish>(url, updatedDish, httpOptions);
     }
     GetCategories(): Observable<Category[]> {
       return this.http.get<Category[]>(this.apiUrl+'/Category');

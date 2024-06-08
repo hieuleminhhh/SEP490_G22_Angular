@@ -20,6 +20,15 @@ export interface AddNewDish{
   imageUrl: string,
   categoryId: string,
   isActive?: boolean;
+  message: string;
+}
+export interface UpdateDish{
+  dishId: number;
+  itemName: string,
+  itemDescription:string,
+  price: number,
+  imageUrl: string,
+  categoryId: string,
 }
 export interface ListAllDishes {
   items: ManagerDish[];
@@ -36,5 +45,6 @@ export interface ManagerDish {
   price: number;
   imageUrl: string;
   categoryName: string;
+  categoryId: string,
   isActive: boolean;
 }
