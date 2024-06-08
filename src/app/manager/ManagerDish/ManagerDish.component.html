@@ -14,7 +14,9 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
               <app-Header></app-Header>
                 <h2 class="h2">Manager Dish</h2>
-                
+                <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11; right: 20px;">
+                  <div *ngIf="addSuccessMessage" class="alert alert-success" style="max-width: 300px;">{{ addSuccessMessage }}</div>
+              </div>             
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="input-group">
                       <div class="input-group">
@@ -55,7 +57,7 @@
                         {{ dish.isActive ? 'Enable' : 'Disable' }}
                       </td>
                       <td>
-                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateDishModal">Update</button>
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateDishModal" (click)="getDishById(dish.dishId)">Update</button>
                       </td>
                     </tr>
                   </ng-container>
@@ -83,30 +85,34 @@
 </div>
 
 <!-- Add Dish Modal -->
-<div class="modal fade" id="addDishModal" tabindex="-1" aria-labelledby="addDishModalLabel" aria-hidden="true">
+<div class="modal fade" #addDishModal id="addDishModal" tabindex="-1" aria-labelledby="addDishModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="addDishModalLabel">Add New Dish</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body">       
         <form (ngSubmit)="createDish()">
           <div class="mb-3">
             <label for="itemName" class="form-label">Item Name</label>
             <input type="text" class="form-control" id="itemName" placeholder="Enter item name" [(ngModel)]="addNew.itemName" name="itemName">
+            <div *ngIf="itemNameError" class="alert alert-danger">{{ itemNameError }}</div>
           </div>
           <div class="mb-3">
             <label for="description" class="form-label">Description</label>
             <textarea class="form-control" id="description" rows="3" placeholder="Enter description" [(ngModel)]="addNew.itemDescription" name="itemDescription"></textarea>
+            <div *ngIf="descriptionError" class="alert alert-danger">{{ descriptionError }}</div>
           </div>
           <div class="mb-3">
             <label for="price" class="form-label">Price</label>
             <input type="text" class="form-control" id="price" placeholder="Enter price" [(ngModel)]="addNew.price" name="price">
+            <div *ngIf="priceError" class="alert alert-danger">{{ priceError }}</div>
           </div>
           <div class="mb-3">
             <label for="image" class="form-label">Image</label>
             <input type="file" class="form-control" id="image" (change)="onImageSelect($event)">
+            <div *ngIf="imageError" class="alert alert-danger">{{ imageError }}</div>
           </div>
           <div class="mb-3 custom-select">
             <label for="category" class="form-label">Category Name</label>
@@ -115,74 +121,71 @@
                 <option disabled [selected]="addNew.categoryId === null" value="">-- Select a category --</option>
                 <option *ngFor="let category of categories" [value]="category.categoryId">{{ category.categoryName }}</option>
               </select>
-              <div class="select-arrow"></div>
             </div>
+            <div *ngIf="categoryError" class="alert alert-danger">{{ categoryError }}</div>
           </div>
-          <div class="mb-3 form-check">
-            <input type="checkbox" checked="true" id="isActive" [(ngModel)]="addNew.isActive" name="isActive" class="form-check-input">
-            <label for="isActive" class="form-check-label">Active</label>
-        </div>
-        
+          
+          
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-primary">Save changes</button>
           </div>
         </form>
+        
       </div>
     </div>
   </div>
 </div>
-<div>
-  
-</div>
+
   
   
   <!-- Update Dish Modal -->
-<div class="modal fade" id="updateDishModal" tabindex="-1" aria-labelledby="updateDishModal" aria-hidden="true">
+  <div class="modal fade" id="updateDishModal" tabindex="-1" aria-labelledby="updateDishModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="addDishModalLabel">Add New Dish</h5>
+          <h5 class="modal-title" id="updateDishModalLabel">Update Dish</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form>
             <div class="mb-3">
               <label for="itemName" class="form-label">Item Name</label>
-              <input type="text" class="form-control" id="itemName" placeholder="Enter item name">
+              <input type="text" class="form-control" id="itemName" placeholder="Enter item name" [(ngModel)]="updatedDish.itemName" name="itemName">
             </div>
             <div class="mb-3">
               <label for="description" class="form-label">Description</label>
-              <textarea class="form-control" id="description" rows="3" placeholder="Enter description"></textarea>
+              <textarea class="form-control" id="description" rows="3" placeholder="Enter description" [(ngModel)]="updatedDish.itemDescription" name="itemDescription"></textarea>
             </div>
             <div class="mb-3">
               <label for="price" class="form-label">Price</label>
-              <input type="text" class="form-control" id="price" placeholder="Enter price">
+              <input type="text" class="form-control" id="price" placeholder="Enter price" [(ngModel)]="updatedDish.price" name="price">
             </div>
             <div class="mb-3">
               <label for="image" class="form-label">Image</label>
-              <input type="file" class="form-control" id="image">
+              <input type="file" class="form-control" id="image" (change)="onUpdateImageSelect($event)">
+              <img *ngIf="updatedDish.imageUrl" [src]="updatedDish.imageUrl" class="img-thumbnail" alt="Current Image">
             </div>
-            <div class="mb-3">
+            <div class="mb-3 custom-select">
               <label for="category" class="form-label">Category Name</label>
-              <input type="text" class="form-control" id="category" placeholder="Enter category name">
-            </div>
-            <div class="mb-3">
-              <label for="discountStatus" class="form-label">Discount Status</label>
-              <select class="form-select" id="discountStatus">
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
+              <div class="select-wrapper">
+                  <select class="form-control" id="category" [(ngModel)]="updatedDish.categoryId" name="categoryName">
+                      <option disabled [ngValue]="null" [selected]="!updatedDish.categoryId">-- Select a category --</option>
+                      <option *ngFor="let category of categories" [ngValue]="category.categoryId">{{ category.categoryName }}</option>
+                  </select>
+                  <div class="select-arrow"></div>
+              </div>
+          </div>         
           </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-primary" (click)="updateDish()">Save changes</button>
         </div>
       </div>
     </div>
-  </div>
+</div>
+
   
   
 
