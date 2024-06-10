@@ -97,92 +97,98 @@
           <div class="mb-3">
             <label for="itemName" class="form-label">Item Name</label>
             <input type="text" class="form-control" id="itemName" placeholder="Enter item name" [(ngModel)]="addNew.itemName" name="itemName">
-            <div *ngIf="itemNameError" class="alert alert-danger">{{ itemNameError }}</div>
+            <div *ngIf="addErrors.itemNameError" class="alert alert-danger">{{ addErrors.itemNameError }}</div>
           </div>
           <div class="mb-3">
             <label for="description" class="form-label">Description</label>
             <textarea class="form-control" id="description" rows="3" placeholder="Enter description" [(ngModel)]="addNew.itemDescription" name="itemDescription"></textarea>
-            <div *ngIf="descriptionError" class="alert alert-danger">{{ descriptionError }}</div>
+            <div *ngIf="addErrors.descriptionError" class="alert alert-danger">{{ addErrors.descriptionError }}</div>
           </div>
           <div class="mb-3">
             <label for="price" class="form-label">Price</label>
-            <input type="text" class="form-control" id="price" placeholder="Enter price" [(ngModel)]="addNew.price" name="price">
-            <div *ngIf="priceError" class="alert alert-danger">{{ priceError }}</div>
+            <input type="number" class="form-control" id="price" placeholder="Enter price" [(ngModel)]="addNew.price" name="price">
+            <div *ngIf="addErrors.priceError" class="alert alert-danger">{{ addErrors.priceError }}</div>
           </div>
           <div class="mb-3">
             <label for="image" class="form-label">Image</label>
             <input type="file" class="form-control" id="image" (change)="onImageSelect($event)">
-            <div *ngIf="imageError" class="alert alert-danger">{{ imageError }}</div>
+            <div *ngIf="addErrors.imageError" class="alert alert-danger">{{ addErrors.imageError }}</div>
           </div>
           <div class="mb-3 custom-select">
             <label for="category" class="form-label">Category Name</label>
             <div class="select-wrapper">
-              <select class="form-control" id="category" [(ngModel)]="addNew.categoryId" name="categoryName">
+              <select class="form-control" id="category" [(ngModel)]="addNew.categoryId" name="categoryId">
                 <option disabled [selected]="addNew.categoryId === null" value="">-- Select a category --</option>
                 <option *ngFor="let category of categories" [value]="category.categoryId">{{ category.categoryName }}</option>
               </select>
             </div>
-            <div *ngIf="categoryError" class="alert alert-danger">{{ categoryError }}</div>
+            <div *ngIf="addErrors.categoryError" class="alert alert-danger">{{ addErrors.categoryError }}</div>
           </div>
-          
-          
+          <div class="mb-3">
+            <label for="isActive" class="form-label">Enable</label>
+            <input type="checkbox" id="isActive" [(ngModel)]="addNew.isActive" name="isActive">
+          </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Close</button>
             <button type="submit" class="btn btn-primary">Save changes</button>
           </div>
         </form>
-        
       </div>
     </div>
   </div>
 </div>
+
 
   
   
   <!-- Update Dish Modal -->
   <div class="modal fade" id="updateDishModal" tabindex="-1" aria-labelledby="updateDishModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="updateDishModalLabel">Update Dish</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateDishModalLabel">Update Dish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Item Name</label>
+                        <input type="text" class="form-control" id="itemName" placeholder="Enter item name" [(ngModel)]="updatedDish.itemName" name="itemName">
+                        <div *ngIf="updateErrors.itemNameError" class="alert alert-danger">{{ updateErrors.itemNameError }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" rows="3" placeholder="Enter description" [(ngModel)]="updatedDish.itemDescription" name="itemDescription"></textarea>
+                        <div *ngIf="updateErrors.descriptionError" class="alert alert-danger">{{ updateErrors.descriptionError }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Price</label>
+                        <input type="text" class="form-control" id="price" placeholder="Enter price" [(ngModel)]="updatedDish.price" name="price">
+                        <div *ngIf="updateErrors.priceError" class="alert alert-danger">{{ updateErrors.priceError }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Image</label>
+                        <input type="file" class="form-control" id="image" (change)="onUpdateImageSelect($event)">
+                        <img *ngIf="updatedDish.imageUrl" [src]="updatedDish.imageUrl" class="img-thumbnail" alt="Current Image">
+                    </div>
+                    <div class="mb-3 custom-select">
+                        <label for="category" class="form-label">Category Name</label>
+                        <div class="select-wrapper">
+                            <select class="form-control" id="category" [(ngModel)]="updatedDish.categoryId" name="categoryId">
+                                <option disabled [ngValue]="null" [selected]="!updatedDish.categoryId">-- Select a category --</option>
+                                <option *ngFor="let category of categories" [ngValue]="category.categoryId">{{ category.categoryName }}</option>
+                            </select>
+                            <div class="select-arrow"></div>
+                        </div>
+                        <div *ngIf="updateErrors.categoryError" class="alert alert-danger">{{ updateErrors.categoryError }}</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Close</button>
+                <button type="button" class="btn btn-primary" (click)="updateDish()">Save changes</button>
+            </div>
         </div>
-        <div class="modal-body">
-          <form>
-            <div class="mb-3">
-              <label for="itemName" class="form-label">Item Name</label>
-              <input type="text" class="form-control" id="itemName" placeholder="Enter item name" [(ngModel)]="updatedDish.itemName" name="itemName">
-            </div>
-            <div class="mb-3">
-              <label for="description" class="form-label">Description</label>
-              <textarea class="form-control" id="description" rows="3" placeholder="Enter description" [(ngModel)]="updatedDish.itemDescription" name="itemDescription"></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="price" class="form-label">Price</label>
-              <input type="text" class="form-control" id="price" placeholder="Enter price" [(ngModel)]="updatedDish.price" name="price">
-            </div>
-            <div class="mb-3">
-              <label for="image" class="form-label">Image</label>
-              <input type="file" class="form-control" id="image" (change)="onUpdateImageSelect($event)">
-              <img *ngIf="updatedDish.imageUrl" [src]="updatedDish.imageUrl" class="img-thumbnail" alt="Current Image">
-            </div>
-            <div class="mb-3 custom-select">
-              <label for="category" class="form-label">Category Name</label>
-              <div class="select-wrapper">
-                  <select class="form-control" id="category" [(ngModel)]="updatedDish.categoryId" name="categoryName">
-                      <option disabled [ngValue]="null" [selected]="!updatedDish.categoryId">-- Select a category --</option>
-                      <option *ngFor="let category of categories" [ngValue]="category.categoryId">{{ category.categoryName }}</option>
-                  </select>
-                  <div class="select-arrow"></div>
-              </div>
-          </div>         
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" (click)="updateDish()">Save changes</button>
-        </div>
-      </div>
     </div>
 </div>
 

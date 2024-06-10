@@ -14,18 +14,20 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
               <app-Header></app-Header>
                 <h2 class="h2">Manager Combo</h2>
-                
+                <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11; right: 20px;">
+                  <div *ngIf="addSuccessMessage" class="alert alert-success" style="max-width: 300px;">{{ addSuccessMessage }}</div>
+              </div>  
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="input-group">
                       <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="button-addon2">
-                        <button class="btn btn-outline-secondary" type="button" id="button-addon2" >Search</button>
+                        <input type="text" class="form-control" placeholder="Search..." aria-label="Search" [(ngModel)]="search" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="onSearch()" >Search</button>
                     </div>
                     
                     </div>
                 </div>
                 <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addDishModal">Add New Dish <i class="bi bi-plus"></i></button>
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addComboModal">Add New Combo <i class="bi bi-plus"></i></button>
                 </div>
             </div>
 
@@ -33,31 +35,44 @@
               <table class="table table-striped">
                 <thead>
                   <tr>
-                    <th>Item Name</th>
-                    <th>Description</th>
+                    <th>Combo Name</th>
                     <th>Price</th>
+                    <th>Note</th>
                     <th>Image</th>
-                    <th>Category Name</th>
                     <th>Active</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  
+                  <ng-container *ngFor="let list of combo">
+                    <tr *ngFor="let combo of list.items">
+                      <td>{{ combo.nameCombo }}</td>
+                      <td>{{ combo.price }}</td>
+                      <td>{{ combo.note }}</td>
+                      <td><img [src]="combo.imageUrl" [alt]="combo.nameCombo" *ngIf="combo.imageUrl"></td>
+                      <td>
+                        <input type="checkbox" (change)="onCheckboxChange($event, combo.comboId)" [checked]="combo.isActive">
+                        {{ combo.isActive ? 'Enable' : 'Disable' }}
+                      </td>
+                      <td>
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateComboModal" (click)="getComboById(combo.comboId)">Update</button>
+                      </td>
+                    </tr>
+                  </ng-container>
                 </tbody>
                 
               
               </table>
               <nav aria-label="Page navigation">
                 <ul class="pagination">
-                  <li class="page-item" >
-                    <a class="page-link" >Previous</a>
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <a class="page-link" (click)="onPageChange(currentPage - 1)">Previous</a>
                   </li>
-                  <li class="page-item" >
-                    <a class="page-link"></a> 
+                  <li class="page-item" *ngFor="let page of totalPagesArray" [class.active]="page === currentPage">
+                    <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
                   </li>
-                  <li class="page-item">
-                    <a class="page-link" >Next</a>
+                  <li class="page-item" [class.disabled]="currentPage === totalPagesArray.length">
+                    <a class="page-link" (click)="onPageChange(currentPage + 1)">Next</a>
                   </li>
                 </ul>
               </nav>
@@ -66,49 +81,40 @@
         </main>
     </div>
 </div>
-
-<!-- Add Dish Modal -->
-<div class="modal fade" id="addDishModal" tabindex="-1" aria-labelledby="addDishModalLabel" aria-hidden="true">
+<!-- Add Combo Modal -->
+<div class="modal fade" #addComboModal id="addComboModal" tabindex="-1" aria-labelledby="addComboModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addDishModalLabel">Add New Dish</h5>
+        <h5 class="modal-title" id="addComboModalLabel">Add New Combo</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form >
+        <form (ngSubmit)="createCombo()">
           <div class="mb-3">
-            <label for="itemName" class="form-label">Item Name</label>
-            <input type="text" class="form-control" id="itemName" placeholder="Enter item name" name="itemName">
-          </div>
-          <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" rows="3" placeholder="Enter description"  name="itemDescription"></textarea>
-          </div>
+            <label for="comboName" class="form-label">Combo Name</label>
+            <input type="text" class="form-control" id="comboName" placeholder="Enter combo name" [(ngModel)]="addNew.nameCombo" name="comboName">
+            <div *ngIf="addErrors.nameComboError" class="alert alert-danger">{{ addErrors.nameComboError }}</div>
+          </div>         
           <div class="mb-3">
             <label for="price" class="form-label">Price</label>
-            <input type="text" class="form-control" id="price" placeholder="Enter price" name="price">
+            <input type="text" class="form-control" id="price" placeholder="Enter price" [(ngModel)]="addNew.price" name="price">
+            <div *ngIf="addErrors.priceError" class="alert alert-danger">{{ addErrors.priceError }}</div>
+          </div>
+          <div class="mb-3">
+            <label for="note" class="form-label">Note</label>
+            <textarea class="form-control" id="note" rows="3" placeholder="Enter description" [(ngModel)]="addNew.note" name="note"></textarea>
+            <div *ngIf="addErrors.noteError" class="alert alert-danger">{{ addErrors.noteError }}</div>
           </div>
           <div class="mb-3">
             <label for="image" class="form-label">Image</label>
-            <input type="file" class="form-control" id="image" >
+            <input type="file" class="form-control" id="image" (change)="onImageSelect($event)">
+            <div *ngIf="addErrors.imageError" class="alert alert-danger">{{ addErrors.imageError }}</div>
           </div>
-          <div class="mb-3 custom-select">
-            <label for="category" class="form-label">Category Name</label>
-            <div class="select-wrapper">
-              <select class="form-control" id="category"  name="categoryName">
-                <option >-- Select a category --</option>
-                <option>1</option>
-                <option>2</option>
-              </select>
-              <div class="select-arrow"></div>
-            </div>
+          <div class="mb-3">
+            <label for="isActive" class="form-label">Enable</label>
+            <input type="checkbox" id="isActive" [(ngModel)]="addNew.isActive" name="isActive">
           </div>
-          <div class="mb-3 form-check">
-            <input type="checkbox" checked="true" id="isActive"  name="isActive" class="form-check-input">
-            <label for="isActive" class="form-check-label">Active</label>
-        </div>
-        
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-primary">Save changes</button>
@@ -118,47 +124,43 @@
     </div>
   </div>
 </div>
-<div>
+
   
-</div>
-  
-  
-  <!-- Update Dish Modal -->
-<div class="modal fade" id="updateDishModal" tabindex="-1" aria-labelledby="updateDishModal" aria-hidden="true">
+ <!-- Update Combo Modal -->
+<div class="modal fade" #updateComboModal id="updateComboModal" tabindex="-1" aria-labelledby="updateComboModal" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="addDishModalLabel">Add New Dish</h5>
+          <h5 class="modal-title" id="updateComboModalLabel">Update Combo</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form>
             <div class="mb-3">
-              <label for="itemName" class="form-label">Item Name</label>
-              <input type="text" class="form-control" id="itemName" placeholder="Enter item name">
-            </div>
-            <div class="mb-3">
-              <label for="description" class="form-label">Description</label>
-              <textarea class="form-control" id="description" rows="3" placeholder="Enter description"></textarea>
-            </div>
+              <label for="comboName" class="form-label">Combo Name</label>
+              <input type="text" class="form-control" id="comboName" placeholder="Enter combo name"  [(ngModel)]="updatedCombo.nameCombo" name="comboName">
+              <div *ngIf="updateErrors.nameComboError" class="alert alert-danger">{{ updateErrors.nameComboError }}</div>
+            </div>         
             <div class="mb-3">
               <label for="price" class="form-label">Price</label>
-              <input type="text" class="form-control" id="price" placeholder="Enter price">
+              <input type="text" class="form-control" id="price" placeholder="Enter price" [(ngModel)]="updatedCombo.price" name="price">
+              <div *ngIf="updateErrors.priceError" class="alert alert-danger">{{ updateErrors.priceError }}</div>
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Note</label>
+              <textarea class="form-control" id="note" rows="3" placeholder="Enter description" [(ngModel)]="updatedCombo.note"  name="itemDescription"></textarea>
+              <div *ngIf="updateErrors.noteError" class="alert alert-danger">{{ updateErrors.noteError }}</div>
             </div>
             <div class="mb-3">
               <label for="image" class="form-label">Image</label>
-              <input type="file" class="form-control" id="image">
-            </div>
-            <div class="mb-3">
-              <label for="category" class="form-label">Category Name</label>
-              <input type="text" class="form-control" id="category" placeholder="Enter category name">
-            </div>
-            
+              <input type="file" class="form-control" id="image" (change)="onUpdateImageSelect($event)">
+            <img *ngIf="updatedCombo.imageUrl" [src]="updatedCombo.imageUrl" class="img-thumbnail" alt="Current Image">
+            </div>         
           </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-primary" (click)="updateCombo()">Save changes</button>
         </div>
       </div>
     </div>
