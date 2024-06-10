@@ -16,9 +16,9 @@ export interface Dish{
 export interface AddNewDish{
   itemName: string,
   itemDescription:string,
-  price: number,
-  imageUrl: string,
-  categoryId: string,
+  price: number | null | undefined;
+  imageUrl: string | null;
+  categoryId: number,
   isActive?: boolean;
   message: string;
 }
@@ -28,7 +28,8 @@ export interface UpdateDish{
   itemDescription:string,
   price: number,
   imageUrl: string,
-  categoryId: string,
+  categoryId: number,
+  message: string,
 }
 export interface ListAllDishes {
   items: ManagerDish[];
@@ -45,6 +46,6 @@ export interface ManagerDish {
   price: number;
   imageUrl: string;
   categoryName: string;
-  categoryId: string,
+  categoryId: number,
   isActive: boolean;
 }

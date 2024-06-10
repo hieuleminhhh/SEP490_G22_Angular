@@ -26,14 +26,15 @@ export class ManagerDishComponent implements OnInit {
     itemDescription: '', 
     price: 0, 
     imageUrl: '',
-    categoryId: '',
+    categoryId: 0,
+    message: '',
   };
   addNew: AddNewDish = {
     itemName: '',
     itemDescription: '',
-    price: 0,
+    price: null as number | null,
     imageUrl: '',
-    categoryId: '',
+    categoryId: 0,
     isActive: true,
     message: '',
   };
@@ -44,13 +45,24 @@ export class ManagerDishComponent implements OnInit {
   totalCount: number = 0;
   selectedFile: File | null = null;
   selectedUpdateFile: File | null = null;
-  errorMessage: string = ''; 
-  itemNameError: string = '';
-  descriptionError: string = '';
-  priceError: string = '';
-  imageError: string = '';
-  categoryError: string = '';
+  addErrorMessage: string = ''; 
+  updateErrorMessage: string = '';
   addSuccessMessage: string = '';
+  updateSuccessMessage: string = '';
+  addErrors = {
+    itemNameError: '',
+    descriptionError: '',
+    priceError: '',
+    imageError: '',
+    categoryError: '',
+  };
+  updateErrors = {
+    itemNameError: '',
+    descriptionError: '',
+    priceError: '',
+    imageError: '',
+    categoryError: '',
+  };
   constructor(@Inject(ManagerDishService) private dishService: ManagerDishService) { }
 
   ngOnInit(): void {
@@ -115,74 +127,73 @@ onImageSelect(event: Event): void {
     this.addNew.imageUrl = imageUrl;
   }
 }
-
-createDish(): void {
-  this.errorMessage = '';
-
-  if (this.selectedFile) {
+uploadImage(): void {
+  if (this.selectedFile !== null) {
     this.dishService.UploadImage(this.selectedFile).subscribe(
       (response) => {
         console.log('Image uploaded successfully:', response);
         this.addNew.imageUrl = response.imageUrl;
-        this.saveDish();
       },
       (error) => {
         console.error('Error uploading image:', error);
-        this.errorMessage = 'An error occurred while uploading the image. Please try again.';
+        this.addErrorMessage = 'An error occurred while uploading the image. Please try again.';
       }
     );
   } else {
-    this.saveDish();
+    console.error('No file selected.');
   }
+}
+
+createDish(): void {
+  this.saveDish();
 }
 
 saveDish(): void {
   this.dishService.AddNewDish(this.addNew).subscribe(
     (response) => {
       console.log('Dish created successfully:', response);
+      if (this.selectedFile) {
+      this.uploadImage();}
+      if (!this.selectedFile) {
+        this.addNew.imageUrl = null;
+      }
+      
       this.addDishModal.nativeElement.classList.remove('show');
       this.addDishModal.nativeElement.style.display = 'none';
       document.body.classList.remove('modal-open');
       const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
-      modalBackdrop.parentNode?.removeChild(modalBackdrop);
+      modalBackdrop?.parentNode?.removeChild(modalBackdrop);
       this.addSuccessMessage = response.message;
-  setTimeout(() => { this.addSuccessMessage = ''; }, 5000);
+      setTimeout(() => { this.addSuccessMessage = ''; }, 5000);
+      this.resetForm();
     },
     (error) => {
       console.error('Error creating dish:', error);
+      this.clearAddErrors();
       if (error.error) {
         const fieldErrors = error.error;
         if (fieldErrors['itemName']) {
-          this.itemNameError = fieldErrors['itemName'];
-        } else {
-          this.itemNameError = ''; 
+          this.addErrors.itemNameError = fieldErrors['itemName'];
         }
         if (fieldErrors['itemDescription']) {
-          this.descriptionError = fieldErrors['itemDescription'];
-        } else {
-          this.descriptionError = '';
+          this.addErrors.descriptionError = fieldErrors['itemDescription'];
         }
         if (fieldErrors['price']) {
-          this.priceError = fieldErrors['price'];
-        } else {
-          this.priceError = '';
+          this.addErrors.priceError = fieldErrors['price'];
         }
-        if (fieldErrors['imageUrl']) {
-          this.imageError = fieldErrors['imageUrl'];
-        } else {
-          this.imageError = '';
+        if (fieldErrors['image']) {
+          this.addErrors.imageError = fieldErrors['image'];
         }
         if (fieldErrors['categoryId']) {
-          this.categoryError = fieldErrors['categoryId'];
-        } else {
-          this.categoryError = '';
+          this.addErrors.categoryError = fieldErrors['categoryId'];
         }
       } else {
-        this.errorMessage = 'An error occurred. Please try again later.';
+        this.addErrorMessage = 'An error occurred. Please try again later.';
       }
     }
   );
 }
+
 onFileChange(event: any): void {
   if (event.target.files && event.target.files[0]) {
     const file = event.target.files[0];
@@ -190,6 +201,7 @@ onFileChange(event: any): void {
     this.addNew.imageUrl = imageUrl;
   }
 }
+
 onUpdateImageSelect(event: Event): void {
   const fileInput = event.target as HTMLInputElement;
   if (fileInput.files && fileInput.files.length > 0) {
@@ -204,12 +216,12 @@ updateDish(): void {
     this.dishService.UploadImage(this.selectedUpdateFile).subscribe(
       (response) => {
         console.log('Image uploaded successfully:', response);
-        this.updatedDish.imageUrl = response.imageUrl;  // Use the uploaded image URL
+        this.updatedDish.imageUrl = response.imageUrl;
         this.saveUpdatedDish();
       },
       (error) => {
         console.error('Error uploading image:', error);
-        this.showErrorMessage('An error occurred while uploading the image. Please try again.');
+        this.updateErrorMessage = 'An error occurred while uploading the image. Please try again.';
       }
     );
   } else {
@@ -219,88 +231,130 @@ updateDish(): void {
 
 saveUpdatedDish(): void {
   this.dishService.UpdateDish(this.updatedDish).subscribe(
-    (updatedDish: UpdateDish) => {
-      console.log('Dish updated successfully:', updatedDish);
+    (response) => {
+      console.log('Dish updated successfully:', response);
       this.loadListDishes();
       this.resetUpdateForm();
+      this.updateSuccessMessage = response.message;
+      setTimeout(() => { this.updateSuccessMessage = ''; }, 5000);
     },
     (error) => {
       console.error('Error updating dish:', error);
+      this.clearUpdateErrors();
+      if (error.error) {
+        const fieldErrors = error.error;
+        if (fieldErrors['itemName']) {
+          this.updateErrors.itemNameError = fieldErrors['itemName'];
+        }
+        if (fieldErrors['itemDescription']) {
+          this.updateErrors.descriptionError = fieldErrors['itemDescription'];
+        }
+        if (fieldErrors['price']) {
+          this.updateErrors.priceError = fieldErrors['price'];
+        }
+        if (fieldErrors['imageUrl']) {
+          this.updateErrors.imageError = fieldErrors['imageUrl'];
+        }
+        if (fieldErrors['categoryId']) {
+          this.updateErrors.categoryError = fieldErrors['categoryId'];
+        }
+      } else {
+        this.updateErrorMessage = 'An error occurred. Please try again later.';
+      }
     }
   );
 }
 
-  onPageChange(page: number): void {
-    this.currentPage = page;
-    this.loadListDishes(this.search);
+onPageChange(page: number): void {
+  this.currentPage = page;
+  this.loadListDishes(this.search);
+}
+
+updateTotalPagesArray(totalPages: number): void {
+  this.totalPagesArray = Array(totalPages).fill(0).map((x, i) => i + 1);
+}
+
+clearAddErrors(): void {
+  this.addErrors = {
+    itemNameError: '',
+    descriptionError: '',
+    priceError: '',
+    imageError: '',
+    categoryError: '',
+  };
+}
+
+clearUpdateErrors(): void {
+  this.updateErrors = {
+    itemNameError: '',
+    descriptionError: '',
+    priceError: '',
+    imageError: '',
+    categoryError: '',
+  };
+}
+
+resetForm(): void {
+  this.addNew = {
+    itemName: '',
+    itemDescription: '',
+    price: 0,
+    imageUrl: '',
+    categoryId: 0,
+    isActive: true,
+    message:'',
+  };
+  this.imageUrl = '';
+  this.clearAddErrors();
+  this.addErrorMessage = '';
+  const fileInput = document.getElementById('image') as HTMLInputElement;
+  if (fileInput) {
+    fileInput.value = '';
   }
+}
 
-  updateTotalPagesArray(totalPages: number): void {
-    this.totalPagesArray = Array(totalPages).fill(0).map((x, i) => i + 1);
-  }
-
-  showErrorMessage(message: string): void {
-    console.error(message);
-  }
-
-  resetForm(): void {
-    this.addNew = {
-      itemName: '',
-      itemDescription: '',
-      price: 0,
-      imageUrl: '',
-      categoryId: '',
-      isActive: true,
-      message:'',
-    };
-    this.imageUrl = '';
-
-    const fileInput = document.getElementById('image') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = '';
-    }
-  }
-  resetUpdateForm(): void {
-
-    this.updatedDish = { 
+resetUpdateForm(): void {
+  this.updatedDish = { 
     dishId: 0,
     itemName: '', 
     itemDescription: '', 
     price: 0, 
     imageUrl: '',
-    categoryId: '',};
-    this.selectedUpdateFile = null;
-    const fileInput = document.getElementById('image') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = '';
-    }
+    categoryId: 0,
+    message: '',
   };
-  
-  
-  updateDishStatus(dishId: number, isActive: boolean): void {
-    if (dishId === undefined || dishId === null) {
-      console.error('Dish ID is not defined');
-      return;
-    }
-    this.dishService.UpdateDishStatus(dishId, isActive).subscribe(
-      (response) => {
-        console.log('Dish status updated successfully:', response);
-        this.loadListDishes(); 
-      },
-      (error) => {
-        console.error('Error updating dish status:', error);
-      }
-    );
+  this.selectedUpdateFile = null;
+  this.clearUpdateErrors();
+  this.updateErrorMessage = '';
+  const fileInput = document.getElementById('image') as HTMLInputElement;
+  if (fileInput) {
+    fileInput.value = '';
   }
+}
 
-  onCheckboxChange(event: Event, dishId: number): void {
-    const target = event.target as HTMLInputElement;
-    if (target) {
-      const isActive = target.checked;
-      this.updateDishStatus(dishId, isActive);
-    } else {
-      console.error('Event target is null');
+updateDishStatus(dishId: number, isActive: boolean): void {
+  if (dishId === undefined || dishId === null) {
+    console.error('Dish ID is not defined');
+    return;
+  }
+  this.dishService.UpdateDishStatus(dishId, isActive).subscribe(
+    (response) => {
+      console.log('Dish status updated successfully:', response);
+      this.loadListDishes(); 
+    },
+    (error) => {
+      console.error('Error updating dish status:', error);
     }
-  
+  );
+}
+
+onCheckboxChange(event: Event, dishId: number): void {
+  const target = event.target as HTMLInputElement;
+  if (target) {
+    const isActive = target.checked;
+    this.updateDishStatus(dishId, isActive);
+  } else {
+    console.error('Event target is null');
+  }
 }
 }
