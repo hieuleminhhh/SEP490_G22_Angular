@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Your Page Title</title>
   </head>
 
   <body>
@@ -12,7 +11,7 @@
         <div class="inner-wrap">
           <div class="filter-cell">
             <select class="form-control" (change)="onCategoryChange($event)" *ngIf="category$ | async as categories">
-              <option value="*">Category</option>
+              <option value="*">Thế loại </option>
               <option *ngFor="let category of categories" [value]="category.categoryName">
                 {{ category.categoryName }}
               </option>
@@ -25,14 +24,14 @@
 
           <div class="filter-cell">
             <select class="form-control" (change)="onSortChange($event)">
-              <option value="">Sort</option>
+              <option value="">Sắp xếp</option>
               <option *ngFor="let sortOption of sortOptions" [value]="sortOption">{{ sortOption }}</option>
             </select>
           </div>
 
           <div class="filter-cell">
             <select class="form-control">
-              <option>Search</option>
+              <option>Tìm kiếm</option>
             </select>
           </div>
         </div>
@@ -49,19 +48,19 @@
                     <h4>{{ item.nameCombo }}</h4>
                   </div>
                   <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>${{ item.price }}</span>
+                    <span>{{ item.price }}₫</span>
                     <button (click)="addToCart(item, 'combo')" class="add-to-cart js-add-to-cart btn small-btn" >Order Now</button>
                   </p>
                 </div>
               </ng-container>
               <ng-template #noItems>
-                <p>No combos found ...</p>
+                <p>Không có combo ...</p>
               </ng-template>
             </ng-container>
           </ng-container>
           <ng-template #dishesView>
             <ng-container *ngIf="dishs$ | async as dishs">
-              <ng-container *ngIf="dishs.length > 0; else noDishes">
+              <ng-container *ngIf="dishs.length > 0 ; else noDishes">
                 <div *ngFor="let item of dishs; let i = index" class="grid-product square" style="width: auto;border: 2px solid rgb(0, 0, 0);">
                   <div class="img-name" (click)="showDetails(item, 'dish')">
                     <img [src]="item.imageUrl" [alt]="item.itemName" width="200" height="200">
@@ -69,18 +68,18 @@
                   </div>
                   <p class="price">
                     <span class="price-container">
-                      <span *ngIf="item.discountedPrice" class="discounted-price">${{ item.discountedPrice }}</span>
-                      <span [class]="item.discountedPrice ? 'original-price' : 'no-discount'">${{ item.price }}</span>
+                      <span *ngIf="item.discountedPrice" class="discounted-price">{{ item.discountedPrice }}₫</span>
+                      <span [class]="item.discountedPrice ? 'original-price' : 'no-discount'">{{ item.price }}₫</span>
                     </span>
                     <span class="button-container">
-                      <button (click)="addToCart(item, 'dish')" class="add-to-cart js-add-to-cart btn small-btn">Order Now</button>
+                      <button (click)="addToCart(item, 'dish')" class="add-to-cart js-add-to-cart btn small-btn">Thêm vào giỏ hàng</button>
                     </span>
                   </p>
 
                 </div>
               </ng-container>
               <ng-template #noDishes>
-                <p>No dishes found ...</p>
+                <p>Không có món ăn  ...</p>
               </ng-template>
             </ng-container>
           </ng-template>
@@ -97,7 +96,7 @@
     <div *ngFor="let message of successMessages; let i = index" class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Success!</h5>
+          <h5 class="modal-title">Thành công!</h5>
           <button type="button" class="close" aria-label="Close" (click)="closeModal(i)">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -118,10 +117,10 @@
       </div>
       <div class="info-container">
         <h2>{{ selectedItem.nameCombo || selectedItem.itemName }}</h2>
-        <p> ${{ selectedItem.price }}</p>
+        <p> {{ selectedItem.discountedPrice || selectedItem.price }}₫</p>
         <p>{{ selectedItem.itemDescription }}</p>
         <!-- Add more detailed information as needed -->
-        <button (click)="addToCart(selectedItem, 'dish')" class="add-to-cart btn" style="margin-left: 200px;">Add to Cart</button>
+        <button (click)="addToCart(selectedItem, 'dish')" class="add-to-cart btn" style="margin-left: 200px;">Thêm vào giỏ hàng</button>
       </div>
     </div>
   </div>
