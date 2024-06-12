@@ -12,6 +12,7 @@ export interface Dish{
   quantity:number;
   unitPrice:number;
   isActive:boolean;
+  totalAmount:number;
 }
 export interface AddNewDish{
   itemName: string,

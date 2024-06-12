@@ -1,0 +1,152 @@
+/* purchaseOrder.component.css */
+
+/* Container div */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Set the height of the container to full viewport height */
+}
+
+/* Form */
+form {
+  border: 2px solid #ccc; /* Add border to the form */
+  border-radius: 5px; /* Add border radius for rounded corners */
+  padding: 20px; /* Add padding inside the form */
+  margin: 0 auto; /* Set margin to auto to center the form horizontally */
+  width: 350px; /* Set the width of the form */
+}
+
+/* Label */
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Input fields */
+input[type="tel"],
+input[type="text"] {
+  padding: 10px;
+  width: 100%; /* Set the width to 100% to fill the container */
+  margin-bottom: 10px;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Button */
+button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* Button hover */
+button:hover {
+  background-color: #45a049;
+}
+.button-container {
+  justify-content: space-between; /* Canh giữa các button và căn khoảng trống giữa chúng */
+}
+
+/* Thiết lập CSS cho button "Back" */
+.back-button {
+  background: #4CAF50; /* Xóa nền của button */
+  border: none; /* Xóa border của button */
+  cursor: pointer; /* Đổi con trỏ chuột thành pointer khi di chuột vào button */
+}
+
+/* Thiết lập CSS cho button "Verify" */
+.verify-button {
+  padding: 10px 20px; /* Thiết lập padding cho button */
+  background-color: #4CAF50; /* Màu nền cho button "Verify" */
+  color: white; /* Màu chữ cho button "Verify" */
+  border: none; /* Xóa border của button */
+  cursor: pointer; /* Đổi con trỏ chuột thành pointer khi di chuột vào button */
+}
+
+.phone-form {
+  text-align: center; /* Canh giữa nội dung trong form */
+}
+
+/* Thiết lập CSS cho button container */
+.button-container {
+  margin-top: 10px; /* Khoảng cách giữa input và button */
+}
+
+/* Thiết lập CSS cho button "Send OTP" */
+.send-otp-button {
+  padding: 10px 20px; /* Thiết lập padding cho button */
+  background-color: #4CAF50; /* Màu nền cho button "Send OTP" */
+  color: white; /* Màu chữ cho button "Send OTP" */
+  border: none; /* Xóa border của button */
+  cursor: pointer; /* Đổi con trỏ chuột thành pointer khi di chuột vào button */
+}
+
+
+.modal-dialog {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1050;
+  width: 320px;
+  transition: transform 0.3s ease-out;
+  transform: translateX(100%);
+}
+
+.modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  outline: 0;
+}
+
+.modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.modal-title {
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+.modal-body {
+  position: relative;
+  flex: 1 1 auto;
+  padding: 1rem;
+}
+
+.close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  padding: 1rem;
+}
+
+.close:focus, .close:hover {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-dialog.slide-in {
+  transform: translateX(0);
+}
+
+.tab-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+
+.tab-content {
+  margin-top: 10px;
+}

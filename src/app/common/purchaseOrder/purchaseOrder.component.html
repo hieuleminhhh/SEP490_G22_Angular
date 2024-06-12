@@ -1,0 +1,91 @@
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<div>
+  <!-- Form nhập số điện thoại -->
+  <form id="phoneForm" *ngIf="!showOtpForm && showPhoneForm" (ngSubmit)="onSubmitPhone()" class="phone-form">
+    <label for="phone">Phone Number:</label>
+    <input type="tel" id="phone" name="phone" [(ngModel)]="phoneNumber" placeholder="Enter your phone number" required>
+    <div class="button-container">
+      <button type="submit" class="send-otp-button">Send OTP</button>
+    </div>
+  </form>
+
+  <!-- Form nhập OTP -->
+  <form id="otpForm" *ngIf="showOtpForm" (ngSubmit)="onSubmitOtp()">
+    <label for="otp">OTP:</label>
+    <input type="text" id="otp" name="otp" [(ngModel)]="otp" placeholder="Enter the OTP" required>
+    <div class="button-container" style="display: flex;">
+      <button type="button" (click)="goBackToPhoneNumberForm()" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <button type="submit" class="verify-button">Verify</button>
+    </div>
+    <hr>
+    <div *ngIf="showOtpForm && countdown > 0">
+      <p style="color: red;">Time remaining to enter OTP: {{ formatTime(countdown) }}</p>
+    </div>
+  </form>
+
+  <!-- Các tab -->
+  <div *ngIf="showTabs">
+    <div class="tab-buttons">
+      <button (click)="showData('all')">All</button>
+      <button (click)="showData('cancelled')">Cancelled</button>
+      <button (click)="showData('completed')">Completed</button>
+    </div>
+    <div class="tab-content">
+      <div *ngFor="let order of filteredOrders">
+        <div class="cart-items">
+          <div class="row">
+            <div class="col-2"></div>
+            <div class="col"></div>
+            <div class="col">
+              <h5><b>Quantity</b></h5>
+            </div>
+            <div class="col">
+              <h5><b>Total Money</b></h5>
+            </div>
+          </div>
+
+          <!-- Iterate over the orderDetails array -->
+          <!-- <div *ngFor="let item of order.orderDetails" class="row border-top border-bottom">
+            <div class="row main align-items-center">
+              <div class="col-2">
+                <img class="img-fluid" [src]="item.imageUrl" alt="Item Image" style="max-width: 100%; height: 56px;">
+              </div>
+              <div class="col">
+                <div>{{ item.itemName || item.nameCombo }}</div>
+              </div>
+              <div class="col">
+                <span>{{ item.quantity }}</span>
+              </div>
+              <div class="col price-close" style="align-items:center;">
+                <span class="price">&dollar; {{ item.unitPrice}}</span>
+              </div>
+            </div>
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal cho thông báo thành công -->
+<div *ngFor="let message of successMessages; let i = index" class="modal-dialog">
+  <div class="modal-content slide-in">
+    <div class="modal-header">
+      <h5 class="modal-title">Thông báo</h5>
+      <button type="button" class="close" aria-label="Close" (click)="closeModal(i)">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      {{ message }}
+    </div>
+  </div>
+</div>
