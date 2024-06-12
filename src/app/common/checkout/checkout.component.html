@@ -1,0 +1,162 @@
+<br>
+<br>
+<br>
+<br>
+
+<div class="card">
+  <div class="row">
+    <div class="col-md-8 cart">
+
+
+      <div >
+        <div class="cart-container">
+          <div class="cart-header">
+            <!-- Đây là vị trí của tiêu đề Quantity -->
+            <div class="row">
+              <div class="col-2"></div>
+              <div class="col">
+                <h5><b>Đồ ăn</b></h5>
+              </div>
+              <div class="col">
+                <h5><b>Đơn giá</b></h5>
+              </div>
+              <div class="col">
+                <h5><b>Số lượng</b></h5>
+              </div>
+              <div class="col">
+                <h5><b>Tổng tiền</b></h5>
+              </div>
+            </div>
+          </div>
+          <div class="cart-items">
+            <div class="row border-top border-bottom" *ngFor="let item of cartItems">
+              <div class="row main align-items-center">
+                <div class="col-2">
+                  <img class="img-fluid" [src]="item.imageUrl" alt="Item Image" style="max-width: 100%; height: 56px;">
+                </div>
+                <div class="col">
+                  <div>{{ item.itemName||item.nameCombo }}</div>
+                </div>
+                <div class="col">
+                  <div>{{ item.discountedPrice || item.price }}₫</div>
+                </div>
+                <div class="col">
+
+                  <span>{{ item.quantity }}</span>
+
+                </div>
+                <div class="col price-close" style="align-items:center;">
+                  <span class="price">{{ getTotalPrice(item) }}₫</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="col-12 panel-footer basket-footer" >
+
+
+        <div class="row">
+          <div class="col-8 align-left description">
+            <div class="dive">Ship</div>
+          </div>
+          <div class="col-4 align-right"><span class="emphasized"></span> Restaurant will call & confirm with you</div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-8 align-left description">
+            <div class="dive">Total</div>
+          </div>
+          <div class="col-4 align-right"><span class="very emphasized"></span>{{ getTotalCartPrice() }}₫</div>
+        </div>
+      </div>
+
+
+
+
+      <div class="back-to-shop">
+        <a routerLink="/cart" routerLinkActive="äctive"><i class="fas fa-arrow-left"></i></a>
+        <span class="text-muted">Về giỏ hàng</span>
+      </div>
+    </div>
+
+
+    <div class="col-md-4 summary" >
+      <div>
+        <h5><b>Thông tin khách hàng</b></h5>
+      </div>
+      <hr>
+      <form >
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="name">Họ tên</label>
+              <input id="name"  name="consigneeName" class="form-control form-control-sm"
+                placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+              <label for="phone">Số điện thoại</label>
+              <input id="phone"  name="guestPhone" class="form-control form-control-sm"
+                placeholder="Enter your phone">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="address">Địa chỉ nhận hàng</label>
+              <input id="address"  name="address" class="form-control form-control-sm"
+                placeholder="Enter your address">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input id="email"  name="email" class="form-control form-control-sm"
+                placeholder="Enter your email">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="service">Dịch vụ</label>
+            <select id="service" name="service" class="form-control form-control-sm">
+              <option value="service1" selected>Đặt hàng</option>
+              <option value="service2">Đặt bàn</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="note">Ghi chú</label>
+            <textarea id="note" name="note" class="form-control form-control-lg"
+              placeholder="Enter your note"></textarea>
+          </div>
+        </div>
+
+        <hr>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="payment-method">Phương thức thanh toán:</label>
+              <div>
+                <label class="radio-label">
+                  <input type="radio" name="paymentMethod" value="cash-on-delivery"
+                    checked>
+                  <span class="radio-text">Thanh toán khi giao hàng</span>
+                </label>
+              </div>
+              <div>
+                <label class="radio-label">
+                  <input type="radio" name="paymentMethod" value="banking">
+                  <span class="radio-text">Chuyển khoản qua ngân hàng</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" class="btn btn-primary">Đặt Hàng</button>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

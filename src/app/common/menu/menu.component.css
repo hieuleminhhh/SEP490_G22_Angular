@@ -289,13 +289,12 @@ html,
 }
 
 
-
 .info-container {
   flex: 2;
 }
 
 button.add-to-cart {
-  padding: 10px 20px;
+  padding: 10px 0px;
   background-color: #4CAF50;
   color: white;
   border: none;

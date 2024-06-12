@@ -25,11 +25,10 @@ export class MenuComponent{
   category$ = this.getCategory();
   dishService: any;
   selectedItem: any;
-  sortOptions = ['From A to Z', 'From Z to A', 'Descending Price', 'Ascending Price'];
+  sortOptions = ['Theo bảng chữ cái từ A-Z', 'Theo bảng chữ cái từ Z-A', 'Giá từ cao tới thấp', 'Giá từ thấp tới cao'];
   selectedCategory: string = '';
   selectedSortOption: string = '';
   selectedFilter: 'Category' | 'Combo' = 'Category';
-
 
   ngOnInit(): void {
     this.loadDishes();
@@ -49,16 +48,16 @@ export class MenuComponent{
       apiUrl += `/sorted-dishes?categoryName=${categoryName}`;
       if (sortOption) {
         switch (sortOption) {
-          case 'From A to Z':
+          case 'Theo bảng chữ cái từ A-Z':
           apiUrl += '&sortField=0&sortOrder=0';
           break;
-        case 'From Z to A':
+        case 'Theo bảng chữ cái từ Z-A':
           apiUrl += '&sortField=0&sortOrder=1';
           break;
-        case 'Descending Price':
+        case 'Giá từ cao tới thấp':
           apiUrl += '&sortField=1&sortOrder=1';
           break;
-        case 'Ascending Price':
+        case 'Giá từ thấp tới cao':
           apiUrl += '&sortField=1&sortOrder=0';
           break;
           default:
@@ -68,16 +67,16 @@ export class MenuComponent{
     } else if (sortOption) {
       // Nếu không có category nhưng có sortOption, chỉ áp dụng sắp xếp
       switch (sortOption) {
-        case 'From A to Z':
+        case 'Theo bảng chữ cái từ A-Z':
           apiUrl += '/sorted-dishes?sortField=0&sortOrder=0';
           break;
-        case 'From Z to A':
+        case 'Theo bảng chữ cái từ Z-A':
           apiUrl += '/sorted-dishes?sortField=0&sortOrder=1';
           break;
-        case 'Descending Price':
+        case 'Giá từ cao tới thấp':
           apiUrl += '/sorted-dishes?sortField=1&sortOrder=1';
           break;
-        case 'Ascending Price':
+        case 'Giá từ thấp tới cao':
           apiUrl += '/sorted-dishes?sortField=1&sortOrder=0';
           break;
         default:
@@ -85,7 +84,10 @@ export class MenuComponent{
       }
     }
     console.log(apiUrl);
-    return this.http.get<Dish[]>(apiUrl);
+    return this.http.get<Dish[]>(apiUrl).pipe(
+      // Lọc danh sách món ăn dựa trên giá trị của isActive
+      map(dishes => dishes.filter(dish => dish.isActive))
+    );
   }
 
   onCategoryChange(event: Event) {
