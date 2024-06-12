@@ -1,14 +1,14 @@
 <div class="menu">
   <nav>
-
-
     <label class="logo">FoodLover</label>
-
-    <ul>
+    <ul class="center-menu">
       <li><a routerLink="/" class="active">Home</a></li>
       <li><a routerLink="/news" routerLinkActive="äctive">News</a></li>
       <li><a routerLink="/menu" routerLinkActive="äctive">Menu</a></li>
-      <li><a routerLink="/booking" routerLinkActive="äctive">Booking</a></li>
+      <li><a routerLink="/booking" routerLinkActive="äctive">Reservation</a></li>
+      <li><a routerLink="/purchase" routerLinkActive="äctive">Purchase orders</a></li>
+    </ul>
+    <ul class="right-menu">
       <li>
         <a routerLink="/cart" routerLinkActive="active">
           Cart <span class="item-count">{{ itemCount }}</span>

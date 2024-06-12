@@ -65,9 +65,9 @@
         </div>
         <div class="row">
           <div class="col-8 align-left description">
-            <div class="dive">Discount</div>
+            <div class="dive">Ship</div>
           </div>
-          <div class="col-4 align-right"><span class="emphasized"></span>&dollar; 0</div>
+          <div class="col-4 align-right"><span class="emphasized"></span> Restaurant will call & confirm with you</div>
         </div>
         <hr>
         <div class="row">
@@ -93,8 +93,9 @@
         <span class="text-muted">Go to menu</span>
       </div>
     </div>
-    <div class="col-md-4 summary" *ngIf="cartItems && cartItems.length > 0; else no">
 
+
+    <div class="col-md-4 summary" *ngIf="cartItems && cartItems.length > 0; else no">
       <div>
         <h5><b>Order Information</b></h5>
       </div>
@@ -104,11 +105,13 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="name">Name</label>
-              <input id="name" [(ngModel)]="consigneeName" name="consigneeName" class="form-control form-control-sm" placeholder="Enter your name">
+              <input id="name" [(ngModel)]="consigneeName" name="consigneeName" class="form-control form-control-sm"
+                placeholder="Enter your name">
             </div>
             <div class="form-group">
               <label for="phone">Phone</label>
-              <input id="phone" [(ngModel)]="guestPhone" name="guestPhone" class="form-control form-control-sm" placeholder="Enter your phone">
+              <input id="phone" [(ngModel)]="guestPhone" name="guestPhone" class="form-control form-control-sm"
+                placeholder="Enter your phone">
             </div>
             <div class="form-group">
               <label for="date">Receiving Date</label>
@@ -118,11 +121,13 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="address">Delivery address</label>
-              <input id="address" [(ngModel)]="address" name="address" class="form-control form-control-sm" placeholder="Enter your address">
+              <input id="address" [(ngModel)]="address" name="address" class="form-control form-control-sm"
+                placeholder="Enter your address">
             </div>
             <div class="form-group">
               <label for="email">Email</label>
-              <input id="email" [(ngModel)]="email" name="email" class="form-control form-control-sm" placeholder="Enter your email">
+              <input id="email" [(ngModel)]="email" name="email" class="form-control form-control-sm"
+                placeholder="Enter your email">
             </div>
             <div class="form-group">
               <label for="time">Receiving Time</label>
@@ -131,7 +136,8 @@
           </div>
           <div class="form-group">
             <label for="note">Note</label>
-            <textarea id="note" [(ngModel)]="note" name="note" class="form-control form-control-lg" placeholder="Enter your note" ></textarea>
+            <textarea id="note" [(ngModel)]="note" name="note" class="form-control form-control-lg"
+              placeholder="Enter your note"></textarea>
           </div>
         </div>
 
@@ -142,7 +148,8 @@
               <label for="payment-method">Payment Method:</label>
               <div>
                 <label class="radio-label">
-                  <input type="radio" name="paymentMethod" value="cash-on-delivery" [(ngModel)]="selectedPaymentMethod" checked>
+                  <input type="radio" name="paymentMethod" value="cash-on-delivery" [(ngModel)]="selectedPaymentMethod"
+                    checked>
                   <span class="radio-text">Cash on delivery</span>
                 </label>
               </div>

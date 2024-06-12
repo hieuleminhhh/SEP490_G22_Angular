@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 
@@ -13,7 +13,10 @@ import { CommonModule } from '@angular/common';
 export class PaymentComponent implements OnInit {
   request: any;
   data:any;
-  constructor(private route: ActivatedRoute, private http: HttpClient) { }
+  orderCancelled: boolean = false;
+
+  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) { } // Inject Router
+
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -34,5 +37,29 @@ export class PaymentComponent implements OnInit {
         console.error('Error during checkout:', error);
       }
     );
+  }
+
+  cancelOrder() {
+    if (this.data && this.data.orderId) {
+      const orderId = this.data.orderId;
+      const url = `https://localhost:7188/api/orders/${orderId}/cancel`;
+      this.http.put(url, {}).subscribe(
+        response => {
+          console.log('Order cancelled:', response);
+          this.orderCancelled = true;
+        },
+        error => {
+          console.error('Error during order cancellation:', error);
+        }
+      );
+    } else {
+      console.error('Order ID not found');
+    }
+  }
+
+  reorder() {
+    console.log(this.data);
+    // Navigate to the cart page with the data
+    this.router.navigate(['/cart'], { queryParams: { data: JSON.stringify(this.data) } });
   }
 }

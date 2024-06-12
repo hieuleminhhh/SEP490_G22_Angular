@@ -1,6 +1,7 @@
 export interface Address{
   addressId:number;
-  address:string;
+  guestAddress:string;
   consigneeName:string;
   guestPhone:string;
+  email:string;
 }

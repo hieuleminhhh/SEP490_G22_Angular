@@ -20,19 +20,15 @@
           </div>
 
           <div class="filter-cell">
-            <button (click)="selectedFilter = 'Combo'" class="sort-button">Combo</button>
+            <button (click)="onFilterChange('Combo')" class="sort-button">Combo</button>
           </div>
 
           <div class="filter-cell">
             <select class="form-control" (change)="onSortChange($event)">
-              <option>Sort</option>
-              <option>From A to Z</option>
-              <option>From Z to A</option>
-              <option>Descending Price</option>
-              <option>Ascending Price</option>
+              <option value="">Sort</option>
+              <option *ngFor="let sortOption of sortOptions" [value]="sortOption">{{ sortOption }}</option>
             </select>
           </div>
-
 
           <div class="filter-cell">
             <select class="form-control">
@@ -54,7 +50,7 @@
                   </div>
                   <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
                     <span>${{ item.price }}</span>
-                    <button (click)="addToCart(item, 'combo')" class="add-to-cart js-add-to-cart btn" >Order Now</button>
+                    <button (click)="addToCart(item, 'combo')" class="add-to-cart js-add-to-cart btn small-btn" >Order Now</button>
                   </p>
                 </div>
               </ng-container>
@@ -71,11 +67,16 @@
                     <img [src]="item.imageUrl" [alt]="item.itemName" width="200" height="200">
                     <h4>{{ item.itemName }}</h4>
                   </div>
-                  <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
-                    <span *ngIf="item.discountedPrice" class="discounted-price">${{ item.discountedPrice }}</span>
-                    <span [class]="item.discountedPrice ? 'original-price' : 'no-discount'">${{ item.price }}</span>
-                    <button (click)="addToCart(item, 'dish')" class="add-to-cart js-add-to-cart btn small-btn">Order Now</button>
+                  <p class="price">
+                    <span class="price-container">
+                      <span *ngIf="item.discountedPrice" class="discounted-price">${{ item.discountedPrice }}</span>
+                      <span [class]="item.discountedPrice ? 'original-price' : 'no-discount'">${{ item.price }}</span>
+                    </span>
+                    <span class="button-container">
+                      <button (click)="addToCart(item, 'dish')" class="add-to-cart js-add-to-cart btn small-btn">Order Now</button>
+                    </span>
                   </p>
+
                 </div>
               </ng-container>
               <ng-template #noDishes>

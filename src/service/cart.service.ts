@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Dish } from '../models/dish.model';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Address } from '../models/address.model';
 
 @Injectable({
   providedIn: 'root'
@@ -9,8 +12,9 @@ export class CartService {
   private cartItems: Dish[] = [];
   private cartSubject = new BehaviorSubject<Dish[]>([]);
   private itemCountSubject = new BehaviorSubject<number>(0);
+  private guestInfo = new BehaviorSubject<Address | null>(null);
 
-  constructor() { }
+  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) { }
 
   addToCart(item: any, itemType: string) {
     const existingItem = itemType === 'Dish' ? this.cartItems.find
@@ -59,6 +63,18 @@ export class CartService {
     this.cartSubject.next([...this.cartItems]);
     const itemCount = this.cartItems.length;  // Đếm số loại item
     this.itemCountSubject.next(itemCount);
+  }
+
+  setGuestInfo(info: Address) {
+    this.guestInfo.next(info);
+  }
+  getGuestInfo(): Observable<Address | null> {
+    return this.guestInfo.asObservable();
+  }
+
+  getGuest(addressId: any): Observable<Address> {
+    const url = `https://localhost:7188/api/Guest/${addressId}`;
+    return this.http.get<Address>(url);
   }
 
 }

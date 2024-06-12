@@ -115,8 +115,11 @@
 
           <div class="back-to-shop">
             <a routerLink="/menu" routerLinkActive="active"><i class="fas fa-arrow-left"></i>Go to menu</a>
-            <button class="btn btn-danger">Cancel Your Order</button>
+            <button *ngIf="!orderCancelled" class="btn btn-danger" (click)="cancelOrder()">Cancel Your Order</button>
+            <button *ngIf="orderCancelled" class="btn btn-primary" (click)="reorder()">Reorder</button>
           </div>
+
+
 
         </div>
       </div>

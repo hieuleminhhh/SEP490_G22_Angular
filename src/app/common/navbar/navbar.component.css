@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap");
+
 /* Base */
 :root {
   --clr-primary: #fe5722;
@@ -14,25 +15,9 @@
   font-family: "Josefin Sans", sans-serif;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   background: #fff;
   color: var(--clr-secondary);
-  overflow-x: hidden;
-}
-
-.section {
-  width: 100%;
-  padding: 40px 0;
-}
-
-.flex {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .container {
@@ -68,8 +53,6 @@ body {
   margin: 20px 0;
 }
 
-/* End Base */
-
 /* Menu */
 nav {
   height: 80px;
@@ -79,22 +62,35 @@ nav {
   background: #fff5f2;
   box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.22);
   z-index: 22;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
 }
 
 label.logo {
   font-size: 35px;
-  line-height: 80px;
-  padding: 0 30px;
   font-weight: 700;
 }
 
-nav ul {
-  float: right;
-  margin-right: 20px;
+.center-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+}
+
+.right-menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 nav ul li {
-  display: inline-block;
   line-height: 80px;
   margin: 0 5px;
 }
@@ -106,74 +102,13 @@ nav ul li a {
   color: var(--clr-secondary);
 }
 
+
 .menu a.active,
 .menu a:hover {
   border-bottom: 2px solid var(--clr-primary);
   transition: 0.3s;
 }
 
-
-
-.category li.active {
-  color: var(--clr-primary);
-}
-
-.restaurant-menu {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.menu-item {
-  width: 260px;
-  margin: 0 auto;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.menu-item img {
-  width: 100%;
-}
-
-.order {
-  justify-content: space-between;
-}
-
-.btn-menu {
-  padding: 6px 10px;
-  font-size: 16px;
-  text-align: center;
-  background: #fff;
-  border: 1px solid var(--clr-primary);
-  color: var(--clr-primary);
-}
-
-.title {
-  font-size: 18px;
-  font-weight: 300;
-  margin: 8px 0;
-}
-
-.location {
-  font-size: 18px;
-  font-weight: 500;
-}
-/* End Restaurant Menu */
-
-/* Testimonial */
-#testimonial .visual img {
-  margin-left: auto;
-}
-
-.user {
-  margin-top: 30px;
-  justify-content: start;
-}
-
-.user img {
-  width: 50px;
-  border-radius: 50%;
-  margin-right: 20px;
-}
 .item-count {
   background-color: red;
   color: white;
@@ -181,4 +116,23 @@ nav ul li a {
   padding: 4px;
   font-size: 12px;
   margin-left: 5px;
+}
+.menu {
+  display: flex;
+  justify-content: center;
+}
+
+.menu-items {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin-right: auto;
+}
+
+.menu-items li {
+  margin: 0 10px;
+}
+
+.logo {
+  margin-left: auto;
 }
