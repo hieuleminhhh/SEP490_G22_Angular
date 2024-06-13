@@ -48,7 +48,7 @@ export class ManagerDishService {
     UploadImage(image: File): Observable<{ imageUrl: string }> {
       const formData = new FormData();
       formData.append('image', image);
-  
+      console.log(image);
       return this.http.post<{ imageUrl: string }>(this.apiUrl+'/Image/upload', formData);
     }
     GetImageUrl(fileName: string): string {

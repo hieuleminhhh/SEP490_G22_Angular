@@ -6,6 +6,7 @@ import { HeaderComponent } from '../Header/Header.component';
 import { SideBarComponent } from '../SideBar/SideBar.component';
 import { ManagerComboService } from '../../../service/managercombo.service';
 import { AddNewCombo, ListAllCombo, UpdateCombo } from '../../../models/combo.model';
+import { AddNewDish, Dish, ManagerDish } from '../../../models/dish.model';
 
 @Component({
   selector: 'app-ManagerCombo',
@@ -16,7 +17,11 @@ import { AddNewCombo, ListAllCombo, UpdateCombo } from '../../../models/combo.mo
 })
 export class ManagerComboComponent implements OnInit {
   @ViewChild('addComboModal') addComboModal!: ElementRef;
+  @ViewChild('updateComboModal') updateComboModal!: ElementRef;
+  @ViewChild('dishesSelect') dishesSelect!: ElementRef;
   combo: ListAllCombo[] = [];
+  allDishes: Dish[] = [];
+  selectedDishes: number[] = [];
   imageUrl: string = '';
   search: string = '';  
   currentPage: number = 1;
@@ -25,8 +30,7 @@ export class ManagerComboComponent implements OnInit {
   selectedFile: File | null = null;
   selectedUpdateFile: File | null = null;
   totalPagesArray: number[] = [];
-  addSuccessMessage: string = '';
-  updateSuccessMessage: string = '';
+  successMessage: string = '';
   addErrorMessage: string = ''; 
   updateErrorMessage: string = '';
   addErrors = {
@@ -34,35 +38,45 @@ export class ManagerComboComponent implements OnInit {
     priceError: '',
     noteError: '',
     imageError: '',
+    dishError: '',
   };
   updateErrors = {
     nameComboError: '',
     priceError: '',
     noteError: '',
     imageError: '',
+    dishError: '',
   };
   addNew: AddNewCombo = {
     nameCombo: '',
-    price: 0,
+    price: null as number | null,
     note: '',
     imageUrl: '',
     isActive: true,
     message: '',
+    dishIds: [],
   };
+  
   updatedCombo: UpdateCombo = {
     comboId: 0,
     nameCombo: '', 
-    price: 0, 
+    price: null as number | null, 
     note : '', 
     imageUrl: '',
     message: '',
+    dishIds: [],
   };
   constructor(private comboService: ManagerComboService) { }
 
   ngOnInit() {
     this.loadListCombo();
+    this.loadAllDishes();
   }
+  
 
+  
+  
+  
   loadListCombo(search: string = ''): void {
     console.log('Loading combos with search term:', search);
     this.comboService.ListCombo(this.currentPage, this.pageSize, search).subscribe(
@@ -81,6 +95,17 @@ export class ManagerComboComponent implements OnInit {
       }
     );
   }
+  loadAllDishes(): void {
+    this.comboService.getAllDishes().subscribe(
+      (dishes: Dish[]) => {
+        this.allDishes = dishes;
+      },
+      (error) => {
+        console.error('Error fetching dishes:', error);
+      }
+    );
+  }
+
   getComboById(comboId: number): void {
     this.comboService.getComboById(comboId).subscribe(
       (combo: UpdateCombo) => {
@@ -145,8 +170,25 @@ export class ManagerComboComponent implements OnInit {
       this.addNew.imageUrl = imageUrl;
     }
   }
-  
-  updateCombo(): void {
+  uploadImage(): void {
+    if (this.selectedFile !== null) {
+      this.comboService.UploadImage(this.selectedFile).subscribe(
+        (response) => {
+          console.log('Image uploaded successfully:', response);
+          this.addNew.imageUrl = response.imageUrl;
+        },
+        (error) => {
+          console.error('Error uploading image:', error);
+          this.addErrorMessage = 'An error occurred while uploading the image. Please try again.';
+        }
+      );
+    } else {
+      console.error('No file selected.');
+    }
+  }
+  updateCombo(selectedDishes: number[]): void {  
+    console.log('Selected dishes:', selectedDishes);
+    this.updatedCombo.dishIds = selectedDishes;
     if (this.selectedUpdateFile) {
       this.comboService.UploadImage(this.selectedUpdateFile).subscribe(
         (response) => {
@@ -166,13 +208,24 @@ export class ManagerComboComponent implements OnInit {
     this.comboService.UpdateCombo(this.updatedCombo).subscribe(
       (response) => {
         console.log('Combo updated successfully:', response.nameCombo);
+        if (this.selectedFile) {
+          this.uploadImage();}
+          if (!this.selectedFile) {
+            this.addNew.imageUrl = null;
+          }
+        this.updateComboModal.nativeElement.classList.remove('show');
+        this.updateComboModal.nativeElement.style.display = 'none';
+        document.body.classList.remove('modal-open');
+        const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
+        modalBackdrop?.parentNode?.removeChild(modalBackdrop);
         this.loadListCombo();
         this.resetForm();
-        this.updateSuccessMessage = response.message;
-        setTimeout(() => { this.updateSuccessMessage = ''; }, 5000);
+        this.successMessage = response.message;
+        setTimeout(() => { this.successMessage = ''; }, 5000);
       },
       (error) => {
         console.error('Error updating combo:', error);
+        this.clearUpdateErrors();
         if (error.error) {
           const fieldErrors = error.error;
           if (fieldErrors['nameCombo']) {
@@ -188,15 +241,20 @@ export class ManagerComboComponent implements OnInit {
           if (fieldErrors['imageUrl']) {
             this.updateErrors.imageError = fieldErrors['imageUrl'];
           }
+          if (fieldErrors['dish']) {
+            this.addErrors.dishError = fieldErrors['dish'];
+          }
         } else {
           this.updateErrorMessage = 'An error occurred. Please try again later.';
         }
       }
     );
   }
-  createCombo(): void {
-    this.addErrorMessage = '';
 
+  createCombo(selectedDishes: number[]): void {
+    console.log('Selected dishes:', selectedDishes);
+    this.addNew.dishIds = selectedDishes;
+    this.addErrorMessage = '';
     if (this.selectedFile) {
       this.comboService.UploadImage(this.selectedFile).subscribe(
         (response) => {
@@ -213,6 +271,8 @@ export class ManagerComboComponent implements OnInit {
       this.saveCombo();
     }
   }
+  
+
   saveCombo(): void {
     this.comboService.AddNewCombo(this.addNew).subscribe(
       (response) => {
@@ -222,12 +282,14 @@ export class ManagerComboComponent implements OnInit {
         document.body.classList.remove('modal-open');
         const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
         modalBackdrop?.parentNode?.removeChild(modalBackdrop);
-        this.addSuccessMessage = response.message;
-        setTimeout(() => { this.addSuccessMessage = ''; }, 5000);
+        this.successMessage = response.message;
+        setTimeout(() => { this.successMessage = ''; }, 5000);
+        this.loadListCombo();
         this.resetForm();
       },
       (error) => {
         console.error('Error creating combo:', error);
+        this.clearAddErrors();
         if (error.error) {
           const fieldErrors = error.error;
           if (fieldErrors['nameCombo']) {
@@ -242,13 +304,35 @@ export class ManagerComboComponent implements OnInit {
           if (fieldErrors['imageUrl']) {
             this.addErrors.imageError = fieldErrors['imageUrl'];
           }
+          if (fieldErrors['dish']) {
+            this.addErrors.dishError = fieldErrors['dish'];
+          }
         } else {
           this.addErrorMessage = 'An error occurred. Please try again later.';
         }
       }
     );
   }
-
+  
+  
+  clearAddErrors(): void {
+    this.addErrors = {
+      nameComboError: '',
+      priceError: '',
+      imageError: '',
+      noteError: '',
+      dishError:'',
+    };
+  }
+  clearUpdateErrors(): void {
+    this.updateErrors = {
+      nameComboError: '',
+      priceError: '',
+      imageError: '',
+      noteError: '',
+      dishError:'',
+    };
+  }
   resetForm(): void {
     this.addNew = {
       nameCombo: '',
@@ -257,8 +341,12 @@ export class ManagerComboComponent implements OnInit {
       imageUrl: '',
       isActive: true,
       message: '',
+      dishIds: [],
     };
-    this.selectedFile = null;
+    this.imageUrl = '';
+    this.clearAddErrors();
+    this.clearUpdateErrors();
+    this.addErrorMessage = '';
     const fileInput = document.getElementById('image') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
