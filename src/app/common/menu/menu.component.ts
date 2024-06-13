@@ -25,8 +25,14 @@ export class MenuComponent{
   category$ = this.getCategory();
   dishService: any;
   selectedItem: any;
-  selectedSortOption: string = '';
+  sortOptions = ['Theo bảng chữ cái từ A-Z', 'Theo bảng chữ cái từ Z-A', 'Giá từ cao tới thấp', 'Giá từ thấp tới cao'];
   selectedCategory: string = '';
+  selectedSortOption: string = '';
+  selectedFilter: 'Category' | 'Combo' = 'Category';
+
+  ngOnInit(): void {
+    this.loadDishes();
+  }
 
   constructor(private cartService: CartService, private categoryService: CategoryService, private cdr: ChangeDetectorRef) {
     this.dishs$ = this.getDish();
@@ -39,21 +45,21 @@ export class MenuComponent{
 
     // Xây dựng URL API dựa trên category và sortOption
     if (categoryName) {
-      apiUrl += `?category=${categoryName}`;
+      apiUrl += `/sorted-dishes?categoryName=${categoryName}`;
       if (sortOption) {
         switch (sortOption) {
-          case 'From A to Z':
-            apiUrl += '&sort=asc';
-            break;
-          case 'From Z to A':
-            apiUrl += '&sort=desc';
-            break;
-          case 'Descending Price':
-            apiUrl += '&sort=priceDesc';
-            break;
-          case 'Ascending Price':
-            apiUrl += '&sort=priceAsc';
-            break;
+          case 'Theo bảng chữ cái từ A-Z':
+          apiUrl += '&sortField=0&sortOrder=0';
+          break;
+        case 'Theo bảng chữ cái từ Z-A':
+          apiUrl += '&sortField=0&sortOrder=1';
+          break;
+        case 'Giá từ cao tới thấp':
+          apiUrl += '&sortField=1&sortOrder=1';
+          break;
+        case 'Giá từ thấp tới cao':
+          apiUrl += '&sortField=1&sortOrder=0';
+          break;
           default:
             break;
         }
@@ -61,53 +67,83 @@ export class MenuComponent{
     } else if (sortOption) {
       // Nếu không có category nhưng có sortOption, chỉ áp dụng sắp xếp
       switch (sortOption) {
-        case 'From A to Z':
-          apiUrl += '/sorted?sortField=0&sortOrder=0';
+        case 'Theo bảng chữ cái từ A-Z':
+          apiUrl += '/sorted-dishes?sortField=0&sortOrder=0';
           break;
-        case 'From Z to A':
-          apiUrl += '/sorted?sortField=0&sortOrder=1';
+        case 'Theo bảng chữ cái từ Z-A':
+          apiUrl += '/sorted-dishes?sortField=0&sortOrder=1';
           break;
-        case 'Descending Price':
-          apiUrl += '/sorted?sortField=1&sortOrder=1';
+        case 'Giá từ cao tới thấp':
+          apiUrl += '/sorted-dishes?sortField=1&sortOrder=1';
           break;
-        case 'Ascending Price':
-          apiUrl += '/sorted?sortField=1&sortOrder=0';
+        case 'Giá từ thấp tới cao':
+          apiUrl += '/sorted-dishes?sortField=1&sortOrder=0';
           break;
         default:
           break;
       }
     }
-
-    return this.http.get<Dish[]>(apiUrl);
+    console.log(apiUrl);
+    return this.http.get<Dish[]>(apiUrl).pipe(
+      // Lọc danh sách món ăn dựa trên giá trị của isActive
+      map(dishes => dishes.filter(dish => dish.isActive))
+    );
   }
 
-
-
-  private getCombo(): Observable<Combo[]>{
-    return this.http.get<Combo[]>('https://localhost:7188/api/Combo');
+  onCategoryChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    this.selectedCategory = target.value === '*' ? '' : target.value;
+    this.selectedFilter = 'Category';
+    this.loadDishes();
   }
-
-  private getCategory():Observable<Category[]>{
-    return this.http.get<Category[]>('https://localhost:7188/api/Category');
-  }
-
-  // onSortChange(event: Event) {
-  //   const target = event.target as HTMLSelectElement;
-  //   const sortOption = target.value;
-
-  //   // Gọi lại getDish với tùy chọn sắp xếp mới
-  //   this.dishs$ = this.getDish(sortOption);
-  // }
 
   onSortChange(event: Event) {
     const target = event.target as HTMLSelectElement;
-    const sortOption = target.value;
+    this.selectedSortOption = target.value;
+    this.loadDishes();
+  }
 
-    // Lưu sortOption để sử dụng khi gọi lại getDish
-    this.selectedSortOption = sortOption;
+  onFilterChange(filter: 'Category' | 'Combo') {
+    this.selectedFilter = filter;
+    this.loadDishes();
+  }
 
-    // Gọi lại getDish với sortOption mới và category hiện tại
-    this.dishs$ = this.getDish(this.selectedCategory, sortOption);
+  private loadDishes() {
+    if (this.selectedFilter === 'Category') {
+      this.dishs$ = this.getDish(this.selectedCategory, this.selectedSortOption);
+    } else if (this.selectedFilter === 'Combo') {
+      this.combo$ = this.getCombo(this.selectedSortOption);
+    }
+  }
+
+  private getCombo(sortOption?: string): Observable<Combo[]> {
+    let apiUrl = 'https://localhost:7188/api/Combo';
+
+    if (sortOption) {
+      apiUrl += '/sorted-combos?';
+      switch (sortOption) {
+        case 'From A to Z':
+          apiUrl += 'sortField=0&sortOrder=0';
+          break;
+        case 'From Z to A':
+          apiUrl += 'sortField=0&sortOrder=1';
+          break;
+        case 'Descending Price':
+          apiUrl += 'sortField=1&sortOrder=1';
+          break;
+        case 'Ascending Price':
+          apiUrl += 'sortField=1&sortOrder=0';
+          break;
+        default:
+          break;
+      }
+    }
+    return this.http.get<Combo[]>(apiUrl);
+  }
+
+
+  private getCategory():Observable<Category[]>{
+    return this.http.get<Category[]>('https://localhost:7188/api/Category');
   }
 
   addToCart(item: any, itemType: string) {
@@ -119,35 +155,19 @@ export class MenuComponent{
       this.cartService.addToCart(item, 'Combo');
     }
 
-    this.successMessages.push(successMessage);  // Add success message
-    this.cdr.detectChanges();  // Kích hoạt phát hiện thay đổi
+    this.successMessages.push(successMessage);
+    this.cdr.detectChanges();
 
     setTimeout(() => {
-      // Gọi hàm để đóng thông báo sau 3 giây
       this.closeModal(this.successMessages.length - 1);
     }, 3000);
   }
 
 
   closeModal(index: number) {
-    // Đóng thông báo thành công khi người dùng nhấp vào nút đóng
     this.successMessages = [];
   }
 
-  selectedFilter: 'Category' | 'Combo' = 'Category';
-  onCategoryChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    const categoryName = target.value === '*' ? null : target.value;
-    if (categoryName) {
-      this.selectedFilter = 'Category';
-      this.dishs$ = this.categoryService.getDishesByCategory(categoryName).pipe(
-        catchError(() => of([]))
-      );
-    } else {
-      this.selectedFilter = 'Category';
-      this.dishs$ = this.getDish();
-    }
-  }
   showDetails(item: any, type: string) {
     console.log(item);
     this.selectedItem = item;

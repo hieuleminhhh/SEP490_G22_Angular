@@ -4,7 +4,6 @@ import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Dish } from '../../../models/dish.model';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { CheckoutService } from '../../../service/checkout.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -20,20 +19,10 @@ export class CartComponent implements OnInit, OnDestroy {
   itemQuantityMap: { [key: string]: number } = {};
   itemCount: number = 0;
 
-  consigneeName: string = '';
-  guestPhone: string = '';
-  email:string='';
-  address: string = '';
-  note: string = '';
-  date: string = '';
-  time: string = '';
-  selectedPaymentMethod: string = 'cash-on-delivery';
-
-
   private cartSubscription!: Subscription;
   private itemCountSubscription!: Subscription;
 
-  constructor(private cartService: CartService, private router: Router, private checkoutService: CheckoutService) { }
+  constructor(private cartService: CartService, private router: Router) { }
 
   ngOnInit() {
     this.cartSubscription = this.cartService.getCart().subscribe(cartItems => {
@@ -45,6 +34,12 @@ export class CartComponent implements OnInit, OnDestroy {
       this.itemCount = count;
     });
   }
+  checkout() {
+    // Push cart data to session storage
+    sessionStorage.setItem('cartItems', JSON.stringify(this.cartItems));
+    this.router.navigateByUrl('/checkout');
+
+  }
 
   calculateItemQuantity() {
     this.itemQuantityMap = {};
@@ -54,19 +49,17 @@ export class CartComponent implements OnInit, OnDestroy {
     });
   }
 
-   getTotalPrice(item: any): number {
+  getTotalPrice(item: any): number {
     const price = item.discountedPrice != null ? item.discountedPrice : item.price;
-    return item.quantity * price;
-}
-
+    return parseFloat((item.quantity * price).toFixed(2));
+  }
 
   getTotalCartPrice(): number {
-  return this.cartItems.reduce((total, item) => {
+    return parseFloat(this.cartItems.reduce((total, item) => {
       const price = item.discountedPrice != null ? item.discountedPrice : item.price;
       return total + (price * item.quantity);
-  }, 0);
-}
-
+    }, 0).toFixed(2));
+  }
 
   getItemNames(): string[] {
     return Object.keys(this.itemQuantityMap);
@@ -97,50 +90,5 @@ export class CartComponent implements OnInit, OnDestroy {
     this.itemCountSubscription.unsubscribe();
   }
 
-  navigateToPayment(): void {
-    const receivingTime = this.formatDateTime(this.date, this.time);
-    const request = {
-      guestPhone: this.guestPhone,
-      email: this.email,
-      addressId: 0,
-      guestAddress: this.address,
-      consigneeName: this.consigneeName,
-      orderDate: new Date().toISOString(),
-      status: 0,
-      recevingOrder: receivingTime,
-      totalAmount: 0,
-      deposits: 0,
-      cartItems: this.cartItems.map(item => ({
-        unitPrice: this.getTotalPrice(item),
-        quantity: item.quantity,
-        note: this.note,
-        dishId: item.dishId,
-        orderId: 0,
-        dishesServed: 0,
-        comboId: item.comboId
-      }))
-    };
-    console.log(request);
-      this.checkoutService.submitOrder(request).subscribe({
-        next: response => {
-          console.log('Order submitted successfully', response);
-          this.cartService.clearCart();
-          if (this.selectedPaymentMethod === 'banking') {
-            // Chuyển hướng đến trang quét mã nếu chọn "Paying through bank"
-            this.router.navigate(['/payment-scan'], { queryParams: { guestPhone: this.guestPhone } });
-          } else {
-            // Chuyển hướng đến trang thanh toán thông thường
-            this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone } });
-          }
-        },
-        error: error => {
-          console.error('Error submitting order', error);
-        }
-      });
-  }
-
-  formatDateTime(date: string, time: string): string {
-    return `${date}T${time}:00.000Z`;
-  }
 }
 

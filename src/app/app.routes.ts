@@ -10,6 +10,8 @@ import { LoginComponent } from './common/login/login.component';
 import { DashboardManagerComponent } from './manager/DashboardManager/DashboardManager.component';
 import { ManagerDishComponent } from './manager/ManagerDish/ManagerDish.component';
 import { ManagerComboComponent } from './manager/ManagerCombo/ManagerCombo.component';
+import { PurchaseOrderComponent } from './common/purchaseOrder/purchaseOrder.component';
+import { CheckoutComponent } from './common/checkout/checkout.component';
 
 export const routes: Routes = [
     {'path': '', component:HomeComponent},
@@ -23,4 +25,6 @@ export const routes: Routes = [
     {'path': 'manager', component:DashboardManagerComponent},
     {'path': 'managerdish', component:ManagerDishComponent},
     {'path': 'managercombo', component:ManagerComboComponent},
+    {'path': 'purchase', component:PurchaseOrderComponent},
+    {'path': 'checkout', component:CheckoutComponent},
 ];
