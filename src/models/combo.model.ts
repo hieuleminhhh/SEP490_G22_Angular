@@ -1,3 +1,5 @@
+import { ManagerDish } from "./dish.model";
+
 export interface Combo{
   comboId:number;
   nameCombo:string;
@@ -15,24 +17,27 @@ export interface ListAllCombo {
 export interface ManagerCombo {
   comboId:number;
   nameCombo:string;
-  price:number;
+  price: number;
   note:string;
-  imageUrl:string;
+  imageUrl: string;
   isActive: boolean;
+  dishes: ManagerDish[]
 }
 export interface UpdateCombo{
   comboId:number;
   nameCombo:string;
-  price:number;
+  price: number | null | undefined;
   note:string;
-  imageUrl:string;
+  imageUrl: string | null;
   message: string,
+  dishIds: number[] | null | undefined;
 }
 export interface AddNewCombo{
   nameCombo:string;
-  price:number;
+  price: number | null | undefined;
   note:string;
-  imageUrl:string;
+  imageUrl: string | null;
   isActive: boolean;
   message: string,
+  dishIds: number[] | null | undefined;
 }

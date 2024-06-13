@@ -27,8 +27,8 @@ export interface UpdateDish{
   dishId: number;
   itemName: string,
   itemDescription:string,
-  price: number,
-  imageUrl: string,
+  price: number | null | undefined;
+  imageUrl: string | null;
   categoryId: number,
   message: string,
 }

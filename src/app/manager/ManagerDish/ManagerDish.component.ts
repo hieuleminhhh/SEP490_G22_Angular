@@ -17,6 +17,7 @@ import { HeaderComponent } from "../Header/Header.component";
 })
 export class ManagerDishComponent implements OnInit {
   @ViewChild('addDishModal') addDishModal!: ElementRef;
+  @ViewChild('updateDishModal') updateDishModal!: ElementRef;
   dishes: ListAllDishes[] = [];
   categories: Category[] = [];
   totalPagesArray: number[] = [];
@@ -24,7 +25,7 @@ export class ManagerDishComponent implements OnInit {
     dishId: 0,
     itemName: '', 
     itemDescription: '', 
-    price: 0, 
+    price: null as number | null,
     imageUrl: '',
     categoryId: 0,
     message: '',
@@ -47,8 +48,7 @@ export class ManagerDishComponent implements OnInit {
   selectedUpdateFile: File | null = null;
   addErrorMessage: string = ''; 
   updateErrorMessage: string = '';
-  addSuccessMessage: string = '';
-  updateSuccessMessage: string = '';
+  successMessage: string = '';
   addErrors = {
     itemNameError: '',
     descriptionError: '',
@@ -118,15 +118,6 @@ export class ManagerDishComponent implements OnInit {
       }
     );
 }
-
-onImageSelect(event: Event): void {
-  const fileInput = event.target as HTMLInputElement;
-  if (fileInput.files && fileInput.files.length > 0) {
-    this.selectedFile = fileInput.files[0];
-    const imageUrl = URL.createObjectURL(this.selectedFile);
-    this.addNew.imageUrl = imageUrl;
-  }
-}
 uploadImage(): void {
   if (this.selectedFile !== null) {
     this.dishService.UploadImage(this.selectedFile).subscribe(
@@ -145,26 +136,45 @@ uploadImage(): void {
 }
 
 createDish(): void {
-  this.saveDish();
+  this.addErrorMessage = '';
+
+  if (this.selectedFile) {
+    this.dishService.UploadImage(this.selectedFile).subscribe(
+      (response) => {
+        console.log('Image uploaded successfully:', response);
+        this.addNew.imageUrl = response.imageUrl;
+        this.saveDish();
+      },
+      (error) => {
+        console.error('Error uploading image:', error);
+        this.addErrorMessage = 'Error uploading image. Please try again later.';
+      }
+    );
+  } else {
+    this.saveDish();
+  }
 }
 
+onImageSelect(event: Event): void {
+  const fileInput = event.target as HTMLInputElement;
+  if (fileInput.files && fileInput.files.length > 0) {
+    this.selectedFile = fileInput.files[0];
+    const imageUrl = URL.createObjectURL(this.selectedFile);
+    this.addNew.imageUrl = imageUrl;
+  }
+}
 saveDish(): void {
   this.dishService.AddNewDish(this.addNew).subscribe(
     (response) => {
       console.log('Dish created successfully:', response);
-      if (this.selectedFile) {
-      this.uploadImage();}
-      if (!this.selectedFile) {
-        this.addNew.imageUrl = null;
-      }
-      
       this.addDishModal.nativeElement.classList.remove('show');
       this.addDishModal.nativeElement.style.display = 'none';
       document.body.classList.remove('modal-open');
       const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
       modalBackdrop?.parentNode?.removeChild(modalBackdrop);
-      this.addSuccessMessage = response.message;
-      setTimeout(() => { this.addSuccessMessage = ''; }, 5000);
+      this.successMessage = response.message;
+      setTimeout(() => { this.successMessage = ''; }, 5000);
+      this.loadListDishes();
       this.resetForm();
     },
     (error) => {
@@ -193,6 +203,7 @@ saveDish(): void {
     }
   );
 }
+
 
 onFileChange(event: any): void {
   if (event.target.files && event.target.files[0]) {
@@ -233,10 +244,15 @@ saveUpdatedDish(): void {
   this.dishService.UpdateDish(this.updatedDish).subscribe(
     (response) => {
       console.log('Dish updated successfully:', response);
+      this.updateDishModal.nativeElement.classList.remove('show');
+      this.updateDishModal.nativeElement.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
+      modalBackdrop?.parentNode?.removeChild(modalBackdrop);
       this.loadListDishes();
       this.resetUpdateForm();
-      this.updateSuccessMessage = response.message;
-      setTimeout(() => { this.updateSuccessMessage = ''; }, 5000);
+      this.successMessage = response.message;
+      setTimeout(() => { this.successMessage = ''; }, 5000);
     },
     (error) => {
       console.error('Error updating dish:', error);
