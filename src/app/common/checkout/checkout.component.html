@@ -6,9 +6,7 @@
 <div class="card">
   <div class="row">
     <div class="col-md-8 cart">
-
-
-      <div >
+      <div>
         <div class="cart-container">
           <div class="cart-header">
             <!-- Đây là vị trí của tiêu đề Quantity -->
@@ -35,15 +33,13 @@
                   <img class="img-fluid" [src]="item.imageUrl" alt="Item Image" style="max-width: 100%; height: 56px;">
                 </div>
                 <div class="col">
-                  <div>{{ item.itemName||item.nameCombo }}</div>
+                  <div>{{ item.itemName || item.nameCombo }}</div>
                 </div>
                 <div class="col">
                   <div>{{ item.discountedPrice || item.price }}₫</div>
                 </div>
                 <div class="col">
-
                   <span>{{ item.quantity }}</span>
-
                 </div>
                 <div class="col price-close" style="align-items:center;">
                   <span class="price">{{ getTotalPrice(item) }}₫</span>
@@ -53,91 +49,99 @@
           </div>
         </div>
       </div>
-
-
-      <div class="col-12 panel-footer basket-footer" >
-
-
+      <hr>
+      <div class="col-12 panel-footer basket-footer">
         <div class="row">
-          <div class="col-8 align-left description">
-            <div class="dive">Ship</div>
+          <div class="col-12 text-right">
+            <div class="dive">Phí giao hàng: <span class="very emphasized">-----₫</span></div>
           </div>
-          <div class="col-4 align-right"><span class="emphasized"></span> Restaurant will call & confirm with you</div>
         </div>
         <hr>
         <div class="row">
-          <div class="col-8 align-left description">
-            <div class="dive">Total</div>
+          <div class="col-12 text-right">
+            <div class="dive">Tổng hóa đơn: <span class="very emphasized">{{ getTotalCartPrice() }}₫</span></div>
           </div>
-          <div class="col-4 align-right"><span class="very emphasized"></span>{{ getTotalCartPrice() }}₫</div>
         </div>
       </div>
-
-
-
-
       <div class="back-to-shop">
         <a routerLink="/cart" routerLinkActive="äctive"><i class="fas fa-arrow-left"></i></a>
         <span class="text-muted">Về giỏ hàng</span>
       </div>
     </div>
 
-
-    <div class="col-md-4 summary" >
+    <div class="col-md-4 summary">
       <div>
         <h5><b>Thông tin khách hàng</b></h5>
       </div>
       <hr>
-      <form >
+      <form>
         <div class="row">
           <div class="col-md-6">
             <div class="form-group">
-              <label for="name">Họ tên</label>
-              <input id="name"  name="consigneeName" class="form-control form-control-sm"
-                placeholder="Enter your name">
+              <label for="name">Họ tên<span class="required">*</span></label>
+              <input id="name" name="consigneeName" class="form-control form-control-sm" placeholder="Điền tên của bạn" required [(ngModel)]="consigneeName">
             </div>
             <div class="form-group">
-              <label for="phone">Số điện thoại</label>
-              <input id="phone"  name="guestPhone" class="form-control form-control-sm"
-                placeholder="Enter your phone">
+              <label for="phone">Số điện thoại<span class="required">*</span></label>
+              <input id="phone" name="guestPhone" class="form-control form-control-sm" placeholder="Điền số điện thoại" required [(ngModel)]="guestPhone">
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
-              <label for="address">Địa chỉ nhận hàng</label>
-              <input id="address"  name="address" class="form-control form-control-sm"
-                placeholder="Enter your address">
+              <label for="address">Địa chỉ nhận hàng<span class="required">*</span></label>
+              <input id="address" name="address" class="form-control form-control-sm" placeholder="Điền địa chỉ nhận hàng" required [(ngModel)]="address">
             </div>
             <div class="form-group">
-              <label for="email">Email</label>
-              <input id="email"  name="email" class="form-control form-control-sm"
-                placeholder="Enter your email">
+              <label for="email">Email<span class="required">*</span></label>
+              <input id="email" name="email" class="form-control form-control-sm" placeholder="Điền email của bạn" required [(ngModel)]="email">
             </div>
           </div>
           <div class="form-group">
             <label for="service">Dịch vụ</label>
-            <select id="service" name="service" class="form-control form-control-sm">
-              <option value="service1" selected>Đặt hàng</option>
+            <select id="service" name="service" class="form-control form-control-sv custom-select"
+              [(ngModel)]="selectedService">
+              <option value="service1">Đặt hàng</option>
               <option value="service2">Đặt bàn</option>
             </select>
           </div>
 
           <div class="form-group">
+            <label for="order-time" *ngIf="selectedService === 'service1'">Thời gian nhận hàng</label>
+            <label for="order-time" *ngIf="selectedService === 'service2'">Thời gian đặt bàn</label>
+            <div class="input-group">
+              <input id="order-time" name="orderTime" class="form-control form-control-sm" [(ngModel)]="orderTime"
+                [readonly]="!isEditing">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary btn-sm" style="background-color: #ddd;" type="button"
+                  (click)="toggleEdit()">
+                  Thay đổi
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div  *ngIf="selectedService === 'service2'">
+              <div class="form-group">
+                <label for="people">Số lượng khách<span class="required">*</span></label>
+                <input id="people" name="people" class="form-control form-control-sm" placeholder="Điền số lượng khách" required [(ngModel)]="people">
+              </div>
+          </div>
+
+          <div class="form-group">
             <label for="note">Ghi chú</label>
             <textarea id="note" name="note" class="form-control form-control-lg"
-              placeholder="Enter your note"></textarea>
+              placeholder="Điền ghi chú (nếu có)" [(ngModel)]="note"></textarea>
           </div>
         </div>
 
         <hr>
-        <div class="row">
+        <div class="row" *ngIf="selectedService === 'service1'">
           <div class="col-md-12">
             <div class="form-group">
               <label for="payment-method">Phương thức thanh toán:</label>
               <div>
                 <label class="radio-label">
-                  <input type="radio" name="paymentMethod" value="cash-on-delivery"
-                    checked>
+                  <input type="radio" name="paymentMethod" value="delivery" checked>
                   <span class="radio-text">Thanh toán khi giao hàng</span>
                 </label>
               </div>
@@ -152,11 +156,50 @@
         </div>
         <div class="row">
           <div class="col-md-12">
-            <button type="submit" class="btn btn-primary">Đặt Hàng</button>
+            <button type="submit" class="btn btn-primary" *ngIf="selectedService === 'service1'" (click)= "navigateToPayment()">Đặt Hàng</button>
+            <button type="submit" class="btn btn-primary" *ngIf="selectedService === 'service2'">Đặt Bàn</button>
           </div>
         </div>
       </form>
+    </div>
+  </div>
+</div>
 
+<!-- Modal -->
+<div class="modal fade" id="updateTimeModal" tabindex="-1" role="dialog" aria-labelledby="updateTimeModalLabel"
+  aria-hidden="true" (shown)="onModalShown()" (hidden)="onModalHidden()">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateTimeModalLabel">Chọn thời gian</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="name">Ngày nhận</label>
+              <input id="name" type="date" name="date" class="form-control form-control-sm" [(ngModel)]="date" (change)="isEarliest = false">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="name">Giờ nhận</label>
+              <input id="name" type="time" name="time" class="form-control form-control-sm" [(ngModel)]="time" (change)="isEarliest = false">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="checkbox-label-container">
+        <input type="checkbox" id="earliestCheckbox" [(ngModel)]="isEarliest" class="form-check-input" (change)="onEarliestChange()">
+        <label for="earliestCheckbox" class="form-check-label">Sớm nhất</label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" style="background-color: red;" class="btn btn-secondary" (click)="hideModal()">Đóng</button>
+        <button type="button" class="btn btn-primary" (click)="saveTime()">Lưu thay đổi</button>
+      </div>
     </div>
   </div>
 </div>

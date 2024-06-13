@@ -206,3 +206,50 @@ span {
   margin-top: 40px;
 }
 
+.cart-container {
+  max-height: 400px; /* Adjust the height as needed */
+  overflow-y: hidden; /* Prevent overflow for the entire container */
+}
+
+.cart-header {
+  position: sticky;
+  top: 0;
+  background-color: white; /* Ensure background matches the container */
+  z-index: 10; /* Keep the header above the scrollable content */
+  padding: 10px 0; /* Optional: add padding for better spacing */
+}
+
+.cart-items {
+  max-height: 350px; /* Adjust the height based on the container height */
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.cart-items .row.main {
+  display: flex;
+  align-items: center;
+  margin: 10px 0; /* Optional: add some spacing between rows */
+}
+
+.cart-items img {
+  max-width: 100%;
+  height: 56px;
+  object-fit: cover; /* Ensure images are properly contained */
+}
+.success-message {
+  margin-top: 50px; /* Căn lề top */
+  padding: 20px; /* Padding bao quanh nội dung */
+  background-color: #f0f0f0; /* Màu nền */
+  border: 1px solid #ccc; /* Viền */
+  border-radius: 8px; /* Bo góc */
+  text-align: center; /* Căn giữa nội dung */
+}
+
+.success-message h4 {
+  margin-bottom: 10px; /* Khoảng cách giữa các đoạn text */
+  color: #333; /* Màu chữ */
+}
+
+.success-message h3 {
+  margin-top: 20px; /* Khoảng cách từ h4 lớn nhất đến h3 */
+  color: #555; /* Màu chữ */
+}
