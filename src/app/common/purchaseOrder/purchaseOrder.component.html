@@ -1,10 +1,3 @@
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
 <div>
   <!-- Form nhập số điện thoại -->
   <form id="phoneForm" *ngIf="!showOtpForm && showPhoneForm" (ngSubmit)="onSubmitPhone()" class="phone-form">
@@ -31,49 +24,55 @@
     </div>
   </form>
 
-  <!-- Các tab -->
   <div *ngIf="showTabs">
     <div class="tab-buttons">
-      <button (click)="showData('all')">All</button>
-      <button (click)="showData('cancelled')">Cancelled</button>
-      <button (click)="showData('completed')">Completed</button>
+      <button (click)="showData('-1')" [class.active]="selectedTab === '-1'" style="width:160px;">Tất cả</button>
+      <button (click)="showData('0')" [class.active]="selectedTab === '0'" style="width:160px;">Đợi xác nhận</button>
+      <button (click)="showData('1')" [class.active]="selectedTab === '1'" style="width:160px;">Đang giao hàng</button>
+      <button (click)="showData('3')" [class.active]="selectedTab === '3'" style="width:160px;">Hoàn thành</button>
+      <button (click)="showData('4')" [class.active]="selectedTab === '4'" style="width:160px;">Đã hủy</button>
     </div>
+
     <div class="tab-content">
-      <div *ngFor="let order of filteredOrders">
-        <div class="cart-items">
-          <div class="row">
-            <div class="col-2"></div>
-            <div class="col"></div>
-            <div class="col">
-              <h5><b>Quantity</b></h5>
-            </div>
-            <div class="col">
-              <h5><b>Total Money</b></h5>
+      <div *ngFor="let order of filteredOrders" class="order-section card mb-3">
+        <div class="card-body">
+          <div class="order-header d-flex justify-content-between align-items-center mb-2">
+            <div class="order-status ml-auto">
+              <span *ngIf="order.status === 3" class="text-success">TRẠNG THÁI ĐƠN HÀNG: HOÀN THÀNH</span>
+              <span *ngIf="order.status === 0" class="text-success">TRẠNG THÁI ĐƠN HÀNG: ĐỢI XÁC NHẬN</span>
+              <span *ngIf="order.status === 1" class="text-success">TRẠNG THÁI ĐƠN HÀNG: ĐANG GIAO HÀNG</span>
+              <span *ngIf="order.status === 4" class="text-danger">TRẠNG THÁI ĐƠN HÀNG: ĐÃ HỦY</span>
             </div>
           </div>
 
-          <!-- Iterate over the orderDetails array -->
-          <!-- <div *ngFor="let item of order.orderDetails" class="row border-top border-bottom">
-            <div class="row main align-items-center">
+          <div class="order-items">
+            <div *ngFor="let item of order.orderDetails" class="row border-top border-bottom py-2" (click)="goToOrderDetail(order.orderId)">
               <div class="col-2">
-                <img class="img-fluid" [src]="item.imageUrl" alt="Item Image" style="max-width: 100%; height: 56px;">
+                <img class="img-fluid" [src]="item.imageUrl" alt="Item Image">
               </div>
-              <div class="col">
+              <div class="col-7" (click)="goToOrderDetail(order.orderId)">
                 <div>{{ item.itemName || item.nameCombo }}</div>
+                <div>x{{ item.quantity }}</div>
               </div>
-              <div class="col">
-                <span>{{ item.quantity }}</span>
-              </div>
-              <div class="col price-close" style="align-items:center;">
-                <span class="price">&dollar; {{ item.unitPrice}}</span>
+              <div class="col-3 text-right">
+                <div class="price">{{ item.unitPrice }}₫</div>
               </div>
             </div>
-          </div> -->
+          </div>
+
+          <div class="order-footer d-flex justify-content-end align-items-center mt-3">
+            <div class="mr-3">
+              <span class="total-price">Thành tiền: {{ order.totalAmount }}₫</span>
+            </div>
+            <div>
+              <button class="btn btn-primary btn-sm">Mua Lại</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+
 
 <!-- Modal cho thông báo thành công -->
 <div *ngFor="let message of successMessages; let i = index" class="modal-dialog">

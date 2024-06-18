@@ -122,22 +122,23 @@ export class MenuComponent{
     if (sortOption) {
       apiUrl += '/sorted-combos?';
       switch (sortOption) {
-        case 'From A to Z':
+        case 'Theo bảng chữ cái từ A-Z':
           apiUrl += 'sortField=0&sortOrder=0';
           break;
-        case 'From Z to A':
+        case 'Theo bảng chữ cái từ Z-A':
           apiUrl += 'sortField=0&sortOrder=1';
           break;
-        case 'Descending Price':
+        case 'Giá từ cao tới thấp':
           apiUrl += 'sortField=1&sortOrder=1';
           break;
-        case 'Ascending Price':
+        case 'Giá từ thấp tới cao':
           apiUrl += 'sortField=1&sortOrder=0';
           break;
         default:
           break;
       }
     }
+    console.log(apiUrl);
     return this.http.get<Combo[]>(apiUrl);
   }
 
@@ -147,7 +148,7 @@ export class MenuComponent{
   }
 
   addToCart(item: any, itemType: string) {
-    const successMessage = 'Add item to cart successfully!';
+    const successMessage = 'Thêm sản phẩm vào giỏ hàng thành công!';
 
     if (itemType === 'dish') {
       this.cartService.addToCart(item, 'Dish');

@@ -25,6 +25,22 @@ export class CartComponent implements OnInit, OnDestroy {
   constructor(private cartService: CartService, private router: Router) { }
 
   ngOnInit() {
+    const isReorder = sessionStorage.getItem('isReorder');
+
+    if (isReorder) {
+      // Xóa cờ reorder
+      sessionStorage.removeItem('isReorder');
+
+      const storedCartItems = sessionStorage.getItem('reorder');
+      console.log(storedCartItems);
+      if (storedCartItems) {
+        this.cartItems = JSON.parse(storedCartItems);
+        this.calculateItemQuantity();
+
+        this.itemCount = this.cartItems.length;
+        this.cartService.updateCart(this.cartItems); // Cập nhật giỏ hàng trong service
+      }
+    }
     this.cartSubscription = this.cartService.getCart().subscribe(cartItems => {
       this.cartItems = cartItems;
       this.calculateItemQuantity();
@@ -33,7 +49,9 @@ export class CartComponent implements OnInit, OnDestroy {
     this.itemCountSubscription = this.cartService.getItemCount().subscribe(count => {
       this.itemCount = count;
     });
+
   }
+
   checkout() {
     // Push cart data to session storage
     sessionStorage.setItem('cartItems', JSON.stringify(this.cartItems));
@@ -86,8 +104,12 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.cartSubscription.unsubscribe();
-    this.itemCountSubscription.unsubscribe();
+    if (this.cartSubscription) {
+      this.cartSubscription.unsubscribe();
+    }
+    if (this.itemCountSubscription) {
+      this.itemCountSubscription.unsubscribe();
+    }
   }
 
 }

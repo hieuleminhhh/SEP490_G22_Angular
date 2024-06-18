@@ -59,7 +59,9 @@ export class PaymentComponent implements OnInit {
 
   reorder() {
     console.log(this.data);
-    // Navigate to the cart page with the data
-    this.router.navigate(['/cart'], { queryParams: { data: JSON.stringify(this.data) } });
+    sessionStorage.setItem('reorder', JSON.stringify(this.data.orderDetails));
+    sessionStorage.setItem('isReorder', 'true'); // Set reorder flag
+    this.router.navigateByUrl('/cart');
   }
+
 }
