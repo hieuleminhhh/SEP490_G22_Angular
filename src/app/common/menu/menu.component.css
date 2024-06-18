@@ -5,7 +5,7 @@ html,
  }
 
  body {
-   padding-top: 230px;
+   padding-top: 100px;
    font-family: 'Source Sans Pro',sans-serif;
    font-weight: 400;
    font-size: 14px;
@@ -211,7 +211,7 @@ html,
 .modal-dialog {
   position: fixed;
   right: 20px;
-  top: 20%; /* Thay đổi vị trí lên cao hơn */
+  top: 30%; /* Thay đổi vị trí lên cao hơn */
   transform: translateY(-50%);
   width: 300px;
   max-width: calc(100% - 40px);

@@ -1,0 +1,4 @@
+.main-content {
+  padding-top: 120px; /* Điều chỉnh giá trị này phù hợp với chiều cao của navbar */
+  padding-bottom: 40px; /* Điều chỉnh giá trị này phù hợp với chiều cao của footer */
+}

@@ -14,7 +14,14 @@ export class CartService {
   private itemCountSubject = new BehaviorSubject<number>(0);
   private guestInfo = new BehaviorSubject<Address | null>(null);
 
-  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) { }
+  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) {
+    // Initialize cart from session storage if available
+    const storedCartItems = sessionStorage.getItem('reorder');
+    if (storedCartItems) {
+      this.cartItems = JSON.parse(storedCartItems);
+      this.updateCartState();
+    }
+  }
 
   addToCart(item: any, itemType: string) {
     const existingItem = itemType === 'Dish' ? this.cartItems.find
@@ -38,7 +45,9 @@ export class CartService {
   getItemCount(): Observable<number> {
     return this.itemCountSubject.asObservable();
   }
-
+  updateItemCount(count: number): void {
+    this.itemCountSubject.next(count);
+  }
   updateCart(cartItems: any[]) {
     this.cartItems = cartItems;
     this.updateCartState();
@@ -59,11 +68,17 @@ export class CartService {
     this.updateCartState();
   }
 
-  private updateCartState() {
-    this.cartSubject.next([...this.cartItems]);
-    const itemCount = this.cartItems.length;  // Đếm số loại item
-    this.itemCountSubject.next(itemCount);
-  }
+  // cart.service.ts
+private updateCartState() {
+  console.log('Updating cart state:', this.cartItems); // Log cart items before update
+  this.cartSubject.next([...this.cartItems]);
+  const itemCount = this.cartItems.length;
+  this.itemCountSubject.next(itemCount);
+
+  // Save cart to session storage
+  sessionStorage.setItem('reorder', JSON.stringify(this.cartItems));
+}
+
 
   setGuestInfo(info: Address) {
     this.guestInfo.next(info);
