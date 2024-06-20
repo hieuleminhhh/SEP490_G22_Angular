@@ -1,3 +1,4 @@
+import { ReservationService } from './../../../service/reservation.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
@@ -29,15 +30,19 @@ export class MenuComponent{
   selectedCategory: string = '';
   selectedSortOption: string = '';
   selectedFilter: 'Category' | 'Combo' = 'Category';
+  isReser: boolean = false;
 
   ngOnInit(): void {
     this.loadDishes();
+    sessionStorage.removeItem('isReser');
   }
 
-  constructor(private cartService: CartService, private categoryService: CategoryService, private cdr: ChangeDetectorRef) {
+  constructor(private cartService: CartService,private reservationService: ReservationService, private categoryService: CategoryService, private cdr: ChangeDetectorRef) {
     this.dishs$ = this.getDish();
     this.category$ = this.getCategory();
     this.combo$ = this.getCombo();
+    const isReserString = sessionStorage.getItem('isReser');
+    this.isReser = isReserString !== null ? JSON.parse(isReserString) : false;
   }
 
   private getDish(categoryName?: string, sortOption?: string): Observable<Dish[]> {
@@ -148,20 +153,38 @@ export class MenuComponent{
   }
 
   addToCart(item: any, itemType: string) {
-    const successMessage = 'Thêm sản phẩm vào giỏ hàng thành công!';
+    if(!this.isReser){
+      const successMessage = 'Đã thêm sản phẩm vào giỏ hàng!';
 
-    if (itemType === 'dish') {
-      this.cartService.addToCart(item, 'Dish');
-    } else if (itemType === 'combo') {
-      this.cartService.addToCart(item, 'Combo');
+      if (itemType === 'dish') {
+        this.cartService.addToCart(item, 'Dish');
+      } else if (itemType === 'combo') {
+        this.cartService.addToCart(item, 'Combo');
+      }
+
+      this.successMessages.push(successMessage);
+      this.cdr.detectChanges();
+
+      setTimeout(() => {
+        this.closeModal(this.successMessages.length - 1);
+      }, 3000);
+    }else{
+      const successMessage = 'Đã thêm sản phẩm vào đặt bàn!';
+
+      if (itemType === 'dish') {
+        this.reservationService.addToCart(item, 'Dish');
+      } else if (itemType === 'combo') {
+        this.reservationService.addToCart(item, 'Combo');
+      }
+
+      this.successMessages.push(successMessage);
+      this.cdr.detectChanges();
+
+      setTimeout(() => {
+        this.closeModal(this.successMessages.length - 1);
+      }, 3000);
     }
 
-    this.successMessages.push(successMessage);
-    this.cdr.detectChanges();
-
-    setTimeout(() => {
-      this.closeModal(this.successMessages.length - 1);
-    }, 3000);
   }
 
 

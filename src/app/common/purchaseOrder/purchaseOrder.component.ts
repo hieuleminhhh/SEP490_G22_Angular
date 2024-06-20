@@ -24,7 +24,7 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
   selectedTab: string = '-1';
   showPhoneForm: boolean = true;
   successMessages: string[] = [];
-  data: any;
+
   orders: any;
   filteredOrders: any;
   subscriptions: Subscription[] = [];
@@ -148,4 +148,29 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
     // Chuyển hướng đến trang chi tiết đơn hàng với orderId được truyền vào
     this.router.navigate(['/orderDetail', orderId]);
   }
+
+  reorder(orderId: number) {
+    console.log(this.orders);
+    if (Array.isArray(this.orders)) {
+      console.log('Orders is an array', this.orders);
+      const order = this.orders.find(order => order.orderId === orderId);
+
+      if (order && Array.isArray(order.orderDetails)) {
+        console.log('Order found', order);
+        const orderDetails = order.orderDetails;
+        sessionStorage.setItem('reorder', JSON.stringify(orderDetails));
+        sessionStorage.setItem('isReorder', 'true'); // Set reorder flag
+        this.router.navigateByUrl('/cart');
+      } else {
+        console.error('Order not found or orderDetails is not an array');
+      }
+    } else {
+      console.error('Orders is not an array or undefined');
+    }
+  }
+
+
+
+
+
 }
