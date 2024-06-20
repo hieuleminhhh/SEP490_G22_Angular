@@ -144,7 +144,8 @@ button:hover {
 .tab-buttons {
   position: fixed; /* Giữ các button ở vị trí cố định trên màn hình */
   top: 80px; /* Điều chỉnh vị trí từ trên xuống (tùy chỉnh theo ý muốn) */
-  left: 29%;
+  left: 50%; /* Đặt vị trí bắt đầu từ giữa màn hình */
+  transform: translateX(-50%);
   width: 70%; /* Chiều rộng */
   max-width: 800px;
   display: flex;

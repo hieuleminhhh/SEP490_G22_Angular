@@ -92,7 +92,6 @@ form{
 }
 select{
   border: 1px solid rgba(0, 0, 0, 0.137);
-  padding: 1.5vh 1vh;
   outline: none;
   width: 100%;
   background-color: rgb(247, 247, 247);
@@ -114,7 +113,6 @@ input:focus::-webkit-input-placeholder
   border-color: #000;
   color: rgb(1, 1, 1);
   width: 100%;
-  padding: 1vh;
   border-radius: 10px;
 }
 .btn:focus{

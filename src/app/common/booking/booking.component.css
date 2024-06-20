@@ -1,0 +1,229 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f3f4f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  padding-top: 1px;
+}
+
+.reservation-form {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 800px;
+  text-align: center;
+  margin: auto;
+  border: 1px solid #ccc;
+}
+
+h2 {
+  color: #333333;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #555555;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="tel"],
+select,
+textarea {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+}
+
+textarea {
+  height: 60px;
+}
+
+button {
+  background-color: #ff6600;
+  color: #ffffff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #e65c00;
+}
+
+.note {
+  margin-top: 20px;
+  color: #777777;
+  font-size: 14px;
+}
+
+.restaurant-options {
+  display: flex;
+  justify-content: space-around;
+}
+
+.restaurant-label {
+  cursor: pointer;
+}
+
+.restaurant-label.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+
+
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+.cart {
+  width: 70%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  margin: auto;
+}
+
+.cart th, .cart td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.cart th {
+  background-color: #f2f2f2;
+}
+
+.cart img {
+  width: 50px;
+  height: auto;
+}
+
+.quantity {
+  display: inline-block;
+  width: 30px;
+  text-align: center;
+}
+
+button:hover {
+  background-color: #ddd;
+}
+
+.summary {
+  margin-bottom: 20px;
+}
+
+.summary p {
+  font-size: 18px;
+  margin: 5px 0;
+  text-align: right;
+  margin-right: 15%;
+}
+
+
+.empty-cart {
+  text-align: center;
+}
+
+.empty-cart .content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+
+.empty-cart .center-text {
+  grid-column: 1 / 2;
+  margin-left: 480px;
+}
+
+.empty-cart .right-content {
+  grid-column: 2 / 3;
+  display: flex;
+  margin-left: 250px;
+  gap: 10px;
+}
+
+.empty-cart .icon {
+  font-size: 24px;
+  color: #13eb2c;
+}
+.fas.fa-plus-circle.icon {
+  cursor: pointer;
+  font-size: 24px; /* Đảm bảo kích thước icon đủ lớn để dễ dàng click */
+}
+.icon-button {
+  background-color: red;
+  border: none; /* Nếu muốn bỏ viền nút */
+  padding: 2px 6px; /* Điều chỉnh kích thước padding để làm nút nhỏ hơn */
+  width: auto; /* Để nút có chiều rộng tự động */
+  height: auto; /* Để nút có chiều cao tự động */
+  cursor: pointer; /* Để hiển thị con trỏ chuột */
+  font-size: inherit; /* Giữ nguyên kích thước biểu tượng */
+}
+
+.summary-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-content a {
+  order: 1; /* Place <a> first */
+  text-align: left;
+  margin-left: 290px; /* Adjusted from 15% to 0 */
+  cursor: pointer;
+}
+
+.summary-content p {
+  order: 3; /* Place <p> third */
+  text-align: right;
+  margin-right: 15%; /* Adjust right margin as needed */
+}
+
+div {
+  max-height: 300px; /* Chiều cao tối đa của div */
+  overflow-y: auto; /* Hiển thị thanh cuộn dọc khi cần thiết */
+  overflow-x: hidden; /* Ẩn thanh cuộn ngang nếu có */
+}
+
+table {
+  width: 100%; /* Đảm bảo bảng lấp đầy phần tử chứa */
+  border-collapse: collapse; /* Gộp đường biên của các ô */
+}
+
+th, td {
+  padding: 8px; /* Đệm cho ô */
+  text-align: left; /* Căn lề trái cho nội dung */
+  border-bottom: 1px solid #ddd; /* Đường kẻ ngang giữa các hàng */
+}
+
+th {
+  background-color: #f2f2f2; /* Màu nền cho hàng tiêu đề */
+}
+
+tr:hover {
+  background-color: #f5f5f5; /* Màu nền khi di chuột qua hàng */
+}
+
+.icon {
+  margin: 0 5px; /* Khoảng cách giữa các biểu tượng */
+}
+
+.price {
+  font-weight: bold; /* Chữ đậm cho giá tiền */
+}

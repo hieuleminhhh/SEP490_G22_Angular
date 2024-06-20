@@ -70,26 +70,38 @@
         <h5><b>Thông tin khách hàng</b></h5>
       </div>
       <hr>
-      <form>
+      <form #myForm="ngForm" (ngSubmit)="submitForm()">
         <div class="row">
           <div class="col-md-6">
             <div class="form-group">
               <label for="name">Họ tên<span class="required">*</span></label>
-              <input id="name" name="consigneeName" class="form-control form-control-sm" placeholder="Điền tên của bạn" required [(ngModel)]="consigneeName">
+              <input id="name" name="consigneeName" class="form-control form-control-sm" placeholder="Điền tên của bạn" required [(ngModel)]="consigneeName" #consigneeNameField="ngModel">
+              <div *ngIf="consigneeNameField.invalid && (consigneeNameField.dirty || consigneeNameField.touched)" class="text-danger">
+                Vui lòng nhập tên quý khách!
+              </div>
             </div>
             <div class="form-group">
               <label for="phone">Số điện thoại<span class="required">*</span></label>
-              <input id="phone" name="guestPhone" class="form-control form-control-sm" placeholder="Điền số điện thoại" required [(ngModel)]="guestPhone">
+              <input id="phone" name="guestPhone" class="form-control form-control-sm" placeholder="Điền số điện thoại" required [(ngModel)]="guestPhone" #guestPhoneField="ngModel">
+              <div *ngIf="guestPhoneField.invalid && (guestPhoneField.dirty || guestPhoneField.touched)" class="text-danger">
+                Vui lòng nhập số điện thoại!
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label for="address">Địa chỉ nhận hàng<span class="required">*</span></label>
-              <input id="address" name="address" class="form-control form-control-sm" placeholder="Điền địa chỉ nhận hàng" required [(ngModel)]="address">
+              <input id="address" name="address" class="form-control form-control-sm" placeholder="Điền địa chỉ nhận hàng" required [(ngModel)]="address" #addressField="ngModel">
+              <div *ngIf="addressField.invalid && (addressField.dirty || addressField.touched)" class="text-danger">
+                Vui lòng nhập địa chỉ nhận hàng!
+              </div>
             </div>
             <div class="form-group">
               <label for="email">Email<span class="required">*</span></label>
-              <input id="email" name="email" class="form-control form-control-sm" placeholder="Điền email của bạn" required [(ngModel)]="email">
+              <input id="email" name="email" class="form-control form-control-sm" placeholder="Điền email của bạn" required [(ngModel)]="email" #emailField="ngModel">
+              <div *ngIf="emailField.invalid && (emailField.dirty || emailField.touched)" class="text-danger">
+                Vui lòng nhập email!
+              </div>
             </div>
           </div>
           <div class="form-group">
@@ -116,11 +128,23 @@
             </div>
           </div>
 
-          <div  *ngIf="selectedService === 'service2'">
-              <div class="form-group">
-                <label for="people">Số lượng khách<span class="required">*</span></label>
-                <input id="people" name="people" class="form-control form-control-sm" placeholder="Điền số lượng khách" required [(ngModel)]="people">
+          <div *ngIf="selectedService === 'service2'">
+            <div class="form-group">
+              <label for="people">Số lượng khách<span class="required">*</span></label>
+              <input id="people" name="people" class="form-control form-control-sm" placeholder="Điền số lượng khách"
+                     required
+                     [(ngModel)]="people"
+                     #peopleInput="ngModel"
+                     pattern="[0-9]*">
+              <div *ngIf="peopleInput.invalid && (peopleInput.dirty || peopleInput.touched)">
+                <small class="text-danger" *ngIf="peopleInput.errors?.['required']">
+                  Vui lòng nhập số lượng khách!
+                </small>
+                <small class="text-danger" *ngIf="peopleInput.errors?.['pattern']">
+                  Số lượng khách chỉ được nhập số!
+                </small>
               </div>
+            </div>
           </div>
 
           <div class="form-group">
@@ -152,9 +176,13 @@
         </div>
         <div class="row">
           <div class="col-md-12">
-            <button type="submit" class="btn btn-primary" *ngIf="selectedService === 'service1'" (click)= "navigateToPayment()">Đặt Hàng</button>
-            <button type="submit" class="btn btn-primary" *ngIf="selectedService === 'service2'">Đặt Bàn</button>
+            <button type="submit" class="btn btn-primary" [disabled]="myForm.invalid" *ngIf="selectedService === 'service1'">Đặt Hàng</button>
+            <button type="submit" class="btn btn-primary" [disabled]="myForm.invalid" *ngIf="selectedService === 'service2'">Đặt Bàn</button>
           </div>
+          <p class="note" *ngIf="selectedService === 'service2'">
+            LƯU Ý: Quý khách cần thanh toán 50% tổng hóa đơn. Bấm đặt bàn để đến trang thanh toán.
+
+          </p>
         </div>
       </form>
     </div>
@@ -176,14 +204,17 @@
         <div class="row">
           <div class="col-md-6">
             <div class="form-group">
-              <label for="name">Ngày nhận</label>
-              <input id="name" type="date" name="date" class="form-control form-control-sm" [(ngModel)]="date" (change)="isEarliest = false">
+              <label for="date">Ngày nhận</label>
+              <input id="date" type="date" name="date" class="form-control form-control-sm" [(ngModel)]="date" (change)="isEarliest = false"
+                     [min]="minDate" [max]="maxDate">
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
-              <label for="name">Giờ nhận</label>
-              <input id="name" type="time" name="time" class="form-control form-control-sm" [(ngModel)]="time" (change)="isEarliest = false">
+              <label for="time">Giờ nhận</label>
+              <select id="time" name="time" class="form-control form-control-sm" style="height: 41px;" [(ngModel)]="time">
+                <option *ngFor="let hour of availableHours" [value]="hour">{{ hour }}</option>
+              </select>
             </div>
           </div>
         </div>

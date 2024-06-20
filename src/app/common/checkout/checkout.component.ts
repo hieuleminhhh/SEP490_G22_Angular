@@ -18,12 +18,11 @@ export class CheckoutComponent implements OnInit {
   selectedService: string = 'service1';
   orderTime: string = 'Sớm nhất';
   isEditing: boolean = false;
-  selectedTime!: Date;
   cartItems: Dish[] = [];
 
   date: string | undefined;
   time: string | undefined;
-  isEarliest: boolean = false;
+  isEarliest: boolean = true;
 
   consigneeName: string = '';
   guestPhone: string = '';
@@ -33,7 +32,18 @@ export class CheckoutComponent implements OnInit {
   people:number | undefined;
   selectedPaymentMethod: string = 'delivery';
 
-  constructor(private cartService: CartService,private router: Router,private route: ActivatedRoute,private checkoutService: CheckoutService) { }
+  minDate: string; // Ngày nhận tối thiểu là ngày hiện tại
+  maxDate: string; // Ngày nhận tối đa là ngày hiện tại + 7 ngày
+  availableHours: string[] = [];
+
+  constructor(private cartService: CartService,private router: Router,private route: ActivatedRoute,private checkoutService: CheckoutService) {
+    const today = new Date();
+    this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 7);
+    this.maxDate = this.formatDate(maxDate); // Ngày nhận tối đa là ngày hiện tại + 7 ngày
+    this.generateAvailableHours();
+   }
 
   ngOnInit() {
     // Lấy dữ liệu từ sessionStorage khi component được khởi tạo
@@ -42,6 +52,24 @@ export class CheckoutComponent implements OnInit {
       this.cartItems = JSON.parse(cartItemsString); // Chuyển đổi chuỗi JSON thành mảng đối tượng JavaScript
       console.log(this.cartItems);
     }
+  }
+
+  generateAvailableHours() {
+    this.availableHours = [];
+    for (let hour = 9; hour <= 21; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const formattedHour = hour.toString().padStart(2, '0') + ':' + minute.toString().padStart(2, '0');
+        this.availableHours.push(formattedHour);
+      }
+    }
+  }
+
+  formatDate(date: Date): string {
+    // Hàm chuyển đổi định dạng ngày thành chuỗi "YYYY-MM-DD"
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   toggleEdit() {
@@ -108,7 +136,7 @@ export class CheckoutComponent implements OnInit {
     }, 0).toFixed(2));
   }
 
-  navigateToPayment(): void {
+  submitForm(): void {
     let receivingTime:string='';
     if (this.date && this.time) {
       receivingTime = this.formatDateTime(this.date, this.time);
