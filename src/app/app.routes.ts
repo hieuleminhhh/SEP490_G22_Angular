@@ -13,6 +13,8 @@ import { ManagerComboComponent } from './manager/ManagerCombo/ManagerCombo.compo
 import { PurchaseOrderComponent } from './common/purchaseOrder/purchaseOrder.component';
 import { CheckoutComponent } from './common/checkout/checkout.component';
 import { OrderDetailComponent } from './common/orderDetail/orderDetail.component';
+import { ManagerOrderComponent } from './staff/ManagerOrder/ManagerOrder.component';
+import { CreateUpdateOrderComponent } from './staff/ManagerOrder/CreateUpdateOrder/CreateUpdateOrder.component';
 
 export const routes: Routes = [
     {'path': '', component:HomeComponent},
@@ -29,4 +31,6 @@ export const routes: Routes = [
     {'path': 'purchase', component:PurchaseOrderComponent},
     {'path': 'checkout', component:CheckoutComponent},
     {'path': 'orderDetail', component:OrderDetailComponent},
+    {'path': 'managerorder', component:ManagerOrderComponent},
+    {'path': 'cuorder', component:CreateUpdateOrderComponent},
 ];

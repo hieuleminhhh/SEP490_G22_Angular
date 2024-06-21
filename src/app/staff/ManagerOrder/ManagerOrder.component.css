@@ -1,0 +1,66 @@
+.container {
+    max-width: 1200px;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.table-dark th {
+    text-align: center;
+}
+
+.table td,
+.table th {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.modal-header {
+    background-color: #343a40;
+    color: white;
+}
+
+.btn-primary,
+.btn-primary:focus,
+.btn-primary:hover {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-success,
+.btn-success:focus,
+.btn-success:hover {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-danger,
+.btn-danger:focus,
+.btn-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table-header-light {
+    background-color: #f8f9fa; /* Light background color */
+    color: #000; /* Dark text color for contrast */
+}
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f2f2f2; /* Light gray color for striped rows */
+}
+.table-hover tbody tr:hover {
+    background-color: #ddd; /* Slightly darker gray for hover effect */
+}
+.table th, .table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+.table th {
+    background-color: #e0f7fa; /* Ensure header background color */
+    color: #000; /* Ensure header text color */
+}
