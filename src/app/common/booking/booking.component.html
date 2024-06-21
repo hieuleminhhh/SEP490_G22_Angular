@@ -1,60 +1,126 @@
-<section class="text-gray-600 body-font">
-  <div class="container px-5 py-24 mx-auto flex flex-wrap">
-    <div class="lg:w-1/2 w-full mb-10 lg:mb-0 rounded-lg overflow-hidden">
-      <img alt="feature" class="object-cover object-center h-full w-full" src="https://dummyimage.com/460x500">
-    </div>
-    <div class="flex flex-col flex-wrap lg:py-6 -mb-10 lg:w-1/2 lg:pl-12 lg:text-left text-center">
-      <div class="flex flex-col mb-10 lg:items-start items-center">
-        <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
-          <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-6 h-6" viewBox="0 0 24 24">
-            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-          </svg>
-        </div>
-        <div class="flex-grow">
-          <h2 class="text-gray-900 text-lg title-font font-medium mb-3">Shooting Stars</h2>
-          <p class="leading-relaxed text-base">Blue bottle crucifix vinyl post-ironic four dollar toast vegan taxidermy. Gastropub indxgo juice poutine.</p>
-          <a class="mt-3 text-indigo-500 inline-flex items-center">Learn More
-            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-              <path d="M5 12h14M12 5l7 7-7 7"></path>
-            </svg>
-          </a>
-        </div>
-      </div>
-      <div class="flex flex-col mb-10 lg:items-start items-center">
-        <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
-          <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-6 h-6" viewBox="0 0 24 24">
-            <circle cx="6" cy="6" r="3"></circle>
-            <circle cx="6" cy="18" r="3"></circle>
-            <path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12"></path>
-          </svg>
-        </div>
-        <div class="flex-grow">
-          <h2 class="text-gray-900 text-lg title-font font-medium mb-3">The Catalyzer</h2>
-          <p class="leading-relaxed text-base">Blue bottle crucifix vinyl post-ironic four dollar toast vegan taxidermy. Gastropub indxgo juice poutine.</p>
-          <a class="mt-3 text-indigo-500 inline-flex items-center">Learn More
-            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-              <path d="M5 12h14M12 5l7 7-7 7"></path>
-            </svg>
-          </a>
-        </div>
-      </div>
-      <div class="flex flex-col mb-10 lg:items-start items-center">
-        <div class="w-12 h-12 inline-flex items-center justify-center rounded-full bg-indigo-100 text-indigo-500 mb-5">
-          <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-6 h-6" viewBox="0 0 24 24">
-            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-        </div>
-        <div class="flex-grow">
-          <h2 class="text-gray-900 text-lg title-font font-medium mb-3">Neptune</h2>
-          <p class="leading-relaxed text-base">Blue bottle crucifix vinyl post-ironic four dollar toast vegan taxidermy. Gastropub indxgo juice poutine.</p>
-          <a class="mt-3 text-indigo-500 inline-flex items-center">Learn More
-            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-              <path d="M5 12h14M12 5l7 7-7 7"></path>
-            </svg>
-          </a>
-        </div>
-      </div>
-    </div>
+<div>
+  <table class="cart" *ngIf="cartItems && cartItems.length > 0; else noItems">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Món ăn</th>
+            <th>Giá bán</th>
+            <th>Số lượng</th>
+            <th>Thành tiền</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody *ngFor="let item of cartItems">
+        <tr>
+            <td><img class="img-fluid" [src]="item.imageUrl" alt="Item Image" style="max-width: 100%; height: 56px;"></td>
+            <td>{{ item.itemName||item.nameCombo }}</td>
+            <td>{{ item.discountedPrice || item.price }} đ</td>
+            <td>
+              <a (click)="decreaseQuantity(item)" class="icon" style="cursor: pointer;">
+                <i class="fas fa-minus" style="color: black; font-size: 10px;"></i>
+              </a>
+              <span>{{ item.quantity }}</span>
+              <a (click)="increaseQuantity(item)" class="icon" style="cursor: pointer;">
+                <i class="fas fa-plus" style="color: black; font-size: 10px;"></i>
+              </a>
+            </td>
+            <td><span class="price"> {{ getTotalPrice(item) }}₫</span></td>
+            <td><button class="delete icon-button" (click)="removeItem(item)">🗑️</button></td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="summary" *ngIf="cartItems && cartItems.length > 0;">
+  <div class="summary-content">
+    <a (click)="navigateToMenu()"><i class="fas fa-arrow-left"></i>Tiếp tục chọn món</a>
+    <p>Tổng cộng: <span id="total">{{ getTotalCartPrice() }} đ</span></p>
   </div>
-</section>
+</div>
+
+
+
+
+<ng-template #noItems>
+  <div class="empty-cart">
+    <div class="content">
+        <p class="center-text">Quý khách có muốn chọn món ngay không?</p>
+        <div class="right-content">
+            <a (click)="navigateToMenu()"><i class="fas fa-plus-circle icon"></i></a>
+            <p>Đặt trước món</p>
+        </div>
+    </div>
+</div>
+</ng-template>
+
+<div class="reservation-form" style="max-height: 500px;">
+  <h2>Đặt Bàn</h2>
+  <form #reservationForm="ngForm" (ngSubmit)="submitForm(reservationForm)">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="name">Tên người đặt (*)</label>
+          <input type="text" id="name" name="name" placeholder="Nhập tên" [(ngModel)]="reservation.name" required
+            #name="ngModel">
+          <div *ngIf="name.invalid && (name.dirty || name.touched || formSubmitted)">
+            <small class="text-danger">Vui lòng nhập Tên quý khách!</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="phone">Số điện thoại (*)</label>
+          <input type="tel" id="phone" name="phone" placeholder="Nhập số điện thoại" [(ngModel)]="reservation.phone"
+            required pattern="^0\d{9,10}$" #phone="ngModel">
+            <div *ngIf="phone.invalid && (phone.dirty || phone.touched || formSubmitted)">
+              <small class="text-danger" *ngIf="phone.errors?.['pattern']">
+                Số điện thoại phải có 10 hoặc 11 chữ số!
+              </small>
+              <small class="text-danger" *ngIf="phone.errors?.['required'] && !phone.errors?.['pattern']">
+                Vui lòng nhập số điện thoại!
+              </small>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label for="date">Ngày (*)</label>
+          <input id="date" type="date" name="date"  [(ngModel)]="reservation.date" [min]="minDate" [max]="maxDate" (change)="updateTimes()" style="width: 100%;height: 40px;">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label for="time">Giờ (*)</label>
+          <select id="time" name="time" [(ngModel)]="reservation.time" required #time="ngModel">
+            <option value="">Chọn</option>
+            <option *ngFor="let time of availableTimes" [value]="time">{{ time }}</option>
+          </select>
+          <div *ngIf="time.invalid && (time.dirty || time.touched || formSubmitted)">
+            <small class="text-danger">Vui lòng chọn giờ ăn!</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label for="people">Số người (*)</label>
+          <input type="number" id="people" name="people" min="1" [(ngModel)]="reservation.people" value="2" required
+            #people="ngModel">
+          <div *ngIf="people.invalid && (people.dirty || people.touched || formSubmitted)">
+            <small class="text-danger">Vui lòng nhập số lượng khách</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="notes">Ghi chú</label>
+      <textarea id="notes" name="notes" placeholder="Ghi chú" [(ngModel)]="reservation.notes"></textarea>
+    </div>
+    <button type="submit">Đặt bàn</button>
+  </form>
+  <p class="note">
+    LƯU Ý: Chỉ khi nhận được cuộc gọi từ nhân viên để xác nhận đơn đặt bàn, yêu cầu của bạn mới được coi là đặt bàn thành công.
+  </p>
+</div>

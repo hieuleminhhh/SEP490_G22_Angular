@@ -142,11 +142,76 @@ button:hover {
 }
 
 .tab-buttons {
+  position: fixed; /* Giữ các button ở vị trí cố định trên màn hình */
+  top: 80px; /* Điều chỉnh vị trí từ trên xuống (tùy chỉnh theo ý muốn) */
+  left: 50%; /* Đặt vị trí bắt đầu từ giữa màn hình */
+  transform: translateX(-50%);
+  width: 70%; /* Chiều rộng */
+  max-width: 800px;
   display: flex;
-  justify-content: space-around;
-  margin-bottom: 10px;
+  justify-content: space-between; /* Căn các button cạnh nhau mà không có khoảng trống giữa */
+  background-color: white; /* Màu nền của container button */
+  padding: 10px; /* Khoảng cách nội bộ của container button */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  z-index: 1000; /* Đảm bảo các button luôn nằm trên các nội dung khác */
 }
+
+.tab-buttons button {
+  background-color: rgb(179, 183, 161); /* Màu nền mặc định của các button */
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.tab-buttons button.active {
+  background-color: rgb(94, 206, 122); /* Màu nền khi button được chọn */
+  color: white; /* Màu chữ khi button được chọn */
+}
+
 
 .tab-content {
   margin-top: 10px;
+}
+
+.card {
+  border-width: 1px; /* Đặt độ dày viền là 1px */
+  border-style: solid; /* Loại viền là solid (viền thẳng) */
+  border-color: #ddd; /* Màu viền */
+  border-radius: 5px; /* Góc bo tròn viền */
+  padding: 20px; /* Khoảng đệm bên trong thẻ card */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  background-color: #f9f9f9; /* Màu nền */
+  width: 70%; /* Chiều rộng */
+  margin: 0 auto; /* Căn giữa theo chiều ngang */
+  max-width: 800px; /* Chiều rộng tối đa */
+}
+
+
+.order-status {
+  font-size: 14px;
+  margin-left: auto;
+}
+
+.return-policy {
+  font-size: 12px;
+}
+
+
+.order-header {
+  padding-bottom: 10px;
+}
+
+.order-footer {
+  padding-top: 10px;
+}
+
+.price {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.total-price {
+  font-weight: bold;
+  color: #333;
+  margin-right: 10px;
 }

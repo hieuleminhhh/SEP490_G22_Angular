@@ -92,8 +92,6 @@ form{
 }
 select{
   border: 1px solid rgba(0, 0, 0, 0.137);
-  padding: 1.5vh 1vh;
-  margin-bottom: 4vh;
   outline: none;
   width: 100%;
   background-color: rgb(247, 247, 247);
@@ -115,8 +113,6 @@ input:focus::-webkit-input-placeholder
   border-color: #000;
   color: rgb(1, 1, 1);
   width: 100%;
-  font-size: 1rem;
-  padding: 1vh;
   border-radius: 10px;
 }
 .btn:focus{
@@ -237,6 +233,10 @@ input[type="radio"] {
   height: 30px;
   font-size: 14px;
 }
+.form-control-sv {
+  height: 50px;
+  font-size: 14px;
+}
 .form-control-lg {
   height: 80px;
 }
@@ -309,4 +309,82 @@ input[type="radio"] {
 .close {
   cursor: pointer;
   color: red; /* Optional: change the color of the close icon */
+}
+
+
+.custom-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%204%205%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M2%200L0%202h4L2%200zM2%205l2-2H0l2%202z%22/%3E%3C/svg%3E') no-repeat right 0.75rem center/8px 10px;
+  padding-right: 2rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 50px;
+  line-height: 1.5;
+  text-align: center;
+  text-align-last: center;
+}
+
+.custom-select option {
+  text-align: center;
+}
+
+/* CSS cho modal */
+.modal-dialog {
+  position: fixed;
+  top: 30%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+}
+
+.modal.fade.show {
+  display: block;
+}
+
+/* Đảm bảo modal hiển thị lớn hơn nền */
+.modal-backdrop {
+  z-index: 1050;
+}
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-footer .btn-secondary,
+.modal-footer .btn-primary {
+  flex: 1;
+  text-align: center; /* Căn giữa văn bản */
+  font-size: 14px; /* Đổi kích thước font chữ */
+  padding: 5px 5px; /* Điều chỉnh khoảng cách nút button */
+}
+
+.modal-footer .btn-secondary {
+  margin-right: 100px; /* Để căn sang trái */
+}
+
+.modal-footer .btn-primary {
+  margin-left: 50px; /* Để căn sang phải */
+}
+/* Định dạng checkbox và label */
+.checkbox-label-container {
+  display: flex;
+  align-items: center; /* Canh giữa theo chiều dọc */
+}
+
+.checkbox-label-container .form-check-input {
+  margin-right: 10px; /* Khoảng cách giữa checkbox và văn bản */
+  margin-left: 20px;
+  transform: scale(0.4); /* Thu nhỏ checkbox */
+  width: 10px;
+  height: 10px;
+}
+
+.checkbox-label-container .form-check-label {
+  flex: 1; /* Văn bản "Sớm nhất" chiếm toàn bộ không gian còn lại */
+}
+.required {
+  color: red;
+  margin-left: 3px; /* Khoảng cách giữa chữ và dấu sao */
 }

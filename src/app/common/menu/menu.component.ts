@@ -1,3 +1,4 @@
+import { ReservationService } from './../../../service/reservation.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
@@ -29,15 +30,19 @@ export class MenuComponent{
   selectedCategory: string = '';
   selectedSortOption: string = '';
   selectedFilter: 'Category' | 'Combo' = 'Category';
+  isReser: boolean = false;
 
   ngOnInit(): void {
     this.loadDishes();
+    sessionStorage.removeItem('isReser');
   }
 
-  constructor(private cartService: CartService, private categoryService: CategoryService, private cdr: ChangeDetectorRef) {
+  constructor(private cartService: CartService,private reservationService: ReservationService, private categoryService: CategoryService, private cdr: ChangeDetectorRef) {
     this.dishs$ = this.getDish();
     this.category$ = this.getCategory();
     this.combo$ = this.getCombo();
+    const isReserString = sessionStorage.getItem('isReser');
+    this.isReser = isReserString !== null ? JSON.parse(isReserString) : false;
   }
 
   private getDish(categoryName?: string, sortOption?: string): Observable<Dish[]> {
@@ -122,22 +127,23 @@ export class MenuComponent{
     if (sortOption) {
       apiUrl += '/sorted-combos?';
       switch (sortOption) {
-        case 'From A to Z':
+        case 'Theo bảng chữ cái từ A-Z':
           apiUrl += 'sortField=0&sortOrder=0';
           break;
-        case 'From Z to A':
+        case 'Theo bảng chữ cái từ Z-A':
           apiUrl += 'sortField=0&sortOrder=1';
           break;
-        case 'Descending Price':
+        case 'Giá từ cao tới thấp':
           apiUrl += 'sortField=1&sortOrder=1';
           break;
-        case 'Ascending Price':
+        case 'Giá từ thấp tới cao':
           apiUrl += 'sortField=1&sortOrder=0';
           break;
         default:
           break;
       }
     }
+    console.log(apiUrl);
     return this.http.get<Combo[]>(apiUrl);
   }
 
@@ -147,20 +153,38 @@ export class MenuComponent{
   }
 
   addToCart(item: any, itemType: string) {
-    const successMessage = 'Add item to cart successfully!';
+    if(!this.isReser){
+      const successMessage = 'Đã thêm sản phẩm vào giỏ hàng!';
 
-    if (itemType === 'dish') {
-      this.cartService.addToCart(item, 'Dish');
-    } else if (itemType === 'combo') {
-      this.cartService.addToCart(item, 'Combo');
+      if (itemType === 'dish') {
+        this.cartService.addToCart(item, 'Dish');
+      } else if (itemType === 'combo') {
+        this.cartService.addToCart(item, 'Combo');
+      }
+
+      this.successMessages.push(successMessage);
+      this.cdr.detectChanges();
+
+      setTimeout(() => {
+        this.closeModal(this.successMessages.length - 1);
+      }, 3000);
+    }else{
+      const successMessage = 'Đã thêm sản phẩm vào đặt bàn!';
+
+      if (itemType === 'dish') {
+        this.reservationService.addToCart(item, 'Dish');
+      } else if (itemType === 'combo') {
+        this.reservationService.addToCart(item, 'Combo');
+      }
+
+      this.successMessages.push(successMessage);
+      this.cdr.detectChanges();
+
+      setTimeout(() => {
+        this.closeModal(this.successMessages.length - 1);
+      }, 3000);
     }
 
-    this.successMessages.push(successMessage);
-    this.cdr.detectChanges();
-
-    setTimeout(() => {
-      this.closeModal(this.successMessages.length - 1);
-    }, 3000);
   }
 
 
