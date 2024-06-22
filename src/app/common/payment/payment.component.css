@@ -25,7 +25,7 @@ body{
 }
 .cart{
   background-color: #fff;
-  padding: 4vh 5vh;
+  padding: 0vh 5vh;
   border-bottom-left-radius: 1rem;
   border-top-left-radius: 1rem;
 }
@@ -236,7 +236,6 @@ span {
   object-fit: cover; /* Ensure images are properly contained */
 }
 .success-message {
-  margin-top: 50px; /* Căn lề top */
   padding: 20px; /* Padding bao quanh nội dung */
   background-color: #f0f0f0; /* Màu nền */
   border: 1px solid #ccc; /* Viền */

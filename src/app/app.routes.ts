@@ -15,6 +15,7 @@ import { CheckoutComponent } from './common/checkout/checkout.component';
 import { OrderDetailComponent } from './common/orderDetail/orderDetail.component';
 import { ManagerOrderComponent } from './staff/ManagerOrder/ManagerOrder.component';
 import { CreateUpdateOrderComponent } from './staff/ManagerOrder/CreateUpdateOrder/CreateUpdateOrder.component';
+import { TableManagementComponent } from './staff/tableManagement/tableManagement.component';
 
 export const routes: Routes = [
     {'path': '', component:HomeComponent},
@@ -33,4 +34,5 @@ export const routes: Routes = [
     {'path': 'orderDetail', component:OrderDetailComponent},
     {'path': 'managerorder', component:ManagerOrderComponent},
     {'path': 'cuorder', component:CreateUpdateOrderComponent},
+    {'path': 'tableManagement', component:TableManagementComponent},
 ];
