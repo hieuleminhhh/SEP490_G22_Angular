@@ -1,0 +1,299 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  display: flex;
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-right: 1px solid #dee2e6;
+}
+
+.sidebar-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.sidebar-nav ul ul {
+  padding-left: 20px;
+}
+
+.sidebar-nav li {
+  margin-bottom: 10px;
+}
+
+.sidebar-nav a {
+  text-decoration: none;
+  color: #333;
+  display: block;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+.sidebar-nav a:hover {
+  background-color: #e2e6ea;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #fff;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  width: 300px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.user-info {
+  font-weight: bold;
+}
+
+.table-layout h2 {
+  margin-bottom: 20px;
+}
+
+.table-layout-buttons {
+  margin-bottom: 20px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  height: auto;
+  justify-content: center;
+}
+
+.table-layout-buttons button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+}
+
+.table-layout-buttons button:hover {
+  background-color: #45a049; /* Darker green background on hover */
+}
+
+.table-layout-buttons button:active {
+  background-color: #3e8e41; /* Even darker green when the button is clicked */
+}
+
+.table-grid {
+  display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Responsive grid with min width for each item */
+    gap: 16px; /* Space between grid items */
+}
+
+.table {
+  border: 1px solid black; /* Green border for table */
+  border-radius: 8px; /* Rounded corners for table */
+  padding: 16px; /* Padding inside the table */
+  text-align: center; /* Centered text */
+  background-color: #f9f9f9; /* Light background for table */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for table */
+  font-size: 16px; /* Font size for table text */
+  cursor: pointer;
+}
+
+.table hr {
+  border: none; /* Remove default border */
+  border-top: 1px solid black; /* Light gray border line */
+  margin: 8px 0; /* Margin around the horizontal rule */
+}
+
+.icon-table {
+  position: absolute;
+  top: 0;
+  margin: 10px;
+  color: green;
+  font-size: 20px;
+}
+
+.add-table.btn {
+  width: 150px;
+  /* Adjust the width as needed */
+  height: 50px;
+  /* Adjust the height as needed */
+  font-size: 18px;
+  /* Adjust the font size as needed */
+  margin-left: 200px;
+  /* Keeps the existing margin */
+  padding: 10px 20px;
+  /* Adjust the padding as needed */
+  border: none;
+  /* Remove the border */
+  border-radius: 5px;
+  /* Rounded corners */
+  background-color: #28a745;
+  /* Background color */
+  color: #fff;
+  /* Text color */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+}
+
+.add-table.btn:hover {
+  background-color: #218838;
+  /* Darker background color on hover */
+}
+
+
+.reservation-card {
+  background-color: #f4f4f4;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.reservation-card h3 {
+  margin-top: 0;
+}
+
+.reservation-card p {
+  margin-bottom: 5px;
+}
+
+.reservation-card .btn {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.card {
+  padding: 16px; /* Padding inside the card */
+  margin: 16px; /* Margin around the card */
+  max-width: 2500px;
+  width: 115%;
+  box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 1rem;
+  border: transparent;
+  flex: 1;
+  background-color: #fff; /* White background for the card */
+}
+
+@media(max-width:767px) {
+  .card {
+    margin: 3vh auto;
+  }
+}
+
+.container {
+  display: flex;
+  gap: 10px;
+  padding-top: 20px;
+}
+
+
+.short-card {
+  flex: none;
+  /* Prevent this card from growing */
+  width: 200px;
+  /* Set a fixed width, adjust as needed */
+  box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 1rem;
+  border: transparent;
+  margin: auto;
+}
+
+.reservation-grid {
+  display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid with min width for each item */
+    gap: 16px; /* Space between grid items */
+}
+
+.reservation {
+  border: 1px solid black; /* Green border for table */
+  border-radius: 8px; /* Rounded corners for table */
+  padding: 16px; /* Padding inside the table */
+  text-align: center; /* Centered text */
+  background-color: #f9f9f9; /* Light background for table */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for table */
+  font-size: 16px; /* Font size for table text */
+}
+
+.reservation hr {
+  border: none; /* Remove default border */
+  border-top: 1px solid black; /* Light gray border line */
+  margin: 8px 0; /* Margin around the horizontal rule */
+}
+
+.reservation-table {
+  position: absolute;
+  top: 0;
+  margin: 10px;
+  color: green;
+  font-size: 20px;
+}
+.vertical-line {
+  width: 1px;
+  /* height: 100px;  */
+  background-color: black; /* Điều chỉnh màu sắc của đường gạch dọc */
+}
+.number-table {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px; /* Điều chỉnh kích thước của phần tử */
+  height: 50px; /* Điều chỉnh kích thước của phần tử */
+  border: 1px solid black;
+  font-weight: bold;
+  font-size: 24px;
+}
+.icon{
+  font-weight: bold;
+  font-size: 24px;
+  color: #007bff;
+  margin-left: -90px;
+  cursor: pointer;
+
+}
+.label-reser{
+  color: #007bff;
+  cursor: pointer;
+}
+
