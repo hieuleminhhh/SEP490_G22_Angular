@@ -1,0 +1,91 @@
+.image-container {
+    position: relative;
+  }
+  
+  .card-img-top {
+    object-fit: cover;
+    height: 150px;
+    width: 100%;
+  }
+  
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* semi-transparent black background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .overlay-text {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+  }
+  .closer-buttons .col-6 {
+    padding-right: 2px; /* Adjust these values as needed */
+    padding-left: 2px;
+  }
+  .left-column {
+    background-color: #f0f8ff; /* Light blue */
+    padding: 20px;
+  }
+  .right-column {
+    background-color: #f5f5f5; /* Light gray */
+    padding: 20px;
+  }
+  .cart-section {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+  }
+  .card {
+    transition: transform 0.2s;
+  }
+  .card:hover {
+    transform: scale(1.05);
+  }
+  .image-container {
+    position: relative;
+  }
+  .overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    transition: .5s ease;
+    background-color: rgba(0,0,0,0.5);
+  }
+  .image-container:hover .overlay {
+    opacity: 1;
+  }
+  .overlay-text {
+    color: white;
+    font-size: 16px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .btn-block {
+    width: 100%;
+  }
+  .dishes-section {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+  }
+  .combos-section {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+  }
