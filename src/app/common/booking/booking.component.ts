@@ -83,15 +83,17 @@ export class BookingComponent implements OnInit {
   }
   updateTimes(): void {
     const now = new Date();
+    const selectedDate = new Date(this.reservation.date);
+    const isToday = now.toDateString() === selectedDate.toDateString();
     const currentHour = now.getHours();
     const currentMinute = now.getMinutes();
     this.availableTimes = [];
 
     for (let hour = 9; hour <= 21; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
-        if (this.reservation.date === 'today' && (hour > currentHour || (hour === currentHour && minute >= currentMinute))) {
+        if (isToday && (hour > currentHour || (hour === currentHour && minute >= currentMinute))) {
           this.addTimeOption(hour, minute);
-        } else if (this.reservation.date !== 'today') {
+        } else if (!isToday) {
           this.addTimeOption(hour, minute);
         }
       }

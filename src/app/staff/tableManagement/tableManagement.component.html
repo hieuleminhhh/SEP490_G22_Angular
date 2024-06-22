@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a>QUẢN LÝ BÀN </a>
+            <ul>
+              <li><a (click)="setView('table-layout')">Sơ đồ bàn</a></li>
+              <li><a (click)="setView('booking-request')">Yêu cầu đặt bàn</a></li>
+              <li><a (click)="setView('booking-schedule')">Lịch đặt bàn</a></li>
+              <li><a (click)="setView('booking-history')">Lịch sử đặt bàn</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <header>
+        <!-- <div class="search-bar">
+          <input type="text" placeholder="Search">
+        </div>
+        <button *ngIf="currentView === 'table-layout'" class="add-table btn" style="margin-left: 200px;">Thêm
+          bàn</button> -->
+        <h2 *ngIf="currentView === 'table-layout'">Sơ đồ bàn</h2>
+        <h2 *ngIf="currentView === 'booking-request'">Yêu cầu đặt bàn</h2>
+        <h2 *ngIf="currentView === 'booking-schedule'">Lịch đặt bàn</h2>
+        <h2 *ngIf="currentView === 'booking-history'">Lịch sử đặt bàn</h2>
+      </header>
+      <hr>
+
+      <section *ngIf="currentView === 'table-layout'">
+        <div class="container">
+          <div class="card short-card">
+            <div class="table-layout-buttons">
+              <button>Tầng một</button>
+              <button>Tầng hai</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-grid">
+              <div class="table">2<br>
+                <hr>Bàn trống<span class="icon-table">&#10004;</span>
+              </div>
+              <div class="table">2<br>
+                <hr>Bàn trống<span class="icon-table">&#10004;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section *ngIf="currentView === 'booking-schedule'">
+        <div class="container">
+          <div class="card">
+            <div class="reservation-grid">
+              <div class="reservation">
+                <div class="row">
+                  <div class="cell">
+                    <span class="data">John Doe - 123456789</span>
+                  </div>
+                </div>
+                <hr>
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="cell">
+                      <span class="number-table">?</span>
+                    </div>
+                  </div>
+                  <div class="vertical-line"></div>
+                  <div class="col-md-8">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="cell">
+                          <span class="data">12:00 PM</span>
+                        </div>
+                      </div>
+                      <div class="vertical-line"></div>
+                      <div class="col-md-5">
+                        <div class="cell">
+                          <span class="data">4 Người</span>
+                        </div>
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="cell">
+                      <span class="data">100,000 VND</span>
+                    </div>
+                  </div>
+                </div>
+                <hr>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="cell">
+                      <span class="icon">...</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6" style="display: flex;justify-content: center;align-items: center;">
+                      <span class="label-reser">Khách nhận bàn</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+      <section *ngIf="currentView === 'booking-request'">
+
+        <p>Nội dung lịch đặt bàn ở đây.</p>
+      </section>
+      <section *ngIf="currentView === 'booking-history'">
+
+        <p>Nội dung lịch sử đặt bàn ở đây.</p>
+      </section>
+
+    </main>
+  </div>
+</body>
+
+</html>
