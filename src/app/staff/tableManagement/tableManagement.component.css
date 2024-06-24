@@ -6,7 +6,7 @@
 }
 
 body {
-  display: flex;
+  /* display: flex; */
   height: 100vh;
 }
 
@@ -226,6 +226,7 @@ header {
   display: flex;
   gap: 10px;
   padding-top: 20px;
+  width: 115%;
 }
 
 
@@ -242,7 +243,7 @@ header {
 
 .reservation-grid {
   display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid with min width for each item */
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); /* Responsive grid with min width for each item */
     gap: 16px; /* Space between grid items */
 }
 
@@ -284,16 +285,118 @@ header {
   font-weight: bold;
   font-size: 24px;
 }
-.icon{
-  font-weight: bold;
-  font-size: 24px;
-  color: #007bff;
-  margin-left: -90px;
-  cursor: pointer;
 
-}
 .label-reser{
   color: #007bff;
   cursor: pointer;
 }
 
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown button {
+  background-color: #f9f9f9;
+  border: none;
+  height: 20px;
+  margin-left: -50px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 130px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  margin-left: -10px;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.show {
+  display: block;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+input[type="checkbox"] {
+  margin-left: 5px;
+}
+
+.btn {
+  padding: 5px 10px;
+  border-radius: 3px;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* CSS cho phần tử details và summary */
+details {
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap; /* Cho phép các phần tử xuống dòng khi không đủ không gian */
+}
+
+.row p {
+  flex: 1; /* Phần tử p sẽ tự động chia đều chiều rộng của flex container */
+  margin-bottom: 10px; /* Khoảng cách giữa các dòng */
+  display: block; /* Hiển thị mỗi thẻ p trên một dòng */
+  padding-right: 50%; /* Tạo khoảng trống bên phải để span có thể chiếm */
+}
+
+.row p span {
+  position: absolute;
+  left: 30%; /* Đẩy span về phía giữa */
+  transform: translateX(-50%); /* Dịch chuyển span để nó nằm giữa */
+}

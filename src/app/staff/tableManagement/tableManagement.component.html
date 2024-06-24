@@ -34,6 +34,13 @@
         <h2 *ngIf="currentView === 'booking-request'">Yêu cầu đặt bàn</h2>
         <h2 *ngIf="currentView === 'booking-schedule'">Lịch đặt bàn</h2>
         <h2 *ngIf="currentView === 'booking-history'">Lịch sử đặt bàn</h2>
+        <h2 *ngIf="currentView === 'detail-reservation'">Chi tiết đơn đặt bàn</h2>
+        <select id="timeframe" name="timeframe" *ngIf="currentView === 'booking-schedule'" [(ngModel)]="selectedTime"
+          (ngModelChange)="onSelectTimeframe()">
+          <option value="today" [selected]="selectedTime === 'today'">Hôm nay</option>
+          <option value="this_week" [selected]="selectedTime === 'this_week'">Tuần này</option>
+        </select>
+
       </header>
       <hr>
 
@@ -41,70 +48,74 @@
         <div class="container">
           <div class="card short-card">
             <div class="table-layout-buttons">
-              <button>Tầng một</button>
-              <button>Tầng hai</button>
+              <button (click)="onSelectFloor1()">Tầng một</button>
+              <button (click)="onSelectFloor2()">Tầng hai</button>
             </div>
           </div>
+
           <div class="card">
             <div class="table-grid">
-              <div class="table">2<br>
-                <hr>Bàn trống<span class="icon-table">&#10004;</span>
-              </div>
-              <div class="table">2<br>
-                <hr>Bàn trống<span class="icon-table">&#10004;</span>
+              <div class="table" *ngFor="let table of dataTable" (click)="assignTable(table.tableId)">
+                {{ table.tableId }}<br>
+                <hr>{{ table.status === 0 ? 'Bàn trống' : 'Đang sử dụng' }}
+                <span class="icon-table" *ngIf="table.status === 1">&#10004;</span>
               </div>
             </div>
           </div>
         </div>
       </section>
-
       <section *ngIf="currentView === 'booking-schedule'">
         <div class="container">
           <div class="card">
             <div class="reservation-grid">
-              <div class="reservation">
+              <div class="reservation" *ngFor="let reservation of dataReservationAccept; let i = index">
                 <div class="row">
                   <div class="cell">
-                    <span class="data">John Doe - 123456789</span>
+                    <span class="data">{{reservation.consigneeName}} - {{reservation.guestPhone}}</span>
                   </div>
                 </div>
                 <hr>
                 <div class="row">
-                  <div class="col-md-3">
+                  <div class="col-md-3" style="display: flex;justify-content: center;align-items: center;">
                     <div class="cell">
-                      <span class="number-table">?</span>
+                      <span class="number-table">{{ reservation.tableId ? reservation.tableId : '?' }}</span>
                     </div>
                   </div>
                   <div class="vertical-line"></div>
                   <div class="col-md-8">
                     <div class="row">
-                      <div class="col-md-6">
+                      <div class="col-md-8">
                         <div class="cell">
-                          <span class="data">12:00 PM</span>
+                          <span>{{ reservation.reservationTime | date:'dd/MM/yyyy HH:mm' }}</span>
                         </div>
                       </div>
                       <div class="vertical-line"></div>
-                      <div class="col-md-5">
+                      <div class="col-md-3">
                         <div class="cell">
-                          <span class="data">4 Người</span>
+                          <span class="data">{{reservation.guestNumber}}</span>
                         </div>
                       </div>
                     </div>
                     <hr>
                     <div class="cell">
-                      <span class="data">100,000 VND</span>
+                      <span class="data">{{reservation.deposits}}</span>
                     </div>
                   </div>
                 </div>
                 <hr>
                 <div class="row">
-                  <div class="col-md-6">
-                    <div class="cell">
-                      <span class="icon">...</span>
+                  <div class="col-md-4" style="height: 20px;">
+                    <div class="dropdown">
+                      <button class="icon" (click)="toggleDropdown(i)">...</button>
+                      <div class="dropdown-content" [class.show]="reservation.isDropdownOpen">
+                        <a (click)="setView('table-layout')">Xếp bàn</a>
+                        <a href="#">Thêm món</a>
+                        <a href="#">Hủy đặt bàn</a>
+                      </div>
                     </div>
                   </div>
-                  <div class="col-md-6" style="display: flex;justify-content: center;align-items: center;">
-                      <span class="label-reser">Khách nhận bàn</span>
+                  <div class="col-md-8" style="display: flex;justify-content: center;align-items: center;height: 20px;">
+                    <span class="label-reser">Khách nhận bàn</span>
                   </div>
                 </div>
               </div>
@@ -114,9 +125,83 @@
 
       </section>
       <section *ngIf="currentView === 'booking-request'">
+        <div class="container">
+          <div class="card">
+            <div >
+              <table >
+                <thead>
+                  <tr>
+                    <th>Tên khách hàng</th>
+                    <th>Số điện thoại</th>
+                    <th>Ngày giờ nhận bàn</th>
+                    <th>Số lượng khách</th>
+                    <th>Đặt cọc</th>
+                    <th>Tình trạng bàn</th>
+                    <th>Trạng thái đơn</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody *ngFor="let reservation of dataReservationPending">
+                  <ng-container>
+                    <tr>
+                      <td>{{reservation.consigneeName}}</td>
+                      <td>{{reservation.guestPhone}}</td>
+                      <td>{{ reservation.reservationTime | date:'dd/MM/yyyy - HH:mm' }}</td>
+                      <td>{{reservation.guestNumber}}</td>
+                      <td>{{reservation.deposits}}</td>
+                      <td>{{reservation.statusOfTable}}</td>
+                      <td>{{reservation.status}}</td>
+                      <td>
+                        <button type="button" class="btn btn-primary btn-sm" (click)="getReservationById(reservation.reservationId)">Chi tiết</button>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
 
-        <p>Nội dung lịch đặt bàn ở đây.</p>
+
+              </table>
+            </div>
+          </div>
+        </div>
       </section>
+      <section *ngIf="currentView === 'detail-reservation'">
+
+        <div class="container">
+          <div class="card" *ngIf="reservationDetail">
+            <details open>
+              <summary>Thông tin đặt bàn</summary>
+              <div class="row">
+                  <p>Ngày giờ nhận bàn<span>:{{ reservationDetail.reservationTime | date:'dd/MM/yyyy HH:mm' }}</span></p>
+                  <p>Số lượng khách<span>:{{ reservationDetail.guestNumber}}</span></p>
+                  <p>Ghi chú<span>:{{ reservationDetail.note }}</span></p>
+                  <p>Trạng thái đơn<span>:{{ reservationDetail.status }}</span></p>
+              </div>
+            </details>
+            <details>
+              <summary>Bàn và khu vực</summary>
+              <div class="row">
+                  <p>Khu vực<span>:</span></p>
+                  <p>Bàn<span>:</span></p>
+                  <p>Loại bàn<span>:</span></p>
+              </div>
+            </details>
+            <details>
+              <summary>Thông tin khách hàng</summary>
+              <div class="row">
+                  <p>Họ tên<span>:{{ reservationDetail.consigneeName }}</span></p>
+                  <p>Số điện thoại<span>:{{ reservationDetail.guestPhone }}</span></p>
+                  <p>Email<span>:</span></p>
+                  <p>Địa chỉ<span>:</span></p>
+              </div>
+            </details>
+            <details>
+              <summary>Thông tin đơn hàng</summary>
+
+            </details>
+          </div>
+        </div>
+      </section>
+
       <section *ngIf="currentView === 'booking-history'">
 
         <p>Nội dung lịch sử đặt bàn ở đây.</p>
