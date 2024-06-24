@@ -1,51 +1,125 @@
-<div class="container mt-5">
-  <h2 class="text-center mb-4">Create Order</h2>
-  <div class="row">
-    <div class="col-md-6">
-      <div class="input-group mb-2">
-        <input type="text" class="form-control" id="customer" placeholder="Khách lẻ" name="customer" disabled>
-        <button class="btn btn-outline-secondary" type="button">
-          <i class="fas fa-user"></i> 
-        </button>
-      </div>
-      
-      <form>
-        <div class="form-group">
-          <label for="customerNameForm">Customer Name</label>
-          <input type="text" class="form-control" id="customerNameForm" placeholder="Enter customer name" name="customerNameForm" required>
+<body>
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Create Order</h2>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" id="customer" placeholder="Khách lẻ" name="customer" disabled>
+          <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#formModal">
+            <i class="fas fa-user"></i>
+          </button>
         </div>
-        <div class="form-group">
-          <label for="guestPhone">Guest Phone</label>
-          <input type="tel" class="form-control" id="guestPhone" placeholder="Enter Guest Phone">
-        </div>
-        <div class="form-group">
-          <label for="customerEmail">Email </label>
-          <input type="email" class="form-control" id="customerEmail" placeholder="Enter email" required>
-        </div>
-        <div class="form-group">
-          <label for="customerAddress">Address </label>
-          <input type="text" class="form-control" id="customerAddress" placeholder="Enter address" required>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">Submit Order</button>
-      </form>
-    </div>
-
-    <div class="col-md-6">
-      <div class="row">
-        <ng-container *ngFor="let list of dishes">
-          <div class="col-lg-4 col-md-6 mb-4" *ngFor="let dish of list.items">
-            <div class="card">
-              <img class="card-img-top" [src]="dish.imageUrl" alt="Card image cap" style="object-fit: cover; height: 150px;">
-              <div class="card-body">
-                <h5 class="card-title">{{ dish.itemName }}</h5>
-                <button class="btn btn-sm btn-outline-primary">
-                  <i class="fas fa-plus"></i> Add
+        <!-- Selected Items Section -->
+        <div class="cart-section mt-4">
+          <h4>Thông tin</h4>
+          <div *ngIf="selectedItems.length === 0" class="alert alert-info" role="alert">
+            Chưa có lựa chọn nào
+          </div>
+          <div class="col-md-12" *ngFor="let item of selectedItems; let i = index">
+            <div class="card mb-2">
+              <div class="card-body d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <img [src]="item.imageUrl" alt="Item image" class="img-thumbnail me-2" style="width: 70px; height: 50px;">
+                  <p class="mb-0">{{ item.itemName || item.nameCombo }}</p>
+                </div>
+                <button class="btn btn-danger btn-sm" (click)="removeItem(i)">
+                  <i class="fas fa-times"></i>
                 </button>
               </div>
             </div>
           </div>
-        </ng-container>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row mb-3">
+          <div class="col-6 pr-1">
+            <button class="btn btn-block" [ngClass]="{'btn-primary': showingDishes, 'btn-secondary': !showingDishes}" (click)="showDishes()">Món ăn</button>
+          </div>
+          <div class="col-6 pl-1">
+            <button class="btn btn-block" [ngClass]="{'btn-primary': showingCombos, 'btn-secondary': !showingCombos}" (click)="showCombos()">Combo</button>
+          </div>
+        </div>
+
+        <div class="dishes-section" *ngIf="showingDishes">
+          <div class="row">
+            <ng-container *ngFor="let list of dishes">
+              <div class="col-lg-4 col-md-6 mb-4" *ngFor="let dish of list.items">
+                <div class="card">
+                  <div class="image-container">
+                    <img class="card-img-top" [src]="dish.imageUrl" alt="Dish image">
+                    <div class="overlay">
+                      <div class="overlay-text">{{ dish.itemName }}</div>
+                    </div>
+                  </div>
+                  <div class="card-body text-center">
+                    <button class="btn btn-sm btn-outline-primary" (click)="addItem(dish)">
+                      <i class="fas fa-plus"></i> Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <div class="combos-section" *ngIf="showingCombos">
+          <div class="row">
+            <ng-container *ngFor="let list of combo">
+              <div class="col-lg-4 col-md-6 mb-4" *ngFor="let cb of list.items">
+                <div class="card">
+                  <div class="image-container">
+                    <img class="card-img-top" [src]="cb.imageUrl" alt="Combo image">
+                    <div class="overlay">
+                      <div class="overlay-text">{{ cb.nameCombo }}</div>
+                    </div>
+                  </div>
+                  <div class="card-body text-center">
+                    <button class="btn btn-sm btn-outline-primary" (click)="addItem(cb)">
+                      <i class="fas fa-plus"></i> Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="formModalLabel">Thông tin khách hàng</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="customerNameForm">Tên khách hàng</label>
+              <input type="text" class="form-control" id="customerNameForm" placeholder="Nhập tên khách hàng" name="customerNameForm" required>
+            </div>
+            <div class="form-group">
+              <label for="guestPhone">Số điện thoại</label>
+              <input type="tel" class="form-control" id="guestPhone" placeholder="Nhập số điện thoại" required>
+            </div>
+            <div class="form-group">
+              <label for="customerEmail">Email</label>
+              <input type="email" class="form-control" id="customerEmail" placeholder="Nhập email" required>
+            </div>
+            <div class="form-group">
+              <label for="customerAddress">Địa chỉ</label>
+              <input type="text" class="form-control" id="customerAddress" placeholder="Nhập địa chỉ" required>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+              <button type="submit" class="btn btn-primary">Lưu lại</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
