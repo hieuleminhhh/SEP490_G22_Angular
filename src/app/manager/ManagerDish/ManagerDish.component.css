@@ -37,4 +37,8 @@
     text-transform: uppercase; 
     text-decoration: underline; 
   }
+  .small-img-thumbnail {
+    width: 100px; /* Adjust width as needed */
+    height: auto; /* Maintain aspect ratio */
+  }
   

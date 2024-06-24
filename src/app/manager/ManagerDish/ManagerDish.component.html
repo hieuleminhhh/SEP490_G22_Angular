@@ -172,7 +172,7 @@
                     <div class="mb-3">
                         <label for="image" class="form-label">Hình ảnh</label>
                         <input type="file" class="form-control" id="image" (change)="onUpdateImageSelect($event)">
-                        <img *ngIf="updatedDish.imageUrl" [src]="updatedDish.imageUrl" class="img-thumbnail" alt="Current Image">
+                        <img *ngIf="updatedDish.imageUrl" [src]="updatedDish.imageUrl" class="img-thumbnail small-img-thumbnail" alt="Current Image">
                     </div>
                     <div class="mb-3 custom-select">
                         <label for="category" class="form-label">Tên thể loại</label>
