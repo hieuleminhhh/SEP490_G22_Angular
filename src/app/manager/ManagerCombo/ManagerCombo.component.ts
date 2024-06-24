@@ -208,18 +208,13 @@ export class ManagerComboComponent implements OnInit {
     this.comboService.UpdateCombo(this.updatedCombo).subscribe(
       (response) => {
         console.log('Combo updated successfully:', response.nameCombo);
-        if (this.selectedFile) {
-          this.uploadImage();}
-          if (!this.selectedFile) {
-            this.addNew.imageUrl = null;
-          }
         this.updateComboModal.nativeElement.classList.remove('show');
         this.updateComboModal.nativeElement.style.display = 'none';
         document.body.classList.remove('modal-open');
         const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
         modalBackdrop?.parentNode?.removeChild(modalBackdrop);
         this.loadListCombo();
-        this.resetForm();
+        this.resetUpdateForm();
         this.successMessage = response.message;
         setTimeout(() => { this.successMessage = ''; }, 5000);
       },
@@ -345,11 +340,30 @@ export class ManagerComboComponent implements OnInit {
     };
     this.imageUrl = '';
     this.clearAddErrors();
-    this.clearUpdateErrors();
     this.addErrorMessage = '';
     const fileInput = document.getElementById('image') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
     }
   }
+  resetUpdateForm(): void {
+    this.addNew = {
+      nameCombo: '',
+      price: 0,
+      note: '',
+      imageUrl: '',
+      isActive: true,
+      message: '',
+      dishIds: [],
+    };
+    this.imageUrl = '';
+    this.clearUpdateErrors();
+    this.addErrorMessage = '';
+    this.selectedDishes =[];
+    const fileInput = document.getElementById('image') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+  
 }
