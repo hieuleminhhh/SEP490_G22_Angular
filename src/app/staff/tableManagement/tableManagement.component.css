@@ -1,3 +1,4 @@
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -398,5 +399,80 @@ summary {
 .row p span {
   position: absolute;
   left: 30%; /* Đẩy span về phía giữa */
-  transform: translateX(-50%); /* Dịch chuyển span để nó nằm giữa */
+}
+/* Định dạng container của giỏ hàng */
+.cart-container {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+/* Định dạng tiêu đề giỏ hàng */
+.cart-header {
+  padding-bottom: 10px;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 15px;
+}
+
+/* Định dạng tiêu đề cột trong giỏ hàng */
+.cart-header h5 {
+  font-size: 16px;
+  text-align: center;
+}
+
+/* Định dạng mục giỏ hàng */
+.cart-items .row {
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.cart-items .row:last-child {
+  border-bottom: none;
+}
+
+/* Định dạng hình ảnh trong mục giỏ hàng */
+.cart-items img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+/* Định dạng chi tiết mục giỏ hàng */
+.cart-items .col {
+  text-align: center;
+}
+
+.cart-items .col div,
+.cart-items .col span {
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Định dạng giá và các chi tiết khác */
+.price-close {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Định dạng giá */
+.price {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Định dạng cho các thiết bị nhỏ hơn */
+@media (max-width: 768px) {
+  .cart-header h5,
+  .cart-items .col {
+    font-size: 14px;
+  }
+
+  .cart-items img {
+    height: 40px;
+  }
+}
+.fas{
+  font-family: "Font Awesome 6 Free";
 }

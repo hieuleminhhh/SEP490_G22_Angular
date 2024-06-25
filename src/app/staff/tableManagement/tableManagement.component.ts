@@ -21,6 +21,7 @@ export class TableManagementComponent implements OnInit {
   selectedTime:string='today';
   dataReservationPending:any;
   reservationDetail:any;
+  showDropdown = false;
 
   constructor(private tableService:TableService, private reservationService:ReservationService) { }
 
@@ -36,6 +37,9 @@ export class TableManagementComponent implements OnInit {
     this.dataReservationAccept.forEach((reservation: any, i: number) => {
       reservation.isDropdownOpen = (i === index) ? !reservation.isDropdownOpen : false;
     });
+  }
+  tableDropdown() {
+    this.showDropdown = !this.showDropdown;
   }
 
   @HostListener('document:click', ['$event'])
