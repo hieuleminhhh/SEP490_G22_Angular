@@ -76,4 +76,9 @@ getReservationAccept(status:number): Observable<any> {
   return this.http.get(url);
 }
 
+createResevetion(reservation: any): Observable<any> {
+  const url = `https://localhost:7188/api/Reservations/create`;
+  return this.http.post(url, reservation);
+}
+
 }

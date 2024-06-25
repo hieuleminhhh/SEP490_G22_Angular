@@ -16,7 +16,8 @@ import { OrderDetailComponent } from './common/orderDetail/orderDetail.component
 import { TableManagementComponent } from './staff/tableManagement/tableManagement.component';
 import { ManagerOrderComponent } from './staff/ManagerOrder/ManagerOrder.component';
 import { CreateUpdateOrderComponent } from './staff/ManagerOrder/CreateUpdateOrder/CreateUpdateOrder.component';
-import { TableManagementComponent } from './staff/tableManagement/tableManagement.component';
+import { PaymentReservationComponent } from './common/paymentReservation/paymentReservation.component';
+
 
 export const routes: Routes = [
     {'path': '', component:HomeComponent},
@@ -36,5 +37,5 @@ export const routes: Routes = [
     {'path': 'tableManagement', component:TableManagementComponent},
     {'path': 'managerorder', component:ManagerOrderComponent},
     {'path': 'cuorder', component:CreateUpdateOrderComponent},
-    {'path': 'tableManagement', component:TableManagementComponent},
+    {'path': 'paymentReservation', component:PaymentReservationComponent},
 ];

@@ -1,0 +1,141 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1500px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.back-button {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.title-container {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.spacer {
+  width: 90px; /* This should match the width of the button */
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+  margin: 0;
+}
+
+
+
+.booking-info, .menu-info {
+  width: 100%;
+}
+
+.booking-info h3, .menu-info h3, .payment-section h3 {
+  background-color: #e9ecef;
+  padding: 10px;
+  border-radius: 4px;
+  color: #333;
+}
+
+.booking-info p, .payment-section p {
+  margin: 10px 10px;
+}
+
+.booking-info p {
+  flex: 1; /* Phần tử p sẽ tự động chia đều chiều rộng của flex container */
+  margin-bottom: 10px; /* Khoảng cách giữa các dòng */
+  display: block; /* Hiển thị mỗi thẻ p trên một dòng */
+  padding-right: 50%; /* Tạo khoảng trống bên phải để span có thể chiếm */
+}
+
+.booking-info p span {
+  position: absolute;
+  left: 30%; /* Đẩy span về phía giữa */
+}
+
+.booking-info span, .payment-section span {
+  font-weight: bold;
+}
+
+.menu-info table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.menu-info table, th, td {
+  border: 1px solid #ddd;
+}
+
+th, td {
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+tfoot td {
+  font-weight: bold;
+}
+
+.payment-section {
+  padding: 50px;
+  background-color: #e9ecef;
+  border-radius: 8px;
+}
+
+.payment-section p {
+  display: flex;
+  justify-content: space-between;
+}
+
+.payment-section form {
+  margin-top: 10px;
+}
+.payment-section h3 {
+  text-align: center;
+  color: #28a745;
+}
+
+
+.payment-section input[type="radio"] {
+  margin-right: 10px;
+}
+
+.payment-section button {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  display: block;
+  width: 100%;
+}
+
+.payment-section button:hover {
+  background-color: #218838;
+}
