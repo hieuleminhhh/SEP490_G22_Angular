@@ -108,54 +108,58 @@ export class BookingComponent implements OnInit {
     this.availableTimes.push(time);
   }
 
-  submitForm(form:any) {
+  submitForm(form: any) {
     this.formSubmitted = true;
     if (form.valid) {
-    let dateTime = this.formatDateTime(this.reservation.date, this.reservation.time);
+      let dateTime = this.formatDateTime(this.reservation.date, this.reservation.time);
 
-    const request = {
-      guestPhone: this.guestPhone,
-      email: '',
-      guestAddress: '',
-      consigneeName: this.consigneeName,
-      reservationTime: dateTime,
-      guestNumber: this.reservation.people,
-      note: this.note,
-      orderDate: new Date().toISOString(),
-      status: 0,
-      receivingOrder: dateTime,
-      totalAmount: 0,
-      deposits: 0,
-      orderDetails: this.cartItems.map(item => ({
-        unitPrice: this.getTotalPrice(item),
-        quantity: item.quantity,
-        dishId: item.dishId,
-        comboId: item.comboId
-      }))
-    };
-    console.log(request);
-    sessionStorage.setItem('request', JSON.stringify(request));
-    sessionStorage.setItem('cart', JSON.stringify(this.cartItems));
-    this.router.navigate(['/paymentReservation']);
-  }
-    // this.reservationService.createResevetion(request).subscribe({
-    //   next: response => {
-    //     console.log('Order submitted successfully', response);
-    //     this.reservationService.clearCart();
-    //     this.router.navigate(['/payment']);
+      const request = {
+        guestPhone: this.guestPhone,
+        email: '',
+        guestAddress: '',
+        consigneeName: this.consigneeName,
+        reservationTime: dateTime,
+        guestNumber: this.reservation.people,
+        note: this.note,
+        orderDate: new Date().toISOString(),
+        status: 0,
+        receivingOrder: dateTime,
+        totalAmount: 0,
+        deposits: 0,
+        orderDetails: this.cartItems.map(item => ({
+          unitPrice: this.getTotalPrice(item),
+          quantity: item.quantity,
+          dishId: item.dishId,
+          comboId: item.comboId
+        }))
+      };
+      console.log(request);
+      sessionStorage.setItem('request', JSON.stringify(request));
+      sessionStorage.setItem('cart', JSON.stringify(this.cartItems));
 
-    //   },
-    //   error: error => {
-    //     if (error.error instanceof ErrorEvent) {
-    //       // Lỗi client-side hoặc mạng
-    //       console.error('An error occurred:', error.error.message);
-    //     } else {
-    //       // Lỗi server-side
-    //       console.error(`Backend returned code ${error.status}, ` +
-    //         `body was: ${JSON.stringify(error.error)}`);
-    //     }
-    //   }
-    // });
+      if (request.orderDetails.length > 0) {
+        this.router.navigate(['/paymentReservation']);
+      }else{
+        this.reservationService.createResevetion(request).subscribe({
+          next: response => {
+            console.log('Order submitted successfully', response);
+            this.reservationService.clearCart();
+            this.router.navigate(['/paymentReservation']);
+
+          },
+          error: error => {
+            if (error.error instanceof ErrorEvent) {
+              // Lỗi client-side hoặc mạng
+              console.error('An error occurred:', error.error.message);
+            } else {
+              // Lỗi server-side
+              console.error(`Backend returned code ${error.status}, ` +
+                `body was: ${JSON.stringify(error.error)}`);
+            }
+          }
+        });
+      }
+    }
   }
   formatDateTime(date: string, time: string): string {
     return `${date}T${time}:00.000Z`;
