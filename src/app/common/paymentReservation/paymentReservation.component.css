@@ -44,8 +44,6 @@ h2 {
   margin: 0;
 }
 
-
-
 .booking-info, .menu-info {
   width: 100%;
 }
@@ -75,6 +73,7 @@ h2 {
 
 .booking-info span, .payment-section span {
   font-weight: bold;
+  width: 200px;
 }
 
 .menu-info table {

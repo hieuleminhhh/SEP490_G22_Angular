@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-paymentReservation',
-  standalone:true,
+  standalone: true,
   templateUrl: './paymentReservation.component.html',
   styleUrls: ['./paymentReservation.component.css'],
   imports: [CommonModule, FormsModule]
@@ -16,22 +16,42 @@ export class PaymentReservationComponent implements OnInit {
   constructor(private reservationService: ReservationService, private router: Router) { }
 
   data: any;
-  cartItem:any;
+  cartItem: any;
+  ispayment: boolean = false;
 
-
-  ngOnInit() :void{
-    const dataString = sessionStorage.getItem('request');
+  ngOnInit(): void {
+    const request = sessionStorage.getItem('request');
     const cart = sessionStorage.getItem('cart');
-    if (dataString) {
-      this.data = JSON.parse(dataString);
+    const storedData = sessionStorage.getItem('data');
+    const storedCartItem = sessionStorage.getItem('cartItem');
+    if (storedData && storedCartItem) {
+      this.data = JSON.parse(storedData);
+      this.cartItem = JSON.parse(storedCartItem);
+      this.ispayment = false;
+
+      // Clear the temporary storage
+      sessionStorage.removeItem('data');
+      sessionStorage.removeItem('cartItem');
     }
-    if (cart) {
+    else if (cart && cart !== '[]' && request) {
+      sessionStorage.removeItem('cart');
+      sessionStorage.removeItem('request');
+
       this.cartItem = JSON.parse(cart);
+      this.data = JSON.parse(request);
+      this.ispayment = true;
     }
+    else if (request) {
+      sessionStorage.removeItem('request');
+      sessionStorage.removeItem('cart');
+      this.data = JSON.parse(request);
+    }
+
     console.log(this.data);
     console.log(this.cartItem);
-
+    console.log(this.ispayment);
   }
+
   getTotalPrice(item: any): number {
     const price = item.discountedPrice != null ? item.discountedPrice : item.price;
     return parseFloat((item.quantity * price).toFixed(2));
@@ -41,5 +61,47 @@ export class PaymentReservationComponent implements OnInit {
       const price = item.discountedPrice != null ? item.discountedPrice : item.price;
       return total + (price * item.quantity);
     }, 0).toFixed(2));
+  }
+  submitForm() {
+    const request = {
+      guestPhone: this.data.guestPhone,
+      email: '',
+      guestAddress: '',
+      consigneeName: this.data.consigneeName,
+      reservationTime: this.data.reservationTime,
+      guestNumber: this.data.guestNumber,
+      note: this.data.note,
+      orderDate: new Date().toISOString(),
+      status: 0,
+      receivingOrder: this.data.reservationTime,
+      totalAmount: this.getTotalCartPrice(),
+      deposits: this.getTotalCartPrice() / 2,
+      orderDetails: this.cartItem.map((item: { quantity: any; dishId: any; comboId: any; }) => ({
+        unitPrice: this.getTotalPrice(item),
+        quantity: item.quantity,
+        dishId: item.dishId,
+        comboId: item.comboId
+      }))
+    };
+    console.log(request);
+    this.reservationService.createResevetion(request).subscribe({
+      next: response => {
+        console.log('Order submitted successfully', response);
+        this.reservationService.clearCart();
+        sessionStorage.setItem('data', JSON.stringify(this.data));
+        sessionStorage.setItem('cartItem', JSON.stringify(this.cartItem));
+        window.location.reload();
+      },
+      error: error => {
+        if (error.error instanceof ErrorEvent) {
+          // Lỗi client-side hoặc mạng
+          console.error('An error occurred:', error.error.message);
+        } else {
+          // Lỗi server-side
+          console.error(`Backend returned code ${error.status}, ` +
+            `body was: ${JSON.stringify(error.error)}`);
+        }
+      }
+    });
   }
 }
