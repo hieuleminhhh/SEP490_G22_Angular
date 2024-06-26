@@ -67,6 +67,18 @@ private updateCartState() {
   this.itemCountSubject.next(itemCount);
 }
 
+getReservation(reservationId:number): Observable<any> {
+  const url = `https://localhost:7188/api/Reservations/${reservationId}`;
+  return this.http.get(url);
+}
+getReservationAccept(status:number): Observable<any> {
+  const url = `https://localhost:7188/api/Reservations?status=${status}`;
+  return this.http.get(url);
+}
 
+createResevetion(reservation: any): Observable<any> {
+  const url = `https://localhost:7188/api/Reservations/create`;
+  return this.http.post(url, reservation);
+}
 
 }

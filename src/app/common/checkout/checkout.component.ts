@@ -158,13 +158,11 @@ export class CheckoutComponent implements OnInit {
       recevingOrder: receivingTime,
       totalAmount: 0,
       deposits: 0,
-      cartItems: this.cartItems.map(item => ({
+      note: this.note,
+      orderDetails: this.cartItems.map(item => ({
         unitPrice: this.getTotalPrice(item),
         quantity: item.quantity,
-        note: this.note,
         dishId: item.dishId,
-        orderId: 0,
-        dishesServed: 0,
         comboId: item.comboId
       }))
     };
@@ -183,8 +181,15 @@ export class CheckoutComponent implements OnInit {
         }
       },
       error: error => {
-        console.error('Error submitting order', error);
-      }
+        if (error.error instanceof ErrorEvent) {
+            // Lỗi client-side hoặc mạng
+            console.error('An error occurred:', error.error.message);
+        } else {
+            // Lỗi server-side
+            console.error(`Backend returned code ${error.status}, ` +
+                          `body was: ${JSON.stringify(error.error)}`);
+        }
+    }
     });
   }
 

@@ -9,7 +9,7 @@ import { ReservationService } from '../../../service/reservation.service';
 
 @Component({
   selector: 'app-booking',
-  standalone:true,
+  standalone: true,
   templateUrl: './booking.component.html',
   styleUrls: ['./booking.component.css'],
   imports: [CommonModule, FormsModule]
@@ -23,13 +23,16 @@ export class BookingComponent implements OnInit {
     people: 2,
     notes: ''
   };
-
   itemQuantityMap: { [key: string]: number } = {};
 
   private cartSubscription!: Subscription;
   minDate: string; // Ngày nhận tối thiểu là ngày hiện tại
   maxDate: string; // Ngày nhận tối đa là ngày hiện tại + 7 ngày
   availableHours: string[] = [];
+
+  consigneeName: string = '';
+  guestPhone: string = '';
+  note: string = '';
 
   constructor(private reservationService: ReservationService, private router: Router) {
     const today = new Date();
@@ -46,7 +49,7 @@ export class BookingComponent implements OnInit {
       notes: ''
     };
     this.generateAvailableHours();
-   }
+  }
   availableTimes: string[] = [];
   formSubmitted = false;
 
@@ -105,14 +108,57 @@ export class BookingComponent implements OnInit {
     this.availableTimes.push(time);
   }
 
-  submitForm(form: any) {
+  submitForm(form:any) {
     this.formSubmitted = true;
     if (form.valid) {
-      // Handle the form submission.
-      console.log('Form is valid, submitting:', this.reservation);
-    } else {
-      console.log('Form is invalid, please fill in all required fields.');
-    }
+    let dateTime = this.formatDateTime(this.reservation.date, this.reservation.time);
+
+    const request = {
+      guestPhone: this.guestPhone,
+      email: '',
+      guestAddress: '',
+      consigneeName: this.consigneeName,
+      reservationTime: dateTime,
+      guestNumber: this.reservation.people,
+      note: this.note,
+      orderDate: new Date().toISOString(),
+      status: 0,
+      receivingOrder: dateTime,
+      totalAmount: 0,
+      deposits: 0,
+      orderDetails: this.cartItems.map(item => ({
+        unitPrice: this.getTotalPrice(item),
+        quantity: item.quantity,
+        dishId: item.dishId,
+        comboId: item.comboId
+      }))
+    };
+    console.log(request);
+    sessionStorage.setItem('request', JSON.stringify(request));
+    sessionStorage.setItem('cart', JSON.stringify(this.cartItems));
+    this.router.navigate(['/paymentReservation']);
+  }
+    // this.reservationService.createResevetion(request).subscribe({
+    //   next: response => {
+    //     console.log('Order submitted successfully', response);
+    //     this.reservationService.clearCart();
+    //     this.router.navigate(['/payment']);
+
+    //   },
+    //   error: error => {
+    //     if (error.error instanceof ErrorEvent) {
+    //       // Lỗi client-side hoặc mạng
+    //       console.error('An error occurred:', error.error.message);
+    //     } else {
+    //       // Lỗi server-side
+    //       console.error(`Backend returned code ${error.status}, ` +
+    //         `body was: ${JSON.stringify(error.error)}`);
+    //     }
+    //   }
+    // });
+  }
+  formatDateTime(date: string, time: string): string {
+    return `${date}T${time}:00.000Z`;
   }
   decreaseQuantity(item: any) {
     if (item.quantity > 1) {

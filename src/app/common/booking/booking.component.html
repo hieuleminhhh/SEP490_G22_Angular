@@ -60,7 +60,7 @@
       <div class="col-md-6">
         <div class="form-group">
           <label for="name">Tên người đặt (*)</label>
-          <input type="text" id="name" name="name" placeholder="Nhập tên" [(ngModel)]="reservation.name" required
+          <input type="text" id="name" name="consigneeName" placeholder="Nhập tên" [(ngModel)]="consigneeName" required
             #name="ngModel">
           <div *ngIf="name.invalid && (name.dirty || name.touched || formSubmitted)">
             <small class="text-danger">Vui lòng nhập Tên quý khách!</small>
@@ -70,7 +70,7 @@
       <div class="col-md-6">
         <div class="form-group">
           <label for="phone">Số điện thoại (*)</label>
-          <input type="tel" id="phone" name="phone" placeholder="Nhập số điện thoại" [(ngModel)]="reservation.phone"
+          <input type="tel" id="phone" name="guestPhone" placeholder="Nhập số điện thoại" [(ngModel)]="guestPhone"
             required pattern="^0\d{9,10}$" #phone="ngModel">
             <div *ngIf="phone.invalid && (phone.dirty || phone.touched || formSubmitted)">
               <small class="text-danger" *ngIf="phone.errors?.['pattern']">
@@ -106,7 +106,7 @@
       <div class="col-md-4">
         <div class="form-group">
           <label for="people">Số người (*)</label>
-          <input type="number" id="people" name="people" min="1" [(ngModel)]="reservation.people" value="2" required
+          <input type="number" id="people" name="guestNumber" min="1" [(ngModel)]="reservation.people" value="2" required
             #people="ngModel">
           <div *ngIf="people.invalid && (people.dirty || people.touched || formSubmitted)">
             <small class="text-danger">Vui lòng nhập số lượng khách</small>
@@ -116,7 +116,7 @@
     </div>
     <div class="form-group">
       <label for="notes">Ghi chú</label>
-      <textarea id="notes" name="notes" placeholder="Ghi chú" [(ngModel)]="reservation.notes"></textarea>
+      <textarea id="notes" name="note" placeholder="Ghi chú" [(ngModel)]="note"></textarea>
     </div>
     <button type="submit">Đặt bàn</button>
   </form>
