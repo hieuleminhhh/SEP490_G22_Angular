@@ -40,3 +40,9 @@ export interface ListOrderDetailByOrder{
   orderDetails:ListOrderDetail[];
 
 }
+export interface AddOrderDetail{
+  unitPrice: number;
+  quantity: number;
+  dishId:number;
+  comboId:number;
+}

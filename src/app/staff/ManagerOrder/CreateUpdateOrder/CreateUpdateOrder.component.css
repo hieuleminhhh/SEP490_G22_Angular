@@ -89,3 +89,7 @@
     padding: 20px;
     border-radius: 10px;
   }
+  .small-input {
+    width: 60px; /* Adjust the width as needed */
+  }
+  
