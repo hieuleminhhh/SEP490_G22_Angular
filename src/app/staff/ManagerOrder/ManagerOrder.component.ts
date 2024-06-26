@@ -21,6 +21,8 @@ export class ManagerOrderComponent implements OnInit {
   pageSize: number = 5;
   totalCount: number = 0;
   totalPagesArray: number[] = [];
+  weeks: { start: string, end: string }[] = [];
+  years: number[] = [];
   statuses = [
     { value: 0, text: 'Đang chờ' },
     { value: 1, text: 'Đã chấp nhận' },
@@ -32,6 +34,8 @@ export class ManagerOrderComponent implements OnInit {
 
   ngOnInit() {
     this.loadListOrder();
+    this.populateWeeks();
+    this.populateYears();
   }
   loadListOrder(search: string = ''): void {
     this.orderService.ListOrders(this.currentPage, this.pageSize, search).subscribe(
@@ -124,5 +128,47 @@ onStatusChange(event: Event, orderId: number): void {
   navigateToCreateOrder() {
     this.router.navigate(['cuorder']);
   }
+  populateWeeks() {
+    const selectElement = document.getElementById('week') as HTMLSelectElement;
+    const currentDate = new Date();
+    const currentWeekNumber = this.getWeekNumber(currentDate);
   
+    for (let i = 1; i <= 52; i++) {
+      const startOfWeek = new Date(currentDate.getFullYear(), 0, (i - 1) * 7 + 1);
+      const endOfWeek = new Date(currentDate.getFullYear(), 0, (i - 1) * 7 + 7);
+  
+      const option = document.createElement('option');
+      option.value = i.toString();
+      const startDay = this.formatTwoDigits(startOfWeek.getDate());
+      const startMonth = this.formatTwoDigits(startOfWeek.getMonth() + 1);
+      const endDay = this.formatTwoDigits(endOfWeek.getDate());
+      const endMonth = this.formatTwoDigits(endOfWeek.getMonth() + 1);
+  
+      option.text = `${startDay}/${startMonth} To ${endDay}/${endMonth}`;
+      selectElement.appendChild(option);
+  
+      if (i === currentWeekNumber) {
+        option.selected = true;
+      }
+    }
+  }
+  
+  private getWeekNumber(date: Date): number {
+    const oneJan = new Date(date.getFullYear(), 0, 1);
+    const weekNumber = Math.ceil(((date.getTime() - oneJan.getTime()) / 86400000 + oneJan.getDay() + 1) / 7);
+    return weekNumber;
+  }
+  
+  private formatTwoDigits(value: number): string {
+    return value < 10 ? `0${value}` : `${value}`;
+  }
+  populateYears() {
+    const currentYear = new Date().getFullYear();
+    for (let i = currentYear; i >= currentYear - 5; i--) {
+      this.years.push(i);
+    }
+  }
+  createNewOrder() {
+    this.router.navigate(['/cuorder']); 
+  }
 }

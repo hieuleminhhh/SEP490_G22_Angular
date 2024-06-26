@@ -1,3 +1,6 @@
+import { AddOrderDetail } from "./orderDetail.model";
+
+//guest
 export interface Order{
   orderId:number;
   orderDate:Date;
@@ -8,6 +11,7 @@ export interface Order{
   tableId:number;
   guestPhone:string;
 }
+//manager
 export interface ManagerOrder {
   orderId: number;
   orderDate: Date;
@@ -29,4 +33,18 @@ export interface ListAllOrder {
   page: number;
   pageSize: number;
   totalPages: number;
+}
+export interface AddNewOrder {
+  guestPhone: string;
+  email: string;
+  addressId: number | null;
+  guestAddress: string;
+  consigneeName: string;
+  orderDate: Date;
+  status: number;
+  recevingOrder: Date | null;
+  totalAmount: number;
+  deposits: number;
+  note: string;
+  orderDetails: AddOrderDetail[];
 }
