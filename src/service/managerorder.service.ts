@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
-import { ListAllOrder } from '../models/order.model';
+import { AddNewOrder, ListAllOrder } from '../models/order.model';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -26,6 +26,10 @@ export class ManagerOrderService {
   UpdateOrderStatus(orderId: number, status: number): Observable<any> {
     const url = `${this.apiUrl}/orders/${orderId}/status`;
     return this.http.patch<any>(url, { status });
+  }
+  AddNewOrder(newOrder: AddNewOrder): Observable<any> {
+    const url = `${this.apiUrl}/Cart/AddNewOrder`;
+    return this.http.post<any>(url, newOrder, httpOptions);
   }
 }
 

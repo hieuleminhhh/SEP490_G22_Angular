@@ -11,24 +11,58 @@
         </div>
         <!-- Selected Items Section -->
         <div class="cart-section mt-4">
-          <h4>Thông tin</h4>
-          <div *ngIf="selectedItems.length === 0" class="alert alert-info" role="alert">
-            Chưa có lựa chọn nào
+  <h4>Thông tin</h4>
+  <div *ngIf="selectedItems.length === 0" class="alert alert-info" role="alert">
+    Chưa có lựa chọn nào
+  </div>
+  <table class="table">
+    <thead>
+      <tr *ngIf="selectedItems.length > 0">
+        <th scope="col">Tên món</th>
+        <th scope="col">Số lượng</th>
+        <th scope="col">Giá món</th>
+        <th scope="col">Tổng</th>
+        <th scope="col"></th> <!-- Column for delete button -->
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of selectedItems; let i = index">
+        <td>
+          <div class="d-flex align-items-center">
+            <img [src]="item.imageUrl" alt="Item image" class="img-thumbnail me-2" style="width: 70px; height: 50px;">
+            <p class="mb-0">{{ item.itemName || item.nameCombo }}</p>
           </div>
-          <div class="col-md-12" *ngFor="let item of selectedItems; let i = index">
-            <div class="card mb-2">
-              <div class="card-body d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                  <img [src]="item.imageUrl" alt="Item image" class="img-thumbnail me-2" style="width: 70px; height: 50px;">
-                  <p class="mb-0">{{ item.itemName || item.nameCombo }}</p>
-                </div>
-                <button class="btn btn-danger btn-sm" (click)="removeItem(i)">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-            </div>
+        </td>
+        <td>
+          <div class="input-group">
+            <button class="btn btn-outline-secondary" (click)="updateQuantity(i, item.quantity - 1)" [disabled]="item.quantity <= 1">-</button>
+            <input type="number" class="form-control text-center small-input" [(ngModel)]="item.quantity" (change)="validateQuantity(i)" min="1" max="100">
+            <button class="btn btn-outline-secondary" (click)="updateQuantity(i, item.quantity + 1)" [disabled]="item.quantity >= 100">+</button>
           </div>
-        </div>
+        </td>
+        <td>{{ item.price | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
+        <td>{{ item.totalPrice | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" (click)="removeItem(i)">
+            <i class="fas fa-times"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div *ngIf="selectedItems.length > 0" class="total-amount mt-3">
+    <strong>Tổng cộng đơn:</strong> {{ calculateTotalAmount() | currency:'USD':'symbol-narrow':'1.2-2' }}
+  </div>
+  <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
+    <button class="btn btn-primary btn-lg" (click)="createOrder()">
+      Lưu lại
+    </button>
+  </div>
+</div>
+<div *ngIf="successMessage" class="alert alert-success" role="alert">
+  {{ successMessage }}
+</div>
+
       </div>
       <div class="col-md-6">
         <div class="row mb-3">
