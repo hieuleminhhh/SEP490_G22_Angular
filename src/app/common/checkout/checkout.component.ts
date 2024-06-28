@@ -159,6 +159,7 @@ export class CheckoutComponent implements OnInit {
       totalAmount: 0,
       deposits: 0,
       note: this.note,
+      type:2,
       orderDetails: this.cartItems.map(item => ({
         unitPrice: this.getTotalPrice(item),
         quantity: item.quantity,

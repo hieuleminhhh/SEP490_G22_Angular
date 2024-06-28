@@ -126,6 +126,7 @@ export class BookingComponent implements OnInit {
         receivingOrder: dateTime,
         totalAmount: 0,
         deposits: 0,
+        type:3,
         orderDetails: this.cartItems.map(item => ({
           unitPrice: this.getTotalPrice(item),
           quantity: item.quantity,

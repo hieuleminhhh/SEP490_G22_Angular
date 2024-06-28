@@ -15,6 +15,7 @@ form {
   padding: 20px; /* Add padding inside the form */
   margin: 0 auto; /* Set margin to auto to center the form horizontally */
   width: 350px; /* Set the width of the form */
+  margin-top: 150px;
 }
 
 /* Label */
@@ -67,6 +68,7 @@ button:hover {
 
 .phone-form {
   text-align: center; /* Canh giữa nội dung trong form */
+  margin-top: 150px;
 }
 
 /* Thiết lập CSS cho button container */
