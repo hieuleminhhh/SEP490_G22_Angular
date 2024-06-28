@@ -1,4 +1,4 @@
-<div>
+<div style="height: 500px;">
   <!-- Form nhập số điện thoại -->
   <form id="phoneForm" *ngIf="!showOtpForm && showPhoneForm" (ngSubmit)="onSubmitPhone()" class="phone-form">
     <label for="phone">Phone Number:</label>
@@ -33,7 +33,7 @@
       <button (click)="showData('4')" [class.active]="selectedTab === '4'" style="width:160px;">Đã hủy</button>
     </div>
 
-    <div class="tab-content">
+    <div class="tab-content" style="height: 500px;">
       <div *ngFor="let order of filteredOrders" class="order-section card mb-3">
         <div class="card-body">
           <div class="order-header d-flex justify-content-between align-items-center mb-2">

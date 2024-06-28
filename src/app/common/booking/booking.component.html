@@ -98,6 +98,9 @@
             <option value="">Chọn</option>
             <option *ngFor="let time of availableTimes" [value]="time">{{ time }}</option>
           </select>
+          <div *ngIf="availableTimes.length<1">
+            <small class="text-danger">Đã hết giờ đặt bàn ngày hôm nay!</small>
+          </div>
           <div *ngIf="time.invalid && (time.dirty || time.touched || formSubmitted)">
             <small class="text-danger">Vui lòng chọn giờ ăn!</small>
           </div>
