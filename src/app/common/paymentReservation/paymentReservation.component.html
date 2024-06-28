@@ -16,7 +16,7 @@
           <h3>Thông tin đơn đặt bàn</h3>
           <p>Tên người đặt bàn<span>:<span style="margin-left: 50px;">{{data.consigneeName}}</span></span></p>
           <p>Điện thoại<span>:<span style="margin-left: 50px;">{{data.guestPhone}}</span></span></p>
-          <p>Thời gian dùng bữa dự kiến<span>:<span style="margin-left: 50px;">{{data.reservationTime | date:'dd/MM/yyyy(HH:mm)'}}</span></span></p>
+          <p>Thời gian dùng bữa dự kiến<span>:<span style="margin-left: 50px;">{{data.reservationTime | date:'dd/MM/yyyy (HH:mm)'}}</span></span></p>
           <p>Số lượng người<span>:<span style="margin-left: 50px;">{{data.guestNumber}}</span></span></p>
         </div>
         <div class="menu-info">
@@ -53,8 +53,8 @@
       <div class="col-md-4">
         <div class="payment-section">
           <h3>THANH TOÁN</h3>
-          <p><span>Tổng cộng:</span> 425.000 đ</p>
-          <p><span>Đặt cọc trước:</span> 200.000 đ</p>
+          <p><span>Tổng cộng:</span> {{ getTotalCartPrice() }}đ</p>
+          <p><span>Đặt cọc trước:</span> {{ getTotalCartPrice()/2 }}đ</p>
           <hr>
           <p>Phương thức thanh toán</p>
           <form>

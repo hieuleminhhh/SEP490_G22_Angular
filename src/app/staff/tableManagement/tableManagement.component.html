@@ -3,7 +3,7 @@
     <nav class="sidebar-nav">
       <ul>
         <li>
-          <a>QUẢN LÝ BÀN </a>
+          <a (click)="setView('table-layout')">QUẢN LÝ BÀN </a>
           <ul>
             <li><a (click)="setView('table-layout')">Sơ đồ bàn</a></li>
             <li><a (click)="setView('booking-request')">Yêu cầu đặt bàn</a></li>
@@ -16,11 +16,7 @@
   </aside>
   <main class="main-content">
     <header>
-      <!-- <div class="search-bar">
-          <input type="text" placeholder="Search">
-        </div>
-        <button *ngIf="currentView === 'table-layout'" class="add-table btn" style="margin-left: 200px;">Thêm
-          bàn</button> -->
+
       <h2 *ngIf="currentView === 'table-layout'">Sơ đồ bàn</h2>
       <h2 *ngIf="currentView === 'booking-request'">Yêu cầu đặt bàn</h2>
       <h2 *ngIf="currentView === 'booking-schedule'">Lịch đặt bàn</h2>
@@ -32,6 +28,12 @@
         <option value="this_week" [selected]="selectedTime === 'this_week'">Tuần này</option>
       </select>
 
+      <select id="timeframe" name="timeframe" *ngIf="currentView === 'table-layout'" [(ngModel)]="selectedTable "
+        (ngModelChange)="filterTablesByFloorAndStatus(selectedTable)">
+        <option value="all">Tất cả bàn</option>
+        <option value="empty">Bàn trống</option>
+      </select>
+
     </header>
     <hr>
 
@@ -39,14 +41,16 @@
       <div class="container">
         <div class="card short-card">
           <div class="table-layout-buttons">
-            <button (click)="onSelectFloor1()">Tầng một</button>
-            <button (click)="onSelectFloor2()">Tầng hai</button>
+            <button *ngFor="let floor of getFloors()" (click)="getTableOFFloor(floor)"
+              [class.active]="selectedFloor === floor">
+              Tầng {{ floor }}
+            </button>
           </div>
         </div>
 
         <div class="card">
           <div class="table-grid">
-            <div class="table" *ngFor="let table of dataTable" (click)="assignTable(table.tableId)">
+            <div class="table" *ngFor="let table of dataTable">
               {{ table.tableId }}<br>
               <hr>{{ table.status === 0 ? 'Bàn trống' : 'Đang sử dụng' }}
               <span class="icon-table" *ngIf="table.status === 1">&#10004;</span>
@@ -55,6 +59,7 @@
         </div>
       </div>
     </section>
+
     <section *ngIf="currentView === 'booking-schedule'">
       <div class="container">
         <div class="card">
@@ -120,9 +125,9 @@
                   <div class="dropdown">
                     <button class="icon" (click)="toggleDropdown(i)">...</button>
                     <div class="dropdown-content" [class.show]="reservation.isDropdownOpen">
-                      <a (click)="setView('table-layout')">Xếp bàn</a>
-                      <a href="#">Thêm món</a>
-                      <a href="#">Hủy đặt bàn</a>
+                      <a (click)="openPopup()">Xếp bàn</a>
+                      <a>Thêm món</a>
+                      <a>Hủy đặt bàn</a>
                     </div>
                   </div>
                 </div>
@@ -130,6 +135,50 @@
                   <span class="label-reser">Khách nhận bàn</span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="updateTimeModal" tabindex="-1" role="dialog" aria-labelledby="updateTimeModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="updateTimeModalLabel">Chọn bàn cho đơn đặt bàn</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closePopup()">X</button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-3">
+                  <select id="timeframe" name="timeframe" [(ngModel)]="selectedFloor" (change)="getTableOFFloorEmpty(selectedFloor)">
+                    <option *ngFor="let floor of getFloors()" [value]="floor"
+                    [class.active]="selectedFloor === floor">
+                      Tầng {{ floor }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-7">
+                  <div class="card">
+                    <div class="table-grid">
+                      <div class="table" *ngFor="let table of dataTable">
+                        {{ table.tableId }}<br>
+                        <hr>Bàn trống
+                      </div>
+                    </div>
+                    <div *ngIf="dataTable.length<1">
+                      <p>Tầng này không có bàn trống</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" style="background-color: red;" class="btn btn-secondary"
+                (click)="closePopup()">Đóng</button>
+              <button type="button" class="btn btn-primary">Lưu thay đổi</button>
             </div>
           </div>
         </div>
@@ -211,7 +260,8 @@
             <summary>Thông tin đơn hàng</summary>
             <div>
               <div class="cart-container">
-                <div class="cart-header" *ngIf="reservationDetail?.order?.orderDetails && reservationDetail.order.orderDetails.length>0">
+                <div class="cart-header"
+                  *ngIf="reservationDetail?.order?.orderDetails && reservationDetail.order.orderDetails.length>0">
                   <div class="row">
                     <div class="col-2"></div>
                     <div class="col">

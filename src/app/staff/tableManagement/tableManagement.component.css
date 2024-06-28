@@ -48,6 +48,7 @@ body {
   padding: 10px;
   border-radius: 5px;
   transition: background 0.3s;
+  cursor: pointer;
 }
 
 .sidebar-nav a:hover {
@@ -94,7 +95,7 @@ header {
 }
 
 .table-layout-buttons button {
-  background-color: #4CAF50;
+  background-color: #45221f8f;
   border: none;
   color: white;
   padding: 15px 32px;
@@ -112,8 +113,9 @@ header {
   background-color: #45a049; /* Darker green background on hover */
 }
 
-.table-layout-buttons button:active {
-  background-color: #3e8e41; /* Even darker green when the button is clicked */
+.table-layout-buttons button:active,
+.table-layout-buttons button.active {
+  background-color: #3e8e41; /* Màu xanh nhạt khi button được click hoặc đang active */
 }
 
 .table-grid {
@@ -315,6 +317,7 @@ header {
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
   margin-left: -10px;
+  cursor: pointer;
 }
 
 .dropdown-content a {
@@ -475,4 +478,77 @@ summary {
 }
 .fas{
   font-family: "Font Awesome 6 Free";
+}
+
+/* Style cho nền mờ khi hiển thị modal */
+.modal {
+  display: none; /* Ẩn modal mặc định */
+  position: fixed; /* Hiển thị modal cố định khi cuộn trang */
+  z-index: 1000; /* Độ sâu của modal */
+  left: 0;
+  top: 0;
+  width: 300%;
+  height: 300%;
+  overflow: auto; /* Cho phép cuộn khi modal dài hơn trang */
+  background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
+}
+
+/* Style cho nội dung modal */
+.modal-content {
+  background-color: #fefefe; /* Màu nền của modal */
+  margin: 20% 55%; /* Căn giữa theo chiều dọc */
+  padding: 20px;
+  border: 1px solid #ccc; /* Viền xung quanh */
+  width: 200%; /* Chiều rộng của modal */
+  max-width: 1000px; /* Chiều rộng tối đa */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng cho modal */
+  border-radius: 8px; /* Bo góc */
+}
+
+/* Style cho tiêu đề của modal */
+.modal-header {
+  background-color: #007bff; /* Màu nền tiêu đề */
+  color: white; /* Màu chữ */
+  padding: 10px 20px; /* Khoảng cách bên trong */
+  border-top-left-radius: 8px; /* Bo góc trên bên trái */
+  border-top-right-radius: 8px; /* Bo góc trên bên phải */
+}
+
+.close {
+  color: black; /* Màu chữ của nút đóng */
+  background-color: red;
+  position: absolute; /* Đặt vị trí tuyệt đối */
+  right: 40px; /* Khoảng cách từ phía phải */
+  font-weight: bold;
+  height: 20px;
+}
+.close:hover,
+.close:focus {
+  color: #ffffff; /* Màu chữ khi di chuột qua */
+  text-decoration: none; /* Không gạch chân */
+  cursor: pointer; /* Con trỏ chuột là pointer */
+}
+
+/* Style cho footer của modal */
+.modal-footer {
+  background-color: #f1f1f1; /* Màu nền footer */
+  padding: 10px 20px; /* Khoảng cách bên trong */
+  border-bottom-left-radius: 8px; /* Bo góc dưới bên trái */
+  border-bottom-right-radius: 8px; /* Bo góc dưới bên phải */
+}
+
+/* Style cho các nút trong footer */
+.modal-footer button {
+  margin-right: 10px; /* Khoảng cách giữa các nút */
+}
+
+/* Style cho nút Đóng */
+.btn-secondary {
+  background-color: #dc3545; /* Màu nền nút Đóng */
+  border-color: #dc3545; /* Viền của nút Đóng */
+}
+
+.btn-secondary:hover {
+  background-color: #c82333; /* Màu nền khi di chuột qua */
+  border-color: #bd2130; /* Viền khi di chuột qua */
 }

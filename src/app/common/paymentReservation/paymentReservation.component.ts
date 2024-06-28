@@ -13,11 +13,13 @@ import { Router } from '@angular/router';
 })
 export class PaymentReservationComponent implements OnInit {
 
-  constructor(private reservationService: ReservationService, private router: Router) { }
-
   data: any;
   cartItem: any;
   ispayment: boolean = false;
+
+  constructor(private reservationService: ReservationService, private router: Router) {
+
+  }
 
   ngOnInit(): void {
     const request = sessionStorage.getItem('request');
@@ -51,6 +53,7 @@ export class PaymentReservationComponent implements OnInit {
     console.log(this.cartItem);
     console.log(this.ispayment);
   }
+
 
   getTotalPrice(item: any): number {
     const price = item.discountedPrice != null ? item.discountedPrice : item.price;
@@ -94,10 +97,8 @@ export class PaymentReservationComponent implements OnInit {
       },
       error: error => {
         if (error.error instanceof ErrorEvent) {
-          // Lỗi client-side hoặc mạng
           console.error('An error occurred:', error.error.message);
         } else {
-          // Lỗi server-side
           console.error(`Backend returned code ${error.status}, ` +
             `body was: ${JSON.stringify(error.error)}`);
         }
