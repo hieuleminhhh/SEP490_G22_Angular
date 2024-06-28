@@ -162,7 +162,19 @@ export class BookingComponent implements OnInit {
     }
   }
   formatDateTime(date: string, time: string): string {
-    return `${date}T${time}:00.000Z`;
+    const datetimeString = `${date}T${time}:00`;
+    const dateObj = new Date(datetimeString);
+
+    // Lấy thời gian hiện tại của client (múi giờ địa phương)
+    const localTimezoneOffset = dateObj.getTimezoneOffset();
+
+    // Chuyển đổi múi giờ sang múi giờ địa phương
+    const localDateObj = new Date(dateObj.getTime() - localTimezoneOffset * 60000);
+
+    // Định dạng lại ngày giờ theo múi giờ địa phương
+    const formattedDateTime = localDateObj.toISOString().slice(0, 19);
+
+    return formattedDateTime;
   }
   decreaseQuantity(item: any) {
     if (item.quantity > 1) {
