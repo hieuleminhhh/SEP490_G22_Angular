@@ -18,7 +18,7 @@ export interface ManagerOrder {
   status: number;
   recevingOrder:Date;
   accountId:number;
-  tableId:number;
+  tableIds: ListTables[];
   invoiceId: number;
   totalAmount: number;
   guestPhone:string;
@@ -48,3 +48,7 @@ export interface AddNewOrder {
   note: string;
   orderDetails: AddOrderDetail[];
 }
+export interface ListTables {
+  tableId: number;
+}
+

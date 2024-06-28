@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { AddNewOrder, ListAllOrder } from '../models/order.model';
+import { Address } from '../models/address.model';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -30,6 +31,10 @@ export class ManagerOrderService {
   AddNewOrder(newOrder: AddNewOrder): Observable<any> {
     const url = `${this.apiUrl}/Cart/AddNewOrder`;
     return this.http.post<any>(url, newOrder, httpOptions);
+  }
+  ListAddress(): Observable<Address[]> {
+    const url = `${this.apiUrl}/Guest/ListAddress`;
+    return this.http.get<Address[]>(url);
   }
 }
 

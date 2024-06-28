@@ -16,6 +16,8 @@ import { ListOrderDetailByOrder } from '../../../models/orderDetail.model';
 })
 export class ManagerOrderComponent implements OnInit {
   orders: ListAllOrder[] = [];
+  dateFrom: string = '';
+  dateTo: string = '';
   search: string = '';  
   currentPage: number = 1;
   pageSize: number = 5;
@@ -29,8 +31,22 @@ export class ManagerOrderComponent implements OnInit {
     { value: 2, text: 'Hoàn thành' },
     { value: 3, text: 'Hủy' }
   ];
+  types = [
+    { value: 'single', text: 'Tại chỗ' },
+    { value: 'takeaway', text: 'Mang về' },
+    { value: 'reservation', text: 'Đặt bàn' },
+    { value: 'online', text: 'Online' }
+  ];
+  times = [
+    { value: 'order', text: 'Đặt hàng' },
+    { value: 'reciving', text: 'Giao hàng' },
+  ];
   orderDetail: ListOrderDetailByOrder | undefined;
-  constructor(private orderService: ManagerOrderService, private orderDetailService : ManagerOrderDetailService, private router: Router) { }
+  constructor(private orderService: ManagerOrderService, private orderDetailService : ManagerOrderDetailService, private router: Router) {
+    const today = new Date();
+    this.dateFrom = today.toISOString().split('T')[0];
+    this.dateTo = today.toISOString().split('T')[0];
+   }
 
   ngOnInit() {
     this.loadListOrder();

@@ -1,56 +1,68 @@
 <div class="container mt-5">
   <h1 class="text-center mb-4">Quản lý đơn hàng</h1>
-  <div class="mb-3 text-end">
+  <!-- Buttons and search bar -->
+  <div class="mb-3 d-flex justify-content-between align-items-center">
     <button type="button" class="btn btn-primary" (click)="createNewOrder()">
       Tạo đơn hàng mới <i class="bi bi-plus"></i>
     </button>
+    <div class="input-group" style="max-width: 400px;">
+      <input type="text" class="form-control" placeholder="Tìm kiếm..." aria-label="Search" aria-describedby="button-addon2" [(ngModel)]="search">
+      <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="onSearch()">Tìm kiếm</button>
+    </div>
+    <div class="col-md-2">
+      <div class="input-group">
+        <label class="input-group-text" for="type">Loại đơn</label>
+        <select id="type" class="form-select" (change)="onSearch()">
+          <option value="">Tất cả</option>
+          <option *ngFor="let type of types" [value]="type.value">{{ type.text }}</option>
+        </select>
+      </div>
+    </div>
   </div>
 
+  <!-- Select filters -->
   <div class="row mb-3">
-    <div class="col-md-4">
+    <div class="col-md-3">
       <div class="input-group">
-        <input type="text" class="form-control" placeholder="Tìm kiếm..." aria-label="Search" aria-describedby="button-addon2" [(ngModel)]="search">
-        <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="onSearch()">Tìm kiếm</button>
+        <label class="input-group-text" for="time">Thời gian</label>
+        <select id="time" class="form-select" (change)="onSearch()">
+          <option value="">Tất cả</option>
+          <option *ngFor="let time of times" [value]="time.value">{{ time.text }}</option>
+        </select>
       </div>
     </div>
     <div class="col-md-3">
       <div class="input-group">
-        <label class="input-group-text" for="week">Tuần</label>
-        <select id="week" class="form-select" (change)="onSearch()">
-          <option *ngFor="let week of weeks" [value]="week.start">{{ week.start }} - {{ week.end }}</option>
-        </select>
+        <label class="input-group-text" for="dateFrom">Từ ngày</label>
+        <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom" (change)="onSearch()">
       </div>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
       <div class="input-group">
-        <label class="input-group-text" for="year">Năm</label>
-        <select id="year" class="form-select" (change)="onSearch()">
-          <option *ngFor="let year of years" [value]="year">{{ year }}</option>
-        </select>
+        <label class="input-group-text" for="dateTo">Đến ngày</label>
+        <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo" (change)="onSearch()">
       </div>
     </div>
     <div class="col-md-3">
       <div class="input-group">
         <label class="input-group-text" for="status">Trạng thái</label>
         <select id="status" class="form-select" (change)="onSearch()">
-          <option value="">Chọn trạng thái</option>
+          <option value="">Tất cả</option>
           <option *ngFor="let status of statuses" [value]="status.value">{{ status.text }}</option>
         </select>
       </div>
     </div>
   </div>
-
+  <!-- Table -->
   <table class="table table-striped table-hover">
     <thead class="table-header-light">
       <tr>
         <th scope="col">Số thứ tự</th>
         <th scope="col">Tên khách hàng</th>
         <th scope="col">Số điện thoại</th>
-        <th scope="col">Địa chỉ</th>
         <th scope="col">Thời gian đặt hàng</th>
         <th scope="col">Thời gian giao hàng</th>
         <th scope="col">Tổng tiền</th>
-        <th scope="col">Tiền trả trước</th>
         <th scope="col">Trạng thái</th>
         <th scope="col">Hành động</th>
       </tr>
@@ -61,18 +73,16 @@
           <td>{{ (currentPage - 1) * pageSize + i * orders[0].items.length + j + 1 }}</td>
           <td>{{ order.consigneeName }}</td>
           <td>{{ order.guestPhone }}</td>
-          <td>{{ order.guestAddress }}</td>
           <td>{{ order.orderDate }}</td>
           <td>{{ order.recevingOrder }}</td>
           <td>{{ order.totalAmount }}</td>
-          <td>{{ order.deposits }}</td>
           <td>
             <select (change)="onStatusChange($event, order.orderId)" [(ngModel)]="order.status" [ngStyle]="{'color': getStatusColor(order.status)}">
               <option *ngFor="let status of statuses" [value]="status.value">{{ status.text }}</option>
             </select>
           </td>
           <td>
-            <button type="button" class="btn btn-info btn-sm" style="margin-right: 10px;" data-bs-toggle="modal" data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">Chi tiết</button>
+            <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">Chi tiết</button>
             <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#updateOrderModal">Cập nhật</button>
           </td>
         </tr>
@@ -80,6 +90,7 @@
     </tbody>
   </table>
 
+  <!-- Pagination -->
   <nav aria-label="Page navigation">
     <ul class="pagination justify-content-end">
       <li class="page-item" [class.disabled]="currentPage === 1">
@@ -122,15 +133,13 @@
                   <td>{{ item.quantity }}</td>
                   <td>
                     <span *ngIf="item.discountedPrice">
-                      <span style="text-decoration: line-through;">{{ item.price}}</span>
+                      <span style="text-decoration: line-through;">{{ item.price }}</span>
                       <br>
-                      <span>{{ item.discountedPrice}}</span>
+                      <span>{{ item.discountedPrice }}</span>
                     </span>
-                    <span *ngIf="!item.discountedPrice">
-                      <span>{{ item.price}}</span>
-                    </span>
+                    <span *ngIf="!item.discountedPrice">{{ item.price }}</span>
                   </td>
-                  <td>{{ item.unitPrice}}</td>
+                  <td>{{ item.unitPrice }}</td>
                 </tr>
               </ng-container>
             </tbody>
@@ -140,7 +149,7 @@
               <div class="col-md-6">
                 <div class="d-flex justify-content-start mb-2">
                   <span class="fw-bold">Tạm tính:</span>
-                  <span>{{ orderDetail.totalAmount}}</span>
+                  <span>{{ orderDetail.totalAmount }}</span>
                 </div>
                 <div class="d-flex justify-content-start mb-2">
                   <span class="fw-bold">Khuyến mãi:</span>
@@ -148,7 +157,7 @@
                 </div>
                 <div class="d-flex justify-content-start">
                   <span class="fw-bold">Tổng cộng:</span>
-                  <span>{{ orderDetail.totalAmount}}</span>
+                  <span>{{ orderDetail.totalAmount }}</span>
                 </div>
               </div>
             </div>
