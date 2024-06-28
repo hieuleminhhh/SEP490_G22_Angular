@@ -3,12 +3,48 @@
     <h2 class="text-center mb-4">Create Order</h2>
     <div class="row">
       <div class="col-md-6">
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" id="customer" placeholder="Khách lẻ" name="customer" disabled>
-          <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#formModal">
+        <div class="input-group mb-3" (clickOutside)="showDropdown = false">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Select address..."
+            (click)="toggleDropdown()"
+            [(ngModel)]="selectedAddress"
+            readonly
+          >
+          <div class="dropdown-menu" [ngClass]="{'show': showDropdown}">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Search..."
+              [(ngModel)]="searchTerm"
+              (click)="$event.stopPropagation()"
+              (input)="filterAddresses()"
+            >
+            <button
+              class="dropdown-item"
+              (click)="selectKhachLe(); $event.stopPropagation();"
+            >
+              Khách lẻ
+            </button>
+            <button
+              class="dropdown-item"
+              *ngFor="let address of filteredAddresses"
+              (click)="selectAddress(address); $event.stopPropagation();"
+            >
+              {{ address.consigneeName }} - {{ address.guestPhone }}
+            </button>
+          </div>
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#formModal"
+          >
             <i class="fas fa-user"></i>
           </button>
         </div>
+        
         <!-- Selected Items Section -->
         <div class="cart-section mt-4">
   <h4>Thông tin</h4>
@@ -73,19 +109,19 @@
             <button class="btn btn-block" [ngClass]="{'btn-primary': showingCombos, 'btn-secondary': !showingCombos}" (click)="showCombos()">Combo</button>
           </div>
         </div>
-
-        <div class="dishes-section" *ngIf="showingDishes">
+        <div class="dishes-section" *ngIf="showingDishes && dishes">
           <div class="row">
             <ng-container *ngFor="let list of dishes">
               <div class="col-lg-4 col-md-6 mb-4" *ngFor="let dish of list.items">
                 <div class="card">
                   <div class="image-container">
                     <img class="card-img-top" [src]="dish.imageUrl" alt="Dish image">
-                    <div class="overlay">
-                      <div class="overlay-text">{{ dish.itemName }}</div>
-                    </div>
                   </div>
                   <div class="card-body text-center">
+                    <div class="dish-details">
+                      <div class="dish-name">{{ dish.itemName }}</div>
+                      <div class="dish-price">{{ dish.price | currency }}</div>
+                    </div>
                     <button class="btn btn-sm btn-outline-primary" (click)="addItem(dish)">
                       <i class="fas fa-plus"></i> Add
                     </button>
@@ -95,19 +131,20 @@
             </ng-container>
           </div>
         </div>
-
-        <div class="combos-section" *ngIf="showingCombos">
+        
+        <div class="combos-section" *ngIf="showingCombos && combo">
           <div class="row">
             <ng-container *ngFor="let list of combo">
               <div class="col-lg-4 col-md-6 mb-4" *ngFor="let cb of list.items">
                 <div class="card">
                   <div class="image-container">
                     <img class="card-img-top" [src]="cb.imageUrl" alt="Combo image">
-                    <div class="overlay">
-                      <div class="overlay-text">{{ cb.nameCombo }}</div>
-                    </div>
                   </div>
                   <div class="card-body text-center">
+                    <div class="combo-details">
+                      <div class="combo-name">{{ cb.nameCombo }}</div>
+                      <div class="combo-price">{{ cb.price | currency }}</div>
+                    </div>
                     <button class="btn btn-sm btn-outline-primary" (click)="addItem(cb)">
                       <i class="fas fa-plus"></i> Add
                     </button>
@@ -117,9 +154,7 @@
             </ng-container>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
+        
 
   <!-- Modal -->
   <div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="formModalLabel" aria-hidden="true">
@@ -156,4 +191,3 @@
       </div>
     </div>
   </div>
-</body>

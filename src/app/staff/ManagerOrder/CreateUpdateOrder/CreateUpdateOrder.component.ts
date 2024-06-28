@@ -10,6 +10,7 @@ import { ListAllCombo } from '../../../../models/combo.model';
 import { AddNewOrder } from '../../../../models/order.model';
 import { AddOrderDetail } from '../../../../models/orderDetail.model';
 import { ManagerOrderService } from '../../../../service/managerorder.service';
+import { Address } from '../../../../models/address.model';
 @Component({
   selector: 'app-CreateUpdateOrder',
   templateUrl: './CreateUpdateOrder.component.html',
@@ -22,6 +23,8 @@ export class CreateUpdateOrderComponent implements OnInit {
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService : ManagerOrderService) { }
   dishes: ListAllDishes[] = [];
   combo: ListAllCombo[] = [];
+  addresses: Address[] = []; 
+  filteredAddresses: any[] = []; 
   totalPagesArray: number[] = [];
   selectedItems: any[] = [];
   currentPage: number = 1;
@@ -30,10 +33,13 @@ export class CreateUpdateOrderComponent implements OnInit {
   showingDishes: boolean = true;
   showingCombos: boolean = false;
   successMessage: string = '';
+  searchTerm: string = '';
+  selectedAddress = '';
+  showDropdown: boolean = false;
   addNew: AddNewOrder = {
     guestPhone: '',
     email: '',
-    addressId: null as number | null,
+    addressId: null,
     guestAddress: '',
     consigneeName: '',
     orderDate: new Date(),
@@ -48,6 +54,8 @@ export class CreateUpdateOrderComponent implements OnInit {
   ngOnInit() {
     this.loadListDishes();
     this.loadListCombo();
+    this.loadAddresses();
+    this.selectedAddress = "Khách lẻ"
   }
   loadListDishes(search: string = ''): void {
     console.log('Loading dishes with search term:', search); 
@@ -173,5 +181,48 @@ export class CreateUpdateOrderComponent implements OnInit {
       item.quantity = 100;
     }
     this.updateQuantity(index, item.quantity);
+  }
+  loadAddresses() {
+    this.orderService.ListAddress().subscribe(
+      (response: Address[]) => {
+        this.addresses = response;
+        this.filteredAddresses = response; // Initialize filteredAddresses
+        console.log('Fetched addresses:', this.addresses);
+      },
+      (error) => {
+        console.error('Error fetching addresses:', error);
+      }
+    );
+  }
+
+  toggleDropdown() {
+    if (!this.selectedAddress) {
+      this.selectedAddress = "Khách lẻ";
+    }
+    this.showDropdown = !this.showDropdown;
+    this.searchTerm = '';
+  }
+
+  clearSearchTerm() {
+    this.searchTerm = ''; 
+  }
+
+  filterAddresses() {
+    this.filteredAddresses = this.addresses.filter(address =>
+      address.consigneeName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      address.guestPhone.includes(this.searchTerm)
+    );
+  }
+
+  selectAddress(address: Address) {
+    this.selectedAddress = `${address.consigneeName} - ${address.guestPhone}`;
+    this.showDropdown = false;
+    this.clearSearchTerm(); 
+  }
+
+  selectKhachLe() {
+    this.selectedAddress = 'Khách lẻ';
+    this.showDropdown = false;
+    this.clearSearchTerm(); 
   }
 }

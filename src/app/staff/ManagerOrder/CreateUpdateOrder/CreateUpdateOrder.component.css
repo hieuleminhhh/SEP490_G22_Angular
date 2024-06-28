@@ -92,4 +92,42 @@
   .small-input {
     width: 60px; /* Adjust the width as needed */
   }
+  .dish-details {
+    margin-bottom: 10px;
+  }
+  
+  .dish-name {
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+  
+  .dish-price {
+    font-size: 1em;
+    color: #888;
+  }
+  .combo-details {
+    margin-bottom: 10px;
+  }
+  
+  .combo-name {
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+  
+  .combo-price {
+    font-size: 1em;
+    color: #888;
+  }
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+  }
+  
+  .dropdown-menu.show {
+    display: block;
+  }
   
