@@ -1,13 +1,15 @@
 <div class="container">
   <div class="header-row">
-    <button class="back-button">Quay lại</button>
+    <button class="back-button" *ngIf="ispayment===true">Quay lại</button>
+    <button class="back-button" *ngIf="ispayment===false">Quay về trang chủ</button>
     <div class="title-container">
-      <h2>THANH TOÁN TRƯỚC CHO ĐƠN ĐẶT BÀN</h2>
+      <h2 *ngIf="ispayment===true">THANH TOÁN TRƯỚC CHO ĐƠN ĐẶT BÀN</h2>
+      <h2 *ngIf="ispayment===false" style="color: green;">YÊU CẦU ĐẶT BÀN ĐÃ ĐƯỢC TIẾP NHẬN</h2>
     </div>
     <div class="spacer"></div>
   </div>
 
-  <div class="info-section">
+  <div class="info-section" *ngIf="ispayment===true">
     <div class="row" *ngIf="data">
       <div class="col-md-8">
         <div class="booking-info">
@@ -31,7 +33,8 @@
             </thead>
             <tbody *ngFor="let item of cartItem">
               <tr>
-                <td><img class="img-fluid" [src]="item.imageUrl" alt="Item Image" style="max-width: 100%; height: 56px;"></td>
+                <td><img class="img-fluid" [src]="item.imageUrl" alt="Item Image"
+                    style="max-width: 100%; height: 56px;"></td>
                 <td>{{ item.itemName||item.nameCombo }}</td>
                 <td>{{ item.discountedPrice || item.price }} ₫</td>
                 <td><span>{{ item.quantity }}</span></td>
@@ -50,15 +53,68 @@
       <div class="col-md-4">
         <div class="payment-section">
           <h3>THANH TOÁN</h3>
-          <p><span>Tổng cộng:</span> 425.000 đ</p>
-          <p><span>Đặt cọc trước:</span> 200.000 đ</p>
+          <p><span>Tổng cộng:</span> {{ getTotalCartPrice() }}đ</p>
+          <p><span>Đặt cọc trước:</span> {{ getTotalCartPrice()/2 }}đ</p>
           <hr>
           <p>Phương thức thanh toán</p>
           <form>
             <input type="radio" id="bank-transfer" name="payment-method" value="bank-transfer" checked>
             <label for="bank-transfer">Chuyển khoản ngân hàng</label><br>
-            <button type="submit">THANH TOÁN</button>
+            <button type="submit" (click)="submitForm()">THANH TOÁN</button>
           </form>
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="info-section" *ngIf="ispayment===false">
+    <div style="margin-top: 30px; text-align: center;color: #000000;font-size: 20px;">
+      <p>Chúng tôi sẽ liên hệ hoặc gửi tin nhắn xác nhận đặt bàn sớm nhất đến bạn </p>
+      <p>Xin cảm ơn!</p>
+    </div>
+    <div class="row" *ngIf="data">
+      <div class="col-md-2"></div>
+      <div class="col-md-8">
+        <div class="booking-info" style="border: 1px solid #000000; margin-top: 50px;">
+          <h3 style="text-align: center;">Thông tin đơn đặt bàn</h3>
+          <p>Tên người đặt bàn<span style="position: absolute;left: 40%;">:<span style="margin-left: 50px;">{{data.consigneeName}}</span></span></p>
+          <p>Điện thoại<span style="position: absolute;left: 40%;">:<span style="margin-left: 50px;">{{data.guestPhone}}</span></span></p>
+          <p>Thời gian dùng bữa dự kiến<span style="position: absolute;left: 40%;">:<span style="margin-left: 50px;">{{data.reservationTime | date:'dd/MM/yyyy(HH:mm)'}}</span></span></p>
+          <p>Số lượng người<span style="position: absolute;left: 40%;">:<span style="margin-left: 50px;">{{data.guestNumber}}</span></span></p>
+          <p>Ghi chú<span style="position: absolute;left: 40%;">:<span style="margin-left: 50px;">{{data.note || '(Không có ghi chú)'}}</span></span></p>
+        </div>
+        <div class="menu-info" *ngIf="cartItem" style="border: 1px solid #000000; margin-top: 50px;">
+          <h3 style="text-align: center;">Thực đơn đặt trước</h3>
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Món ăn</th>
+                <th>Giá bán</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody *ngFor="let item of cartItem">
+              <tr>
+                <td><img class="img-fluid" [src]="item.imageUrl" alt="Item Image"
+                    style="max-width: 100%; height: 56px;"></td>
+                <td>{{ item.itemName||item.nameCombo }}</td>
+                <td>{{ item.discountedPrice || item.price }} ₫</td>
+                <td><span>{{ item.quantity }}</span></td>
+                <td><span class="price"> {{ getTotalPrice(item) }}₫</span></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="4">Tổng cộng</td>
+                <td>{{ getTotalCartPrice() }}đ</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
