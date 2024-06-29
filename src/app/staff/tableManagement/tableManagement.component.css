@@ -18,6 +18,7 @@ body {
 
 .sidebar {
   width: 250px;
+  height: 700px;
   background-color: #f8f9fa;
   padding: 20px;
   border-right: 1px solid #dee2e6;
@@ -54,7 +55,10 @@ body {
 .sidebar-nav a:hover {
   background-color: #e2e6ea;
 }
-
+.sidebar-nav ul li a.active {
+  color: #fff; /* Màu chữ khi chọn */
+  background-color: #007bff; /* Màu nền khi chọn */
+}
 .main-content {
   flex-grow: 1;
   padding: 20px;
@@ -125,6 +129,7 @@ header {
 }
 
 .table {
+  position: relative;
   border: 1px solid black; /* Green border for table */
   border-radius: 8px; /* Rounded corners for table */
   padding: 16px; /* Padding inside the table */
@@ -143,10 +148,19 @@ header {
 
 .icon-table {
   position: absolute;
-  top: 0;
-  margin: 10px;
+  top: -5px;
   color: green;
   font-size: 20px;
+  left: 145px;
+}
+.icon-sl{
+  position: absolute;
+  top: -1px;
+  color: black;
+  font-size: 18px;
+  left: 0;
+  border: 1px solid black;
+  border-radius: 8px;
 }
 
 .add-table.btn {
@@ -551,4 +565,61 @@ summary {
 .btn-secondary:hover {
   background-color: #c82333; /* Màu nền khi di chuột qua */
   border-color: #bd2130; /* Viền khi di chuột qua */
+}
+.col-md-3 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.floor-select {
+  width: 70%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  -webkit-appearance: none; /* Remove default styling in Chrome */
+  -moz-appearance: none; /* Remove default styling in Firefox */
+  appearance: none; /* Remove default styling in other browsers */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23007bff' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px top 50%;
+  background-size: 10px 10px;
+}
+
+.floor-select option {
+  padding: 10px;
+  text-align: center;
+}
+
+.floor-select option.active {
+  background-color: #007bff;
+  color: white;
+}
+
+
+.btn-create-order {
+  background-color: blue;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.btn-create-order:hover {
+  background-color: darkblue;
+}
+
+.btn-create-order:active {
+  transform: scale(0.95);
+}
+
+.btn-create-order .icon {
+  margin-right: 8px;
 }
