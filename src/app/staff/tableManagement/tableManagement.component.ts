@@ -24,6 +24,7 @@ export class TableManagementComponent implements OnInit {
   showDropdown = false;
   selectedTable: string = 'all';
   selectedFloor = 1;
+  selectedTableIds: number[] = [];
 
   constructor(private tableService: TableService, private reservationService: ReservationService) { }
 
@@ -95,6 +96,14 @@ export class TableManagementComponent implements OnInit {
     const button = event.target as HTMLButtonElement;
     button.classList.remove('button-normal');
     button.classList.add('button-clicked');
+  }
+  toggleTableSelection(tableId: number): void {
+    const index = this.selectedTableIds.indexOf(tableId);
+    if (index === -1) {
+      this.selectedTableIds.push(tableId);
+    } else {
+      this.selectedTableIds.splice(index, 1);
+    }
   }
   //================================================================================================================
   getReservationData(): void {
@@ -196,6 +205,7 @@ export class TableManagementComponent implements OnInit {
       response => {
         console.log('Success:', response);
         this.getReservation();
+        this.getReservationData();
       },
       error => {
         console.error('Error:', error);

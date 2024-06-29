@@ -5,10 +5,14 @@
         <li>
           <a (click)="setView('table-layout')">QUẢN LÝ BÀN </a>
           <ul>
-            <li><a (click)="setView('table-layout')">Sơ đồ bàn</a></li>
-            <li><a (click)="setView('booking-request')">Yêu cầu đặt bàn</a></li>
-            <li><a (click)="setView('booking-schedule')">Lịch đặt bàn</a></li>
-            <li><a (click)="setView('booking-history')">Lịch sử đặt bàn</a></li>
+            <li><a [class.active]="currentView === 'table-layout'" (click)="setView('table-layout')">Sơ đồ bàn</a></li>
+            <li><a [class.active]="currentView === 'booking-request'" (click)="setView('booking-request')">Yêu cầu đặt
+                bàn</a></li>
+            <li><a [class.active]="currentView === 'booking-schedule'" (click)="setView('booking-schedule')">Lịch đặt
+                bàn</a></li>
+            <li><a [class.active]="currentView === 'booking-history'" (click)="setView('booking-history')">Lịch sử đặt
+                bàn</a></li>
+
           </ul>
         </li>
       </ul>
@@ -23,16 +27,21 @@
       <h2 *ngIf="currentView === 'booking-history'">Lịch sử đặt bàn</h2>
       <h2 *ngIf="currentView === 'detail-reservation'">Chi tiết đơn đặt bàn</h2>
       <select id="timeframe" name="timeframe" *ngIf="currentView === 'booking-schedule'" [(ngModel)]="selectedTime"
-        (ngModelChange)="onSelectTimeframe()">
+        (ngModelChange)="onSelectTimeframe()" class="floor-select" style="width: 20%;padding: 5px;">
         <option value="today" [selected]="selectedTime === 'today'">Hôm nay</option>
         <option value="this_week" [selected]="selectedTime === 'this_week'">Tuần này</option>
       </select>
 
       <select id="timeframe" name="timeframe" *ngIf="currentView === 'table-layout'" [(ngModel)]="selectedTable "
-        (ngModelChange)="filterTablesByFloorAndStatus(selectedTable)">
+        (ngModelChange)="filterTablesByFloorAndStatus(selectedTable)" class="floor-select"
+        style="width: 20%;padding: 5px;">
         <option value="all">Tất cả bàn</option>
         <option value="empty">Bàn trống</option>
       </select>
+
+      <button *ngIf="currentView === 'booking-request' || currentView === 'booking-history'" class="btn-create-order">
+        <i class="fas fa-plus-circle icon"></i>Tạo đơn đặt bàn
+      </button>
 
     </header>
     <hr>
@@ -53,6 +62,7 @@
             <div class="table" *ngFor="let table of dataTable">
               {{ table.tableId }}<br>
               <hr>{{ table.status === 0 ? 'Bàn trống' : 'Đang sử dụng' }}
+              <span class="icon-sl"><i class="fas fa-chair"></i>{{ table.capacity }}</span>
               <span class="icon-table" *ngIf="table.status === 1">&#10004;</span>
             </div>
           </div>
@@ -94,10 +104,6 @@
                   *ngIf="reservation.tableOfReservation && reservation.tableOfReservation.length === 0">
                   <span class="number-table">?</span>
                 </div>
-
-
-
-
                 <div class="vertical-line"></div>
                 <div class="col-md-8">
                   <div class="row">
@@ -132,7 +138,8 @@
                   </div>
                 </div>
                 <div class="col-md-8" style="display: flex;justify-content: center;align-items: center;height: 20px;">
-                  <span class="label-reser">Khách nhận bàn</span>
+                  <span class="label-reser" (click)="updateReservationById(reservation.reservationId, 2)">Khách nhận
+                    bàn</span>
                 </div>
               </div>
             </div>
@@ -146,35 +153,39 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="updateTimeModalLabel">Chọn bàn cho đơn đặt bàn</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closePopup()">X</button>
+              <h5 class="modal-title" id="updateTimeModalLabel">Chọn bàn</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                (click)="closePopup()">X</button>
             </div>
             <div class="modal-body">
               <div class="row">
                 <div class="col-md-3">
-                  <select id="timeframe" name="timeframe" [(ngModel)]="selectedFloor" (change)="getTableOFFloorEmpty(selectedFloor)">
-                    <option *ngFor="let floor of getFloors()" [value]="floor"
-                    [class.active]="selectedFloor === floor">
+                  <select id="floor" name="floor" [(ngModel)]="selectedFloor"
+                    (change)="getTableOFFloorEmpty(selectedFloor)" class="floor-select">
+                    <option *ngFor="let floor of getFloors()" [value]="floor" [class.active]="selectedFloor === floor">
                       Tầng {{ floor }}
                     </option>
                   </select>
+
                 </div>
                 <div class="col-md-7">
                   <div class="card">
                     <div class="table-grid">
-                      <div class="table" *ngFor="let table of dataTable">
+                      <div class="table" *ngFor="let table of dataTable" (click)="toggleTableSelection(table.tableId)">
                         {{ table.tableId }}<br>
+                        <span class="icon-sl"><i class="fas fa-chair"></i>{{ table.capacity }}</span>
+                        <span class="icon-table" style="left: 170px;"
+                          *ngIf="selectedTableIds.includes(table.tableId)">&#10004;</span>
                         <hr>Bàn trống
                       </div>
                     </div>
-                    <div *ngIf="dataTable.length<1">
+                    <div *ngIf="dataTable.length<1" style="height: 100px;">
                       <p>Tầng này không có bàn trống</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
             <div class="modal-footer">
               <button type="button" style="background-color: red;" class="btn btn-secondary"
                 (click)="closePopup()">Đóng</button>
@@ -212,7 +223,7 @@
                     <td>{{reservation.deposits}}</td>
                     <td>{{reservation.status}}</td>
                     <td><button type="button" class="btn btn-primary btn-sm" style="background-color: green;"
-                      (click)="updateReservationById(reservation.reservationId, 1)">Nhận đơn</button></td>
+                        (click)="updateReservationById(reservation.reservationId, 1)">Nhận đơn</button></td>
                     <td>
                       <button type="button" class="btn btn-primary btn-sm"
                         (click)="getReservationById(reservation.reservationId)">Chi tiết</button>
