@@ -95,7 +95,7 @@ export class TableManagementComponent implements OnInit {
     const button = event.target as HTMLButtonElement;
     button.classList.remove('button-normal');
     button.classList.add('button-clicked');
-}
+  }
   //================================================================================================================
   getReservationData(): void {
     this.reservationService.getReservationAccept(1).subscribe(
@@ -190,5 +190,21 @@ export class TableManagementComponent implements OnInit {
       }
     );
   }
+
+  updateReservationById(id: number, status: number): void {
+    this.reservationService.updateStatusReservation(id, status).subscribe(
+      response => {
+        console.log('Success:', response);
+        this.getReservation();
+      },
+      error => {
+        console.error('Error:', error);
+        if (error.error && error.error.errors) {
+          console.error('Validation Errors:', error.error.errors);
+        }
+      }
+    );
+}
+
 
 }

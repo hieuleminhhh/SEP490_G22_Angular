@@ -197,8 +197,8 @@
                   <th>Ngày giờ nhận bàn</th>
                   <th>Số lượng khách</th>
                   <th>Đặt cọc</th>
-                  <th>Tình trạng bàn</th>
                   <th>Trạng thái đơn</th>
+                  <th></th>
                   <th></th>
                 </tr>
               </thead>
@@ -210,8 +210,9 @@
                     <td>{{ reservation.reservationTime | date:'dd/MM/yyyy - HH:mm' }}</td>
                     <td>{{reservation.guestNumber}}</td>
                     <td>{{reservation.deposits}}</td>
-                    <td>{{reservation.statusOfTable}}</td>
                     <td>{{reservation.status}}</td>
+                    <td><button type="button" class="btn btn-primary btn-sm" style="background-color: green;"
+                      (click)="updateReservationById(reservation.reservationId, 1)">Nhận đơn</button></td>
                     <td>
                       <button type="button" class="btn btn-primary btn-sm"
                         (click)="getReservationById(reservation.reservationId)">Chi tiết</button>
