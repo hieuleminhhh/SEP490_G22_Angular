@@ -21,9 +21,9 @@ import { Observable } from 'rxjs';
 export class AppComponent {
   loggedIn$: Observable<boolean>;
 
-  constructor(private accountService: AccountService, private router: Router) {     
+  constructor(private accountService: AccountService, private router: Router) {
     this.loggedIn$ = this.accountService.isLoggedIn();
   }
   title = 'ManageRestaurant';
- 
+
 }

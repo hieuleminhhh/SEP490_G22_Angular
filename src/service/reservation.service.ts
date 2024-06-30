@@ -71,11 +71,11 @@ export class ReservationService {
     const url = `https://localhost:7188/api/Reservations/${reservationId}`;
     return this.http.get(url);
   }
-  getReservationAccept(status: number): Observable<any> {
-    const url = `https://localhost:7188/api/Reservations?status=${status}`;
+  getReservationList(status?: number): Observable<any> {
+    const baseUrl = 'https://localhost:7188/api/Reservations';
+    const url = status !== undefined ? `${baseUrl}?status=${status}` : baseUrl;
     return this.http.get(url);
   }
-
   createResevetion(reservation: any): Observable<any> {
     const url = `https://localhost:7188/api/Reservations/create`;
     return this.http.post(url, reservation);
