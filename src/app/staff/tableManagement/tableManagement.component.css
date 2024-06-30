@@ -359,6 +359,7 @@ th, td {
   padding: 10px;
   text-align: left;
   border-bottom: 1px solid #ddd;
+  text-align: center;
 }
 
 th {
@@ -622,4 +623,100 @@ summary {
 
 .btn-create-order .icon {
   margin-right: 8px;
+}
+
+
+.tabs {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+}
+.tab {
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #666;
+  outline: none;
+  transition: color 0.3s, border-bottom 0.3s;
+}
+.tab:hover, .tab:focus {
+  color: #000;
+}
+.tab.active {
+  color: blue;
+  border-bottom: 2px solid blue;
+}
+.tabs input[type="text"] {
+  margin-left: auto;
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+}
+.status-pending {
+  color: #ffc107;
+  border: 1px solid #ffc107; /* yellow border */
+}
+
+.status-confirmed {
+  color: #007bff;
+  border: 1px solid #007bff; /* blue border */
+}
+
+.status-completed {
+  color: #28a745;
+  border: 1px solid #28a745; /* green border */
+}
+
+.status-cancelled {
+  color: #dc3545;
+  border: 1px solid #dc3545; /* red border */
+}
+.status-label {
+  display: inline-block; /* Đảm bảo phần tử là inline-block */
+  padding: 4px; /* Thêm padding cho khoảng cách */
+  height: auto;
+  width: 140px;
+  border-radius: 50px;
+}
+
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination button,
+.pagination input[type="number"],
+.pagination span {
+  margin: 0 5px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button {
+  background-color: #f0f0f0;
+  width: 81px;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pagination input[type="number"] {
+  width: 50px;
+  text-align: center;
+}
+
+.pagination span {
+  font-weight: bold;
 }

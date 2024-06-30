@@ -6,11 +6,11 @@
           <a (click)="setView('table-layout')">QUẢN LÝ BÀN </a>
           <ul>
             <li><a [class.active]="currentView === 'table-layout'" (click)="setView('table-layout')">Sơ đồ bàn</a></li>
-            <li><a [class.active]="currentView === 'booking-request'" (click)="setView('booking-request')">Yêu cầu đặt
+            <li><a [class.active]="currentView === 'booking-request'" (click)="setView('booking-request')" (click)="getReservation()">Yêu cầu đặt
                 bàn</a></li>
-            <li><a [class.active]="currentView === 'booking-schedule'" (click)="setView('booking-schedule')">Lịch đặt
+            <li><a [class.active]="currentView === 'booking-schedule'" (click)="setView('booking-schedule')" (click)="getReservationData()">Lịch đặt
                 bàn</a></li>
-            <li><a [class.active]="currentView === 'booking-history'" (click)="setView('booking-history')">Lịch sử đặt
+            <li><a [class.active]="currentView === 'booking-history'" (click)="setView('booking-history')" (click)="getReservationList()">Lịch sử đặt
                 bàn</a></li>
 
           </ul>
@@ -39,7 +39,7 @@
         <option value="empty">Bàn trống</option>
       </select>
 
-      <button *ngIf="currentView === 'booking-request' || currentView === 'booking-history'" class="btn-create-order">
+      <button *ngIf="currentView === 'booking-request'" class="btn-create-order">
         <i class="fas fa-plus-circle icon"></i>Tạo đơn đặt bàn
       </button>
 
@@ -144,6 +144,19 @@
               </div>
             </div>
           </div>
+          <div *ngIf="!dataReservationAccept || dataReservationAccept.length === 0">
+            <p>Không có đơn đặt bàn cho ngày hôm nay</p>
+          </div>
+          <div class="pagination" *ngIf="totalPages>0">
+            <button (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+
+            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"
+              max="{{ totalPages }}">
+
+            <span>of {{ totalPages }}</span>
+
+            <button (click)="onNextPage()" [disabled]="currentPage === totalPages">Next</button>
+          </div>
         </div>
       </div>
 
@@ -231,9 +244,18 @@
                   </tr>
                 </ng-container>
               </tbody>
-
-
             </table>
+          </div>
+          <br>
+          <div class="pagination">
+            <button (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+
+            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"
+              max="{{ totalPages }}">
+
+            <span>of {{ totalPages }}</span>
+
+            <button (click)="onNextPage()" [disabled]="currentPage === totalPages">Next</button>
           </div>
         </div>
       </div>
@@ -320,8 +342,72 @@
     </section>
 
     <section *ngIf="currentView === 'booking-history'">
+      <div class="container">
+        <div class="card">
+          <div class="tabs">
+            <button class="tab" *ngFor="let tab of tabs; let i = index" [class.active]="i === selectedIndex"
+              (click)="selectTab(i)">
+              {{ tab }}
+            </button>
+            <input type="text" placeholder="Nhập từ khóa tìm kiếm..." [(ngModel)]="searchTerm">
+          </div>
 
-      <p>Nội dung lịch sử đặt bàn ở đây.</p>
+          <br>
+          <div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Tên khách hàng</th>
+                  <th>Số điện thoại</th>
+                  <th>Ngày giờ nhận bàn</th>
+                  <th>Số lượng khách</th>
+                  <th>Đặt cọc</th>
+                  <th>Khu vực, bàn</th>
+                  <th>Trạng thái đơn</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody *ngFor="let reservation of dataReservation">
+                <ng-container>
+                  <tr>
+                    <td>{{reservation.consigneeName}}</td>
+                    <td>{{reservation.guestPhone}}</td>
+                    <td>{{ reservation.reservationTime | date:'dd/MM/yyyy - HH:mm' }}</td>
+                    <td>{{reservation.guestNumber}}</td>
+                    <td>{{reservation.deposits}}</td>
+                    <td>
+                      <div [innerHTML]="formatTables(reservation.tableOfReservation)"></div>
+                    </td>
+                    <td>
+                      <span [ngClass]="getStatusLabel(reservation.status).class" class="status-label">{{
+                        getStatusLabel(reservation.status).label }}</span>
+                    </td>
+
+
+                    <td>
+                      <button type="button" class="btn btn-primary btn-sm"
+                        (click)="getReservationById(reservation.reservationId)">Chi tiết</button>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+
+
+            </table>
+          </div>
+          <br>
+          <div class="pagination">
+            <button (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+
+            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"
+              max="{{ totalPages }}">
+
+            <span>of {{ totalPages }}</span>
+
+            <button (click)="onNextPage()" [disabled]="currentPage === totalPages">Next</button>
+          </div>
+        </div>
+      </div>
     </section>
 
   </main>
