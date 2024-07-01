@@ -20,8 +20,8 @@ export class ReservationService {
 
   addToCart(item: any, itemType: string) {
     const existingItem = itemType === 'Dish' ? this.cartItems.find
-    (cartItem => cartItem.dishId === item.dishId) : this.cartItems.find
-    (cartItem => cartItem.comboId === item.comboId);
+      (cartItem => cartItem.dishId === item.dishId) : this.cartItems.find
+      (cartItem => cartItem.comboId === item.comboId);
 
     if (existingItem) {
       existingItem.quantity++;
@@ -30,7 +30,7 @@ export class ReservationService {
       this.cartItems.push(item);
     }
 
-      this.updateCartState();
+    this.updateCartState();
 
 
   }
@@ -60,25 +60,31 @@ export class ReservationService {
   }
 
   // cart.service.ts
-private updateCartState() {
-  console.log('Updating cart state:', this.cartItems); // Log cart items before update
-  this.cartSubject.next([...this.cartItems]);
-  const itemCount = this.cartItems.length;
-  this.itemCountSubject.next(itemCount);
-}
+  private updateCartState() {
+    console.log('Updating cart state:', this.cartItems); // Log cart items before update
+    this.cartSubject.next([...this.cartItems]);
+    const itemCount = this.cartItems.length;
+    this.itemCountSubject.next(itemCount);
+  }
 
-getReservation(reservationId:number): Observable<any> {
-  const url = `https://localhost:7188/api/Reservations/${reservationId}`;
-  return this.http.get(url);
-}
-getReservationAccept(status:number): Observable<any> {
-  const url = `https://localhost:7188/api/Reservations?status=${status}`;
-  return this.http.get(url);
-}
+  getReservation(reservationId: number): Observable<any> {
+    const url = `https://localhost:7188/api/Reservations/${reservationId}`;
+    return this.http.get(url);
+  }
+  getReservationList(status?: number): Observable<any> {
+    const baseUrl = 'https://localhost:7188/api/Reservations';
+    const url = status !== undefined ? `${baseUrl}?status=${status}` : baseUrl;
+    return this.http.get(url);
+  }
+  createResevetion(reservation: any): Observable<any> {
+    const url = `https://localhost:7188/api/Reservations/create`;
+    return this.http.post(url, reservation);
+  }
 
-createResevetion(reservation: any): Observable<any> {
-  const url = `https://localhost:7188/api/Reservations/create`;
-  return this.http.post(url, reservation);
+  updateStatusReservation(reservationId: number, status: any): Observable<any> {
+    const url = `https://localhost:7188/api/Reservations/${reservationId}/update-status`;
+    const payload = { status: status };
+    console.log('Payload:', payload);
+    return this.http.put(url, payload);
 }
-
 }
