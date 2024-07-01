@@ -15,14 +15,20 @@ export class ManagerOrderService {
     private apiUrl = 'https://localhost:7188/api';
 
   constructor(private http: HttpClient) { }
-  ListOrders(page: number = 1, pageSize: number = 10, search: string = ''): Observable<ListAllOrder> {
+  ListOrders(page: number = 1, pageSize: number = 10, search: string = '', dateFrom: string = '', dateTo: string = '', status: number = 0, filterByDate: string = '', type: number = 0): Observable<ListAllOrder> {
     let params = new HttpParams()
         .set('page', page.toString())
         .set('pageSize', pageSize.toString())
-        .set('search', search.toString());
-        const url = `${this.apiUrl}/orders/GetListOrde`;
-        console.log('Request URL:', url, 'Params:', params.toString());  
-    return this.http.get<ListAllOrder>(`${this.apiUrl}/orders/GetListOrder`, { params });
+        .set('search', search)
+        .set('dateFrom', dateFrom)
+        .set('dateTo', dateTo)
+        .set('status', status.toString())
+        .set('filterByDate', filterByDate)
+        .set('type', type.toString());
+
+    const url = `${this.apiUrl}/orders/GetListOrder`;
+    console.log('Request URL:', url, 'Params:', params.toString());  
+    return this.http.get<ListAllOrder>(url, { params });
   }
   UpdateOrderStatus(orderId: number, status: number): Observable<any> {
     const url = `${this.apiUrl}/orders/${orderId}/status`;

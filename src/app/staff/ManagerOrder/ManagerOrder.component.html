@@ -12,8 +12,8 @@
     <div class="col-md-2">
       <div class="input-group">
         <label class="input-group-text" for="type">Loại đơn</label>
-        <select id="type" class="form-select" (change)="onSearch()">
-          <option value="">Tất cả</option>
+        <select id="type" class="form-select" [(ngModel)]="selectedType" (change)="onSearch()">
+          <option value="0">Tất cả</option>
           <option *ngFor="let type of types" [value]="type.value">{{ type.text }}</option>
         </select>
       </div>
@@ -25,9 +25,8 @@
     <div class="col-md-3">
       <div class="input-group">
         <label class="input-group-text" for="time">Thời gian</label>
-        <select id="time" class="form-select" (change)="onSearch()">
-          <option value="">Tất cả</option>
-          <option *ngFor="let time of times" [value]="time.value">{{ time.text }}</option>
+        <select id="time" class="form-select" [(ngModel)]="selectedFilter" (change)="onSearch()">
+          <option *ngFor="let option of filterByDate" [value]="option.value">{{ option.text }}</option>
         </select>
       </div>
     </div>
@@ -42,12 +41,12 @@
         <label class="input-group-text" for="dateTo">Đến ngày</label>
         <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo" (change)="onSearch()">
       </div>
-    </div>
+    </div>    
     <div class="col-md-3">
       <div class="input-group">
         <label class="input-group-text" for="status">Trạng thái</label>
-        <select id="status" class="form-select" (change)="onSearch()">
-          <option value="">Tất cả</option>
+        <select id="status" class="form-select" [(ngModel)]="selectedStatus" (change)="onSearch()">
+          <option value="0">Tất cả</option>
           <option *ngFor="let status of statuses" [value]="status.value">{{ status.text }}</option>
         </select>
       </div>
