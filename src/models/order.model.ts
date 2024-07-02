@@ -46,6 +46,7 @@ export interface AddNewOrder {
   totalAmount: number;
   deposits: number;
   note: string;
+  type: number;
   orderDetails: AddOrderDetail[];
 }
 export interface ListTables {
