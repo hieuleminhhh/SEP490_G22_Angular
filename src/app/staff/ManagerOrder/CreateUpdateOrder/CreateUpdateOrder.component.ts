@@ -48,6 +48,7 @@ export class CreateUpdateOrderComponent implements OnInit {
     totalAmount: 0,
     deposits: 0,
     note: '',
+    type: 4,
     orderDetails: []
   };
   
@@ -110,9 +111,15 @@ export class CreateUpdateOrderComponent implements OnInit {
       this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
     } else {
       // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
-      this.selectedItems.push({ ...item, quantity: 1, unitPrice: item.price, totalPrice: item.price });
+      // Use discountedPrice if available, otherwise fallback to price
+      const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
+      this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
     }
+
+    // Recalculate totalAmount after adding item
+    this.calculateTotalAmount();
   }
+  
   
   itemsAreEqual(item1: any, item2: any): boolean {
     if (item1.hasOwnProperty('itemName') && item2.hasOwnProperty('itemName')) {
@@ -208,8 +215,9 @@ export class CreateUpdateOrderComponent implements OnInit {
   }
 
   filterAddresses() {
-    this.filteredAddresses = this.addresses.filter(address =>
-      address.consigneeName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+    const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
+    this.filteredAddresses = this.addresses.filter(address => 
+      address.consigneeName.toLowerCase().includes(lowerCaseSearchTerm) || 
       address.guestPhone.includes(this.searchTerm)
     );
   }
