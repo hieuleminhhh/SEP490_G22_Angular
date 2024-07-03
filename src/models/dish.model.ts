@@ -1,3 +1,4 @@
+//gues
 export interface Dish{
   dishId: number;
   itemName:string;
@@ -14,6 +15,7 @@ export interface Dish{
   isActive:boolean;
   totalAmount:number;
 }
+//manager
 export interface AddNewDish{
   itemName: string,
   itemDescription:string,
@@ -49,4 +51,6 @@ export interface ManagerDish {
   categoryName: string;
   categoryId: number,
   isActive: boolean;
+  discountedPrice: number;
+  discountPercentage: number;
 }

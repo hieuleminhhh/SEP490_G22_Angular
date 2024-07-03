@@ -32,44 +32,65 @@ export class ManagerOrderComponent implements OnInit {
     { value: 3, text: 'Hủy' }
   ];
   types = [
-    { value: 'single', text: 'Tại chỗ' },
-    { value: 'takeaway', text: 'Mang về' },
-    { value: 'reservation', text: 'Đặt bàn' },
-    { value: 'online', text: 'Online' }
+    { value: '1', text: 'Mang về' },
+    { value: '2', text: 'Online' },
+    { value: '3', text: 'Đặt bàn' },
+    { value: '4', text: 'Tại chỗ' }
   ];
-  times = [
-    { value: 'order', text: 'Đặt hàng' },
-    { value: 'reciving', text: 'Giao hàng' },
+  filterByDate = [
+    { value: 'Đặt hàng', text: 'Đặt hàng' },
+    { value: 'Giao hàng', text: 'Giao hàng' },
   ];
+  selectedStatus: number = 0;
+  selectedFilter: string = 'Đặt hàng';
+  selectedType: number = 0;
   orderDetail: ListOrderDetailByOrder | undefined;
-  constructor(private orderService: ManagerOrderService, private orderDetailService : ManagerOrderDetailService, private router: Router) {
-    const today = new Date();
-    this.dateFrom = today.toISOString().split('T')[0];
-    this.dateTo = today.toISOString().split('T')[0];
-   }
+
+  constructor(
+    private orderService: ManagerOrderService, 
+    private orderDetailService: ManagerOrderDetailService, 
+    private router: Router
+  ) {}
 
   ngOnInit() {
+    this.setDefaultDates();
     this.loadListOrder();
-    this.populateWeeks();
-    this.populateYears();
   }
-  loadListOrder(search: string = ''): void {
-    this.orderService.ListOrders(this.currentPage, this.pageSize, search).subscribe(
+
+  setDefaultDates() {
+    const today = new Date();
+    this.dateFrom = this.formatDate(today);
+    this.dateTo = this.formatDate(today);
+  }
+
+  loadListOrder(): void {
+    this.orderService.ListOrders(
+      this.currentPage, 
+      this.pageSize, 
+      this.search, 
+      this.dateFrom, 
+      this.dateTo, 
+      this.selectedStatus, 
+      this.selectedFilter, 
+      this.selectedType,
+    ).subscribe(
       (response: ListAllOrder) => {
         if (response && response.items) {
           this.orders = [response];
           this.totalCount = response.totalCount;
           this.updateTotalPagesArray(response.totalPages);
-          console.log('Fetched order:', this.orders);
+          console.log('Fetched orders:', this.orders);
         } else {
           console.error('Invalid response:', response);
         }
       },
       (error) => {
-        console.error('Error fetching dishes:', error);
+        console.error('Error fetching orders:', error);
       }
     );
   }
+  
+
   loadListOrderDetails(orderId: number) {
     this.orderDetailService.getOrderDetail(orderId).subscribe(
       (orderDetail) => {
@@ -81,10 +102,11 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
-  
+
   updateTotalPagesArray(totalPages: number): void {
     this.totalPagesArray = Array(totalPages).fill(0).map((x, i) => i + 1);
   }
+
   updateOrderStatus(orderId: number, status: number): void {
     this.orderService.UpdateOrderStatus(orderId, status).subscribe(
       (response) => {
@@ -96,28 +118,31 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
-onStatusChange(event: Event, orderId: number): void {
-  const selectElement = event.target as HTMLSelectElement;
-  const selectedStatus = parseInt(selectElement.value, 10);
-  const listOrder = this.orders.find(list => list.items.some(o => o.orderId === orderId));
-  
-  if (listOrder) {
-    const order = listOrder.items.find(o => o.orderId === orderId);
-    
-    if (order) {
-      order.status = selectedStatus;
-      this.updateOrderStatus(orderId, selectedStatus);
+
+  onStatusChange(event: Event, orderId: number): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const selectedStatus = parseInt(selectElement.value, 10);
+    const listOrder = this.orders.find(list => list.items.some(o => o.orderId === orderId));
+
+    if (listOrder) {
+      const order = listOrder.items.find(o => o.orderId === orderId);
+
+      if (order) {
+        order.status = selectedStatus;
+        this.updateOrderStatus(orderId, selectedStatus);
+      } else {
+        console.error(`Order with orderId ${orderId} not found`);
+      }
     } else {
-      console.error(`Order with orderId ${orderId} not found`);
+      console.error(`ListAllOrder containing orderId ${orderId} not found`);
     }
-  } else {
-    console.error(`ListAllOrder containing orderId ${orderId} not found`);
   }
-}
+
   getStatusText(status: number): string {
     const statusObj = this.statuses.find(s => s.value === status);
     return statusObj ? statusObj.text : 'Không xác định';
   }
+
   getStatusColor(status: number): string {
     switch (status) {
       case 0:
@@ -132,59 +157,29 @@ onStatusChange(event: Event, orderId: number): void {
         return 'black';
     }
   }
+
   onPageChange(page: number): void {
     this.currentPage = page;
-    this.loadListOrder(this.search);
+    this.loadListOrder();
   }
+
   onSearch(): void {
     this.currentPage = 1;
-    console.log('Search term:', this.search);  
-    this.loadListOrder(this.search);
+    this.loadListOrder();
   }
+
   navigateToCreateOrder() {
     this.router.navigate(['cuorder']);
   }
-  populateWeeks() {
-    const selectElement = document.getElementById('week') as HTMLSelectElement;
-    const currentDate = new Date();
-    const currentWeekNumber = this.getWeekNumber(currentDate);
-  
-    for (let i = 1; i <= 52; i++) {
-      const startOfWeek = new Date(currentDate.getFullYear(), 0, (i - 1) * 7 + 1);
-      const endOfWeek = new Date(currentDate.getFullYear(), 0, (i - 1) * 7 + 7);
-  
-      const option = document.createElement('option');
-      option.value = i.toString();
-      const startDay = this.formatTwoDigits(startOfWeek.getDate());
-      const startMonth = this.formatTwoDigits(startOfWeek.getMonth() + 1);
-      const endDay = this.formatTwoDigits(endOfWeek.getDate());
-      const endMonth = this.formatTwoDigits(endOfWeek.getMonth() + 1);
-  
-      option.text = `${startDay}/${startMonth} To ${endDay}/${endMonth}`;
-      selectElement.appendChild(option);
-  
-      if (i === currentWeekNumber) {
-        option.selected = true;
-      }
-    }
-  }
-  
-  private getWeekNumber(date: Date): number {
-    const oneJan = new Date(date.getFullYear(), 0, 1);
-    const weekNumber = Math.ceil(((date.getTime() - oneJan.getTime()) / 86400000 + oneJan.getDay() + 1) / 7);
-    return weekNumber;
-  }
-  
-  private formatTwoDigits(value: number): string {
-    return value < 10 ? `0${value}` : `${value}`;
-  }
-  populateYears() {
-    const currentYear = new Date().getFullYear();
-    for (let i = currentYear; i >= currentYear - 5; i--) {
-      this.years.push(i);
-    }
-  }
+
   createNewOrder() {
-    this.router.navigate(['/cuorder']); 
+    this.router.navigate(['/cuorder']);
+  }
+
+  formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2); // Add leading zero if month is < 10
+    const day = ('0' + date.getDate()).slice(-2); // Add leading zero if day is < 10
+    return `${year}-${month}-${day}`;
   }
 }

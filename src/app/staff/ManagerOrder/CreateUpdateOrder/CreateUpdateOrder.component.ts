@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -10,7 +10,7 @@ import { ListAllCombo } from '../../../../models/combo.model';
 import { AddNewOrder } from '../../../../models/order.model';
 import { AddOrderDetail } from '../../../../models/orderDetail.model';
 import { ManagerOrderService } from '../../../../service/managerorder.service';
-import { Address } from '../../../../models/address.model';
+import { AddNewAddress, Address } from '../../../../models/address.model';
 @Component({
   selector: 'app-CreateUpdateOrder',
   templateUrl: './CreateUpdateOrder.component.html',
@@ -21,6 +21,7 @@ import { Address } from '../../../../models/address.model';
 export class CreateUpdateOrderComponent implements OnInit {
 
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService : ManagerOrderService) { }
+  @ViewChild('formModal') formModal!: ElementRef;
   dishes: ListAllDishes[] = [];
   combo: ListAllCombo[] = [];
   addresses: Address[] = []; 
@@ -48,9 +49,14 @@ export class CreateUpdateOrderComponent implements OnInit {
     totalAmount: 0,
     deposits: 0,
     note: '',
+    type: 4,
     orderDetails: []
   };
-  
+  newAddress: AddNewAddress = {
+    guestAddress: '',
+    consigneeName: '',
+    guestPhone: '',
+  };
   ngOnInit() {
     this.loadListDishes();
     this.loadListCombo();
@@ -110,9 +116,15 @@ export class CreateUpdateOrderComponent implements OnInit {
       this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
     } else {
       // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
-      this.selectedItems.push({ ...item, quantity: 1, unitPrice: item.price, totalPrice: item.price });
+      // Use discountedPrice if available, otherwise fallback to price
+      const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
+      this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
     }
+
+    // Recalculate totalAmount after adding item
+    this.calculateTotalAmount();
   }
+  
   
   itemsAreEqual(item1: any, item2: any): boolean {
     if (item1.hasOwnProperty('itemName') && item2.hasOwnProperty('itemName')) {
@@ -208,8 +220,9 @@ export class CreateUpdateOrderComponent implements OnInit {
   }
 
   filterAddresses() {
-    this.filteredAddresses = this.addresses.filter(address =>
-      address.consigneeName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+    const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
+    this.filteredAddresses = this.addresses.filter(address => 
+      address.consigneeName.toLowerCase().includes(lowerCaseSearchTerm) || 
       address.guestPhone.includes(this.searchTerm)
     );
   }
@@ -225,4 +238,60 @@ export class CreateUpdateOrderComponent implements OnInit {
     this.showDropdown = false;
     this.clearSearchTerm(); 
   }
+  createAddress() {
+    this.saveAddress();
+  }
+
+  saveAddress() {
+    this.orderService.AddNewAddress(this.newAddress).subscribe(
+      response => {
+        console.log('Address created successfully:', response);
+        this.successMessage = 'Địa chỉ đã được thêm thành công!';
+        setTimeout(() => this.successMessage = '', 5000);
+        this.loadAddresses();
+        this.clearForm();
+        this.closeModal();
+      },
+      error => {
+        console.error('Error creating address:', error);
+        this.clearAddErrors();
+        if (error.error) {
+          const fieldErrors = error.error;
+          if (fieldErrors['consigneeName']) {
+            this.addErrors.consigneeNameError = fieldErrors['consigneeName'];
+          }
+          if (fieldErrors['guestPhone']) {
+            this.addErrors.guestPhoneError = fieldErrors['guestPhone'];
+          }
+          if (fieldErrors['guestAddress']) {
+            this.addErrors.guestAddressError = fieldErrors['guestAddress'];
+          }
+        } else {
+          this.addErrorMessage = 'An error occurred. Please try again later.';
+        }
+      }
+    );
+  }
+
+  clearForm() {
+    this.newAddress = { consigneeName: '', guestPhone: '', guestAddress: '' };
+  }
+  addErrors: any = {};
+  addErrorMessage: string = '';
+  clearAddErrors() {
+    this.addErrors = {};
+  }
+
+  closeModal() {
+    const modalElement = this.formModal.nativeElement;
+    modalElement.classList.remove('show');
+    modalElement.style.display = 'none';
+    document.body.classList.remove('modal-open');
+    const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
+    if (modalBackdrop && modalBackdrop.parentNode) {
+      modalBackdrop.parentNode.removeChild(modalBackdrop);
+    }
+  }
+
+
 }

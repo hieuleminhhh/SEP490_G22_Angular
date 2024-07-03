@@ -60,7 +60,35 @@
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
-.table th {
-    background-color: #e0f7fa; /* Ensure header background color */
-    color: #000; /* Ensure header text color */
+.summary-section {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f9f9f9;
 }
+
+.summary-section .row {
+  margin: 0;
+}
+
+.summary-section .col-md-6 {
+  padding: 0;
+}
+
+.summary-section .d-flex {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.summary-section .label {
+  flex: 0 1 auto;
+  margin-right: 5px; /* Adjust this value as needed */
+}
+
+.summary-section .value {
+  text-align: right;
+  flex: 0 1 auto;
+  margin-left: 5px; /* Adjust this value as needed */
+}
+
+  

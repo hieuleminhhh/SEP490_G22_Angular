@@ -118,16 +118,29 @@
     font-size: 1em;
     color: #888;
   }
-  .dropdown-menu {
-    display: none;
-    position: absolute;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
-  }
-  
   .dropdown-menu.show {
     display: block;
   }
+
+  .input-group {
+    position: relative;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000; /* Ensure dropdown appears above other elements */
+  }
+  
+  .input-group .btn-outline-secondary {
+    margin-left: 10px; /* Adjust margin to move the button away from the input */
+  }
+  .dropdown-scrollable {
+    max-height: 200px; /* Adjust this value as needed */
+    overflow-y: auto;
+  }
+  
+  
   

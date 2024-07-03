@@ -12,8 +12,8 @@
     <div class="col-md-2">
       <div class="input-group">
         <label class="input-group-text" for="type">Loại đơn</label>
-        <select id="type" class="form-select" (change)="onSearch()">
-          <option value="">Tất cả</option>
+        <select id="type" class="form-select" [(ngModel)]="selectedType" (change)="onSearch()">
+          <option value="0">Tất cả</option>
           <option *ngFor="let type of types" [value]="type.value">{{ type.text }}</option>
         </select>
       </div>
@@ -25,9 +25,8 @@
     <div class="col-md-3">
       <div class="input-group">
         <label class="input-group-text" for="time">Thời gian</label>
-        <select id="time" class="form-select" (change)="onSearch()">
-          <option value="">Tất cả</option>
-          <option *ngFor="let time of times" [value]="time.value">{{ time.text }}</option>
+        <select id="time" class="form-select" [(ngModel)]="selectedFilter" (change)="onSearch()">
+          <option *ngFor="let option of filterByDate" [value]="option.value">{{ option.text }}</option>
         </select>
       </div>
     </div>
@@ -42,12 +41,12 @@
         <label class="input-group-text" for="dateTo">Đến ngày</label>
         <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo" (change)="onSearch()">
       </div>
-    </div>
+    </div>    
     <div class="col-md-3">
       <div class="input-group">
         <label class="input-group-text" for="status">Trạng thái</label>
-        <select id="status" class="form-select" (change)="onSearch()">
-          <option value="">Tất cả</option>
+        <select id="status" class="form-select" [(ngModel)]="selectedStatus" (change)="onSearch()">
+          <option value="0">Tất cả</option>
           <option *ngFor="let status of statuses" [value]="status.value">{{ status.text }}</option>
         </select>
       </div>
@@ -71,8 +70,8 @@
       <ng-container *ngFor="let orderList of orders; let i = index">
         <tr *ngFor="let order of orderList.items; let j = index">
           <td>{{ (currentPage - 1) * pageSize + i * orders[0].items.length + j + 1 }}</td>
-          <td>{{ order.consigneeName }}</td>
-          <td>{{ order.guestPhone }}</td>
+          <td>{{ order.consigneeName || 'Khách lẻ' }}</td>
+          <td>{{ order.guestPhone || '------------' }}</td>
           <td>{{ order.orderDate }}</td>
           <td>{{ order.recevingOrder }}</td>
           <td>{{ order.totalAmount }}</td>
@@ -87,6 +86,7 @@
           </td>
         </tr>
       </ng-container>
+      
     </tbody>
   </table>
 
@@ -115,10 +115,10 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div *ngIf="orderDetail">
-          <h5>Thông tin chi tiết đơn hàng</h5>
-          <table class="table table-bordered">
-            <thead>
+        <div *ngIf="orderDetail; else loadingOrError">
+          <h5 class="mb-3">Thông tin chi tiết đơn hàng</h5>
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
               <tr>
                 <th>Món ăn</th>
                 <th>Số lượng</th>
@@ -129,46 +129,57 @@
             <tbody>
               <ng-container *ngFor="let item of orderDetail.orderDetails">
                 <tr>
-                  <td>{{ item.itemName }}</td>
+                  <td>
+                    <span *ngIf="item.dishId !== 0; else comboNameTemplate">{{ item.itemName }}</span>
+                    <ng-template #comboNameTemplate>{{ item.nameCombo }}</ng-template>
+                  </td>
                   <td>{{ item.quantity }}</td>
                   <td>
-                    <span *ngIf="item.discountedPrice">
-                      <span style="text-decoration: line-through;">{{ item.price }}</span>
-                      <br>
+                    <ng-container *ngIf="item.discountedPrice">
                       <span>{{ item.discountedPrice }}</span>
-                    </span>
-                    <span *ngIf="!item.discountedPrice">{{ item.price }}</span>
+                    </ng-container>
+                    <ng-container *ngIf="!item.discountedPrice">
+                      <span>{{ item.price }}</span>
+                    </ng-container>
                   </td>
+                  
                   <td>{{ item.unitPrice }}</td>
                 </tr>
-              </ng-container>
+              </ng-container>              
             </tbody>
           </table>
-          <div class="container mt-4">
+          <div class="summary-section mt-4">
             <div class="row">
               <div class="col-md-6">
-                <div class="d-flex justify-content-start mb-2">
-                  <span class="fw-bold">Tạm tính:</span>
-                  <span>{{ orderDetail.totalAmount }}</span>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="fw-bold label">Tạm tính:</span>
+                  <span class="value">{{ orderDetail.totalAmount }}</span>
                 </div>
-                <div class="d-flex justify-content-start mb-2">
-                  <span class="fw-bold">Khuyến mãi:</span>
-                  <span>-----</span>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="fw-bold label">Khuyến mãi:</span>
+                  <!-- <span class="value">{{ orderDetail.discount | currency }}</span> -->
                 </div>
-                <div class="d-flex justify-content-start">
-                  <span class="fw-bold">Tổng cộng:</span>
-                  <span>{{ orderDetail.totalAmount }}</span>
+                <div class="d-flex justify-content-between">
+                  <span class="fw-bold label">Tổng cộng:</span>
+                  <span class="value">{{ orderDetail.totalAmount }}</span>
                 </div>
               </div>
             </div>
           </div>
+          
+          
+          
+          
+          
         </div>
-        <div *ngIf="!orderDetail">
-          <p>Loading order details...</p>
-        </div>
-        <div *ngIf="orderDetail === undefined">
-          <p>Error loading order details. Please try again later.</p>
-        </div>
+        <ng-template #loadingOrError>
+          <div *ngIf="!orderDetail">
+            <p>Loading order details...</p>
+          </div>
+          <div *ngIf="orderDetail === undefined">
+            <p>Error loading order details. Please try again later.</p>
+          </div>
+        </ng-template>
       </div>
     </div>
   </div>
