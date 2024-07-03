@@ -84,7 +84,14 @@ export class ReservationService {
   updateStatusReservation(reservationId: number, status: any): Observable<any> {
     const url = `https://localhost:7188/api/Reservations/${reservationId}/update-status`;
     const payload = { status: status };
-    console.log('Payload:', payload);
     return this.http.put(url, payload);
-}
+  }
+
+  searchReservation(searchTerm: string): Observable<any[]> {
+    const url = `https://localhost:7188/api/Reservations/searchNameOrPhone?guestNameOrguestPhone=${searchTerm}`;
+    return this.http.get<any[]>(url);
+  }
+
+
+
 }

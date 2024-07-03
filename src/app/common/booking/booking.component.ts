@@ -126,7 +126,7 @@ export class BookingComponent implements OnInit {
         receivingOrder: dateTime,
         totalAmount: 0,
         deposits: 0,
-        type:3,
+        type: 0,
         orderDetails: this.cartItems.map(item => ({
           unitPrice: this.getTotalPrice(item),
           quantity: item.quantity,
@@ -140,7 +140,7 @@ export class BookingComponent implements OnInit {
 
       if (request.orderDetails.length > 0) {
         this.router.navigate(['/paymentReservation']);
-      }else{
+      } else {
         this.reservationService.createResevetion(request).subscribe({
           next: response => {
             console.log('Order submitted successfully', response);
