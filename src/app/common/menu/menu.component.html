@@ -88,6 +88,17 @@
         </div>
       </div>
 
+      <div class="pagination" *ngIf="totalPages>0">
+        <button (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+
+        <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"
+          max="{{ totalPages }}">
+
+        <span>of {{ totalPages }}</span>
+
+        <button (click)="onNextPage()" [disabled]="currentPage === totalPages">Next</button>
+      </div>
+
       <div class="sticky"></div>
     </div>
 

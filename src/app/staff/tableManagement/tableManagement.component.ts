@@ -5,6 +5,10 @@ import { FormsModule } from '@angular/forms';
 import moment from 'moment';
 import { ReservationService } from '../../../service/reservation.service';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { BehaviorSubject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-tableManagement',
@@ -33,16 +37,20 @@ export class TableManagementComponent implements OnInit {
   tabs: string[] = ['Tất cả', 'Chưa nhận bàn', 'Đã nhận bàn', 'Đã hủy', 'Đã hoàn thành'];
   selectedIndex: number = 0;
   searchTerm: string = '';
+  searchTermSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   currentPage = 1; // Trang hiện tại
-  itemsPerPage = 8; // Số bản ghi trên mỗi trang
+  itemsPerPage = 9; // Số bản ghi trên mỗi trang
   totalItems = 0; // Tổng số bản ghi
 
 
-  constructor(private tableService: TableService, private reservationService: ReservationService) { }
+  constructor(private tableService: TableService, private reservationService: ReservationService, private router: Router) { }
 
   ngOnInit(): void {
     this.getTableData();
+    this.searchTermSubject.pipe(debounceTime(300)).subscribe(searchTerm => {
+      this.getSearchList();
+    });
   }
   setView(view: string) {
     this.currentView = view;
@@ -217,14 +225,15 @@ export class TableManagementComponent implements OnInit {
     this.setView('detail-reservation');
     this.reservationService.getReservation(id).subscribe(
       response => {
+        console.log(response); // Add this line to inspect the response
         this.reservationDetail = response;
-
       },
       error => {
         console.error('Error:', error);
       }
     );
   }
+
 
   updateReservationById(id: number, status: number): void {
     this.reservationService.updateStatusReservation(id, status).subscribe(
@@ -244,21 +253,21 @@ export class TableManagementComponent implements OnInit {
   //=================================================================================================================
   selectTab(index: number): void {
     this.selectedIndex = index;
-    this.getReservationList();
+    this.currentPage = 1;
+    if (this.searchTerm.trim() === '') {
+      this.getReservationList();
+    } else {
+      this.getSearchList();
+    }
   }
 
   getReservationList(): void {
     const status = this.selectedIndex > 0 ? this.selectedIndex : undefined;
-    const params = {
-      status,
-      page: this.currentPage,
-      limit: this.itemsPerPage
-    };
     this.reservationService.getReservationList(status).subscribe(
       response => {
         this.dataReservation = this.filterDataByStatus(response, this.selectedIndex);
-        this.totalItems = this.dataReservation.length; // Cập nhật lại tổng số bản ghi
-        this.paginateData(); // Sau khi cập nhật totalItems, cắt dữ liệu cho trang hiện tại
+        this.totalItems = this.dataReservation.length;
+        this.paginateData();
       },
       error => {
         console.error('Error:', error);
@@ -268,11 +277,12 @@ export class TableManagementComponent implements OnInit {
 
 
   filterDataByStatus(data: any[], status: number): any[] {
-    if (status === 0) {
-      return data.filter(item => item.status !== 0); // Return all data except those with status = 0
+    if (status === undefined || status === 0) {
+      return data.filter(item => item.status !== 0);
     }
     return data.filter(item => item.status === status);
   }
+
   groupTablesByFloor(tables: any[]): any[] {
     const groupedTables = tables.reduce((acc, table) => {
       if (!acc[table.floor]) {
@@ -298,16 +308,21 @@ export class TableManagementComponent implements OnInit {
     });
   }
   formatTables(tables: any[]): string {
-    if (tables.length === 0) {
+    if (!tables || tables.length === 0) {
       return 'Trống';
     }
     const grouped = this.groupTablesByFloor(tables);
     return grouped.map(group => `Tầng ${group.floor}, bàn ${group.tableRange}`).join('<br>');
   }
+
   getStatusLabel(status: number): { label: string, class: string } {
     let label = 'Không xác định'; // Default label if status doesn't match
     let cssClass = ''; // Default class
     switch (status) {
+      case 0:
+        label = 'Đợi xác nhận';
+        cssClass = 'status-pending';
+        break;
       case 1:
         label = 'Chưa nhận bàn';
         cssClass = 'status-pending';
@@ -394,7 +409,39 @@ export class TableManagementComponent implements OnInit {
       console.log('Invalid page number');
     }
   }
+  getSearchList(): void {
+    const status = this.selectedIndex > 0 ? this.selectedIndex : undefined;
+    if (this.searchTerm.trim() === '') {
+      this.getReservationList();
+      return;
+    }
 
+    this.reservationService.searchReservation(this.searchTerm).subscribe(
+      response => {
+        console.log('response',response);
+        this.dataReservation = this.filterDataByStatus(response, this.selectedIndex);
+        console.log(this.searchTerm);
+        console.log(this.dataReservation);
+        this.totalItems = this.dataReservation.length;
+        this.paginateData();
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
 
+  onSearchChange(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    this.searchTerm = inputElement.value;
+    this.currentPage = 1;
+    this.searchTermSubject.next(this.searchTerm);
+  }
+
+  //==================================================================================================================================
+
+  createReservation(){
+    this.setView('create-reservation');
+  }
 
 }

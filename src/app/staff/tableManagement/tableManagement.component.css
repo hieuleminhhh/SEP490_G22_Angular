@@ -567,11 +567,7 @@ summary {
   background-color: #c82333; /* Màu nền khi di chuột qua */
   border-color: #bd2130; /* Viền khi di chuột qua */
 }
-.col-md-3 {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+
 
 .floor-select {
   width: 70%;
@@ -719,4 +715,69 @@ summary {
 
 .pagination span {
   font-weight: bold;
+}
+
+
+h2 {
+  color: #333333;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #555555;
+}
+
+.input-text,
+.input-number,
+.input-tel,
+.input-select,
+.input-textarea {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+}
+
+textarea {
+  height: 60px;
+}
+
+.reser {
+  background-color: #ff6600;
+  color: #ffffff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.reser:hover {
+  background-color: #e65c00;
+}
+
+.note {
+  margin-top: 20px;
+  color: #777777;
+  font-size: 14px;
+}
+
+.restaurant-options {
+  display: flex;
+  justify-content: space-around;
+}
+
+.restaurant-label {
+  cursor: pointer;
+}
+
+.restaurant-label.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
