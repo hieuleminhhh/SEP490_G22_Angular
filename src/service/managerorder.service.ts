@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { AddNewOrder, ListAllOrder } from '../models/order.model';
-import { Address } from '../models/address.model';
+import { AddNewAddress, Address } from '../models/address.model';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -41,6 +41,10 @@ export class ManagerOrderService {
   ListAddress(): Observable<Address[]> {
     const url = `${this.apiUrl}/Guest/ListAddress`;
     return this.http.get<Address[]>(url);
+  }
+  AddNewAddress(newAddress: AddNewAddress): Observable<any> {
+    const url = `${this.apiUrl}/Guest/CreateGuest`;
+    return this.http.post<any>(url, newAddress, httpOptions);
   }
 }
 
