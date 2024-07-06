@@ -6,11 +6,14 @@
           <a (click)="setView('table-layout')">QUẢN LÝ BÀN </a>
           <ul>
             <li><a [class.active]="currentView === 'table-layout'" (click)="setView('table-layout')">Sơ đồ bàn</a></li>
-            <li><a [class.active]="currentView === 'booking-request'" (click)="setView('booking-request')" (click)="getReservation()">Yêu cầu đặt
+            <li><a [class.active]="currentView === 'booking-request'" (click)="setView('booking-request')"
+                (click)="getReservation()">Yêu cầu đặt
                 bàn</a></li>
-            <li><a [class.active]="currentView === 'booking-schedule'" (click)="setView('booking-schedule')" (click)="getReservationData()">Lịch đặt
+            <li><a [class.active]="currentView === 'booking-schedule'" (click)="setView('booking-schedule')"
+                (click)="getReservationData()">Lịch đặt
                 bàn</a></li>
-            <li><a [class.active]="currentView === 'booking-history'" (click)="setView('booking-history')" (click)="getReservationList()">Lịch sử đặt
+            <li><a [class.active]="currentView === 'booking-history'" (click)="setView('booking-history')"
+                (click)="getReservationList()">Lịch sử đặt
                 bàn</a></li>
 
           </ul>
@@ -26,6 +29,8 @@
       <h2 *ngIf="currentView === 'booking-schedule'">Lịch đặt bàn</h2>
       <h2 *ngIf="currentView === 'booking-history'">Lịch sử đặt bàn</h2>
       <h2 *ngIf="currentView === 'detail-reservation'">Chi tiết đơn đặt bàn</h2>
+      <h2 *ngIf="currentView === 'create-reservation'">Tạo đơn đặt bàn</h2>
+
       <select id="timeframe" name="timeframe" *ngIf="currentView === 'booking-schedule'" [(ngModel)]="selectedTime"
         (ngModelChange)="onSelectTimeframe()" class="floor-select" style="width: 20%;padding: 5px;">
         <option value="today" [selected]="selectedTime === 'today'">Hôm nay</option>
@@ -39,7 +44,7 @@
         <option value="empty">Bàn trống</option>
       </select>
 
-      <button *ngIf="currentView === 'booking-request'" class="btn-create-order">
+      <button *ngIf="currentView === 'booking-request'" class="btn-create-order" (click)="createReservation()">
         <i class="fas fa-plus-circle icon"></i>Tạo đơn đặt bàn
       </button>
 
@@ -113,7 +118,7 @@
                       </div>
                     </div>
                     <div class="vertical-line"></div>
-                    <div class="col-md-3">
+                    <div class="col-md-3" style="display: flex;justify-content: center;align-items: center;">
                       <div class="cell">
                         <span class="data"><i class="fas fa-user"></i> {{reservation.guestNumber}}</span>
                       </div>
@@ -144,7 +149,7 @@
               </div>
             </div>
           </div>
-          <div *ngIf="!dataReservationAccept || dataReservationAccept.length === 0">
+          <div *ngIf="!dataReservationAccept || dataReservationAccept.length === 0" style="text-align: center;">
             <p>Không có đơn đặt bàn cho ngày hôm nay</p>
           </div>
           <div class="pagination" *ngIf="totalPages>0">
@@ -172,7 +177,7 @@
             </div>
             <div class="modal-body">
               <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-3" style="display: flex;justify-content: center;align-items: center;">
                   <select id="floor" name="floor" [(ngModel)]="selectedFloor"
                     (change)="getTableOFFloorEmpty(selectedFloor)" class="floor-select">
                     <option *ngFor="let floor of getFloors()" [value]="floor" [class.active]="selectedFloor === floor">
@@ -234,7 +239,8 @@
                     <td>{{ reservation.reservationTime | date:'dd/MM/yyyy - HH:mm' }}</td>
                     <td>{{reservation.guestNumber}}</td>
                     <td>{{reservation.deposits}}</td>
-                    <td>{{reservation.status}}</td>
+                    <td><span [ngClass]="getStatusLabel(reservation.status).class" class="status-label">{{
+                        getStatusLabel(reservation.status).label }}</span></td>
                     <td><button type="button" class="btn btn-primary btn-sm" style="background-color: green;"
                         (click)="updateReservationById(reservation.reservationId, 1)">Nhận đơn</button></td>
                     <td>
@@ -247,7 +253,10 @@
             </table>
           </div>
           <br>
-          <div class="pagination">
+          <div *ngIf="!dataReservationPending || dataReservationPending.length === 0" style="text-align: center;">
+            <p>Không có yêu cầu đặt bàn </p>
+          </div>
+          <div class="pagination" *ngIf="totalPages>0">
             <button (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
 
             <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"
@@ -267,27 +276,29 @@
           <details open>
             <summary>Thông tin đặt bàn</summary>
             <div class="row">
-              <p>Ngày giờ nhận bàn<span>:{{ reservationDetail.reservationTime | date:'dd/MM/yyyy HH:mm' }}</span></p>
-              <p>Số lượng khách<span>:{{ reservationDetail.guestNumber}}</span></p>
-              <p>Ghi chú<span>:{{ reservationDetail.note }}</span></p>
-              <p>Trạng thái đơn<span>:{{ reservationDetail.status }}</span></p>
+              <p>Ngày giờ nhận bàn<span>:{{ reservationDetail.data.reservationTime | date:'dd/MM/yyyy HH:mm' }}</span>
+              </p>
+              <p>Số lượng khách<span>:{{ reservationDetail.data.guestNumber}}</span></p>
+              <p>Ghi chú<span>:{{ reservationDetail.data.note }}</span></p>
+              <p>Trạng thái đơn<span [ngClass]="getStatusLabel(reservationDetail.data.status).class">:{{
+                  getStatusLabel(reservationDetail.data.status).label }}</span></p>
             </div>
           </details>
           <details>
             <summary>Bàn và khu vực</summary>
-            <div class="row">
-              <p>Khu vực<span>:Tầng {{ reservationDetail?.tableOfReservation[0]?.floor }}</span></p>
-              <p>Bàn<span>:{{ reservationDetail?.tableOfReservation[0]?.tableId }}</span></p>
-              <p>Loại bàn<span>:{{ reservationDetail?.tableOfReservation[0]?.capacity }} người</span></p>
+            <div class="row" *ngIf="reservationDetail?.data.tableOfReservation.length > 0">
+              <p>Khu vực<span>:Tầng {{ reservationDetail?.data.tableOfReservation[0]?.floor }}</span></p>
+              <p>Bàn<span>:{{ reservationDetail?.data.tableOfReservation[0]?.tableId }}</span></p>
+              <p>Loại bàn<span>:{{ reservationDetail?.data.tableOfReservation[0]?.capacity }} người</span></p>
             </div>
           </details>
           <details>
             <summary>Thông tin khách hàng</summary>
             <div class="row">
-              <p>Họ tên<span>:{{ reservationDetail.consigneeName }}</span></p>
-              <p>Số điện thoại<span>:{{ reservationDetail.guestPhone }}</span></p>
-              <p>Email<span>:{{ reservationDetail?.email }}</span></p>
-              <p>Địa chỉ<span>:{{ reservationDetail?.address }}</span></p>
+              <p>Họ tên<span>:{{ reservationDetail.data.consigneeName }}</span></p>
+              <p>Số điện thoại<span>:{{ reservationDetail.data.guestPhone }}</span></p>
+              <p>Email<span>:{{ reservationDetail?.data.email }}</span></p>
+              <p>Địa chỉ<span>:{{ reservationDetail?.data.address }}</span></p>
             </div>
           </details>
           <details>
@@ -295,7 +306,7 @@
             <div>
               <div class="cart-container">
                 <div class="cart-header"
-                  *ngIf="reservationDetail?.order?.orderDetails && reservationDetail.order.orderDetails.length>0">
+                  *ngIf="reservationDetail?.data.order?.orderDetails && reservationDetail.data.order.orderDetails.length>0">
                   <div class="row">
                     <div class="col-2"></div>
                     <div class="col">
@@ -313,7 +324,8 @@
                   </div>
                 </div>
                 <div class="cart-items">
-                  <div class="row border-top border-bottom" *ngFor="let item of reservationDetail.order.orderDetails">
+                  <div class="row border-top border-bottom"
+                    *ngFor="let item of reservationDetail?.data?.order?.orderDetails">
                     <div class="row main align-items-center">
                       <div class="col-2">
                         <img class="img-fluid" [src]="item.imageUrl" alt="Item Image"
@@ -341,6 +353,70 @@
       </div>
     </section>
 
+    <section *ngIf="currentView === 'create-reservation'">
+      <div class="container">
+        <div class="card">
+          <div class="reservation-form" style="max-height: 500px;">
+            <h2>Đặt Bàn</h2>
+            <form #reservationForm="ngForm">
+              <div class="row">
+                <div class="col-md-5">
+                  <div class="form-group">
+                    <label for="name">Tên người đặt (*)</label>
+                    <input class="input-text name" type="text" id="name" name="consigneeName" placeholder="Nhập tên"
+                      required>
+                  </div>
+                </div>
+                <div class="col-md-2"></div>
+                <div class="col-md-5">
+                  <div class="form-group">
+                    <label for="phone">Số điện thoại (*)</label>
+                    <input class="input-tel phone" type="tel" id="phone" name="guestPhone"
+                      placeholder="Nhập số điện thoại" required pattern="^0\d{9,10}$">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="date">Ngày (*)</label>
+                    <input class="input-date" id="date" type="date" name="date" style="width: 100%;height: 40px;">
+                  </div>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="time">Giờ (*)</label>
+                    <select class="input-select" id="time" name="time" required>
+                      <option value="">Chọn</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-1"></div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="people">Số người (*)</label>
+                    <input class="input-number number" type="number" id="people" name="guestNumber" min="1" value="2"
+                      required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="notes">Ghi chú</label>
+                <textarea class="input-textarea note" id="notes" name="note" placeholder="Ghi chú"></textarea>
+              </div>
+
+              <button class="reser" type="submit">Đặt bàn</button>
+            </form>
+          </div>
+
+
+        </div>
+      </div>
+    </section>
+
     <section *ngIf="currentView === 'booking-history'">
       <div class="container">
         <div class="card">
@@ -349,8 +425,11 @@
               (click)="selectTab(i)">
               {{ tab }}
             </button>
-            <input type="text" placeholder="Nhập từ khóa tìm kiếm..." [(ngModel)]="searchTerm">
+            <input type="text" placeholder="Nhập từ khóa tìm kiếm..." [(ngModel)]="searchTerm"
+              (input)="onSearchChange($event)">
           </div>
+
+
 
           <br>
           <div>
@@ -396,7 +475,10 @@
             </table>
           </div>
           <br>
-          <div class="pagination">
+          <div *ngIf="!dataReservation || dataReservation.length === 0" style="text-align: center;">
+            <p>Không có dữ liệu </p>
+          </div>
+          <div class="pagination" *ngIf="totalPages>0">
             <button (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
 
             <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"

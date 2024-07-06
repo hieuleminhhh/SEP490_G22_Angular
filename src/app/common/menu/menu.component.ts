@@ -9,21 +9,22 @@ import { Category } from '../../../models/category.model';
 import { CategoryService } from '../../../service/category.service';
 import { Combo } from '../../../models/combo.model';
 import { ChangeDetectorRef } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-menu',
   standalone: true,
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.css'],
-  imports:[HttpClientModule, AsyncPipe, CommonModule]
+  imports: [HttpClientModule, AsyncPipe, CommonModule, FormsModule]
 })
-export class MenuComponent{
+export class MenuComponent {
   http = inject(HttpClient);
   successMessages: string[] = [];
 
-  dishs$ = this.getDish();
-  combo$ = this.getCombo();
-  category$ = this.getCategory();
+  dishs$!: Observable<Dish[]>;
+  combo$!: Observable<Combo[]>;
+  category$!: Observable<Category[]>;
   dishService: any;
   selectedItem: any;
   sortOptions = ['Theo bảng chữ cái từ A-Z', 'Theo bảng chữ cái từ Z-A', 'Giá từ cao tới thấp', 'Giá từ thấp tới cao'];
@@ -32,12 +33,16 @@ export class MenuComponent{
   selectedFilter: 'Category' | 'Combo' = 'Category';
   isReser: boolean = false;
 
+  currentPage = 1; // Trang hiện tại
+  itemsPerPage = 4; // Số bản ghi trên mỗi trang
+  totalItems = 0; // Tổng số bản ghi
+
   ngOnInit(): void {
     this.loadDishes();
     sessionStorage.removeItem('isReser');
   }
 
-  constructor(private cartService: CartService,private reservationService: ReservationService, private categoryService: CategoryService, private cdr: ChangeDetectorRef) {
+  constructor(private cartService: CartService, private reservationService: ReservationService, private categoryService: CategoryService, private cdr: ChangeDetectorRef) {
     this.dishs$ = this.getDish();
     this.category$ = this.getCategory();
     this.combo$ = this.getCombo();
@@ -54,17 +59,17 @@ export class MenuComponent{
       if (sortOption) {
         switch (sortOption) {
           case 'Theo bảng chữ cái từ A-Z':
-          apiUrl += '&sortField=0&sortOrder=0';
-          break;
-        case 'Theo bảng chữ cái từ Z-A':
-          apiUrl += '&sortField=0&sortOrder=1';
-          break;
-        case 'Giá từ cao tới thấp':
-          apiUrl += '&sortField=1&sortOrder=1';
-          break;
-        case 'Giá từ thấp tới cao':
-          apiUrl += '&sortField=1&sortOrder=0';
-          break;
+            apiUrl += '&sortField=0&sortOrder=0';
+            break;
+          case 'Theo bảng chữ cái từ Z-A':
+            apiUrl += '&sortField=0&sortOrder=1';
+            break;
+          case 'Giá từ cao tới thấp':
+            apiUrl += '&sortField=1&sortOrder=1';
+            break;
+          case 'Giá từ thấp tới cao':
+            apiUrl += '&sortField=1&sortOrder=0';
+            break;
           default:
             break;
         }
@@ -88,10 +93,27 @@ export class MenuComponent{
           break;
       }
     }
-    console.log(apiUrl);
-    return this.http.get<Dish[]>(apiUrl).pipe(
-      // Lọc danh sách món ăn dựa trên giá trị của isActive
-      map(dishes => dishes.filter(dish => dish.isActive))
+    return this.http.get<any>(apiUrl).pipe(
+      map(response => {
+        // Log dữ liệu nhận được từ API
+        console.log('API response:', response);
+
+        // Kiểm tra nếu response là một mảng
+        if (Array.isArray(response)) {
+          return response.filter((dish: Dish) => dish.isActive);
+        }
+        // Kiểm tra nếu response.data là một mảng
+        else if (response && Array.isArray(response.data)) {
+          return response.data.filter((dish: Dish) => dish.isActive);
+        } else {
+          console.error('API response.data is not an array');
+          return [];
+        }
+      }),
+      catchError(error => {
+        console.error('Error fetching dishes:', error);
+        return of([]);
+      })
     );
   }
 
@@ -116,8 +138,29 @@ export class MenuComponent{
   private loadDishes() {
     if (this.selectedFilter === 'Category') {
       this.dishs$ = this.getDish(this.selectedCategory, this.selectedSortOption);
+
+      // this.dishs$.subscribe(
+      //   (data: Dish[]) => {
+      //     this.totalItems = data.length;
+      //     console.log(this.totalItems);
+      //     console.log(data);
+      //     this.paginateData(data);
+      //   },
+      //   (error: any) => {
+      //     console.error('Error fetching dishs:', error);
+      //   }
+      // );
     } else if (this.selectedFilter === 'Combo') {
       this.combo$ = this.getCombo(this.selectedSortOption);
+      this.combo$.subscribe(
+        (data: Combo[]) => {
+          this.totalItems = data.length;
+          this.paginateData(data);
+        },
+        (error: any) => {
+          console.error('Error fetching combos:', error);
+        }
+      );
     }
   }
 
@@ -143,17 +186,16 @@ export class MenuComponent{
           break;
       }
     }
-    console.log(apiUrl);
     return this.http.get<Combo[]>(apiUrl);
   }
 
 
-  private getCategory():Observable<Category[]>{
+  private getCategory(): Observable<Category[]> {
     return this.http.get<Category[]>('https://localhost:7188/api/Category');
   }
 
   addToCart(item: any, itemType: string) {
-    if(!this.isReser){
+    if (!this.isReser) {
       const successMessage = 'Đã thêm sản phẩm vào giỏ hàng!';
 
       if (itemType === 'dish') {
@@ -168,7 +210,7 @@ export class MenuComponent{
       setTimeout(() => {
         this.closeModal(this.successMessages.length - 1);
       }, 3000);
-    }else{
+    } else {
       const successMessage = 'Đã thêm sản phẩm vào đặt bàn!';
 
       if (itemType === 'dish') {
@@ -200,6 +242,42 @@ export class MenuComponent{
   closePopup() {
     this.selectedItem = null;
   }
+
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.itemsPerPage);
+  }
+  onPreviousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+
+      this.loadDishes();
+    }
+  }
+
+  onNextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadDishes();
+    }
+  }
+
+  paginateData(data: any): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    if (data) {
+      data = data.slice(startIndex, endIndex);
+    }
+
+  }
+  goToDesiredPage(): void {
+    if (this.currentPage >= 1 && this.currentPage <= this.totalPages) {
+      this.loadDishes();
+    } else {
+      // Xử lý thông báo lỗi nếu số trang nhập không hợp lệ
+      console.log('Invalid page number');
+    }
+  }
+
 
 }
 

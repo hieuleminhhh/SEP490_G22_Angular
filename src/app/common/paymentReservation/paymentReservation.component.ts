@@ -79,6 +79,7 @@ export class PaymentReservationComponent implements OnInit {
       receivingOrder: this.data.reservationTime,
       totalAmount: this.getTotalCartPrice(),
       deposits: this.getTotalCartPrice() / 2,
+      type: 3,
       orderDetails: this.cartItem.map((item: { quantity: any; dishId: any; comboId: any; }) => ({
         unitPrice: this.getTotalPrice(item),
         quantity: item.quantity,
