@@ -124,15 +124,38 @@
             
             <!-- Right column for dishes and combos -->
             <div class="col-md-6">
-              <div class="row mb-3">
-                <div class="col-6 pr-1">
-                  <button class="btn btn-block" [ngClass]="{'btn-primary': showingDishes, 'btn-secondary': !showingDishes}" (click)="showDishes()">Món ăn</button>
-                </div>
-                <div class="col-6 pl-1">
-                  <button class="btn btn-block" [ngClass]="{'btn-primary': showingCombos, 'btn-secondary': !showingCombos}" (click)="showCombos()">Combo</button>
-                </div>
-              </div>
-
+              <div class="category-buttons">
+                <button class="btn"
+                        [class.btn-primary]="searchCategory !== 'Món chính'"
+                        [class.btn-secondary]="searchCategory === 'Món chính'"
+                        (click)="selectCategory('Món chính')">Món chính
+                </button>
+                <button class="btn"
+                        [class.btn-primary]="searchCategory !== 'Món khai vị'"
+                        [class.btn-secondary]="searchCategory === 'Món khai vị'"
+                        (click)="selectCategory('Món khai vị')">Món khai vị
+                </button>
+                <button class="btn"
+                        [class.btn-primary]="searchCategory !== 'Món tráng miệng'"
+                        [class.btn-secondary]="searchCategory === 'Món tráng miệng'"
+                        (click)="selectCategory('Món tráng miệng')">Món tráng miệng
+                </button>
+                <button class="btn"
+                        [class.btn-primary]="searchCategory !== 'Đồ uống'"
+                        [class.btn-secondary]="searchCategory === 'Đồ uống'"
+                        (click)="selectCategory('Đồ uống')">Đồ uống
+                </button>
+                <button class="btn"
+                        [class.btn-primary]="!showingCombos"
+                        [class.btn-secondary]="showingCombos"
+                        (click)="showCombos()">Combo
+                </button>
+            </div>
+            <div class="search-bar mt-3">
+              <input type="text" class="form-control" placeholder="Tìm kiếm món ăn..." [(ngModel)]="search" (input)="onSearch()">
+            </div>
+              
+              
               <!-- Dishes Section -->
               <div class="dishes-section" *ngIf="showingDishes && dishes">
                 <div class="row">
@@ -161,7 +184,6 @@
                   </ng-container>
                 </div>
               </div>
-              
               <!-- Combos Section -->
               <div class="combos-section" *ngIf="showingCombos && combo">
                 <div class="row">
@@ -185,6 +207,7 @@
                   </ng-container>
                 </div>
               </div>
+              
             </div>
           </div>
         </div>
