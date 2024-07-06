@@ -14,13 +14,12 @@ import { PurchaseOrderComponent } from './common/purchaseOrder/purchaseOrder.com
 import { CheckoutComponent } from './common/checkout/checkout.component';
 import { OrderDetailComponent } from './common/orderDetail/orderDetail.component';
 import { TableManagementComponent } from './staff/tableManagement/tableManagement.component';
-<<<<<<< Updated upstream
 import { ManagerOrderComponent } from './staff/ManagerOrder/ManagerOrder.component';
-import { CreateUpdateOrderComponent } from './staff/ManagerOrder/CreateUpdateOrder/CreateUpdateOrder.component';
+import { CreateUpdateOrderComponent } from './staff/ManagerOrder/CreateSpotOrder/CreateUpdateOrder.component';
 import { PaymentReservationComponent } from './common/paymentReservation/paymentReservation.component';
+import { CreateOnlineOrderComponent } from './staff/ManagerOrder/CreateOnlineOrder/CreateOnlineOrder.component';
+import { CreateTakeAwayOrderComponent } from './staff/ManagerOrder/CreateTakeAwayOrder/CreateTakeAwayOrder.component';
 
-=======
->>>>>>> Stashed changes
 
 export const routes: Routes = [
     {'path': '', component:HomeComponent},
@@ -38,10 +37,11 @@ export const routes: Routes = [
     {'path': 'checkout', component:CheckoutComponent},
     {'path': 'orderDetail', component:OrderDetailComponent},
     {'path': 'tableManagement', component:TableManagementComponent},
-<<<<<<< Updated upstream
     {'path': 'managerorder', component:ManagerOrderComponent},
-    {'path': 'cuorder', component:CreateUpdateOrderComponent},
     {'path': 'paymentReservation', component:PaymentReservationComponent},
-=======
->>>>>>> Stashed changes
+    {'path': 'managerorder', component:ManagerOrderComponent},
+    {'path': 'createSpot', component:CreateUpdateOrderComponent},
+    {'path': 'paymentReservation', component:PaymentReservationComponent},
+    {'path': 'createTakeaway', component:CreateTakeAwayOrderComponent},
+    {'path': 'createOnline', component:CreateOnlineOrderComponent},
 ];
