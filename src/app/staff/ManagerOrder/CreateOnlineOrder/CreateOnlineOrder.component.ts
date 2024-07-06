@@ -35,7 +35,8 @@ export class CreateOnlineOrderComponent implements OnInit {
   showingDishes: boolean = true;
   showingCombos: boolean = false;
   successMessage: string = '';
-  searchTerm: string = '';
+  search: string = '';
+  searchCategory: string = '';
   selectedAddress = '';
   showDropdown: boolean = false;
   receivingDate: string = '';
@@ -63,10 +64,22 @@ export class CreateOnlineOrderComponent implements OnInit {
     this.receivingDate = today.toISOString().split('T')[0];
     this.generateTimeOptions();
     this.setDefaultReceivingTime();
+    this.selectCategory('Món chính');
   }
-  loadListDishes(search: string = ''): void {
+  selectCategory(category: string) {
+    this.searchCategory = category;
+    if (category === 'Combo') {
+      this.showingDishes = false;
+      this.showingCombos = true;
+    } else {
+      this.showingDishes = true;
+      this.showingCombos = false;
+      this.loadListDishes(category);
+    }
+  }
+  loadListDishes(search: string = '', searchCategory: string =''): void {
     console.log('Loading dishes with search term:', search); 
-    this.dishService.ListDishes(this.currentPage, this.pageSize, search).subscribe(
+    this.dishService.ListDishes(this.currentPage,this.pageSize, search, searchCategory ).subscribe(
       (response: ListAllDishes) => {
         if (response && response.items) {
           this.dishes = [response];
@@ -81,6 +94,7 @@ export class CreateOnlineOrderComponent implements OnInit {
       }
     );
   }
+
   loadListCombo(search: string = ''): void {
     console.log('Loading combos with search term:', search);
     this.comboService.ListCombo(this.currentPage, this.pageSize, search).subscribe(
@@ -98,15 +112,23 @@ export class CreateOnlineOrderComponent implements OnInit {
       }
     );
   }
+  onSearch() {
+    this.loadListDishes(this.searchCategory, this.search); 
+  }
+  
+  
   showDishes() {
     this.showingDishes = true;
     this.showingCombos = false;
   }
 
   showCombos() {
+    this.showingCombos = !this.showingCombos;
     this.showingDishes = false;
     this.showingCombos = true;
-  }
+    this.searchCategory = ''; 
+}
+
   addItem(item: any) {
     // Find if the item already exists in selectedItems
     const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
@@ -151,32 +173,34 @@ export class CreateOnlineOrderComponent implements OnInit {
     }
   }
   
-createOrder() {
-  const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
-    itemId: item.id,
-    quantity: item.quantity,
-    price: item.price,
-    unitPrice: item.totalPrice,
-    dishId: item.dishId,
-    comboId: item.comboId
-  }));
-  this.combineDateTime();
-  this.addNew.totalAmount = this.calculateTotalAmount();
-  this.addNew.orderDetails = orderDetails;
-  this.addNew.orderDate = this.getVietnamTime();
-  console.log('Order Details:', orderDetails);
-  this.orderService.AddNewOrder(this.addNew).subscribe(
-    response => {
-      console.log('Order created successfully:', response);
-      this.successMessage = 'Đơn hàng đã được tạo thành công!';
-      this.selectedItems = [];
-      setTimeout(() => this.successMessage = '', 5000);
-    },
-    error => {
-      console.error('Error creating order:', error);
-    }
-  );
-}
+  createOrder() {
+    const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
+      itemId: item.id,
+      quantity: item.quantity,
+      price: item.price,
+      unitPrice: item.totalPrice,
+      dishId: item.dishId,
+      comboId: item.comboId
+    }));
+    this.combineDateTime();
+    this.addNew.totalAmount = this.calculateTotalAmount();
+    this.addNew.orderDetails = orderDetails;
+    this.addNew.orderDate = this.getVietnamTime();
+    console.log('Order Details:', orderDetails);
+    this.orderService.AddNewOrder(this.addNew).subscribe(
+      response => {
+        console.log('Order created successfully:', response);
+        this.successMessage = 'Đơn hàng đã được tạo thành công!';
+        this.selectedItems = [];
+        this.clearForm(); // Clear the form after successful order creation
+        this.setDefaultReceivingTime(); // Reset the default receiving time
+        setTimeout(() => this.successMessage = '', 5000);
+      },
+      error => {
+        console.error('Error creating order:', error);
+      }
+    );
+  }
 generateTimeOptions() {
   const startHour = 9; // 9 AM
   const endHour = 21; // 9 PM
@@ -248,31 +272,6 @@ setDefaultReceivingTime() {
         console.error('Error fetching addresses:', error);
       }
     );
-  }
-
-  toggleDropdown() {
-    if (!this.selectedAddress) {
-      this.selectedAddress = "Khách lẻ";
-    }
-    this.showDropdown = !this.showDropdown;
-    this.searchTerm = '';
-  }
-
-  clearSearchTerm() {
-    this.searchTerm = ''; 
-  }
-
-  filterAddresses() {
-    const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
-    this.filteredAddresses = this.addresses.filter(address => 
-      address.consigneeName.toLowerCase().includes(lowerCaseSearchTerm) || 
-      address.guestPhone.includes(this.searchTerm)
-    );
-  }
-  selectKhachLe() {
-    this.selectedAddress = 'Khách lẻ';
-    this.showDropdown = false;
-    this.clearSearchTerm(); 
   }
 
   clearForm() {

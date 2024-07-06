@@ -16,11 +16,12 @@ export class ManagerDishService {
   
 
   constructor(private http: HttpClient) { }
-  ListDishes(page: number = 1, pageSize: number = 10, search: string = ''): Observable<ListAllDishes> {
+  ListDishes(page: number = 1, pageSize: number = 10, searchCategory: string ='', search: string = ''): Observable<ListAllDishes> {
     let params = new HttpParams()
         .set('page', page.toString())
         .set('pageSize', pageSize.toString())
-        .set('search', search.toString());
+        .set('search', search.toString())
+        .set('searchCategory', searchCategory.toString());
         const url = `${this.apiUrl}/Dish/ListDishes`;
         console.log('Request URL:', url, 'Params:', params.toString());  
     return this.http.get<ListAllDishes>(`${this.apiUrl}/Dish/ListDishes`, { params });
@@ -48,7 +49,6 @@ export class ManagerDishService {
     UploadImage(image: File): Observable<{ imageUrl: string }> {
       const formData = new FormData();
       formData.append('image', image);
-      console.log(image);
       return this.http.post<{ imageUrl: string }>(this.apiUrl+'/Image/upload', formData);
     }
     GetImageUrl(fileName: string): string {
