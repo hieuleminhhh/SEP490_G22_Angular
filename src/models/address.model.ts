@@ -9,4 +9,5 @@ export interface AddNewAddress{
   guestAddress:string;
   consigneeName:string;
   guestPhone:string;
+  email:string;
 }
