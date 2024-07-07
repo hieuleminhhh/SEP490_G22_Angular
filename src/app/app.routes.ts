@@ -19,6 +19,7 @@ import { CreateUpdateOrderComponent } from './staff/ManagerOrder/CreateSpotOrder
 import { PaymentReservationComponent } from './common/paymentReservation/paymentReservation.component';
 import { CreateOnlineOrderComponent } from './staff/ManagerOrder/CreateOnlineOrder/CreateOnlineOrder.component';
 import { CreateTakeAwayOrderComponent } from './staff/ManagerOrder/CreateTakeAwayOrder/CreateTakeAwayOrder.component';
+import { ViewTableOrderComponent } from './staff/ManagerOrder/ViewTableOrder/ViewTableOrder.component';
 
 
 export const routes: Routes = [
@@ -42,4 +43,5 @@ export const routes: Routes = [
     {'path': 'paymentReservation', component:PaymentReservationComponent},
     {'path': 'createTakeaway', component:CreateTakeAwayOrderComponent},
     {'path': 'createOnline', component:CreateOnlineOrderComponent},
+    {'path': 'listTable', component:ViewTableOrderComponent},
 ];
