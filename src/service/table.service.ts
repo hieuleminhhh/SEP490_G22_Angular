@@ -14,10 +14,14 @@ export class TableService {
   }
 
 
-  updateStatusTable(tableId:number): Observable<any> {
+  updateStatusTable(tableId: number): Observable<any> {
     const url = `https://localhost:7188/api/Table/${tableId}`;
     return this.http.get(url);
   }
 
-
+  createTableReservation(tableReser: any): Observable<any> {
+    const url = `https://localhost:7188/api/Reservations/register-tables`;
+    return this.http.post(url, tableReser);
+  }
 }
+
