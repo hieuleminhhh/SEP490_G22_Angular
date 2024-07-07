@@ -40,4 +40,6 @@ export const routes: Routes = [
     {'path': 'managerorder', component:ManagerOrderComponent},
     {'path': 'createSpot', component:CreateUpdateOrderComponent},
     {'path': 'paymentReservation', component:PaymentReservationComponent},
+    {'path': 'createTakeaway', component:CreateTakeAwayOrderComponent},
+    {'path': 'createOnline', component:CreateOnlineOrderComponent},
 ];
