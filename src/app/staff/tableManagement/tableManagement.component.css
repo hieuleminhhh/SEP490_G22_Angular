@@ -313,6 +313,16 @@ header {
   display: inline-block;
 }
 
+.dropdown-table {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  margin-top: 8px;
+  left: 30px;
+}
+
 .dropdown button {
   background-color: #f9f9f9;
   border: none;
@@ -344,6 +354,15 @@ header {
 
 .dropdown-content a:hover {
   background-color: #f1f1f1;
+}
+.dropdown-table ul {
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+}
+
+.dropdown-table li {
+  padding: 5px 10px;
 }
 
 .show {
@@ -781,3 +800,34 @@ textarea {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.table .icon-reserved {
+  position: absolute;
+  cursor: pointer;
+  font-size: 18px;
+  top: 60px;
+  left: 5px;
+  color: #007bff;
+}
+
+.table-grid .table {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.table-grid .table.status-in-use {
+  border-color: green;
+}
+
+.table-grid hr {
+  border: none;
+  border-top: 1px solid #000000;
+  margin: 10px 0;
+}
+
+.table-grid .text-in-use {
+  color: green;
+}
+
+

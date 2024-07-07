@@ -133,10 +133,10 @@
               <hr>
               <div class="row">
                 <div class="col-md-4" style="height: 20px;">
-                  <div class="dropdown">
+                  <div class="dropdown" style="position: relative;display: inline-block;">
                     <button class="icon" (click)="toggleDropdown(i)">...</button>
                     <div class="dropdown-content" [class.show]="reservation.isDropdownOpen">
-                      <a (click)="openPopup()">Xếp bàn</a>
+                      <a (click)="openPopup(reservation.reservationId)">Xếp bàn</a>
                       <a>Thêm món</a>
                       <a>Hủy đặt bàn</a>
                     </div>
@@ -165,39 +165,58 @@
         </div>
       </div>
 
-      <!-- Modal -->
+      <!-- Main Modal -->
       <div class="modal fade" id="updateTimeModal" tabindex="-1" role="dialog" aria-labelledby="updateTimeModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="updateTimeModalLabel">Chọn bàn</h5>
+              <h5 class="modal-title" id="updateTimeModalLabel">Đăng ký bàn</h5>
+              <div class="text-center text-white flex-fill" style="font-size: 18px;">
+                {{ reservationTimeSelected | date: 'dd/MM/yyyy - HH:mm' }}
+              </div>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close"
                 (click)="closePopup()">X</button>
             </div>
             <div class="modal-body">
               <div class="row">
-                <div class="col-md-3" style="display: flex;justify-content: center;align-items: center;">
+                <div class="col-md-3" style="display: flex; justify-content: center; align-items: center;">
                   <select id="floor" name="floor" [(ngModel)]="selectedFloor"
                     (change)="getTableOFFloorEmpty(selectedFloor)" class="floor-select">
                     <option *ngFor="let floor of getFloors()" [value]="floor" [class.active]="selectedFloor === floor">
                       Tầng {{ floor }}
                     </option>
                   </select>
-
                 </div>
                 <div class="col-md-7">
                   <div class="card">
                     <div class="table-grid">
-                      <div class="table" *ngFor="let table of dataTable" (click)="toggleTableSelection(table.tableId)">
+                      <div class="table" *ngFor="let table of dataTable"
+                        [ngClass]="{'status-in-use': table.status !== 0}" (click)="toggleTableSelection(table)">
                         {{ table.tableId }}<br>
-                        <span class="icon-sl"><i class="fas fa-chair"></i>{{ table.capacity }}</span>
+                        <span class="icon-sl">
+                          <i class="fas fa-chair"></i>{{ table.capacity }}
+                        </span>
                         <span class="icon-table" style="left: 170px;"
-                          *ngIf="selectedTableIds.includes(table.tableId)">&#10004;</span>
-                        <hr>Bàn trống
+                          *ngIf="table.status === 0 && selectedTableIds.includes(table.tableId)">&#10004;</span>
+                        <span *ngIf="table.reservationTimes && table.reservationTimes.length > 0" class="icon-reserved"
+                          (click)="toggleDropdownTable($event, table)">
+                          <i class="fas fa-calendar-alt"></i>
+                        </span>
+                        <div *ngIf="table.showDropdown" class="dropdown-table">
+                          <ul>
+                            <li *ngFor="let time of table.reservationTimes">{{ getTimeOnly(time) }}
+                              <hr>
+                            </li>
+                          </ul>
+                        </div>
+                        <hr>
+                        <span [ngClass]="{'text-in-use': table.status !== 0}">
+                          {{ table.status === 0 ? 'Bàn trống' : 'Đang sử dụng' }}
+                        </span>
                       </div>
                     </div>
-                    <div *ngIf="dataTable.length<1" style="height: 100px;">
+                    <div *ngIf="dataTable.length < 1" style="height: 100px;">
                       <p>Tầng này không có bàn trống</p>
                     </div>
                   </div>
@@ -207,13 +226,42 @@
             <div class="modal-footer">
               <button type="button" style="background-color: red;" class="btn btn-secondary"
                 (click)="closePopup()">Đóng</button>
-              <button type="button" class="btn btn-primary">Lưu thay đổi</button>
+              <button type="button" class="btn btn-primary" (click)="openConfirmSaveModal()">Lưu thay đổi</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirm Save Modal -->
+      <div class="modal fade" id="confirmSaveModal" tabindex="-1" role="dialog" aria-labelledby="confirmSaveModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content" style="width: 100%;margin: 60% 110%;">
+            <div class="modal-header">
+              <h5 class="modal-title" id="confirmSaveModalLabel">Xác nhận Lưu thay đổi</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                (click)="closeConfirmSaveModal()">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              Bạn có chắc chắn muốn đăng ký bàn sau cho đơn này không?
+              <ul style="margin-left: 20px;">
+                <li *ngFor="let table of selectedTableIds">Bàn {{ table }}</li>
+              </ul>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                (click)="closeConfirmSaveModal()">Hủy</button>
+              <button type="button" class="btn btn-primary" (click)="confirmSave()">Xác nhận</button>
             </div>
           </div>
         </div>
       </div>
 
     </section>
+
     <section *ngIf="currentView === 'booking-request'">
       <div class="container">
         <div class="card">

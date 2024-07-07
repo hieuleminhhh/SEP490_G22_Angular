@@ -8,6 +8,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { BehaviorSubject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { Table, TableReservationResponse } from '../../../models/table.model';
+import { DatePipe } from '@angular/common';
 
 
 @Component({
@@ -16,13 +18,14 @@ import { Router } from '@angular/router';
   templateUrl: './tableManagement.component.html',
   styleUrls: ['./tableManagement.component.css'],
   imports: [CommonModule, FormsModule, NgxPaginationModule],
+  providers: [DatePipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class TableManagementComponent implements OnInit {
 
   currentView: string = 'table-layout';
   dataTable: any;
-  originalDataTable: any[] = [];
+  originalDataTable: Table[] = [];
   dataReservationAccept: any;
   dataReservationToday: any;
   selectedTime: string = 'today';
@@ -33,6 +36,9 @@ export class TableManagementComponent implements OnInit {
   selectedFloor = 1;
   selectedTableIds: number[] = [];
   dataReservation: any;
+  reservationTimeSelected: string | undefined;
+  reserId: number | undefined;
+
 
   tabs: string[] = ['Tất cả', 'Chưa nhận bàn', 'Đã nhận bàn', 'Đã hủy', 'Đã hoàn thành'];
   selectedIndex: number = 0;
@@ -100,33 +106,58 @@ export class TableManagementComponent implements OnInit {
 
   getFloors(): number[] {
     const uniqueFloors = new Set<number>();
-    this.originalDataTable.forEach(table => {
-      uniqueFloors.add(table.floor);
-    });
+    if (Array.isArray(this.originalDataTable)) {
+      this.originalDataTable.forEach(table => {
+        uniqueFloors.add(table.floor);
+      });
+    } else {
+      console.error('originalDataTable is not an array:', this.originalDataTable);
+    }
     return Array.from(uniqueFloors).sort((a, b) => a - b);
   }
+
   getTableOFFloor(floor: number) {
     this.selectedFloor = floor;
     this.filterTablesByFloorAndStatus(this.selectedTable);
   }
 
+  //=================================================================================================================================
+
   getTableOFFloorEmpty(floor: any): void {
     this.selectedFloor = parseInt(floor, 10);
-    this.dataTable = this.originalDataTable.filter(table => table.floor === this.selectedFloor && table.status === 0);
+    this.dataTable = this.originalDataTable.filter(table => table.floor === this.selectedFloor);
   }
   onClickButton(event: MouseEvent) {
     const button = event.target as HTMLButtonElement;
     button.classList.remove('button-normal');
     button.classList.add('button-clicked');
   }
-  toggleTableSelection(tableId: number): void {
-    const index = this.selectedTableIds.indexOf(tableId);
-    if (index === -1) {
-      this.selectedTableIds.push(tableId);
-    } else {
-      this.selectedTableIds.splice(index, 1);
+  toggleTableSelection(table: any) {
+    // Chỉ cho phép thay đổi selection nếu status là 0
+    if (table.status === 0) {
+      const index = this.selectedTableIds.indexOf(table.tableId);
+      if (index > -1) {
+        this.selectedTableIds.splice(index, 1);
+      } else {
+        this.selectedTableIds.push(table.tableId);
+      }
     }
+    console.log(this.selectedTableIds);
   }
+
+  toggleDropdownTable(event: Event, table: any) {
+    event.stopPropagation();
+    table.showDropdown = !table.showDropdown;
+  }
+
+  getTimeOnly(dateTime: string): string {
+    const date = new Date(dateTime);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+
   //================================================================================================================
   getReservationData(): void {
     const params = {
@@ -174,15 +205,47 @@ export class TableManagementComponent implements OnInit {
     this.paginateData();
   }
 
-  openPopup() {
+  openPopup(reserId: number) {
     const modal = document.getElementById('updateTimeModal');
     if (modal) {
       modal.classList.add('show');
       modal.style.display = 'block';
     }
-    this.selectedTable = 'empty';
+    this.selectedTable = 'all';
     this.selectedFloor = 1;
-    this.filterTablesByFloorAndStatus(this.selectedTable);
+    this.reserId = reserId;
+    this.reservationService.getTableReservation(this.reserId).subscribe(
+      response => {
+        if (typeof response.reservationTime === 'string') {
+          this.reservationTimeSelected = response.reservationTime;
+        } else {
+          console.error('reservationTime không phải là một chuỗi:', response.reservationTime);
+        }
+        console.log(this.reservationTimeSelected);
+        const { currentDayReservationTables, allTables } = response;
+        this.originalDataTable = allTables.map(table => {
+          const reservedTables = currentDayReservationTables.filter(t => t.tableId === table.tableId);
+          const reservationTimes = reservedTables.map(t => t.reservationTime);
+          reservationTimes.sort((a, b) => {
+            const dateA = a ? new Date(a) : null;
+            const dateB = b ? new Date(b) : null;
+            if (!dateA || !dateB) {
+              return 0;
+            }
+            return dateA.getTime() - dateB.getTime();
+          });
+          return { ...table, reservationTimes: reservationTimes };
+        });
+
+        this.dataTable = [...this.originalDataTable];
+        console.log(response);
+        console.log(this.dataTable);
+        this.filterTablesByFloorAndStatus(this.selectedTable);
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
   }
   closePopup() {
     // Đóng modal
@@ -196,9 +259,43 @@ export class TableManagementComponent implements OnInit {
     this.filterTablesByFloorAndStatus(this.selectedTable);
   }
 
-  saveSelections() {
-    // Handle saving selected tables logic here
+  openConfirmSaveModal() {
+    const confirmModal = document.getElementById('confirmSaveModal');
+    if (confirmModal) {
+      confirmModal.classList.add('show');
+      confirmModal.style.display = 'block';
+    }
+  }
 
+  closeConfirmSaveModal() {
+    const confirmModal = document.getElementById('confirmSaveModal');
+    if (confirmModal) {
+      confirmModal.classList.remove('show');
+      confirmModal.style.display = 'none';
+    }
+  }
+
+  confirmSave() {
+    const request = {
+      reservationId: this.reserId,
+      tableIds: this.selectedTableIds
+    }
+    console.log(request);
+    this.tableService.createTableReservation(request).subscribe({
+      next: response => {
+        console.log(response);
+        this.getReservationData();
+      },
+      error: error => {
+        if (error.error instanceof ErrorEvent) {
+          console.error('An error occurred:', error.error.message);
+        } else {
+          console.error(`Backend returned code ${error.status}, ` +
+            `body was: ${JSON.stringify(error.error)}`);
+        }
+      }
+    });
+    this.closeConfirmSaveModal();
     this.closePopup();
   }
 
@@ -418,7 +515,7 @@ export class TableManagementComponent implements OnInit {
 
     this.reservationService.searchReservation(this.searchTerm).subscribe(
       response => {
-        console.log('response',response);
+        console.log('response', response);
         this.dataReservation = this.filterDataByStatus(response, this.selectedIndex);
         console.log(this.searchTerm);
         console.log(this.dataReservation);
@@ -426,6 +523,7 @@ export class TableManagementComponent implements OnInit {
         this.paginateData();
       },
       error => {
+        console.log(this.searchTerm);
         console.error('Error:', error);
       }
     );
@@ -440,7 +538,7 @@ export class TableManagementComponent implements OnInit {
 
   //==================================================================================================================================
 
-  createReservation(){
+  createReservation() {
     this.setView('create-reservation');
   }
 
