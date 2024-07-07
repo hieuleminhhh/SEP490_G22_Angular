@@ -4,6 +4,7 @@ import { Dish } from '../models/dish.model';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Address } from '../models/address.model';
+import { TableReservationResponse } from '../models/table.model';
 
 @Injectable({
   providedIn: 'root'
@@ -92,6 +93,9 @@ export class ReservationService {
     return this.http.get<any[]>(url);
   }
 
-
+  getTableReservation(reserId: number): Observable<TableReservationResponse> {
+    const url = `https://localhost:7188/api/Reservations/check-time/${reserId}`;
+    return this.http.get<TableReservationResponse>(url);
+  }
 
 }
