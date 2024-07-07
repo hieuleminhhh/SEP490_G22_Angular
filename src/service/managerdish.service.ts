@@ -16,16 +16,25 @@ export class ManagerDishService {
   
 
   constructor(private http: HttpClient) { }
-  ListDishes(page: number = 1, pageSize: number = 10, searchCategory: string ='', search: string = ''): Observable<ListAllDishes> {
+  ListDishes(page: number = 1, pageSize: number = 10, searchCategory: string = '', search: string = ''): Observable<ListAllDishes> {
+    // Ensure default values are properly converted to strings
     let params = new HttpParams()
-        .set('page', page.toString())
-        .set('pageSize', pageSize.toString())
-        .set('search', search.toString())
-        .set('searchCategory', searchCategory.toString());
-        const url = `${this.apiUrl}/Dish/ListDishes`;
-        console.log('Request URL:', url, 'Params:', params.toString());  
-    return this.http.get<ListAllDishes>(`${this.apiUrl}/Dish/ListDishes`, { params });
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString())
+      .set('search', search ? search.toString() : '')
+      .set('searchCategory', searchCategory ? searchCategory.toString() : '');
+  
+    const url = `${this.apiUrl}/Dish/ListDishes`;
+  
+    // Log the URL and parameters to verify correctness
+    console.log('Request URL:', url);
+    console.log('Params:', params.toString());
+    console.log('Search Term:', search);
+    console.log('Search Category:', searchCategory);
+  
+    return this.http.get<ListAllDishes>(url, { params });
   }
+  
     getDishById(dishId: number): Observable<UpdateDish> {
     const url = `${this.apiUrl}/Dish/${dishId}`; 
     return this.http.get<UpdateDish>(url);

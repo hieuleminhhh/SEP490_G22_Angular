@@ -42,7 +42,7 @@ export interface AddNewOrder {
   consigneeName: string;
   orderDate: Date | null;
   status: number;
-  recevingOrder: Date | null;
+  recevingOrder: string | null;
   totalAmount: number;
   deposits: number;
   note: string;
