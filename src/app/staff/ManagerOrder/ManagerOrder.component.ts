@@ -6,13 +6,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ManagerOrderDetailService } from '../../../service/managerorderDetail.service';
 import { ListOrderDetailByOrder } from '../../../models/orderDetail.model';
+import { SidebarOrderComponent } from "../SidebarOrder/SidebarOrder.component";
 
 @Component({
-  selector: 'app-ManagerOrder',
-  templateUrl: './ManagerOrder.component.html',
-  styleUrls: ['./ManagerOrder.component.css'],
-  standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule]
+    selector: 'app-ManagerOrder',
+    templateUrl: './ManagerOrder.component.html',
+    styleUrls: ['./ManagerOrder.component.css'],
+    standalone: true,
+    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
 })
 export class ManagerOrderComponent implements OnInit {
   orders: ListAllOrder[] = [];
@@ -26,10 +27,11 @@ export class ManagerOrderComponent implements OnInit {
   weeks: { start: string, end: string }[] = [];
   years: number[] = [];
   statuses = [
-    { value: 0, text: 'Đang chờ' },
-    { value: 1, text: 'Đã chấp nhận' },
-    { value: 2, text: 'Hoàn thành' },
-    { value: 3, text: 'Hủy' }
+    { value: 1, text: 'Đang chờ' },
+    { value: 2, text: 'Đã chấp nhận' },
+    { value: 3, text: 'Đang phục vụ' },
+    { value: 4, text: 'Hoàn thành' },
+    { value: 5, text: 'Hủy' }
   ];
   types = [
     { value: '1', text: 'Mang về' },
@@ -145,18 +147,21 @@ export class ManagerOrderComponent implements OnInit {
 
   getStatusColor(status: number): string {
     switch (status) {
-      case 0:
-        return 'orange';
       case 1:
-        return 'blue';
+        return 'orange';
       case 2:
-        return 'green';
+        return 'blue';
       case 3:
+        return 'purple';
+      case 4:
+        return 'teal';
+      case 5:
         return 'red';
       default:
         return 'black';
     }
   }
+  
 
   onPageChange(page: number): void {
     this.currentPage = page;

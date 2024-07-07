@@ -35,12 +35,12 @@ export interface ListAllOrder {
   totalPages: number;
 }
 export interface AddNewOrder {
-  guestPhone: string;
+  guestPhone: string | null;
   email: string;
   addressId: number | null;
   guestAddress: string;
   consigneeName: string;
-  orderDate: Date;
+  orderDate: Date | null;
   status: number;
   recevingOrder: Date | null;
   totalAmount: number;

@@ -11,12 +11,13 @@ import { AddNewOrder } from '../../../../models/order.model';
 import { AddOrderDetail } from '../../../../models/orderDetail.model';
 import { ManagerOrderService } from '../../../../service/managerorder.service';
 import { AddNewAddress, Address } from '../../../../models/address.model';
+import { SidebarOrderComponent } from "../../SidebarOrder/SidebarOrder.component";
 @Component({
-  selector: 'app-CreateUpdateOrder',
-  templateUrl: './CreateUpdateOrder.component.html',
-  styleUrls: ['./CreateUpdateOrder.component.css'],
-  standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule]
+    selector: 'app-CreateUpdateOrder',
+    templateUrl: './CreateUpdateOrder.component.html',
+    styleUrls: ['./CreateUpdateOrder.component.css'],
+    standalone: true,
+    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
 })
 export class CreateUpdateOrderComponent implements OnInit {
 
@@ -40,11 +41,11 @@ export class CreateUpdateOrderComponent implements OnInit {
   addNew: AddNewOrder = {
     guestPhone: '',
     email: '',
-    addressId: null,
+    addressId: 0,
     guestAddress: '',
     consigneeName: '',
     orderDate: new Date(),
-    status: 0,
+    status: 3,
     recevingOrder: null,
     totalAmount: 0,
     deposits: 0,
@@ -53,9 +54,10 @@ export class CreateUpdateOrderComponent implements OnInit {
     orderDetails: []
   };
   newAddress: AddNewAddress = {
-    guestAddress: '',
+    guestAddress: 'Ăn tại quán',
     consigneeName: '',
     guestPhone: '',
+    email:'antaiquan@gmail.com',
   };
   ngOnInit() {
     this.loadListDishes();
@@ -139,34 +141,45 @@ export class CreateUpdateOrderComponent implements OnInit {
   removeItem(index: number) {
     this.selectedItems.splice(index, 1);
   }
-  createOrder() {
-    const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
-      itemId: item.id,
-      quantity: item.quantity,
-      price: item.price,
-      unitPrice: item.totalPrice,
-      dishId: item.dishId, 
-      comboId: item.comboId
-    }));
-
-    this.addNew.totalAmount = this.calculateTotalAmount();
-    this.addNew.addressId = null;
-    this.addNew.orderDetails = orderDetails;
-    this.addNew.recevingOrder = null;
-    this.addNew.orderDate = this.getVietnamTime();
-
-    this.orderService.AddNewOrder(this.addNew).subscribe(
-      response => {
-        console.log('Order created successfully:', response);
-        this.successMessage = 'Đơn hàng đã được tạo thành công!';
-        this.selectedItems = []; 
-        setTimeout(() => this.successMessage = '', 5000); // Hide message after 3 seconds
-      },
-      error => {
-        console.error('Error creating order:', error);
-      }
-    );
+  selectAddress(address: Address) {
+    this.selectedAddress = `${address.consigneeName} - ${address.guestPhone}`;
+    this.addNew.guestPhone = address.guestPhone;
+    this.addNew.email = 'antaiquan@gmail.com';
+    this.addNew.guestAddress = 'Ăn tại quán'; 
+    this.addNew.consigneeName = address.consigneeName; 
+    this.showDropdown = false;
+    console.log('Selected Address:', this.addNew);
 }
+
+createOrder() {
+  const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
+    itemId: item.id,
+    quantity: item.quantity,
+    price: item.price,
+    unitPrice: item.totalPrice,
+    dishId: item.dishId,
+    comboId: item.comboId
+  }));
+
+  this.addNew.totalAmount = this.calculateTotalAmount();
+  this.addNew.orderDetails = orderDetails;
+  this.addNew.recevingOrder = null;
+  this.addNew.orderDate = this.getVietnamTime();
+  console.log('Order Details:', orderDetails);
+  console.log('Guest Phone:', this.addNew.guestPhone);
+  this.orderService.AddNewOrder(this.addNew).subscribe(
+    response => {
+      console.log('Order created successfully:', response);
+      this.successMessage = 'Đơn hàng đã được tạo thành công!';
+      this.selectedItems = [];
+      setTimeout(() => this.successMessage = '', 5000);
+    },
+    error => {
+      console.error('Error creating order:', error);
+    }
+  );
+}
+  
 
   getVietnamTime(): Date {
     const now = new Date();
@@ -226,13 +239,6 @@ export class CreateUpdateOrderComponent implements OnInit {
       address.guestPhone.includes(this.searchTerm)
     );
   }
-
-  selectAddress(address: Address) {
-    this.selectedAddress = `${address.consigneeName} - ${address.guestPhone}`;
-    this.showDropdown = false;
-    this.clearSearchTerm(); 
-  }
-
   selectKhachLe() {
     this.selectedAddress = 'Khách lẻ';
     this.showDropdown = false;
@@ -240,41 +246,41 @@ export class CreateUpdateOrderComponent implements OnInit {
   }
   createAddress() {
     this.saveAddress();
-  }
-
+}
   saveAddress() {
     this.orderService.AddNewAddress(this.newAddress).subscribe(
-      response => {
-        console.log('Address created successfully:', response);
-        this.successMessage = 'Địa chỉ đã được thêm thành công!';
-        setTimeout(() => this.successMessage = '', 5000);
-        this.loadAddresses();
-        this.clearForm();
-        this.closeModal();
-      },
-      error => {
-        console.error('Error creating address:', error);
-        this.clearAddErrors();
-        if (error.error) {
-          const fieldErrors = error.error;
-          if (fieldErrors['consigneeName']) {
-            this.addErrors.consigneeNameError = fieldErrors['consigneeName'];
-          }
-          if (fieldErrors['guestPhone']) {
-            this.addErrors.guestPhoneError = fieldErrors['guestPhone'];
-          }
-          if (fieldErrors['guestAddress']) {
-            this.addErrors.guestAddressError = fieldErrors['guestAddress'];
-          }
-        } else {
-          this.addErrorMessage = 'An error occurred. Please try again later.';
-        }
-      }
-    );
-  }
+        response => {
+            console.log('Address created successfully:', response);
+            this.successMessage = 'Địa chỉ đã được thêm thành công!';
+            setTimeout(() => this.successMessage = '', 5000);
+            this.loadAddresses();
+            this.clearForm();
+            this.closeModal();
+        },
+        error => {
+            console.error('Error creating address:', error);
+            this.clearAddErrors();
 
+            // Xử lý lỗi từ response
+            if (error.error) {
+                const fieldErrors = error.error;
+                if (fieldErrors['consigneeName']) {
+                    this.addErrors.consigneeNameError = fieldErrors['consigneeName'];
+                }
+                if (fieldErrors['guestPhone']) {
+                    this.addErrors.guestPhoneError = fieldErrors['guestPhone'];
+                }
+                if (fieldErrors['guestAddress']) {
+                    this.addErrors.guestAddressError = fieldErrors['guestAddress'];
+                }
+            } else {
+                this.addErrorMessage = 'An error occurred. Please try again later.';
+            }
+        }
+    );
+}
   clearForm() {
-    this.newAddress = { consigneeName: '', guestPhone: '', guestAddress: '' };
+    this.newAddress = { consigneeName: '', guestPhone: '', guestAddress: '' , email: '' };
   }
   addErrors: any = {};
   addErrorMessage: string = '';

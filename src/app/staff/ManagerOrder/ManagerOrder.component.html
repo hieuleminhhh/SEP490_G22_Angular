@@ -1,186 +1,199 @@
-<div class="container mt-5">
-  <h1 class="text-center mb-4">Quản lý đơn hàng</h1>
-  <!-- Buttons and search bar -->
-  <div class="mb-3 d-flex justify-content-between align-items-center">
-    <button type="button" class="btn btn-primary" (click)="createNewOrder()">
-      Tạo đơn hàng mới <i class="bi bi-plus"></i>
-    </button>
-    <div class="input-group" style="max-width: 400px;">
-      <input type="text" class="form-control" placeholder="Tìm kiếm..." aria-label="Search" aria-describedby="button-addon2" [(ngModel)]="search">
-      <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="onSearch()">Tìm kiếm</button>
-    </div>
-    <div class="col-md-2">
-      <div class="input-group">
-        <label class="input-group-text" for="type">Loại đơn</label>
-        <select id="type" class="form-select" [(ngModel)]="selectedType" (change)="onSearch()">
-          <option value="0">Tất cả</option>
-          <option *ngFor="let type of types" [value]="type.value">{{ type.text }}</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- Select filters -->
-  <div class="row mb-3">
-    <div class="col-md-3">
-      <div class="input-group">
-        <label class="input-group-text" for="time">Thời gian</label>
-        <select id="time" class="form-select" [(ngModel)]="selectedFilter" (change)="onSearch()">
-          <option *ngFor="let option of filterByDate" [value]="option.value">{{ option.text }}</option>
-        </select>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="input-group">
-        <label class="input-group-text" for="dateFrom">Từ ngày</label>
-        <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom" (change)="onSearch()">
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="input-group">
-        <label class="input-group-text" for="dateTo">Đến ngày</label>
-        <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo" (change)="onSearch()">
-      </div>
-    </div>    
-    <div class="col-md-3">
-      <div class="input-group">
-        <label class="input-group-text" for="status">Trạng thái</label>
-        <select id="status" class="form-select" [(ngModel)]="selectedStatus" (change)="onSearch()">
-          <option value="0">Tất cả</option>
-          <option *ngFor="let status of statuses" [value]="status.value">{{ status.text }}</option>
-        </select>
-      </div>
-    </div>
-  </div>
-  <!-- Table -->
-  <table class="table table-striped table-hover">
-    <thead class="table-header-light">
-      <tr>
-        <th scope="col">Số thứ tự</th>
-        <th scope="col">Tên khách hàng</th>
-        <th scope="col">Số điện thoại</th>
-        <th scope="col">Thời gian đặt hàng</th>
-        <th scope="col">Thời gian giao hàng</th>
-        <th scope="col">Tổng tiền</th>
-        <th scope="col">Trạng thái</th>
-        <th scope="col">Hành động</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngFor="let orderList of orders; let i = index">
-        <tr *ngFor="let order of orderList.items; let j = index">
-          <td>{{ (currentPage - 1) * pageSize + i * orders[0].items.length + j + 1 }}</td>
-          <td>{{ order.consigneeName || 'Khách lẻ' }}</td>
-          <td>{{ order.guestPhone || '------------' }}</td>
-          <td>{{ order.orderDate }}</td>
-          <td>{{ order.recevingOrder }}</td>
-          <td>{{ order.totalAmount }}</td>
-          <td>
-            <select (change)="onStatusChange($event, order.orderId)" [(ngModel)]="order.status" [ngStyle]="{'color': getStatusColor(order.status)}">
-              <option *ngFor="let status of statuses" [value]="status.value">{{ status.text }}</option>
-            </select>
-          </td>
-          <td>
-            <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">Chi tiết</button>
-            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#updateOrderModal">Cập nhật</button>
-          </td>
-        </tr>
-      </ng-container>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+        <app-SidebarOrder></app-SidebarOrder>
+      </nav>
       
-    </tbody>
-  </table>
-
-  <!-- Pagination -->
-  <nav aria-label="Page navigation">
-    <ul class="pagination justify-content-end">
-      <li class="page-item" [class.disabled]="currentPage === 1">
-        <a class="page-link" (click)="onPageChange(currentPage - 1)">Trước</a>
-      </li>
-      <li class="page-item" *ngFor="let page of totalPagesArray" [class.active]="page === currentPage">
-        <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
-      </li>
-      <li class="page-item" [class.disabled]="currentPage === totalPagesArray.length">
-        <a class="page-link" (click)="onPageChange(currentPage + 1)">Sau</a>
-      </li>
-    </ul>
-  </nav>
-</div>
-
-<!-- Modal chi tiết đơn hàng -->
-<div class="modal fade" id="viewOrderModal" tabindex="-1" aria-labelledby="viewOrderModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="viewOrderModalLabel">Thông tin đơn hàng</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div *ngIf="orderDetail; else loadingOrError">
-          <h5 class="mb-3">Thông tin chi tiết đơn hàng</h5>
-          <table class="table table-bordered table-hover">
-            <thead class="table-light">
-              <tr>
-                <th>Món ăn</th>
-                <th>Số lượng</th>
-                <th>Giá</th>
-                <th>Tổng số tiền</th>
-              </tr>
-            </thead>
-            <tbody>
-              <ng-container *ngFor="let item of orderDetail.orderDetails">
-                <tr>
-                  <td>
-                    <span *ngIf="item.dishId !== 0; else comboNameTemplate">{{ item.itemName }}</span>
-                    <ng-template #comboNameTemplate>{{ item.nameCombo }}</ng-template>
-                  </td>
-                  <td>{{ item.quantity }}</td>
-                  <td>
-                    <ng-container *ngIf="item.discountedPrice">
-                      <span>{{ item.discountedPrice }}</span>
-                    </ng-container>
-                    <ng-container *ngIf="!item.discountedPrice">
-                      <span>{{ item.price }}</span>
-                    </ng-container>
-                  </td>
-                  
-                  <td>{{ item.unitPrice }}</td>
-                </tr>
-              </ng-container>              
-            </tbody>
-          </table>
-          <div class="summary-section mt-4">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="d-flex justify-content-between mb-2">
-                  <span class="fw-bold label">Tạm tính:</span>
-                  <span class="value">{{ orderDetail.totalAmount }}</span>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                  <span class="fw-bold label">Khuyến mãi:</span>
-                  <!-- <span class="value">{{ orderDetail.discount | currency }}</span> -->
-                </div>
-                <div class="d-flex justify-content-between">
-                  <span class="fw-bold label">Tổng cộng:</span>
-                  <span class="value">{{ orderDetail.totalAmount }}</span>
-                </div>
+      <!-- Main content -->
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <!-- Page Header -->
+        <div class="container mt-5">
+          <h1 class="text-center mb-4">Quản lý đơn hàng</h1>
+          
+          <!-- Buttons and search bar -->
+          <div class="mb-3 d-flex justify-content-between align-items-center">
+            <button type="button" class="btn btn-primary" (click)="createNewOrder()">
+              Tạo đơn hàng mới <i class="bi bi-plus"></i>
+            </button>
+            <div class="input-group" style="max-width: 400px;">
+              <input type="text" class="form-control" placeholder="Tìm kiếm..." aria-label="Search" aria-describedby="button-addon2" [(ngModel)]="search">
+              <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="onSearch()">Tìm kiếm</button>
+            </div>
+            <div class="col-md-2">
+              <div class="input-group">
+                <label class="input-group-text" for="type">Loại đơn</label>
+                <select id="type" class="form-select" [(ngModel)]="selectedType" (change)="onSearch()">
+                  <option value="0">Tất cả</option>
+                  <option *ngFor="let type of types" [value]="type.value">{{ type.text }}</option>
+                </select>
               </div>
             </div>
           </div>
           
-          
-          
-          
-          
+          <!-- Select filters -->
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <div class="input-group">
+                <label class="input-group-text" for="time">Thời gian</label>
+                <select id="time" class="form-select" [(ngModel)]="selectedFilter" (change)="onSearch()">
+                  <option *ngFor="let option of filterByDate" [value]="option.value">{{ option.text }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="input-group">
+                <label class="input-group-text" for="dateFrom">Từ ngày</label>
+                <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom" (change)="onSearch()">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="input-group">
+                <label class="input-group-text" for="dateTo">Đến ngày</label>
+                <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo" (change)="onSearch()">
+              </div>
+            </div>    
+            <div class="col-md-3">
+              <div class="input-group">
+                <label class="input-group-text" for="status">Trạng thái</label>
+                <select id="status" class="form-select" [(ngModel)]="selectedStatus" (change)="onSearch()">
+                  <option value="0">Tất cả</option>
+                  <option *ngFor="let status of statuses" [value]="status.value">{{ status.text }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Orders Table -->
+          <table class="table table-striped table-hover">
+            <thead class="table-header-light">
+              <tr>
+                <th scope="col">Số thứ tự</th>
+                <th scope="col">Tên khách hàng</th>
+                <th scope="col">Số điện thoại</th>
+                <th scope="col">Thời gian đặt hàng</th>
+                <th scope="col">Thời gian giao hàng</th>
+                <th scope="col">Tổng tiền</th>
+                <th scope="col">Trạng thái</th>
+                <th scope="col">##</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let orderList of orders; let i = index">
+                <tr *ngFor="let order of orderList.items; let j = index">
+                  <td>{{ (currentPage - 1) * pageSize + i * orders[0].items.length + j + 1 }}</td>
+                  <td>{{ order.consigneeName || 'Khách lẻ' }}</td>
+                  <td>{{ order.guestPhone || '------------' }}</td>
+                  <td>{{ order.orderDate }}</td>
+                  <td>{{ order.recevingOrder }}</td>
+                  <td>{{ order.totalAmount }}</td>
+                  <td>
+                    <select (change)="onStatusChange($event, order.orderId)" [(ngModel)]="order.status" [ngStyle]="{'color': getStatusColor(order.status)}">
+                      <option *ngFor="let status of statuses" [value]="status.value">{{ status.text }}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">Chi tiết</button>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+
+          <!-- Pagination -->
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-end">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <a class="page-link" (click)="onPageChange(currentPage - 1)">Trước</a>
+              </li>
+              <li class="page-item" *ngFor="let page of totalPagesArray" [class.active]="page === currentPage">
+                <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPagesArray.length">
+                <a class="page-link" (click)="onPageChange(currentPage + 1)">Sau</a>
+              </li>
+            </ul>
+          </nav>
         </div>
-        <ng-template #loadingOrError>
-          <div *ngIf="!orderDetail">
-            <p>Loading order details...</p>
+
+        <!-- Modal chi tiết đơn hàng -->
+        <div class="modal fade" id="viewOrderModal" tabindex="-1" aria-labelledby="viewOrderModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="viewOrderModalLabel">Thông tin đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div *ngIf="orderDetail; else loadingOrError">
+                  <h5 class="mb-3">Thông tin chi tiết đơn hàng</h5>
+                  <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Món ăn</th>
+                        <th>Số lượng</th>
+                        <th>Giá</th>
+                        <th>Tổng số tiền</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <ng-container *ngFor="let item of orderDetail.orderDetails">
+                        <tr>
+                          <td>
+                            <span *ngIf="item.dishId !== 0; else comboNameTemplate">{{ item.itemName }}</span>
+                            <ng-template #comboNameTemplate>{{ item.nameCombo }}</ng-template>
+                          </td>
+                          <td>{{ item.quantity }}</td>
+                          <td>
+                            <ng-container *ngIf="item.discountedPrice">
+                              <span>{{ item.discountedPrice }}</span>
+                            </ng-container>
+                            <ng-container *ngIf="!item.discountedPrice">
+                              <span>{{ item.price }}</span>
+                            </ng-container>
+                          </td>
+                          
+                          <td>{{ item.unitPrice }}</td>
+                        </tr>
+                      </ng-container>              
+                    </tbody>
+                  </table>
+                  <div class="summary-section mt-4">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="d-flex justify-content-between mb-2">
+                          <span class="fw-bold label">Tạm tính:</span>
+                          <span class="value">{{ orderDetail.totalAmount }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                          <span class="fw-bold label">Khuyến mãi:</span>
+                          <!-- <span class="value">{{ orderDetail.discount | currency }}</span> -->
+                        </div>
+                        <div class="d-flex justify-content-between">
+                          <span class="fw-bold label">Tổng cộng:</span>
+                          <span class="value">{{ orderDetail.totalAmount }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <ng-template #loadingOrError>
+                  <div *ngIf="!orderDetail">
+                    <p>Loading order details...</p>
+                  </div>
+                  <div *ngIf="orderDetail === undefined">
+                    <p>Error loading order details. Please try again later.</p>
+                  </div>
+                </ng-template>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+              </div>
+            </div>
           </div>
-          <div *ngIf="orderDetail === undefined">
-            <p>Error loading order details. Please try again later.</p>
-          </div>
-        </ng-template>
-      </div>
+        </div>
+      </main>
     </div>
   </div>
-</div>
+</body>
