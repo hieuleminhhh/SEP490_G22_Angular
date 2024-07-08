@@ -1,0 +1,137 @@
+<div class="container">
+  <aside class="sidebar">
+    <nav class="sidebar-nav">
+      <ul>
+        <li>
+          <ul>
+            <br><br><br>
+            <li><a [class.active]="currentView === 'order-layout'" (click)="setView('order-layout')">Đơn hiện tại</a>
+            </li>
+            <li><a [class.active]="currentView === 'booking-order'" (click)="setView('booking-order')">Đơn đặt hàng</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+  <main class="main-content">
+    <header>
+      <h2 *ngIf="currentView === 'order-layout'">Đơn hiện tại</h2>
+      <h2 *ngIf="currentView === 'booking-order'">Đơn đặt hàng</h2>
+
+      <div class="col-md-3" *ngIf="currentView === 'booking-order'">
+        <div class="input-group">
+          <label class="input-group-text" for="dateFrom">Từ ngày</label>
+          <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom" >
+        </div>
+      </div>
+      <div class="col-md-3" *ngIf="currentView === 'booking-order'">
+        <div class="input-group">
+          <label class="input-group-text" for="dateTo">Đến ngày</label>
+          <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo" >
+        </div>
+      </div>
+    </header>
+    <hr>
+
+    <section *ngIf="currentView === 'order-layout'">
+      <div class="container">
+        <div class="card">
+          <div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Mã đơn</th>
+                  <th>Loại đơn</th>
+                  <th>Thời gian</th>
+                  <th>Trạng thái</th>
+                  <th></th>
+
+                </tr>
+              </thead>
+              <tbody>
+                <ng-container>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <button type="button" class="btn btn-primary btn-sm">Chi tiết</button>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+
+
+            </table>
+          </div>
+          <br>
+          <div style="text-align: center;">
+            <p>Không có dữ liệu </p>
+          </div>
+          <!-- <div class="pagination" *ngIf="totalPages>0">
+            <button (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+
+            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"
+              max="{{ totalPages }}">
+
+            <span>of {{ totalPages }}</span>
+
+            <button (click)="onNextPage()" [disabled]="currentPage === totalPages">Next</button>
+          </div> -->
+        </div>
+      </div>
+    </section>
+
+    <section *ngIf="currentView === 'booking-order'">
+      <div class="container">
+        <div class="card">
+          <div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Mã đơn</th>
+                  <th>Loại đơn</th>
+                  <th>Thời gian</th>
+                  <th>Trạng thái</th>
+                  <th></th>
+
+                </tr>
+              </thead>
+              <tbody>
+                <ng-container>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <button type="button" class="btn btn-primary btn-sm">Chi tiết</button>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+
+
+            </table>
+          </div>
+          <br>
+          <div style="text-align: center;">
+            <p>Không có dữ liệu </p>
+          </div>
+          <!-- <div class="pagination" *ngIf="totalPages>0">
+            <button (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+
+            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"
+              max="{{ totalPages }}">
+
+            <span>of {{ totalPages }}</span>
+
+            <button (click)="onNextPage()" [disabled]="currentPage === totalPages">Next</button>
+          </div> -->
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
