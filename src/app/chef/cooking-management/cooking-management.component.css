@@ -1,0 +1,165 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  /* display: flex; */
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+}
+
+.sidebar {
+  width: 250px;
+  height: 700px;
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-right: 1px solid #dee2e6;
+}
+
+.sidebar-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.sidebar-nav ul ul {
+  padding-left: 20px;
+}
+
+.sidebar-nav li {
+  margin-bottom: 10px;
+}
+
+.sidebar-nav a {
+  text-decoration: none;
+  color: #333;
+  display: block;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+
+.sidebar-nav a:hover {
+  background-color: #e2e6ea;
+}
+.sidebar-nav ul li a.active {
+  color: #fff; /* Màu chữ khi chọn */
+  background-color: #007bff; /* Màu nền khi chọn */
+}
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #fff;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.card {
+  padding: 16px; /* Padding inside the card */
+  margin: 16px; /* Margin around the card */
+  max-width: 2500px;
+  width: 115%;
+  box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 1rem;
+  border: transparent;
+  flex: 1;
+  background-color: #fff; /* White background for the card */
+}
+
+@media(max-width:767px) {
+  .card {
+    margin: 3vh auto;
+  }
+}
+
+.container {
+  display: flex;
+  gap: 10px;
+  padding-top: 20px;
+  width: 115%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+.btn {
+  padding: 5px 10px;
+  border-radius: 3px;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+
+/* Styling for the input group */
+.input-group {
+  display: flex;
+  align-items: center;
+}
+
+/* Styling for the labels */
+.input-group-text {
+  background-color: #f8f9fa; /* Light grey background */
+  border: 1px solid #ced4da; /* Border color to match the inputs */
+  border-radius: 4px 0 0 4px; /* Rounded left corners */
+  padding: 5px 10px;
+  font-weight: bold;
+  white-space: nowrap; /* Prevent text wrap */
+}
+
+/* Styling for the input fields */
+.form-control {
+  border: 1px solid #ced4da; /* Border color */
+  border-radius: 0 4px 4px 0; /* Rounded right corners */
+  padding: 5px 10px;
+  flex: 1; /* Make input take the remaining space */
+}
+
+/* Optional: Add focus styles for better accessibility */
+.form-control:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Ensure the input group takes the full width of the column */
+.input-group {
+  width: 100%;
+}
