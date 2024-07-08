@@ -36,8 +36,7 @@ export class CreateOnlineOrderComponent implements OnInit {
   showingCombos: boolean = false;
   successMessage: string = '';
   search: string = '';
-  searchCategory: string = '';
-  selectedAddress = '';
+  selectedCategory: string = '';
   showDropdown: boolean = false;
   receivingDate: string = '';
   receivingTime: string = '';
@@ -50,7 +49,7 @@ export class CreateOnlineOrderComponent implements OnInit {
     consigneeName: '',
     orderDate: new Date(),
     status: 1,
-    recevingOrder: new Date(),
+    recevingOrder: '',
     totalAmount: 0,
     deposits: 0,
     note: '',
@@ -66,15 +65,15 @@ export class CreateOnlineOrderComponent implements OnInit {
     this.setDefaultReceivingTime();
     this.selectCategory('Món chính');
   }
-  selectCategory(category: string) {
-    this.searchCategory = category;
-    if (category === 'Combo') {
+  selectCategory(searchCategory: string) {
+    this.selectedCategory = searchCategory;
+    if (searchCategory === 'Combo') {
       this.showingDishes = false;
       this.showingCombos = true;
     } else {
       this.showingDishes = true;
       this.showingCombos = false;
-      this.loadListDishes(category);
+      this.loadListDishes(searchCategory);
     }
   }
   loadListDishes(search: string = '', searchCategory: string =''): void {
@@ -113,20 +112,25 @@ export class CreateOnlineOrderComponent implements OnInit {
     );
   }
   onSearch() {
-    this.loadListDishes(this.searchCategory, this.search); 
+    if (this.showingDishes) {
+      this.loadListDishes(this.selectedCategory,this.search);
+    } else if (this.showingCombos) {
+      this.loadListCombo(this.search);
+    }
   }
   
   
   showDishes() {
     this.showingDishes = true;
     this.showingCombos = false;
+    this.loadListDishes(this.search);
   }
 
   showCombos() {
     this.showingCombos = !this.showingCombos;
     this.showingDishes = false;
     this.showingCombos = true;
-    this.searchCategory = ''; 
+    this.selectedCategory = ''; 
 }
 
   addItem(item: any) {
@@ -164,14 +168,18 @@ export class CreateOnlineOrderComponent implements OnInit {
   }
   combineDateTime(): void {
     if (this.receivingDate && this.receivingTime) {
-      const date = new Date(this.receivingDate);  // Parse date string
-      const timeParts = this.receivingTime.split(':');
-      date.setHours(parseInt(timeParts[0], 10));  // Set hours
-      date.setMinutes(parseInt(timeParts[1], 10));  // Set minutes
-  
-      this.addNew.recevingOrder = date;
+        const formattedDateTime = this.formatDateTime(this.receivingDate, this.receivingTime);
+        this.addNew.recevingOrder = formattedDateTime;
+        console.log(formattedDateTime);
+        console.log(this.receivingDate);
+        console.log(this.receivingTime);
     }
-  }
+}
+
+formatDateTime(date: string, time: string): string {
+    return `${date}T${time}:00.000Z`;
+}
+
   
   createOrder() {
     const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
@@ -186,6 +194,7 @@ export class CreateOnlineOrderComponent implements OnInit {
     this.addNew.totalAmount = this.calculateTotalAmount();
     this.addNew.orderDetails = orderDetails;
     this.addNew.orderDate = this.getVietnamTime();
+    
     console.log('Order Details:', orderDetails);
     this.orderService.AddNewOrder(this.addNew).subscribe(
       response => {

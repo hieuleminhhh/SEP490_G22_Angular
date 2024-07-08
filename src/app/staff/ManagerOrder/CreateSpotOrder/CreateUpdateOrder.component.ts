@@ -29,6 +29,8 @@ export class CreateUpdateOrderComponent implements OnInit {
   filteredAddresses: any[] = []; 
   totalPagesArray: number[] = [];
   selectedItems: any[] = [];
+  searchCategory: string = '';
+  search: string = '';
   currentPage: number = 1;
   pageSize: number = 5;
   totalCount: number = 0;
@@ -64,10 +66,22 @@ export class CreateUpdateOrderComponent implements OnInit {
     this.loadListCombo();
     this.loadAddresses();
     this.selectedAddress = "Khách lẻ"
+    this.selectCategory('Món chính');
   }
-  loadListDishes(search: string = ''): void {
+  selectCategory(category: string) {
+    this.searchCategory = category;
+    if (category === 'Combo') {
+      this.showingDishes = false;
+      this.showingCombos = true;
+    } else {
+      this.showingDishes = true;
+      this.showingCombos = false;
+      this.loadListDishes(category);
+    }
+  }
+  loadListDishes(search: string = '', searchCategory: string =''): void {
     console.log('Loading dishes with search term:', search); 
-    this.dishService.ListDishes(this.currentPage, this.pageSize, search).subscribe(
+    this.dishService.ListDishes(this.currentPage,this.pageSize, search, searchCategory ).subscribe(
       (response: ListAllDishes) => {
         if (response && response.items) {
           this.dishes = [response];
@@ -82,6 +96,7 @@ export class CreateUpdateOrderComponent implements OnInit {
       }
     );
   }
+
   loadListCombo(search: string = ''): void {
     console.log('Loading combos with search term:', search);
     this.comboService.ListCombo(this.currentPage, this.pageSize, search).subscribe(
@@ -99,15 +114,26 @@ export class CreateUpdateOrderComponent implements OnInit {
       }
     );
   }
+  onSearch() {
+    if (this.showingDishes) {
+      this.loadListDishes(this.searchCategory,this.search);
+    } else if (this.showingCombos) {
+      this.loadListCombo(this.search);
+    }
+  }
+  
+  
   showDishes() {
     this.showingDishes = true;
     this.showingCombos = false;
   }
 
   showCombos() {
+    this.showingCombos = !this.showingCombos;
     this.showingDishes = false;
     this.showingCombos = true;
-  }
+    this.searchCategory = ''; 
+}
   addItem(item: any) {
     // Find if the item already exists in selectedItems
     const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
@@ -179,8 +205,6 @@ createOrder() {
     }
   );
 }
-  
-
   getVietnamTime(): Date {
     const now = new Date();
     const utcOffset = now.getTimezoneOffset() * 60000;

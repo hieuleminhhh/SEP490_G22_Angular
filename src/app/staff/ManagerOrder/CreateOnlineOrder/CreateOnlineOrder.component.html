@@ -126,23 +126,23 @@
             <div class="col-md-6">
               <div class="category-buttons">
                 <button class="btn"
-                        [class.btn-primary]="searchCategory !== 'Món chính'"
-                        [class.btn-secondary]="searchCategory === 'Món chính'"
+                        [class.btn-primary]="selectedCategory !== 'Món chính'"
+                        [class.btn-secondary]="selectedCategory === 'Món chính'"
                         (click)="selectCategory('Món chính')">Món chính
                 </button>
                 <button class="btn"
-                        [class.btn-primary]="searchCategory !== 'Món khai vị'"
-                        [class.btn-secondary]="searchCategory === 'Món khai vị'"
+                        [class.btn-primary]="selectedCategory !== 'Món khai vị'"
+                        [class.btn-secondary]="selectedCategory === 'Món khai vị'"
                         (click)="selectCategory('Món khai vị')">Món khai vị
                 </button>
                 <button class="btn"
-                        [class.btn-primary]="searchCategory !== 'Món tráng miệng'"
-                        [class.btn-secondary]="searchCategory === 'Món tráng miệng'"
+                        [class.btn-primary]="selectedCategory !== 'Món tráng miệng'"
+                        [class.btn-secondary]="selectedCategory === 'Món tráng miệng'"
                         (click)="selectCategory('Món tráng miệng')">Món tráng miệng
                 </button>
                 <button class="btn"
-                        [class.btn-primary]="searchCategory !== 'Đồ uống'"
-                        [class.btn-secondary]="searchCategory === 'Đồ uống'"
+                        [class.btn-primary]="selectedCategory !== 'Đồ uống'"
+                        [class.btn-secondary]="selectedCategory === 'Đồ uống'"
                         (click)="selectCategory('Đồ uống')">Đồ uống
                 </button>
                 <button class="btn"

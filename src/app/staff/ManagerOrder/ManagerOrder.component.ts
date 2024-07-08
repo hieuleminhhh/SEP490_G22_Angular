@@ -21,7 +21,7 @@ export class ManagerOrderComponent implements OnInit {
   dateTo: string = '';
   search: string = '';  
   currentPage: number = 1;
-  pageSize: number = 5;
+  pageSize: number = 10;
   totalCount: number = 0;
   totalPagesArray: number[] = [];
   weeks: { start: string, end: string }[] = [];
