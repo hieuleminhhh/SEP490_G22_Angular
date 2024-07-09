@@ -5,9 +5,9 @@
         <li>
           <ul>
             <br><br><br>
-            <li><a [class.active]="currentView === 'order-layout'" (click)="setView('order-layout')">Đơn hiện tại</a>
+            <li><a [class.active]="currentView === 'order-layout'" (click)="setView('order-layout')" (click)="getOrders('1-4')">Đơn hiện tại</a>
             </li>
-            <li><a [class.active]="currentView === 'booking-order'" (click)="setView('booking-order')">Đơn đặt hàng</a>
+            <li><a [class.active]="currentView === 'booking-order'" (click)="setView('booking-order')" (click)="getOrders('2-3')">Đơn đặt hàng</a>
             </li>
           </ul>
         </li>
@@ -46,16 +46,15 @@
                   <th>Thời gian</th>
                   <th>Trạng thái</th>
                   <th></th>
-
                 </tr>
               </thead>
               <tbody>
-                <ng-container>
+                <ng-container *ngFor="let order of order">
                   <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>{{order.orderId}}</td>
+                    <td>{{getTypeString(order.type)}}</td>
+                    <td>{{order.orderDate | date:'dd/MM/yyyy - HH:mm' }}</td>
+                    <td>{{order.status}}</td>
                     <td>
                       <button type="button" class="btn btn-primary btn-sm">Chi tiết</button>
                     </td>
@@ -67,7 +66,7 @@
             </table>
           </div>
           <br>
-          <div style="text-align: center;">
+          <div *ngIf="!order || order.length === 0"  style="text-align: center;">
             <p>Không có dữ liệu </p>
           </div>
           <!-- <div class="pagination" *ngIf="totalPages>0">
@@ -100,12 +99,12 @@
                 </tr>
               </thead>
               <tbody>
-                <ng-container>
+                <ng-container *ngFor="let order of order">
                   <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>{{order.orderId}}</td>
+                    <td>{{getTypeString(order.type)}}</td>
+                    <td>{{order.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</td>
+                    <td>{{order.status}}</td>
                     <td>
                       <button type="button" class="btn btn-primary btn-sm">Chi tiết</button>
                     </td>
@@ -117,7 +116,7 @@
             </table>
           </div>
           <br>
-          <div style="text-align: center;">
+          <div *ngIf="!order || order.length === 0"  style="text-align: center;">
             <p>Không có dữ liệu </p>
           </div>
           <!-- <div class="pagination" *ngIf="totalPages>0">

@@ -76,7 +76,7 @@ export class PaymentReservationComponent implements OnInit {
       note: this.data.note,
       orderDate: new Date().toISOString(),
       status: 0,
-      receivingOrder: this.data.reservationTime,
+      recevingOrder: this.data.reservationTime,
       totalAmount: this.getTotalCartPrice(),
       deposits: this.getTotalCartPrice() / 2,
       type: 3,
