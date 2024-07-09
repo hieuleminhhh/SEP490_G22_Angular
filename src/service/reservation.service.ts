@@ -88,6 +88,13 @@ export class ReservationService {
     return this.http.put(url, payload);
   }
 
+  updateStatusTable(reservationId: number, status: any): Observable<any> {
+    const url = `https://localhost:7188/api/Reservations/${reservationId}/tables/status`;
+    const payload = { tableStatus: status };  // Cập nhật tên trường
+    return this.http.put(url, payload);
+  }
+
+
   searchReservation(searchTerm: string): Observable<any[]> {
     const url = `https://localhost:7188/api/Reservations/searchNameOrPhone?guestNameOrguestPhone=${searchTerm}`;
     return this.http.get<any[]>(url);

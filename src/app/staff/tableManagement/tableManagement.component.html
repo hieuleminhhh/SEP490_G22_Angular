@@ -143,8 +143,10 @@
                   </div>
                 </div>
                 <div class="col-md-8" style="display: flex;justify-content: center;align-items: center;height: 20px;">
-                  <span class="label-reser" (click)="updateReservationById(reservation.reservationId, 2)">Khách nhận
-                    bàn</span>
+                  <span class="label-reser" (click)="updateReservationById(reservation.reservationId, 2)"
+                    [class.disabled]="!reservation.tableOfReservation || reservation.tableOfReservation.length === 0"
+                    *ngIf="reservation.tableOfReservation && reservation.tableOfReservation.length > 0">
+                    Khách nhận bàn</span>
                 </div>
               </div>
             </div>
@@ -405,18 +407,16 @@
       <div class="container">
         <div class="card">
           <div class="reservation-form" style="max-height: 500px;">
-            <h2>Đặt Bàn</h2>
             <form #reservationForm="ngForm">
               <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-6">
                   <div class="form-group">
                     <label for="name">Tên người đặt (*)</label>
                     <input class="input-text name" type="text" id="name" name="consigneeName" placeholder="Nhập tên"
                       required>
                   </div>
                 </div>
-                <div class="col-md-2"></div>
-                <div class="col-md-5">
+                <div class="col-md-6">
                   <div class="form-group">
                     <label for="phone">Số điện thoại (*)</label>
                     <input class="input-tel phone" type="tel" id="phone" name="guestPhone"
@@ -426,14 +426,13 @@
               </div>
 
               <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-4">
                   <div class="form-group">
                     <label for="date">Ngày (*)</label>
                     <input class="input-date" id="date" type="date" name="date" style="width: 100%;height: 40px;">
                   </div>
                 </div>
-                <div class="col-md-1"></div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                   <div class="form-group">
                     <label for="time">Giờ (*)</label>
                     <select class="input-select" id="time" name="time" required>
@@ -441,8 +440,7 @@
                     </select>
                   </div>
                 </div>
-                <div class="col-md-1"></div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                   <div class="form-group">
                     <label for="people">Số người (*)</label>
                     <input class="input-number number" type="number" id="people" name="guestNumber" min="1" value="2"
@@ -450,16 +448,29 @@
                   </div>
                 </div>
               </div>
-
-              <div class="form-group">
-                <label for="notes">Ghi chú</label>
-                <textarea class="input-textarea note" id="notes" name="note" placeholder="Ghi chú"></textarea>
+              <div class="row" style="padding: 0 15px;margin-bottom: 15px;">
+                <div class="form-group">
+                  <label for="notes">Ghi chú</label>
+                  <textarea class="input-textarea note" id="notes" name="note" placeholder="Ghi chú" style="margin-top: 0;"></textarea>
+                </div>
               </div>
-
-              <button class="reser" type="submit">Đặt bàn</button>
+              <div class="row">
+                <div class="col-md-12 d-flex justify-content-center align-items-center">
+                  <button class="reser" type="submit">Đặt bàn</button>
+                </div>
+              </div>
             </form>
           </div>
-
+          <div class="row" style="background-color: #ebebeb;padding: 10px;">
+            <div class="col-md-12 d-flex justify-content-center align-items-center">
+              <div class="plus-icon">
+                +
+              </div>
+            </div>
+            <div class="col-md-12 d-flex justify-content-center align-items-center">
+              <span>Thêm món</span>
+            </div>
+          </div>
 
         </div>
       </div>
