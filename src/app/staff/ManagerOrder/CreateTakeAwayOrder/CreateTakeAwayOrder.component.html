@@ -223,6 +223,7 @@
                   <div class="form-group">
                     <label for="guestPhone">Số điện thoại</label>
                     <input type="tel" [(ngModel)]="newAddress.guestPhone" class="form-control" id="guestPhone" placeholder="Nhập số điện thoại" name="guestPhone" required>
+                    <!-- <div *ngIf="addErrors.guestPhoneError" class="alert alert-danger">{{ addErrors.guestPhoneError }}</div> -->
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>

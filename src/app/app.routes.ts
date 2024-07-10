@@ -15,12 +15,12 @@ import { CheckoutComponent } from './common/checkout/checkout.component';
 import { OrderDetailComponent } from './common/orderDetail/orderDetail.component';
 import { TableManagementComponent } from './staff/tableManagement/tableManagement.component';
 import { ManagerOrderComponent } from './staff/ManagerOrder/ManagerOrder.component';
-import { CreateUpdateOrderComponent } from './staff/ManagerOrder/CreateSpotOrder/CreateUpdateOrder.component';
 import { PaymentReservationComponent } from './common/paymentReservation/paymentReservation.component';
 import { CreateOnlineOrderComponent } from './staff/ManagerOrder/CreateOnlineOrder/CreateOnlineOrder.component';
 import { CreateTakeAwayOrderComponent } from './staff/ManagerOrder/CreateTakeAwayOrder/CreateTakeAwayOrder.component';
 import { CookingManagementComponent } from './chef/cooking-management/cooking-management.component';
 import { ViewTableOrderComponent } from './staff/ManagerOrder/ViewTableOrder/ViewTableOrder.component';
+import { CreateOfflineOrderComponent } from './staff/ManagerOrder/CreateOfflineOrder/CreateOfflineOrder.component';
 
 
 export const routes: Routes = [
@@ -40,10 +40,10 @@ export const routes: Routes = [
     {'path': 'orderDetail', component:OrderDetailComponent},
     {'path': 'tableManagement', component:TableManagementComponent},
     {'path': 'managerorder', component:ManagerOrderComponent},
-    {'path': 'createSpot', component:CreateUpdateOrderComponent},
     {'path': 'paymentReservation', component:PaymentReservationComponent},
     {'path': 'createTakeaway', component:CreateTakeAwayOrderComponent},
     {'path': 'createOnline', component:CreateOnlineOrderComponent},
     {'path': 'cooking', component:CookingManagementComponent},
     {'path': 'listTable', component:ViewTableOrderComponent},
+    {'path': 'createOffline', component:CreateOfflineOrderComponent}
 ];

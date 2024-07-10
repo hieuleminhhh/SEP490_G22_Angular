@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
-import { AddNewOrder, ListAllOrder } from '../models/order.model';
+import { AddNewOrder, ListAllOrder, ManagerOrderByTableId } from '../models/order.model';
 import { AddNewAddress, Address } from '../models/address.model';
 
 const httpOptions = {
@@ -45,6 +45,14 @@ export class ManagerOrderService {
   AddNewAddress(newAddress: AddNewAddress): Observable<any> {
     const url = `${this.apiUrl}/Guest/CreateGuest`;
     return this.http.post<any>(url, newAddress, httpOptions);
+  }
+  getOrdersByTableId(tableId: number): Observable<any> {
+    const url = `${this.apiUrl}/orders/getOrderByTableId?tableId=${tableId}`;
+    return this.http.get<any>(url);
+  }
+  createOrderOffline(orderData: any): Observable<any> {
+    const url = `${this.apiUrl}/orders/createOrderForTable/${orderData.tableId}`;
+    return this.http.post<any>(url, orderData, httpOptions);
   }
 }
 

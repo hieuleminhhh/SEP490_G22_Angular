@@ -52,4 +52,36 @@ export interface AddNewOrder {
 export interface ListTables {
   tableId: number;
 }
+export interface OrderTableDetail {
+  tableId: number;
+  status: number;
+  capacity: number;
+  floor: number;
+}
+
+export interface ManagerOrderByTableId {
+  orderId: number;
+  orderDate: Date;
+  status: number;
+  recevingOrder: Date;
+  totalAmount: number;
+  guestPhone: string;
+  deposits: number;
+  guestAddress: string;
+  consigneeName: string;
+  tables: OrderTableDetail[];
+}
+export interface OrderItem {
+  orderDetailId: number;
+  dishId: number;
+  comboId: number;
+  nameCombo?: string;
+  itemName: string;
+  unitPrice: number;
+  price: number;
+  discountedPrice?: number;
+  quantity: number;
+  imageUrl: string;
+  totalPrice: number;
+}
 
