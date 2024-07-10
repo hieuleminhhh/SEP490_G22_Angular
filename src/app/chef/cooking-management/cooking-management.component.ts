@@ -17,6 +17,9 @@ export class CookingManagementComponent implements OnInit {
   dateTo: string = '';
   order: any;
 
+  selectedOrderId: number | null = null;
+  selectedOrderDetails: any[] = [];
+
   constructor(private cookingService: CookingService) { }
 
   ngOnInit(): void {
@@ -53,4 +56,16 @@ export class CookingManagementComponent implements OnInit {
         return '';
     }
   }
+
+  getOrderDetails(orderId: number): void {
+    this.setView('order_details');
+    const selectedOrder = this.order.find((order: { orderId: number; }) => order.orderId === orderId);
+    if (selectedOrder) {
+      this.selectedOrderDetails = selectedOrder.orderDetails;
+    } else {
+      this.selectedOrderDetails = [];
+    }
+    this.selectedOrderId = orderId;
+  }
+
 }
