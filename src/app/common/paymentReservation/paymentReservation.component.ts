@@ -66,6 +66,7 @@ export class PaymentReservationComponent implements OnInit {
     }, 0).toFixed(2));
   }
   submitForm() {
+    const currentDateTime = new Date().toISOString();
     const request = {
       guestPhone: this.data.guestPhone,
       email: '',
@@ -74,7 +75,7 @@ export class PaymentReservationComponent implements OnInit {
       reservationTime: this.data.reservationTime,
       guestNumber: this.data.guestNumber,
       note: this.data.note,
-      orderDate: new Date().toISOString(),
+      orderDate: currentDateTime,
       status: 0,
       recevingOrder: this.data.reservationTime,
       totalAmount: this.getTotalCartPrice(),
@@ -87,6 +88,7 @@ export class PaymentReservationComponent implements OnInit {
         comboId: item.comboId
       }))
     };
+    console.log(currentDateTime);
     console.log(request);
     this.reservationService.createResevetion(request).subscribe({
       next: response => {
