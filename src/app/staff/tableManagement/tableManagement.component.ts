@@ -6,7 +6,7 @@ import moment from 'moment';
 import { ReservationService } from '../../../service/reservation.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { BehaviorSubject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Table, TableReservationResponse } from '../../../models/table.model';
 import { DatePipe } from '@angular/common';
@@ -333,15 +333,20 @@ export class TableManagementComponent implements OnInit {
 
 
   updateReservationById(id: number, status: number): void {
-    this.reservationService.updateStatusReservation(id, status).subscribe(
+    this.reservationService.updateStatusReservation(id, status).pipe(
+      switchMap(response => {
+        return this.reservationService.updateStatusTable(id, 1);
+      })
+    ).subscribe(
       response => {
+        this.getTableData();
         this.getReservation();
         this.getReservationData();
       },
       error => {
-        console.error('Error:', error);
+        console.error('Lỗi khi cập nhật trạng thái:', error);
         if (error.error && error.error.errors) {
-          console.error('Validation Errors:', error.error.errors);
+          console.error('Lỗi xác thực:', error.error.errors);
         }
       }
     );
