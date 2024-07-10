@@ -21,6 +21,7 @@ import { CreateTakeAwayOrderComponent } from './staff/ManagerOrder/CreateTakeAwa
 import { CookingManagementComponent } from './chef/cooking-management/cooking-management.component';
 import { ViewTableOrderComponent } from './staff/ManagerOrder/ViewTableOrder/ViewTableOrder.component';
 import { CreateOfflineOrderComponent } from './staff/ManagerOrder/CreateOfflineOrder/CreateOfflineOrder.component';
+import { UpdateOfflineOrderComponent } from './staff/ManagerOrder/UpdateOfflineOrder/UpdateOfflineOrder.component';
 
 
 export const routes: Routes = [
@@ -45,5 +46,6 @@ export const routes: Routes = [
     {'path': 'createOnline', component:CreateOnlineOrderComponent},
     {'path': 'cooking', component:CookingManagementComponent},
     {'path': 'listTable', component:ViewTableOrderComponent},
-    {'path': 'createOffline', component:CreateOfflineOrderComponent}
+    {'path': 'createOffline', component:CreateOfflineOrderComponent},
+    {'path': 'updateOffline' , component:UpdateOfflineOrderComponent}
 ];

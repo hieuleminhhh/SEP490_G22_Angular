@@ -14,13 +14,14 @@ import { ManagerComboService } from '../../../../service/managercombo.service';
 import { ManagerOrderDetailService } from '../../../../service/managerorderDetail.service';
 import { AddOrderDetail, ListOrderDetailByOrder } from '../../../../models/orderDetail.model';
 @Component({
-    selector: 'app-create-offline-order',
-    templateUrl: './CreateOfflineOrder.component.html',
-    styleUrls: ['./CreateOfflineOrder.component.css'],
-    standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
+  selector: 'app-UpdateOfflineOrder',
+  templateUrl: './UpdateOfflineOrder.component.html',
+  styleUrls: ['./UpdateOfflineOrder.component.css'],
+  standalone: true,
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
 })
-export class CreateOfflineOrderComponent implements OnInit {
+export class UpdateOfflineOrderComponent implements OnInit {
+
   tableId: number = 0;
   orders: any[] = []; 
   errorMessage: string = '';
@@ -408,4 +409,5 @@ export class CreateOfflineOrderComponent implements OnInit {
         modalBackdrop.parentNode.removeChild(modalBackdrop);
       }
     }
+
 }

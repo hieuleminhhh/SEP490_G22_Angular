@@ -62,8 +62,11 @@ export class ViewTableOrderComponent implements OnInit {
       this.dataTable = this.originalDataTable.filter(table => table.floor === currentFloor && table.status === 0);
     }
   }
-  navigateToCreateOfflineOrder(tableId: number): void {
-    this.router.navigate(['/createOffline'], { queryParams: { tableId } });
+  navigateToOrder(tableId: number, status: number): void {
+    if (status === 0) {
+      this.router.navigate(['/createOffline'], { queryParams: { tableId } });
+    } else if (status === 1) {
+      this.router.navigate(['/updateOffline'], { queryParams: { tableId } });
+    }
   }
-
 }
