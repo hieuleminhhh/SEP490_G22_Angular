@@ -23,5 +23,10 @@ export class TableService {
     const url = `https://localhost:7188/api/Reservations/register-tables`;
     return this.http.post(url, tableReser);
   }
+  getOrdersByTableId(tableId: number): Observable<any> {
+    const url = `https://localhost:7188/api/orders/GetOrderByTableId/${tableId}`;
+    return this.http.get(url);
+  }
+  
 }
 

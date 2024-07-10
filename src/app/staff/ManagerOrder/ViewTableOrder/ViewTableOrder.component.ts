@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { TableService } from '../../../../service/table.service';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SidebarOrderComponent } from "../../SidebarOrder/SidebarOrder.component";
 
 @Component({
-  selector: 'app-ViewTableOrder',
-  templateUrl: './ViewTableOrder.component.html',
-  styleUrls: ['./ViewTableOrder.component.css'],
-  standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule]
+    selector: 'app-ViewTableOrder',
+    templateUrl: './ViewTableOrder.component.html',
+    styleUrls: ['./ViewTableOrder.component.css'],
+    standalone: true,
+    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
 })
 export class ViewTableOrderComponent implements OnInit {
   tables: any[] = [];
@@ -18,7 +19,7 @@ export class ViewTableOrderComponent implements OnInit {
   selectedFloor = 1;
   selectedTable: string = 'all';
   dataTable: any;
-  constructor(private tableService: TableService) { }
+  constructor(private tableService: TableService, private router: Router) { }
 
   ngOnInit() {
     this.getTableData();
@@ -61,5 +62,11 @@ export class ViewTableOrderComponent implements OnInit {
       this.dataTable = this.originalDataTable.filter(table => table.floor === currentFloor && table.status === 0);
     }
   }
-
+  navigateToOrder(tableId: number, status: number): void {
+    if (status === 0) {
+      this.router.navigate(['/createOffline'], { queryParams: { tableId } });
+    } else if (status === 1) {
+      this.router.navigate(['/updateOffline'], { queryParams: { tableId } });
+    }
+  }
 }
