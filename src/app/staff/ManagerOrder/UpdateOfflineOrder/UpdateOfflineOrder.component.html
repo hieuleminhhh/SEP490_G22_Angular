@@ -1,0 +1,251 @@
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+        <app-SidebarOrder></app-SidebarOrder>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="container mt-5">
+          <h2 class="text-center mb-4">Đơn hàng tại quán bàn {{ tableId }}</h2>
+          <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+          </div>
+          <div class="row">
+            <!-- Left column for address and cart details -->
+            <div class="col-md-6">
+              <!-- Address Selection -->
+              <div class="input-group mb-3" (clickOutside)="showDropdown = false">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Select address..."
+                  (click)="toggleDropdown()"
+                  [(ngModel)]="selectedAddress"
+                  readonly
+                >
+                <div class="dropdown-menu dropdown-scrollable" [ngClass]="{'show': showDropdown}" [style.zIndex]="1000">
+                  <div class="search-container">
+                    <input
+                      type="text"
+                      class="form-control search-input"
+                      placeholder="Search..."
+                      [(ngModel)]="searchTerm"
+                      (click)="$event.stopPropagation()"
+                      (input)="filterAddresses()"
+                    >
+                  </div>
+                  <button
+                    class="dropdown-item"
+                    *ngIf="!searchTerm"
+                    (click)="selectKhachLe(); $event.stopPropagation();"
+                  >
+                    Khách lẻ
+                  </button>
+                  <button
+                    class="dropdown-item"
+                    *ngFor="let address of filteredAddresses"
+                    (click)="selectAddress(address); $event.stopPropagation();"
+                  >
+                    {{ address.consigneeName }} - {{ address.guestPhone }}
+                  </button>
+                </div>
+                <button
+                  class="btn btn-outline-secondary ml-2"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#formModal"
+                >
+                  <i class="fas fa-user"></i>
+                </button>
+              </div>
+
+              <!-- Selected Items Section -->
+              <div class="cart-section mt-4">
+                <h4>Thông tin</h4>
+                <div *ngIf="selectedItems.length === 0" class="alert alert-info" role="alert">
+                  Chưa có lựa chọn nào
+                </div>
+                <table class="table">
+                  <thead>
+                    <tr *ngIf="selectedItems.length > 0">
+                      <th scope="col">Tên món</th>
+                      <th scope="col">Số lượng</th>
+                      <th scope="col">Số lượng hoàn thành</th>
+                      <th scope="col">Giá món</th>
+                      <th scope="col">Tổng</th>
+                      <th scope="col"></th> <!-- Column for delete button -->
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of selectedItems; let i = index">
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <img [src]="item.imageUrl" alt="Item image" class="img-thumbnail me-2" style="width: 70px; height: 50px;">
+                          <p class="mb-0">{{ item.itemName || item.nameCombo }}</p>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <input type="number" class="form-control text-center small-input" [(ngModel)]="item.quantity" (change)="validateQuantity(i)" min="1" max="100">
+                        </div>
+                      </td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <input type="number" class="form-control text-center small-input" [(ngModel)]="item.dishesServed">
+                         
+                        </div>
+                      </td>
+                      <td>
+                        <div *ngIf="item.discountedPrice" class="d-flex align-items-center">
+                          <span>{{ item.discountedPrice | currency:'USD':'symbol-narrow':'1.2-2' }}</span>
+                        </div>
+                        <div *ngIf="!item.discountedPrice" class="d-flex align-items-center">
+                          <span>{{ item.price | currency:'USD':'symbol-narrow':'1.2-2' }}</span>
+                        </div>
+                      </td>
+                      <td>{{ item.totalPrice | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
+                      <td>
+                        <button class="btn btn-danger btn-sm" (click)="removeItem(i)">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                
+                <div *ngIf="selectedItems.length > 0" class="total-amount mt-3">
+                  <strong>Tổng cộng đơn:</strong> {{ calculateTotalAmount() | currency:'USD':'symbol-narrow':'1.2-2' }}
+                </div>
+                <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
+                  <button class="btn btn-primary btn-lg" (click)="createOrderOffline(tableId)">
+                    Lưu lại
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="successMessage" class="alert alert-success" role="alert">
+                {{ successMessage }}
+              </div>
+            </div>
+            
+            <!-- Right column for dishes and combos -->
+            <div class="col-md-6">
+              <div class="category-buttons">
+                <button class="btn"
+                        [class.btn-primary]="searchCategory !== 'Món chính'"
+                        [class.btn-secondary]="searchCategory === 'Món chính'"
+                        (click)="selectCategory('Món chính')">Món chính
+                </button>
+                <button class="btn"
+                        [class.btn-primary]="searchCategory !== 'Món khai vị'"
+                        [class.btn-secondary]="searchCategory === 'Món khai vị'"
+                        (click)="selectCategory('Món khai vị')">Món khai vị
+                </button>
+                <button class="btn"
+                        [class.btn-primary]="searchCategory !== 'Món tráng miệng'"
+                        [class.btn-secondary]="searchCategory === 'Món tráng miệng'"
+                        (click)="selectCategory('Món tráng miệng')">Món tráng miệng
+                </button>
+                <button class="btn"
+                        [class.btn-primary]="searchCategory !== 'Đồ uống'"
+                        [class.btn-secondary]="searchCategory === 'Đồ uống'"
+                        (click)="selectCategory('Đồ uống')">Đồ uống
+                </button>
+                <button class="btn"
+                        [class.btn-primary]="!showingCombos"
+                        [class.btn-secondary]="showingCombos"
+                        (click)="showCombos()">Combo
+                </button>
+              </div>
+              <div class="search-bar mt-3">
+                <input type="text" class="form-control" placeholder="Tìm kiếm món ăn..." [(ngModel)]="search" (input)="onSearch()">
+              </div>
+              
+              <!-- Dishes Section -->
+              <div class="dishes-section" *ngIf="showingDishes && dishes">
+                <div class="row">
+                  <ng-container *ngFor="let list of dishes">
+                    <div class="col-lg-4 col-md-6 mb-4" *ngFor="let dish of list.items">
+                      <div class="card h-100">
+                        <div class="image-container">
+                          <img class="card-img-top" [src]="dish.imageUrl" alt="Dish image">
+                        </div>
+                        <div class="card-body text-center">
+                          <div class="dish-details">
+                            <div class="dish-name">{{ dish.itemName }}</div>
+                            <div *ngIf="dish.discountedPrice" class="dish-price">
+                              <span class="text-decoration-line-through">{{ dish.price | currency }}</span>
+                              <br>
+                              <span style="color: red">{{ dish.discountedPrice | currency }}</span>
+                            </div>
+                            <div *ngIf="!dish.discountedPrice" class="dish-price">{{ dish.price | currency }}</div>
+                          </div>
+                          <button class="btn btn-sm btn-outline-primary" (click)="addItem(dish)">
+                            <i class="fas fa-plus"></i> Thêm
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+              <!-- Combos Section -->
+              <div class="combos-section" *ngIf="showingCombos && combo">
+                <div class="row">
+                  <ng-container *ngFor="let list of combo">
+                    <div class="col-lg-4 col-md-6 mb-4" *ngFor="let cb of list.items">
+                      <div class="card h-100">
+                        <div class="image-container">
+                          <img class="card-img-top" [src]="cb.imageUrl" alt="Combo image">
+                        </div>
+                        <div class="card-body text-center">
+                          <div class="combo-details">
+                            <div class="combo-name">{{ cb.nameCombo }}</div>
+                            <div class="combo-price">{{ cb.price | currency }}</div>
+                          </div>
+                          <button class="btn btn-sm btn-outline-primary" (click)="addItem(cb)">
+                            <i class="fas fa-plus"></i> Thêm
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <div #formModal class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="formModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="formModalLabel">Thông tin khách hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form #form="ngForm" (ngSubmit)="createAddress()">
+                  <div class="form-group">
+                    <label for="customerNameForm">Tên khách hàng</label>
+                    <input type="text" [(ngModel)]="newAddress.consigneeName" class="form-control" id="customerNameForm" placeholder="Nhập tên khách hàng" name="consigneeName" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="guestPhone">Số điện thoại</label>
+                    <input type="tel" [(ngModel)]="newAddress.guestPhone" class="form-control" id="guestPhone" placeholder="Nhập số điện thoại" name="guestPhone" required>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary">Lưu lại</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
