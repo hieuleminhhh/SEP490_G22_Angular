@@ -1,40 +1,45 @@
-<br>
-<br>
-<br>
-<br>
-<br>
 <body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+        <app-SidebarOrder></app-SidebarOrder>
+      </nav>
 
-  <select id="timeframe" name="timeframe" *ngIf="currentView === 'table-layout'" [(ngModel)]="selectedTable"
-          (ngModelChange)="filterTablesByFloorAndStatus(selectedTable)" class="floor-select">
-      <option value="all">Tất cả bàn</option>
-      <option value="empty">Bàn trống</option>
-  </select>
-  
-  <section>
-    <div class="container">
-      <div class="card short-card">
-        <div class="table-layout-buttons">
-          <button *ngFor="let floor of getFloors()" (click)="getTableOFFloor(floor)"
-                  [class.active]="selectedFloor === floor" class="floor-button">
-            Tầng {{ floor }}
-          </button>
-        </div>
-      </div>
-  
-      <div class="card">
-        <div class="table-grid">
-          <div class="table" *ngFor="let table of dataTable" [class.in-use]="table.status === 1">
-            <div class="table-id">{{ table.tableId }}</div>
-            <div class="table-status">{{ table.status === 0 ? 'Bàn trống' : 'Đang sử dụng' }}</div>
-            <div class="table-capacity">
-              <i class="fas fa-chair"></i>{{ table.capacity }}
+      <!-- Main Content -->
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <select id="timeframe" name="timeframe" *ngIf="currentView === 'table-layout'" [(ngModel)]="selectedTable"
+                (ngModelChange)="filterTablesByFloorAndStatus(selectedTable)" class="floor-select">
+          <option value="all">Tất cả bàn</option>
+          <option value="empty">Bàn trống</option>
+        </select>
+        
+        <section>
+          <div class="container">
+            <div class="card short-card">
+              <div class="table-layout-buttons">
+                <button *ngFor="let floor of getFloors()" (click)="getTableOFFloor(floor)"
+                        [class.active]="selectedFloor === floor" class="floor-button">
+                  Tầng {{ floor }}
+                </button>
+              </div>
             </div>
-            <div class="table-check" *ngIf="table.status === 1">&#10004;</div>
+        
+            <div class="card">
+              <div class="table-grid">
+                <div class="table" *ngFor="let table of dataTable" [class.in-use]="table.status === 1" (click)="navigateToCreateOfflineOrder(table.tableId)">
+                  <div class="table-id">{{ table.tableId }}</div>
+                  <div class="table-status">{{ table.status === 0 ? 'Bàn trống' : 'Đang sử dụng' }}</div>
+                  <div class="table-capacity">
+                    <i class="fas fa-chair"></i>{{ table.capacity }}
+                  </div>
+                  <div class="table-check" *ngIf="table.status === 1">&#10004;</div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
-  </section>
-  
-  </body>
+  </div>
+</body>

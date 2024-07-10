@@ -141,6 +141,10 @@
     max-height: 200px; /* Adjust this value as needed */
     overflow-y: auto;
   }
+  .error-message {
+    color: red;
+    margin-top: 10px;
+  }
   
   
   

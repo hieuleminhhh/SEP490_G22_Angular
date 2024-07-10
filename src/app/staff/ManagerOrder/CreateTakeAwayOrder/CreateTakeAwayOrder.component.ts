@@ -177,6 +177,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     console.log('Selected Address:', this.addNew);
 }
 
+
 createOrder() {
   const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
     itemId: item.id,
@@ -190,8 +191,21 @@ createOrder() {
   this.addNew.totalAmount = this.calculateTotalAmount();
   this.addNew.orderDetails = orderDetails;
   this.addNew.orderDate = this.getVietnamTime();
+  const currentDate = new Date();
+  this.addNew.recevingOrder = currentDate.toISOString();
+
   console.log('Order Details:', orderDetails);
-  console.log('Guest Phone:', this.addNew.guestPhone);
+  
+
+  if (this.selectedAddress !== 'Khách lẻ') {
+    const parts = this.selectedAddress.split(' - ');
+    this.addNew.consigneeName = parts[0];
+    this.addNew.guestPhone = parts[1];
+    this.addNew.email = 'antaiquan@gmail.com';
+    this.addNew.guestAddress = 'Ăn tại quán';
+    console.log('Guest Phone:', this.addNew.guestPhone);
+  }
+
   this.orderService.AddNewOrder(this.addNew).subscribe(
     response => {
       console.log('Order created successfully:', response);
@@ -204,6 +218,7 @@ createOrder() {
     }
   );
 }
+
   
 
   getVietnamTime(): Date {
@@ -232,18 +247,7 @@ createOrder() {
     }
     this.updateQuantity(index, item.quantity);
   }
-  loadAddresses() {
-    this.orderService.ListAddress().subscribe(
-      (response: Address[]) => {
-        this.addresses = response;
-        this.filteredAddresses = response; // Initialize filteredAddresses
-        console.log('Fetched addresses:', this.addresses);
-      },
-      (error) => {
-        console.error('Error fetching addresses:', error);
-      }
-    );
-  }
+  
 
   toggleDropdown() {
     if (!this.selectedAddress) {
@@ -257,13 +261,7 @@ createOrder() {
     this.searchTerm = ''; 
   }
 
-  filterAddresses() {
-    const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
-    this.filteredAddresses = this.addresses.filter(address => 
-      address.consigneeName.toLowerCase().includes(lowerCaseSearchTerm) || 
-      address.guestPhone.includes(this.searchTerm)
-    );
-  }
+ 
   selectKhachLe() {
     this.selectedAddress = 'Khách lẻ';
     this.showDropdown = false;
@@ -272,38 +270,75 @@ createOrder() {
   createAddress() {
     this.saveAddress();
 }
-  saveAddress() {
-    this.orderService.AddNewAddress(this.newAddress).subscribe(
-        response => {
-            console.log('Address created successfully:', response);
-            this.successMessage = 'Địa chỉ đã được thêm thành công!';
-            setTimeout(() => this.successMessage = '', 5000);
-            this.loadAddresses();
-            this.clearForm();
-            this.closeModal();
-        },
-        error => {
-            console.error('Error creating address:', error);
-            this.clearAddErrors();
 
-            // Xử lý lỗi từ response
-            if (error.error) {
-                const fieldErrors = error.error;
-                if (fieldErrors['consigneeName']) {
-                    this.addErrors.consigneeNameError = fieldErrors['consigneeName'];
-                }
-                if (fieldErrors['guestPhone']) {
-                    this.addErrors.guestPhoneError = fieldErrors['guestPhone'];
-                }
-                if (fieldErrors['guestAddress']) {
-                    this.addErrors.guestAddressError = fieldErrors['guestAddress'];
-                }
-            } else {
-                this.addErrorMessage = 'An error occurred. Please try again later.';
-            }
+saveAddress() {
+  this.orderService.AddNewAddress(this.newAddress).subscribe(
+    (response: any) => {
+      console.log('Address created successfully:', response); // Debug: Check response here
+      this.successMessage = 'Địa chỉ đã được thêm thành công!';
+      setTimeout(() => this.successMessage = '', 5000);
+
+      // Ensure response contains correct properties in 'data'
+      if (response && response.data && response.data.consigneeName && response.data.guestPhone) {
+        // Update selectedAddress with the newly created address data
+        this.selectedAddress = `${response.data.consigneeName} - ${response.data.guestPhone}`;
+      } else {
+        console.error('Invalid response format after creating address:', response);
+      }
+
+      // Reload addresses to update the list
+      this.loadAddresses();
+
+      // Clear form and close modal
+      this.clearForm();
+      this.closeModal();
+    },
+    error => {
+      console.error('Error creating address:', error);
+      this.clearAddErrors();
+
+      // Handle errors from response
+      if (error.error) {
+        const fieldErrors = error.error;
+        if (fieldErrors['consigneeName']) {
+          this.addErrors.consigneeNameError = fieldErrors['consigneeName'];
         }
-    );
+        if (fieldErrors['phone']) {
+          this.addErrors.guestPhoneError = fieldErrors['phone'];
+        }
+        if (fieldErrors['guestAddress']) {
+          this.addErrors.guestAddressError = fieldErrors['guestAddress'];
+        }
+      } else {
+        this.addErrorMessage = 'An error occurred. Please try again later.';
+      }
+    }
+  );
 }
+
+
+
+
+
+  loadAddresses() {
+    this.orderService.ListAddress().subscribe(
+      (response: Address[]) => {
+        this.addresses = response;
+        this.filteredAddresses = response; // Initialize filteredAddresses
+        console.log('Fetched addresses:', this.addresses);
+      },
+      (error) => {
+        console.error('Error fetching addresses:', error);
+      }
+    );
+  }
+  filterAddresses() {
+    const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
+    this.filteredAddresses = this.addresses.filter(address => 
+      address.consigneeName.toLowerCase().includes(lowerCaseSearchTerm) || 
+      address.guestPhone.includes(this.searchTerm)
+    );
+  }
   clearForm() {
     this.newAddress = { consigneeName: '', guestPhone: '', guestAddress: '' , email: '' };
   }
