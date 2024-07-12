@@ -75,9 +75,32 @@ export interface OrderItem {
   orderDetailId: number;
   dishId: number;
   comboId: number;
-  nameCombo?: string;
+  dish: {
+    itemName?: string | null;
+    price: number;
+    discountedPrice?: number;
+    imageUrl: string;
+  };
+  combo?: {
+    comboId: number;
+    nameCombo?: string | null;
+    price: number;
+    imageUrl: string;
+    isActive: boolean;
+  };
+  unitPrice: number;
+  dishesServed?: number;
+  quantity: number;
+}
+
+
+export interface SelectedItem {
+  orderDetailId: number;
+  dishId: number;
+  comboId: number;
   itemName: string;
   unitPrice: number;
+  dishesServed: number;
   price: number;
   discountedPrice?: number;
   quantity: number;

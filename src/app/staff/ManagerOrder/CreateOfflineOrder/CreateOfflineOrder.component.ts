@@ -57,6 +57,7 @@ export class CreateOfflineOrderComponent implements OnInit {
     this.loadListDishes();
     this.loadListCombo();
     this.loadAddresses();
+    this.selectedAddress = "Khách lẻ"
     this.selectCategory('Món chính');
     this.route.queryParams.subscribe(params => {
       this.tableId = +params['tableId']; 
@@ -303,38 +304,62 @@ export class CreateOfflineOrderComponent implements OnInit {
     createAddress() {
       this.saveAddress();
   }
-    saveAddress() {
-      this.orderService.AddNewAddress(this.newAddress).subscribe(
-          response => {
-              console.log('Address created successfully:', response);
-              this.successMessage = 'Địa chỉ đã được thêm thành công!';
-              setTimeout(() => this.successMessage = '', 5000);
-              this.loadAddresses();
-              this.clearForm();
-              this.closeModal();
-          },
-          error => {
-              console.error('Error creating address:', error);
-              this.clearAddErrors();
+  saveAddress() {
+    this.orderService.AddNewAddress(this.newAddress).subscribe(
+      (response: any) => {
+        console.log('Address created successfully:', response); // Debug: Check response here
+        this.successMessage = 'Địa chỉ đã được thêm thành công!';
+        setTimeout(() => this.successMessage = '', 5000);
   
-              // Xử lý lỗi từ response
-              if (error.error) {
-                  const fieldErrors = error.error;
-                  if (fieldErrors['consigneeName']) {
-                      this.addErrors.consigneeNameError = fieldErrors['consigneeName'];
-                  }
-                  if (fieldErrors['guestPhone']) {
-                      this.addErrors.guestPhoneError = fieldErrors['guestPhone'];
-                  }
-                  if (fieldErrors['guestAddress']) {
-                      this.addErrors.guestAddressError = fieldErrors['guestAddress'];
-                  }
-              } else {
-                  this.addErrorMessage = 'An error occurred. Please try again later.';
-              }
+        // Ensure response contains correct properties in 'data'
+        if (response && response.data && response.data.consigneeName && response.data.guestPhone) {
+          // Update selectedAddress with the newly created address data
+          this.selectedAddress = `${response.data.consigneeName} - ${response.data.guestPhone}`;
+        } else {
+          console.error('Invalid response format after creating address:', response);
+        }
+  
+        // Reload addresses to update the list
+        this.loadAddresses();
+  
+        // Clear form and close modal
+        this.clearForm();
+        this.closeModal();
+      },
+      error => {
+        console.error('Error creating address:', error);
+        this.clearAddErrors();
+  
+        // Handle errors from response
+        if (error.error) {
+          const fieldErrors = error.error;
+          if (fieldErrors['consigneeName']) {
+            this.addErrors.consigneeNameError = fieldErrors['consigneeName'];
           }
-      );
+          if (fieldErrors['phone']) {
+            this.addErrors.guestPhoneError = fieldErrors['phone'];
+          }
+          if (fieldErrors['guestAddress']) {
+            this.addErrors.guestAddressError = fieldErrors['guestAddress'];
+          }
+        } else {
+          this.addErrorMessage = 'An error occurred. Please try again later.';
+        }
+      }
+    );
   }
+    loadAddresses() {
+      this.orderService.ListAddress().subscribe(
+        (response: Address[]) => {
+          this.addresses = response;
+          this.filteredAddresses = response; // Initialize filteredAddresses
+          console.log('Fetched addresses:', this.addresses);
+        },
+        (error) => {
+          console.error('Error fetching addresses:', error);
+        }
+      );
+    }
   createOrderOffline(tableId: number) {
     const orderDetails = this.selectedItems.map(item => ({
       dishId: item.dishId,
@@ -375,20 +400,6 @@ export class CreateOfflineOrderComponent implements OnInit {
     );
   }
   
-  
-  
-  loadAddresses() {
-    this.orderService.ListAddress().subscribe(
-      (response: Address[]) => {
-        this.addresses = response;
-        this.filteredAddresses = response; // Initialize filteredAddresses
-        console.log('Fetched addresses:', this.addresses);
-      },
-      (error) => {
-        console.error('Error fetching addresses:', error);
-      }
-    );
-  }
     clearForm() {
       this.newAddress = { consigneeName: '', guestPhone: '', guestAddress: '' , email: '' };
     }
