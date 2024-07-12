@@ -120,10 +120,17 @@
                   <strong>Tổng cộng đơn:</strong> {{ calculateTotalAmount() | currency:'USD':'symbol-narrow':'1.2-2' }}
                 </div>
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
-                  <button class="btn btn-primary btn-lg" (click)="createOrderOffline(tableId)">
+                  <button class="btn btn-primary btn-lg" (click)="updateOrderOffline(tableId)">
                     Lưu lại
                   </button>
+                  <button class="btn btn-success btn-lg">
+                    Hoàn thành
+                  </button>
+                  <button class="btn btn-danger btn-lg" >
+                    Xóa
+                  </button>
                 </div>
+                
               </div>
               <div *ngIf="successMessage" class="alert alert-success" role="alert">
                 {{ successMessage }}

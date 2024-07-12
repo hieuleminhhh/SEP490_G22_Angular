@@ -13,6 +13,7 @@ import { ManagerDishService } from '../../../../service/managerdish.service';
 import { ManagerComboService } from '../../../../service/managercombo.service';
 import { ManagerOrderDetailService } from '../../../../service/managerorderDetail.service';
 import { AddOrderDetail, ListOrderDetailByOrder } from '../../../../models/orderDetail.model';
+import { OrderItem, SelectedItem } from '../../../../models/order.model';
 @Component({
   selector: 'app-UpdateOfflineOrder',
   templateUrl: './UpdateOfflineOrder.component.html',
@@ -44,13 +45,14 @@ export class UpdateOfflineOrderComponent implements OnInit {
   receivingDate: string = '';
   timeOptions: string[] = [];
   searchTerm: string = '';
-  selectedAddress = '';
+  selectedAddress: Address | any = {};
   newAddress: AddNewAddress = {
     guestAddress: 'Ăn tại quán',
     consigneeName: '',
     guestPhone: '',
     email:'antaiquan@gmail.com',
   };
+  addressId: number | null = null;
   addNew: any = {};
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService, private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService ) { }
   @ViewChild('formModal') formModal!: ElementRef;
@@ -70,32 +72,51 @@ export class UpdateOfflineOrderComponent implements OnInit {
     this.orderService.getOrdersByTableId(tableId).subscribe(
       (response: any) => {
         if (response && response.data && response.data.orderDetails && response.data.orderDetails.length > 0) {
-          this.selectedItems = response.data.orderDetails.map((orderItem: any) => ({
-            orderDetailId: orderItem.orderDetailId,
-            dishId: orderItem.dishId,
-            comboId: orderItem.comboId,
-            itemName: orderItem.dish.itemName,
-            unitPrice: orderItem.unitPrice,
-            dishesServed: orderItem.dishesServed || 0,
-            price: orderItem.dish.price,
-            discountedPrice: orderItem.dish.discountedPrice,
-            quantity: orderItem.quantity,
-            imageUrl: orderItem.dish.imageUrl,
-            totalPrice: orderItem.dish.discountedPrice ? orderItem.dish.discountedPrice * orderItem.quantity : orderItem.dish.price * orderItem.quantity,
-          }));
+          this.selectedItems = response.data.orderDetails.map((orderItem: OrderItem) => {
+            if (orderItem) {
+              let itemName = orderItem.dish?.itemName ?? ''; // Default to empty string if itemName is null
+              let nameCombo = orderItem.combo?.nameCombo ?? ''; // Default to empty string if nameCombo is null
+  
+              // Determine which name to display based on availability
+              let displayName = itemName || nameCombo;
+  
+              const totalPrice = orderItem.dish?.discountedPrice 
+                ? orderItem.dish.discountedPrice * orderItem.quantity 
+                : orderItem.dish?.price * orderItem.quantity;
+  
+              return {
+                orderDetailId: orderItem.orderDetailId,
+                dishId: orderItem.dishId,
+                comboId: orderItem.comboId,
+                itemName: displayName,
+                unitPrice: orderItem.unitPrice,
+                dishesServed: orderItem.dishesServed || 0,
+                price: orderItem.dish?.price || orderItem.combo?.price || 0,
+                discountedPrice: orderItem.dish?.discountedPrice,
+                quantity: orderItem.quantity,
+                imageUrl: orderItem.dish?.imageUrl || orderItem.combo?.imageUrl || '',
+                totalPrice: totalPrice || 0
+              } as SelectedItem;
+            } else {
+              console.warn('Invalid order item:', orderItem);
+              return null; // Return null for invalid items
+            }
+          }).filter((item: SelectedItem | null): item is SelectedItem => item !== null); 
+          
           console.log('Fetched order details:', this.selectedItems);
         } else {
           console.error('Invalid response:', response);
-          this.selectedItems = []; 
+          this.selectedItems = [];
         }
       },
       (error: HttpErrorResponse) => {
         console.error('Error fetching orders:', error);
         this.errorMessage = error.error.message || 'Bàn này không có đơn hàng nào...';
-        this.selectedItems = []; // Clear the cart if there's an error
+        this.selectedItems = [];
       }
     );
   }
+  
   
   
   private parseDateString(dateStr: string): Date | null {
@@ -294,6 +315,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
     }
     selectAddress(address: Address) {
       this.selectedAddress = `${address.consigneeName} - ${address.guestPhone}`;
+      this.addressId = address.addressId;
       this.addNew.guestPhone = address.guestPhone;
       this.addNew.email = 'antaiquan@gmail.com';
       this.addNew.guestAddress = 'Ăn tại quán'; 
@@ -304,39 +326,51 @@ export class UpdateOfflineOrderComponent implements OnInit {
     createAddress() {
       this.saveAddress();
   }
-    saveAddress() {
-      this.orderService.AddNewAddress(this.newAddress).subscribe(
-          response => {
-              console.log('Address created successfully:', response);
-              this.successMessage = 'Địa chỉ đã được thêm thành công!';
-              setTimeout(() => this.successMessage = '', 5000);
-              this.loadAddresses();
-              this.clearForm();
-              this.closeModal();
-          },
-          error => {
-              console.error('Error creating address:', error);
-              this.clearAddErrors();
+  saveAddress() {
+    this.orderService.AddNewAddress(this.newAddress).subscribe(
+      (response: any) => {
+        console.log('Address created successfully:', response); // Debug: Check response here
+        this.successMessage = 'Địa chỉ đã được thêm thành công!';
+        setTimeout(() => this.successMessage = '', 5000);
   
-              // Xử lý lỗi từ response
-              if (error.error) {
-                  const fieldErrors = error.error;
-                  if (fieldErrors['consigneeName']) {
-                      this.addErrors.consigneeNameError = fieldErrors['consigneeName'];
-                  }
-                  if (fieldErrors['guestPhone']) {
-                      this.addErrors.guestPhoneError = fieldErrors['guestPhone'];
-                  }
-                  if (fieldErrors['guestAddress']) {
-                      this.addErrors.guestAddressError = fieldErrors['guestAddress'];
-                  }
-              } else {
-                  this.addErrorMessage = 'An error occurred. Please try again later.';
-              }
+        // Ensure response contains correct properties in 'data'
+        if (response && response.data && response.data.consigneeName && response.data.guestPhone) {
+          // Update selectedAddress with the newly created address data
+          this.selectedAddress = `${response.data.consigneeName} - ${response.data.guestPhone}`;
+        } else {
+          console.error('Invalid response format after creating address:', response);
+        }
+  
+        // Reload addresses to update the list
+        this.loadAddresses();
+  
+        // Clear form and close modal
+        this.clearForm();
+        this.closeModal();
+      },
+      error => {
+        console.error('Error creating address:', error);
+        this.clearAddErrors();
+  
+        // Handle errors from response
+        if (error.error) {
+          const fieldErrors = error.error;
+          if (fieldErrors['consigneeName']) {
+            this.addErrors.consigneeNameError = fieldErrors['consigneeName'];
           }
-      );
+          if (fieldErrors['phone']) {
+            this.addErrors.guestPhoneError = fieldErrors['phone'];
+          }
+          if (fieldErrors['guestAddress']) {
+            this.addErrors.guestAddressError = fieldErrors['guestAddress'];
+          }
+        } else {
+          this.addErrorMessage = 'An error occurred. Please try again later.';
+        }
+      }
+    );
   }
-  createOrderOffline(tableId: number) {
+  updateOrderOffline( tableId: number) {
     const orderDetails = this.selectedItems.map(item => ({
       dishId: item.dishId,
       comboId: item.comboId,
@@ -346,7 +380,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
     }));
     const guestPhone = this.addNew.guestPhone || '';
     // Construct the order object
-    const newOrder = {
+    const updatedOrder = {
       tableId: tableId,
       guestAddress: this.addNew.guestAddress,
       consigneeName: this.addNew.consigneeName,
@@ -356,28 +390,25 @@ export class UpdateOfflineOrderComponent implements OnInit {
       guestPhone: guestPhone,
       note: "This is a special request note.",
       type: 4,
-      status : 3,
+      status: 3,
       orderDetails: orderDetails
     };
   
-    // Call the service method to create the order
-    this.orderService.createOrderOffline(newOrder).subscribe(
+    // Call the service method to update the order
+    this.orderService.updateOrderOffline(updatedOrder).subscribe(
       response => {
-        console.log('Offline order created successfully:', response);
-        this.successMessage = 'Offline order created successfully!';
+        console.log('Offline order updated successfully:', response);
+        this.successMessage = 'Offline order updated successfully!';
         setTimeout(() => this.successMessage = '', 5000);
       },
       error => {
-        console.error('Error creating offline order:', error);
+        console.error('Error updating offline order:', error);
         if (error.error && error.error.errors) {
           console.error('Validation errors:', error.error.errors);
         }
       }
     );
-  }
-  
-  
-  
+  }  
   loadAddresses() {
     this.orderService.ListAddress().subscribe(
       (response: Address[]) => {

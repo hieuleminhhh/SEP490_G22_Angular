@@ -29,7 +29,7 @@ export interface ListOrderDetailByOrder{
   orderId:number;
   orderDate:Date;
   status:number;
-  recivingOrder:boolean;
+  recevingOrder:Date;
   tableId:number;
   invoiceId:number;
   totalAmount:number;
@@ -38,7 +38,6 @@ export interface ListOrderDetailByOrder{
   guestAddress:string;
   consigneeName:string;
   orderDetails:ListOrderDetail[];
-
 }
 export interface AddOrderDetail{
   unitPrice: number;
