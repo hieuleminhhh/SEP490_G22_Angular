@@ -54,5 +54,9 @@ export class ManagerOrderService {
     const url = `${this.apiUrl}/orders/createOrderForTable/${orderData.tableId}`;
     return this.http.post<any>(url, orderData, httpOptions);
   }
+  updateOrderOffline(orderData: any): Observable<any> {
+    const url = `${this.apiUrl}/orders/updateOrderDetails/${orderData.tableId}`;
+    return this.http.put<any>(url, orderData, httpOptions);
+  }
 }
 
