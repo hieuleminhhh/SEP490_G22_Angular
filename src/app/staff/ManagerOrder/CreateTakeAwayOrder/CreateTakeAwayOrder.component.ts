@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -22,7 +22,7 @@ import { SidebarOrderComponent } from '../../SidebarOrder/SidebarOrder.component
 })
 export class CreateTakeAwayOrderComponent implements OnInit {
 
-  constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService : ManagerOrderService) { }
+  constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService : ManagerOrderService,  private cd: ChangeDetectorRef ) { }
   @ViewChild('formModal') formModal!: ElementRef;
   dishes: ListAllDishes[] = [];
   combo: ListAllCombo[] = [];
@@ -41,6 +41,9 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   searchTerm: string = '';
   selectedAddress = '';
   showDropdown: boolean = false;
+  paymentMethod: string = '0';
+  customerPaid: number | null = null;
+  paymentAmount: number = 0;
   addNew: AddNewOrder = {
     guestPhone: '',
     email: '',
@@ -54,8 +57,18 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     deposits: 0,
     note: '',
     type: 1,
-    orderDetails: []
+    orderDetails: [],
+    paymentTime: '',
+    paymentAmount: 0,
+    discountId: 0,
+    taxcode: '',
+    paymentStatus: 0,
+    amountReceived: 0,
+    returnAmount: 0,
+    paymentMethods: 0,
+    description: ''
   };
+  
   newAddress: AddNewAddress = {
     guestAddress: 'Ăn tại quán',
     consigneeName: '',
@@ -179,6 +192,13 @@ export class CreateTakeAwayOrderComponent implements OnInit {
 
 
 createOrder() {
+  // Ensure selectedItems is defined
+  if (!this.selectedItems || this.selectedItems.length === 0) {
+    console.error('No items selected for the order.');
+    return;
+  }
+
+  // Map selected items to order details
   const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
     itemId: item.id,
     quantity: item.quantity,
@@ -188,24 +208,46 @@ createOrder() {
     comboId: item.comboId
   }));
 
-  this.addNew.totalAmount = this.calculateTotalAmount();
-  this.addNew.orderDetails = orderDetails;
-  this.addNew.orderDate = this.getVietnamTime();
+  // Calculate total amount and set various properties
+  const totalAmount = this.calculateTotalAmount();
   const currentDate = new Date();
-  this.addNew.recevingOrder = currentDate.toISOString();
+  const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
+  const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; // Convert paymentMethod to number
 
-  console.log('Order Details:', orderDetails);
-  
+  this.addNew = {
+    ...this.addNew, // Spread existing properties if any
+    totalAmount,
+    orderDetails,
+    orderDate: this.getVietnamTime(),
+    recevingOrder: currentDate.toISOString(),
+    paymentTime: currentDate.toISOString(),
+    paymentAmount: totalAmount,
+    amountReceived: paymentMethodValue === 0 ? customerPaidAmount : totalAmount,
+    returnAmount: paymentMethodValue === 0 ? customerPaidAmount - totalAmount : 0,
+    paymentMethods: paymentMethodValue,
+    description: 'Order payment description',
+    discountId: 1,
+    taxcode: 'ABCD',
+    paymentStatus: 1,
+  };
 
+  // Handle address selection
   if (this.selectedAddress !== 'Khách lẻ') {
     const parts = this.selectedAddress.split(' - ');
-    this.addNew.consigneeName = parts[0];
-    this.addNew.guestPhone = parts[1];
+    if (parts.length >= 2) {
+      this.addNew.consigneeName = parts[0];
+      this.addNew.guestPhone = parts[1];
+    } else {
+      console.error('Selected address format is incorrect.');
+    }
     this.addNew.email = 'antaiquan@gmail.com';
     this.addNew.guestAddress = 'Ăn tại quán';
-    console.log('Guest Phone:', this.addNew.guestPhone);
   }
 
+  // Log order details for debugging
+  console.log('Order Details:', orderDetails);
+
+  // Call the service to add the new order
   this.orderService.AddNewOrder(this.addNew).subscribe(
     response => {
       console.log('Order created successfully:', response);
@@ -215,6 +257,9 @@ createOrder() {
     },
     error => {
       console.error('Error creating order:', error);
+      if (error && error.error && error.error.message) {
+        console.error('Inner exception:', error.error.message);
+      }
     }
   );
 }
@@ -315,11 +360,6 @@ saveAddress() {
     }
   );
 }
-
-
-
-
-
   loadAddresses() {
     this.orderService.ListAddress().subscribe(
       (response: Address[]) => {

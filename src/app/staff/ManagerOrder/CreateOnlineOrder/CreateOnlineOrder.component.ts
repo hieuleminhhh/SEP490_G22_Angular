@@ -54,7 +54,16 @@ export class CreateOnlineOrderComponent implements OnInit {
     deposits: 0,
     note: '',
     type: 2,
-    orderDetails: []
+    orderDetails: [],
+    paymentTime: '',
+    paymentAmount: 0,
+    discountId: 0,
+    taxcode: '',
+    paymentStatus: 0,
+    amountReceived: 0,
+    returnAmount: 0,
+    paymentMethods: 0,
+    description: ''
   };
   ngOnInit() {
     this.loadListDishes();
@@ -200,7 +209,6 @@ formatDateTime(date: string, time: string): string {
       response => {
         console.log('Order created successfully:', response);
         this.successMessage = 'Đơn hàng đã được tạo thành công!';
-        this.selectedItems = [];
         this.clearForm(); // Clear the form after successful order creation
         this.setDefaultReceivingTime(); // Reset the default receiving time
         setTimeout(() => this.successMessage = '', 5000);
@@ -297,7 +305,16 @@ setDefaultReceivingTime() {
       totalAmount: 0,   // Assuming totalAmount is of type number
       deposits: 0,     // Assuming deposits is of type array or any other type
       note: '',  
-      type: 0,       // Assuming note is of type string
+      type: 0, 
+      paymentTime: '',
+    paymentAmount: 0,
+    discountId: 0,
+    taxcode: '',
+    paymentStatus: 0,
+    amountReceived: 0,
+    returnAmount: 0,
+    paymentMethods: 0,
+    description: ''      // Assuming note is of type string
       // Add more properties as required by the AddNewOrder type/interface
     };
   }

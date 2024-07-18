@@ -112,8 +112,11 @@
                   <strong>Tổng cộng đơn:</strong> {{ calculateTotalAmount() | currency:'USD':'symbol-narrow':'1.2-2' }}
                 </div>
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
-                  <button class="btn btn-primary btn-lg" (click)="createOrder()">
-                    Lưu lại
+                  <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                    Thanh toán
+                  </button>
+                  <button class="btn btn-danger btn-lg" >
+                    Hủy
                   </button>
                 </div>
               </div>
@@ -208,6 +211,31 @@
                 </div>
               </div>
               
+
+              <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="paymentModalLabel">Thông tin thanh toán</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <!-- Thông tin hóa đơn -->
+                      <div class="mb-3">
+                        <label for="invoiceDetails" class="form-label">Chi tiết hóa đơn:</label>
+                        <textarea class="form-control" id="invoiceDetails" rows="4">Thông tin chi tiết của hóa đơn...</textarea>
+                      </div>
+                      <!-- Nút in hóa đơn -->
+                      <button type="button" class="btn btn-secondary">In hóa đơn</button>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                      <button type="button" class="btn btn-primary">Xác nhận thanh toán</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>

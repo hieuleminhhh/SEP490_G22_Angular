@@ -35,7 +35,7 @@ export class ManagerOrderService {
     return this.http.patch<any>(url, { status });
   }
   AddNewOrder(newOrder: AddNewOrder): Observable<AddNewOrder> {
-    const url = `${this.apiUrl}/Cart/AddNewOrder`;
+    const url = `${this.apiUrl}/Cart/AddNewOrderTakeAway`;
     return this.http.post<AddNewOrder>(url, newOrder, httpOptions);
   }
   ListAddress(): Observable<Address[]> {
