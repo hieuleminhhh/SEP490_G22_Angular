@@ -46,6 +46,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
   timeOptions: string[] = [];
   searchTerm: string = '';
   selectedAddress: Address | any = {};
+  paymentMethod: string = 'cash';
   newAddress: AddNewAddress = {
     guestAddress: 'Ăn tại quán',
     consigneeName: '',
