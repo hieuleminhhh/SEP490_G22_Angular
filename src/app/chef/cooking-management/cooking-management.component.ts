@@ -38,6 +38,7 @@ export class CookingManagementComponent implements OnInit {
       },
       error => {
         console.error('Error:', error);
+        this.order = [];
       }
     );
   }

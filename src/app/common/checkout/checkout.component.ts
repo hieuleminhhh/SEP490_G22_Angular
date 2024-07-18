@@ -154,7 +154,7 @@ export class CheckoutComponent implements OnInit {
       guestAddress: this.address,
       consigneeName: this.consigneeName,
       orderDate: new Date().toISOString(),
-      status: 0,
+      status: 1,
       recevingOrder: receivingTime,
       totalAmount: 0,
       deposits: 0,
