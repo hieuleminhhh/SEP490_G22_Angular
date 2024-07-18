@@ -66,7 +66,9 @@ export class PaymentReservationComponent implements OnInit {
     }, 0).toFixed(2));
   }
   submitForm() {
-    const currentDateTime = new Date().toISOString();
+    const localDateTime = new Date();
+    const offset = localDateTime.getTimezoneOffset() * 60000; // offset in milliseconds
+    const localISOTime = new Date(localDateTime.getTime() - offset).toISOString().slice(0, -1);
     const request = {
       guestPhone: this.data.guestPhone,
       email: '',
@@ -75,8 +77,8 @@ export class PaymentReservationComponent implements OnInit {
       reservationTime: this.data.reservationTime,
       guestNumber: this.data.guestNumber,
       note: this.data.note,
-      orderDate: currentDateTime,
-      status: 0,
+      orderDate: localISOTime,
+      status: 1,
       recevingOrder: this.data.reservationTime,
       totalAmount: this.getTotalCartPrice(),
       deposits: this.getTotalCartPrice() / 2,
@@ -88,8 +90,7 @@ export class PaymentReservationComponent implements OnInit {
         comboId: item.comboId
       }))
     };
-    console.log(currentDateTime);
-    console.log(request);
+    console.log("Request Object:", request);
     this.reservationService.createResevetion(request).subscribe({
       next: response => {
         console.log('Order submitted successfully', response);

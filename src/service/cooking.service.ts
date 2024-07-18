@@ -9,7 +9,7 @@ export class CookingService {
   constructor(private http: HttpClient) { }
 
   getOrders(type:string): Observable<any> {
-    const url = `https://localhost:7188/api/OrderDetailsForChef/Type ${type}`;
+    const url = `https://localhost:7188/api/OrderDetailsForChef/${type}`;
     return this.http.get(url);
   }
 
