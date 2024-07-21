@@ -172,38 +172,26 @@ export class CheckoutComponent implements OnInit {
       }))
     };
     console.log(request);
-    this.checkoutService.getVnPay(request).subscribe(response => {
-      if (response.url) {
-        window.location.href = response.url; // Redirect đến URL trả về
-      } else {
-        console.error('Unexpected response format', response);
+
+    this.checkoutService.submitOrder(request).subscribe({
+      next: response => {
+        console.log('Order submitted successfully', response);
+        this.cartService.clearCart();
+        sessionStorage.removeItem('cartItems');
+        this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone, paymentmethod:this.selectedPaymentMethod } });
+      },
+      error: error => {
+        if (error.error instanceof ErrorEvent) {
+          // Lỗi client-side hoặc mạng
+          console.error('An error occurred:', error.error.message);
+        } else {
+          // Lỗi server-side
+          console.error(`Backend returned code ${error.status}, ` +
+            `body was: ${JSON.stringify(error.error)}`);
+        }
       }
-    }, error => {
-      console.error('Error during payment initiation', error);
     });
 
-    // this.checkoutService.submitOrder(request).subscribe({
-    //   next: response => {
-    //     console.log('Order submitted successfully', response);
-    //     this.cartService.clearCart();
-    //     sessionStorage.removeItem('cartItems');
-    //      else {
-    //     // Chuyển hướng đến trang thanh toán thông thường
-    //     this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone } });
-    //   }
-    // },
-    //   error: error => {
-    //     if (error.error instanceof ErrorEvent) {
-    //       // Lỗi client-side hoặc mạng
-    //       console.error('An error occurred:', error.error.message);
-    //     } else {
-    //       // Lỗi server-side
-    //       console.error(`Backend returned code ${error.status}, ` +
-    //         `body was: ${JSON.stringify(error.error)}`);
-    //     }
-    //   }
-    // });
-}
-
+  }
 
 }

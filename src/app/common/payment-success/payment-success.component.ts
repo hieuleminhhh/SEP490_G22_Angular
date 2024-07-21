@@ -1,50 +1,64 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CheckoutService } from '../../../service/checkout.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-payment-success',
+  standalone: true,
   templateUrl: './payment-success.component.html',
-  styleUrls: ['./payment-success.component.css']
+  styleUrls: ['./payment-success.component.css'],
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule]
 })
 export class PaymentSuccessComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
     private checkoutService: CheckoutService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private http: HttpClient
+  ) { }
+
+
+  success: boolean = true;
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      // Lấy tham số từ URL
-      const vnp_TxnRef = params['vnp_TxnRef'];
-      const vnp_SecureHash = params['vnp_SecureHash'];
-      const vnp_ResponseCode = params['vnp_ResponseCode'];
+      const responseCode = params['vnp_ResponseCode'];
+      const orderInfo = params['vnp_OrderInfo'];
+      console.log(params);
 
-      if (vnp_TxnRef && vnp_SecureHash && vnp_ResponseCode) {
-        // Gọi API backend để kiểm tra kết quả thanh toán
-        this.checkoutService.verifyPayment().subscribe(response => {
-          if (response.success) {
-            // Xử lý đơn hàng thành công
-            console.log('Payment successful');
-            // Redirect hoặc thông báo cho người dùng
-            this.router.navigate(['/order-success']); // Redirect đến trang đơn hàng thành công
-          } else {
-            // Xử lý trường hợp thanh toán không thành công
-            console.error('Payment verification failed', response.message);
-            this.router.navigate(['/order-failed']); // Redirect đến trang đơn hàng thất bại
-          }
-        }, error => {
-          console.error('Error verifying payment', error);
-          this.router.navigate(['/order-failed']); // Redirect đến trang đơn hàng thất bại
-        });
+      if (responseCode === '00') {
+        // Thanh toán thành công
+        this.success = true;
+        console.log('Thanh toán thành công:', params);
       } else {
-        console.error('Missing payment parameters');
-        this.router.navigate(['/order-failed']); // Redirect đến trang đơn hàng thất bại
+        // Thanh toán thất bại
+        this.success = false;
+        const orderId = this.extractOrderId(orderInfo);
+        this.cancelOrder(orderId);
+        console.log('Thanh toán thất bại:', params);
       }
     });
   }
 
+  extractOrderId(orderInfo: string): number | null {
+    const match = orderInfo.match(/\d+$/); // Tìm số ở cuối chuỗi
+    return match ? Number(match[0]) : null; // Chuyển đổi chuỗi thành số
+  }
+
+  cancelOrder(orderId: number|null) {
+    const url = `https://localhost:7188/api/orders/${orderId}/cancel`;
+    this.http.put(url, {}).subscribe(
+      response => {
+        console.log('Order cancelled:', response);
+      },
+      error => {
+        console.error('Error during order cancellation:', error);
+      }
+    );
+  }
 
 }

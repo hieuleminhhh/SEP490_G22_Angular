@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -17,11 +17,10 @@ export class CheckoutService {
 
   getVnPay(order: any): Observable<any> {
     const url = `https://localhost:7188/api/VnPay`;
-    return this.http.post<any>(url, order);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    return this.http.post<any>(url, JSON.stringify(order), { headers });
   }
 
-  verifyPayment(): Observable<any> {
-    const url = `https://localhost:7188/api/VnPay/VerifyPayment`;
-    return this.http.post<any>(url, {});
-  }
 }
