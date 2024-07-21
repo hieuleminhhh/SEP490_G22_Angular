@@ -14,4 +14,14 @@ export class CheckoutService {
   submitOrder(order: any): Observable<any> {
     return this.http.post(this.apiUrl, order);
   }
+
+  getVnPay(order: any): Observable<any> {
+    const url = `https://localhost:7188/api/VnPay`;
+    return this.http.post<any>(url, order);
+  }
+
+  verifyPayment(): Observable<any> {
+    const url = `https://localhost:7188/api/VnPay/VerifyPayment`;
+    return this.http.post<any>(url, {});
+  }
 }
