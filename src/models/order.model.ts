@@ -48,6 +48,15 @@ export interface AddNewOrder {
   note: string;
   type: number;
   orderDetails: AddOrderDetail[];
+  paymentTime: string | null;
+  paymentAmount: number;
+  discountId: number;
+  taxcode: string;
+  paymentStatus: number;
+  amountReceived: number;
+  returnAmount: number;
+  paymentMethods: number;
+  description: string;
 }
 export interface ListTables {
   tableId: number;
