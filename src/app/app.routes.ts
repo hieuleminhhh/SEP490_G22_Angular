@@ -22,6 +22,7 @@ import { CookingManagementComponent } from './chef/cooking-management/cooking-ma
 import { ViewTableOrderComponent } from './staff/ManagerOrder/ViewTableOrder/ViewTableOrder.component';
 import { CreateOfflineOrderComponent } from './staff/ManagerOrder/CreateOfflineOrder/CreateOfflineOrder.component';
 import { UpdateOfflineOrderComponent } from './staff/ManagerOrder/UpdateOfflineOrder/UpdateOfflineOrder.component';
+import { PaymentSuccessComponent } from './common/payment-success/payment-success.component';
 
 
 export const routes: Routes = [
@@ -47,5 +48,6 @@ export const routes: Routes = [
     {'path': 'cooking', component:CookingManagementComponent},
     {'path': 'listTable', component:ViewTableOrderComponent},
     {'path': 'createOffline', component:CreateOfflineOrderComponent},
-    {'path': 'updateOffline' , component:UpdateOfflineOrderComponent}
+    {'path': 'updateOffline' , component:UpdateOfflineOrderComponent},
+    {'path': 'paymentSuccess' , component:PaymentSuccessComponent}
 ];

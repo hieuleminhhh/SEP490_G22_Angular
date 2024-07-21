@@ -12,7 +12,7 @@ import { CartService } from '../../../service/cart.service';
   standalone: true,
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css'],
-  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule,MatDialogModule]
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, MatDialogModule]
 })
 export class CheckoutComponent implements OnInit {
   selectedService: string = 'service1';
@@ -29,21 +29,21 @@ export class CheckoutComponent implements OnInit {
   email: string = '';
   address: string = '';
   note: string = '';
-  people:number | undefined;
+  people: number | undefined;
   selectedPaymentMethod: string = 'delivery';
 
   minDate: string; // Ngày nhận tối thiểu là ngày hiện tại
   maxDate: string; // Ngày nhận tối đa là ngày hiện tại + 7 ngày
   availableHours: string[] = [];
 
-  constructor(private cartService: CartService,private router: Router,private route: ActivatedRoute,private checkoutService: CheckoutService) {
+  constructor(private cartService: CartService, private router: Router, private route: ActivatedRoute, private checkoutService: CheckoutService) {
     const today = new Date();
     this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
     const maxDate = new Date();
     maxDate.setDate(today.getDate() + 7);
     this.maxDate = this.formatDate(maxDate); // Ngày nhận tối đa là ngày hiện tại + 7 ngày
     this.generateAvailableHours();
-   }
+  }
 
   ngOnInit() {
     // Lấy dữ liệu từ sessionStorage khi component được khởi tạo
@@ -96,7 +96,7 @@ export class CheckoutComponent implements OnInit {
     } else {
       // Xử lý khi người dùng nhập ngày và giờ
       if (this.date && this.time) {
-        this.orderTime = 'Ngày:'+this.date +'  Giờ:'+ this.time;
+        this.orderTime = 'Ngày:' + this.date + '  Giờ:' + this.time;
       } else {
         console.error('Ngày hoặc giờ chưa được nhập.');
         // Có thể thực hiện các xử lý khác tại đây, ví dụ hiển thị thông báo lỗi
@@ -135,12 +135,16 @@ export class CheckoutComponent implements OnInit {
       return total + (price * item.quantity);
     }, 0).toFixed(2));
   }
+  onPaymentMethodChange(event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    this.selectedPaymentMethod = inputElement.value;
+  }
 
   submitForm(): void {
-    let receivingTime:string='';
+    let receivingTime: string = '';
     if (this.date && this.time) {
       receivingTime = this.formatDateTime(this.date, this.time);
-    }else{
+    } else {
       const currentTime = new Date();
       currentTime.setHours(currentTime.getHours() + 1);
       const currentDate = currentTime.toISOString().split('T')[0];
@@ -156,10 +160,10 @@ export class CheckoutComponent implements OnInit {
       orderDate: new Date().toISOString(),
       status: 1,
       recevingOrder: receivingTime,
-      totalAmount: 0,
+      totalAmount: this.getTotalCartPrice(),
       deposits: 0,
       note: this.note,
-      type:2,
+      type: 2,
       orderDetails: this.cartItems.map(item => ({
         unitPrice: this.getTotalPrice(item),
         quantity: item.quantity,
@@ -168,31 +172,38 @@ export class CheckoutComponent implements OnInit {
       }))
     };
     console.log(request);
-    this.checkoutService.submitOrder(request).subscribe({
-      next: response => {
-        console.log('Order submitted successfully', response);
-        this.cartService.clearCart();
-        sessionStorage.removeItem('cartItems');
-        if (this.selectedPaymentMethod === 'banking') {
-          // Chuyển hướng đến trang quét mã nếu chọn "Paying through bank"
-          this.router.navigate(['/payment-scan'], { queryParams: { guestPhone: this.guestPhone } });
-        } else {
-          // Chuyển hướng đến trang thanh toán thông thường
-          this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone } });
-        }
-      },
-      error: error => {
-        if (error.error instanceof ErrorEvent) {
-            // Lỗi client-side hoặc mạng
-            console.error('An error occurred:', error.error.message);
-        } else {
-            // Lỗi server-side
-            console.error(`Backend returned code ${error.status}, ` +
-                          `body was: ${JSON.stringify(error.error)}`);
-        }
-    }
+    this.checkoutService.getVnPay(request).subscribe(response => {
+      if (response.url) {
+        window.location.href = response.url; // Redirect đến URL trả về
+      } else {
+        console.error('Unexpected response format', response);
+      }
+    }, error => {
+      console.error('Error during payment initiation', error);
     });
-  }
+
+    // this.checkoutService.submitOrder(request).subscribe({
+    //   next: response => {
+    //     console.log('Order submitted successfully', response);
+    //     this.cartService.clearCart();
+    //     sessionStorage.removeItem('cartItems');
+    //      else {
+    //     // Chuyển hướng đến trang thanh toán thông thường
+    //     this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone } });
+    //   }
+    // },
+    //   error: error => {
+    //     if (error.error instanceof ErrorEvent) {
+    //       // Lỗi client-side hoặc mạng
+    //       console.error('An error occurred:', error.error.message);
+    //     } else {
+    //       // Lỗi server-side
+    //       console.error(`Backend returned code ${error.status}, ` +
+    //         `body was: ${JSON.stringify(error.error)}`);
+    //     }
+    //   }
+    // });
+}
 
 
 }
