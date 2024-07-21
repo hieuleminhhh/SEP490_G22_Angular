@@ -1,7 +1,13 @@
-<div class="success-page">
+<div class="success-page" *ngIf="success === true">
   <img src="http://share.ashiknesin.com/green-checkmark.png" class="center" alt="" />
-  <h2>Payment Successful !</h2>
-  <p>We are delighted to inform you that we received your payments</p>
-  <a href="#" class="btn-view-orders">View Orders</a>
-  <a href="#">Continue Shopping</a>
+  <h2>Thanh toán thành công !</h2>
+  <p>Chúng tôi đã ghi nhận thanh toán của bạn và sẽ liên lạc lại trong ít phút</p>
+  <a href="#" class="btn-view-orders">Xem đơn hàng</a>
+  <a href="#">Quay lại trang chủ</a>
+</div>
+
+<div class="success-page" *ngIf="success === false">
+  <img src="http://share.ashiknesin.com/green-checkmark.png" class="center" alt="" />
+  <h2>Thanh toán thất bại !</h2>
+  <a href="#">Quay lại trang chủ</a>
 </div>
