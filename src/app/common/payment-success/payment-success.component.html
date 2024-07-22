@@ -1,0 +1,21 @@
+<div class="success-page" *ngIf="success === true">
+  <div class="content-wrapper">
+    <i class="fas fa-check-circle success-icon"></i>
+    <h2>Thanh toán thành công!</h2>
+    <p>Chúng tôi đã ghi nhận thanh toán của bạn và sẽ liên lạc lại trong ít phút.</p>
+    <div class="btn-container">
+      <a class="btn-view-orders" (click)="viewOrder()">Xem đơn hàng</a>
+      <a class="btn-home" href="#">Quay lại trang chủ</a>
+    </div>
+  </div>
+</div>
+
+<div class="success-page" *ngIf="success === false">
+  <div class="content-wrapper">
+    <i class="fas fa-times-circle failure-icon"></i>
+    <h2>Thanh toán thất bại!</h2>
+    <div class="btn-container">
+      <a class="btn-home" href="#">Quay lại trang chủ</a>
+    </div>
+  </div>
+</div>

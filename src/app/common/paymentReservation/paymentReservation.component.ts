@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ReservationService } from '../../../service/reservation.service';
 import { Router } from '@angular/router';
+import { CheckoutService } from '../../../service/checkout.service';
 
 @Component({
   selector: 'app-paymentReservation',
@@ -17,7 +18,7 @@ export class PaymentReservationComponent implements OnInit {
   cartItem: any;
   ispayment: boolean = false;
 
-  constructor(private reservationService: ReservationService, private router: Router) {
+  constructor(private reservationService: ReservationService, private router: Router, private checkoutService: CheckoutService) {
 
   }
 
@@ -66,7 +67,9 @@ export class PaymentReservationComponent implements OnInit {
     }, 0).toFixed(2));
   }
   submitForm() {
-    const currentDateTime = new Date().toISOString();
+    const localDateTime = new Date();
+    const offset = localDateTime.getTimezoneOffset() * 60000; // offset in milliseconds
+    const localISOTime = new Date(localDateTime.getTime() - offset).toISOString().slice(0, -1);
     const request = {
       guestPhone: this.data.guestPhone,
       email: '',
@@ -75,8 +78,8 @@ export class PaymentReservationComponent implements OnInit {
       reservationTime: this.data.reservationTime,
       guestNumber: this.data.guestNumber,
       note: this.data.note,
-      orderDate: currentDateTime,
-      status: 0,
+      orderDate: localISOTime,
+      status: 1,
       recevingOrder: this.data.reservationTime,
       totalAmount: this.getTotalCartPrice(),
       deposits: this.getTotalCartPrice() / 2,
@@ -88,15 +91,15 @@ export class PaymentReservationComponent implements OnInit {
         comboId: item.comboId
       }))
     };
-    console.log(currentDateTime);
-    console.log(request);
+    console.log("Request Object:", request);
     this.reservationService.createResevetion(request).subscribe({
       next: response => {
         console.log('Order submitted successfully', response);
         this.reservationService.clearCart();
         sessionStorage.setItem('data', JSON.stringify(this.data));
         sessionStorage.setItem('cartItem', JSON.stringify(this.cartItem));
-        window.location.reload();
+        // window.location.reload();
+        this.checkVnPay(request);
       },
       error: error => {
         if (error.error instanceof ErrorEvent) {
@@ -108,4 +111,19 @@ export class PaymentReservationComponent implements OnInit {
       }
     });
   }
+
+  checkVnPay(data: any) {
+    console.log('Data being sent:', data);
+    this.checkoutService.getVnPays(data).subscribe(response => {
+      if (response.url) {
+        window.location.href = response.url; // Redirect đến URL trả về
+      } else {
+        console.error('Unexpected response format', response);
+      }
+    }, error => {
+      console.error('Error during payment initiation', error);
+      console.error('Error details:', error.error); // Kiểm tra chi tiết lỗi từ server
+    });
+  }
+
 }

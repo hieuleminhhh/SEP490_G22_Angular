@@ -9,7 +9,7 @@
                 (click)="getOrders('1-4')">Đơn hiện tại</a>
             </li>
             <li><a [class.active]="currentView === 'booking-order'" (click)="setView('booking-order')"
-                (click)="getOrders('2-3')">Đơn đặt hàng</a>
+                (click)="getOrder('2-3')">Đơn đặt hàng</a>
             </li>
           </ul>
         </li>
@@ -24,15 +24,18 @@
       <div class="col-md-3" *ngIf="currentView === 'booking-order'">
         <div class="input-group">
           <label class="input-group-text" for="dateFrom">Từ ngày</label>
-          <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom">
+          <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom" (change)="onDateFromChange()">
         </div>
       </div>
       <div class="col-md-3" *ngIf="currentView === 'booking-order'">
         <div class="input-group">
           <label class="input-group-text" for="dateTo">Đến ngày</label>
-          <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo">
+          <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo" [min]="dateFrom"
+            (change)="onDateToChange()">
         </div>
       </div>
+
+
     </header>
     <hr>
 
@@ -43,23 +46,30 @@
             <table>
               <thead>
                 <tr>
-                  <th>Mã đơn</th>
-                  <th>Loại đơn</th>
-                  <th>Thời gian</th>
-                  <th>Trạng thái</th>
-                  <th></th>
+                  <th>Tên món</th>
+                  <th>Số lượng</th>
+                  <th>Thời gian gọi món</th>
+                  <th>Ghi chú</th>
+                  <th>Số lượng phục vụ</th>
                 </tr>
               </thead>
               <tbody>
                 <ng-container *ngFor="let order of order">
                   <tr>
-                    <td>{{order.orderId}}</td>
-                    <td>{{getTypeString(order.type)}}</td>
-                    <td>{{order.orderDate | date:'dd/MM/yyyy - HH:mm' }}</td>
-                    <td>{{order.status}}</td>
+                    <td>{{order.itemName}}</td>
+                    <td>{{order.quantity}}</td>
+                    <td>{{order.orderTime | date:'dd/MM/yyyy - HH:mm' }}</td>
+                    <td>{{order.note ? null: 'trống'}}</td>
                     <td>
-                      <button type="button" class="btn btn-primary btn-sm" (click)="getOrderDetails(order.orderId)">Chi
-                        tiết</button>
+                      <input type="number" [(ngModel)]="order.dishesServed" [ngModelOptions]="{standalone: true}"
+                        [attr.min]="order.dishesServed" [attr.max]="order.quantity"
+                        class="form-control form-control-sm" />
+                      <button type="button" class="btn btn-primary btn-sm" (click)="completeOrder(order)">
+                        Hoàn thành
+                      </button>
+                    </td>
+                    <td>
+
                     </td>
                   </tr>
                 </ng-container>
@@ -93,34 +103,33 @@
             <table>
               <thead>
                 <tr>
-                  <th>Mã đơn</th>
-                  <th>Loại đơn</th>
-                  <th>Thời gian</th>
-                  <th>Trạng thái</th>
+                  <th>Tên món</th>
+                  <th>Số lượng</th>
+                  <th>Thời gian giao hàng</th>
+                  <th>Ghi chú</th>
+                  <th>Số lượng phục vụ</th>
                   <th></th>
-
                 </tr>
               </thead>
               <tbody>
-                <ng-container *ngFor="let order of order">
+                <ng-container *ngFor="let order of filteredOrders">
                   <tr>
-                    <td>{{order.orderId}}</td>
-                    <td>{{getTypeString(order.type)}}</td>
+                    <td>{{order.itemName}}</td>
+                    <td>{{order.quantity}}</td>
                     <td>{{order.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</td>
-                    <td>{{order.status}}</td>
+                    <td>{{order.note ? null: 'trống'}}</td>
+                    <td>{{order.dishesServed ? null:0}}</td>
                     <td>
-                      <button type="button" class="btn btn-primary btn-sm" (click)="getOrderDetails(order.orderId)">Chi
+                      <button type="button" class="btn btn-primary btn-sm">Chi
                         tiết</button>
                     </td>
                   </tr>
                 </ng-container>
               </tbody>
-
-
             </table>
           </div>
           <br>
-          <div *ngIf="!order || order.length === 0" style="text-align: center;">
+          <div *ngIf="!filteredOrders || filteredOrders.length === 0" style="text-align: center;">
             <p>Không có dữ liệu </p>
           </div>
           <!-- <div class="pagination" *ngIf="totalPages>0">
@@ -133,50 +142,6 @@
 
             <button (click)="onNextPage()" [disabled]="currentPage === totalPages">Next</button>
           </div> -->
-        </div>
-      </div>
-    </section>
-
-    <section *ngIf="currentView === 'order_details'">
-      <div class="container">
-        <div class="card">
-          <div>
-            <table>
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>Tên món</th>
-                  <th>Số lượng</th>
-                  <th>Số món đã phục vụ</th>
-                  <th></th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <ng-container>
-                  <tr *ngFor="let dish of selectedOrderDetails">
-                    <td>{{ dish.image }}</td>
-                    <td>{{ dish.itemName || dish.comboName }}</td>
-                    <td>{{ dish.quantity }}</td>
-                    <td>{{ dish.dishesServed ?? 0 }}</td>
-                    <td>
-                      <button type="button" class="btn btn-primary btn-sm">+1</button>
-                    </td>
-                    <!-- <td>
-                      <button type="button" class="btn btn-primary btn-sm">Xong {{ dish.quantity }}</button>
-                    </td> -->
-                  </tr>
-                </ng-container>
-
-              </tbody>
-
-
-            </table>
-          </div>
-          <br>
-          <div *ngIf="!order || order.length === 0" style="text-align: center;">
-            <p>Không có dữ liệu </p>
-          </div>
         </div>
       </div>
     </section>

@@ -159,17 +159,18 @@
               <label for="payment-method">Phương thức thanh toán:</label>
               <div>
                 <label class="radio-label">
-                  <input type="radio" name="paymentMethod" value="delivery" checked>
+                  <input type="radio" name="paymentMethod" value="delivery" [(ngModel)]="selectedPaymentMethod" (change)="onPaymentMethodChange($event)" checked>
                   <span class="radio-text">Thanh toán khi giao hàng</span>
                 </label>
               </div>
               <div>
                 <label class="radio-label">
-                  <input type="radio" name="paymentMethod" value="banking">
+                  <input type="radio" name="paymentMethod" value="banking" [(ngModel)]="selectedPaymentMethod" (change)="onPaymentMethodChange($event)">
                   <span class="radio-text">Chuyển khoản qua ngân hàng</span>
                 </label>
               </div>
             </div>
+
           </div>
         </div>
         <div class="row">
