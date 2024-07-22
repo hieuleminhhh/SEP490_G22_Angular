@@ -1,35 +1,64 @@
-.success-page{
-  max-width:300px;
-  display:block;
-  margin: 0 auto;
-  text-align: center;
-      position: relative;
-    top: 50%;
-    transform: perspective(1px) translateY(50%)
-}
-.success-page img{
-  max-width:62px;
-  display: block;
-  margin: 0 auto;
+.success-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 56vh; /* Adjust to ensure proper spacing from header and footer */
+  padding: 20px;
+  background-color: #f9f9f9;
 }
 
-.btn-view-orders{
-  display: block;
-  border:1px solid #47c7c5;
-  width:100px;
-  margin: 0 auto;
-  margin-top: 45px;
-  padding: 10px;
-  color:#fff;
-  background-color:#47c7c5;
-  text-decoration: none;
+.content-wrapper {
+  text-align: center;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.success-icon, .failure-icon {
+  font-size: 100px;
   margin-bottom: 20px;
 }
-h2{
-  color:#47c7c5;
-    margin-top: 25px;
 
+.success-icon {
+  color: #4caf50; /* Green color for success */
 }
-a{
+
+.failure-icon {
+  color: #ff5252; /* Red color for failure */
+}
+
+h2 {
+  color: #4caf50; /* Green color for success */
+  margin-bottom: 15px;
+}
+
+.success-page h2.failure {
+  color: #ff5252; /* Red color for failure */
+}
+
+p {
+  margin-bottom: 20px;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn-view-orders, .btn-home {
+  padding: 10px 20px;
+  color: white;
   text-decoration: none;
+  border-radius: 5px;
+  background-color: #4caf50; /* Green color for buttons */
+}
+
+.btn-home {
+  background-color: #ff5252; /* Red color for home button */
+}
+
+.btn-view-orders:hover, .btn-home:hover {
+  opacity: 0.8;
 }

@@ -6,6 +6,7 @@ import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/r
 import { FormsModule } from '@angular/forms';
 import { CheckoutService } from '../../../service/checkout.service';
 import { CartService } from '../../../service/cart.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-checkout',
@@ -36,7 +37,7 @@ export class CheckoutComponent implements OnInit {
   maxDate: string; // Ngày nhận tối đa là ngày hiện tại + 7 ngày
   availableHours: string[] = [];
 
-  constructor(private cartService: CartService, private router: Router, private route: ActivatedRoute, private checkoutService: CheckoutService) {
+  constructor(private cartService: CartService, private http: HttpClient, private router: Router, private route: ActivatedRoute, private checkoutService: CheckoutService) {
     const today = new Date();
     this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
     const maxDate = new Date();
@@ -178,7 +179,12 @@ export class CheckoutComponent implements OnInit {
         console.log('Order submitted successfully', response);
         this.cartService.clearCart();
         sessionStorage.removeItem('cartItems');
-        this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone, paymentmethod:this.selectedPaymentMethod } });
+        if (this.selectedPaymentMethod === 'banking') {
+          this.checkVnPay(this.guestPhone);
+        }else{
+          this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone} });
+        }
+
       },
       error: error => {
         if (error.error instanceof ErrorEvent) {
@@ -191,7 +197,24 @@ export class CheckoutComponent implements OnInit {
         }
       }
     });
+  }
 
+  checkVnPay(guestPhone:string) {
+    sessionStorage.setItem('guestPhone', guestPhone);
+    const url = `https://localhost:7188/api/Cart/checkoutsuccess/${guestPhone}`;
+    this.http.get(url).subscribe(
+      response => {
+        this.checkoutService.getVnPay(response).subscribe(response => {
+          if (response.url) {
+            window.location.href = response.url; // Redirect đến URL trả về
+          } else {
+            console.error('Unexpected response format', response);
+          }
+        }, error => {
+          console.error('Error during payment initiation', error);
+        });
+      }
+    )
   }
 
 }
