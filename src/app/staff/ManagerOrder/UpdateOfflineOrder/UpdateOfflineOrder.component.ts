@@ -14,6 +14,7 @@ import { ManagerComboService } from '../../../../service/managercombo.service';
 import { ManagerOrderDetailService } from '../../../../service/managerorderDetail.service';
 import { AddOrderDetail, ListOrderDetailByOrder } from '../../../../models/orderDetail.model';
 import { OrderItem, SelectedItem } from '../../../../models/order.model';
+import { InvoiceService } from '../../../../service/invoice.service';
 @Component({
   selector: 'app-UpdateOfflineOrder',
   templateUrl: './UpdateOfflineOrder.component.html',
@@ -22,7 +23,7 @@ import { OrderItem, SelectedItem } from '../../../../models/order.model';
   imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
 })
 export class UpdateOfflineOrderComponent implements OnInit {
-
+  orderId: number = 0;
   tableId: number = 0;
   orders: any[] = []; 
   errorMessage: string = '';
@@ -46,16 +47,19 @@ export class UpdateOfflineOrderComponent implements OnInit {
   timeOptions: string[] = [];
   searchTerm: string = '';
   selectedAddress: Address | any = {};
-  paymentMethod: string = 'cash';
+  paymentMethod: string = '0';
+  selectedOrder: any; 
   newAddress: AddNewAddress = {
     guestAddress: 'Ăn tại quán',
     consigneeName: '',
     guestPhone: '',
     email:'antaiquan@gmail.com',
   };
+  customerPaid: number | null = null;
   addressId: number | null = null;
   addNew: any = {};
-  constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService, private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService ) { }
+  constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService,
+     private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService ) { }
   @ViewChild('formModal') formModal!: ElementRef;
   ngOnInit() {
     this.loadListDishes();
@@ -73,18 +77,15 @@ export class UpdateOfflineOrderComponent implements OnInit {
     this.orderService.getOrdersByTableId(tableId).subscribe(
       (response: any) => {
         if (response && response.data && response.data.orderDetails && response.data.orderDetails.length > 0) {
-          this.selectedItems = response.data.orderDetails.map((orderItem: OrderItem) => {
+          this.selectedItems = response.data.orderDetails.map((orderItem: any) => {
             if (orderItem) {
-              let itemName = orderItem.dish?.itemName ?? ''; // Default to empty string if itemName is null
-              let nameCombo = orderItem.combo?.nameCombo ?? ''; // Default to empty string if nameCombo is null
-  
-              // Determine which name to display based on availability
+              let itemName = orderItem.dish?.itemName ?? '';
+              let nameCombo = orderItem.combo?.nameCombo ?? '';
               let displayName = itemName || nameCombo;
-  
-              const totalPrice = orderItem.dish?.discountedPrice 
-                ? orderItem.dish.discountedPrice * orderItem.quantity 
+              const totalPrice = orderItem.dish?.discountedPrice
+                ? orderItem.dish.discountedPrice * orderItem.quantity
                 : orderItem.dish?.price * orderItem.quantity;
-  
+
               return {
                 orderDetailId: orderItem.orderDetailId,
                 dishId: orderItem.dishId,
@@ -100,25 +101,41 @@ export class UpdateOfflineOrderComponent implements OnInit {
               } as SelectedItem;
             } else {
               console.warn('Invalid order item:', orderItem);
-              return null; // Return null for invalid items
+              return null;
             }
-          }).filter((item: SelectedItem | null): item is SelectedItem => item !== null); 
-          
+          }).filter((item: SelectedItem | null): item is SelectedItem => item !== null);
+
+          // Cập nhật thông tin khách hàng
+          this.selectedOrder = {
+            guestName: response.data.consigneeName,
+            guestPhone: response.data.guestPhone,
+            guestAddress: response.data.guestAddress
+          };
+          this.orderId = response.data.orderId;
+
           console.log('Fetched order details:', this.selectedItems);
         } else {
           console.error('Invalid response:', response);
           this.selectedItems = [];
+          this.selectedOrder = {
+            guestName: 'N/A',
+            guestPhone: 'N/A',
+            guestAddress: 'N/A'
+          };
         }
       },
       (error: HttpErrorResponse) => {
         console.error('Error fetching orders:', error);
         this.errorMessage = error.error.message || 'Bàn này không có đơn hàng nào...';
         this.selectedItems = [];
+        this.selectedOrder = {
+          guestName: 'N/A',
+          guestPhone: 'N/A',
+          guestAddress: 'N/A'
+        };
       }
     );
   }
-  
-  
   
   private parseDateString(dateStr: string): Date | null {
     if (!dateStr) return null; // Handle empty date strings
@@ -410,6 +427,37 @@ export class UpdateOfflineOrderComponent implements OnInit {
       }
     );
   }  
+  createInvoiceOffline(orderId: number) {
+    const totalAmount = this.calculateTotalAmount();
+    const currentDate = new Date();
+    const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
+    const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0;
+    const invoiceData = {
+      orderId: this.orderId,
+      paymentTime: currentDate.toISOString(), 
+      paymentAmount: totalAmount,
+      discountId: 0,
+      taxcode: 'ZXCVBNM',
+      paymentStatus: 1,
+      amountReceived: paymentMethodValue === 0 ? customerPaidAmount : totalAmount, 
+      returnAmount: paymentMethodValue === 0 ? customerPaidAmount - totalAmount : 0, 
+      paymentMethods: paymentMethodValue, 
+      description: 'azzvbb' 
+    };
+  
+    this.invoiceService.createInvoiceOffline(invoiceData).subscribe(
+      response => {
+        console.log('Invoice created successfully:', response);
+        this.successMessage = 'Invoice created successfully!';
+        setTimeout(() => this.successMessage = '', 5000);
+      },
+      error => {
+        console.error('Error creating invoice:', error);
+        this.errorMessage = 'Failed to create invoice. Please try again later.';
+      }
+    );
+  }
+  
   loadAddresses() {
     this.orderService.ListAddress().subscribe(
       (response: Address[]) => {
