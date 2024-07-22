@@ -293,22 +293,33 @@
         
       </main>
     <!-- Template for cffff -->
-      <div class="modal fade" id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="paymentModalLabel">HÓA ĐƠN THANH TOÁN</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
+    <div class="modal fade" id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="paymentModalLabel">HÓA ĐƠN THANH TOÁN</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <!-- Success message -->
+                  <div class="text-center mb-3">
+                      <div class="d-flex justify-content-center align-items-center flex-column">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
+                          <path d="M8 16a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5.586l-3-3a.5.5 0 0 1 .707-.707L7 9.293l4.646-4.647a.5.5 0 0 1 .708.707l-5 5a.5.5 0 0 1-.708 0z"/>
+                      </svg>
+                                           
+                          <h4 class="mt-2">Tạo đơn hàng thành công</h4>
+                      </div>
+                  </div>
+                  
                   <div class="mb-3">
                       <label for="orderID" class="form-label">Mã hóa đơn: </label>
                       <span id="orderID">123456</span>
                   </div>
                   <div class="mb-3">
-                    <label for="phoneNumber" class="form-label">Số điện thoại: </label>
-                    <span id="phoneNumber">0968534145</span>
-                </div>
+                      <label for="phoneNumber" class="form-label">Số điện thoại: </label>
+                      <span id="phoneNumber">0968534145</span>
+                  </div>
                   <div class="mb-3">
                       <label for="customerName" class="form-label">Tên khách hàng:</label>
                       <span id="customerName">Nguyễn Văn A</span>
@@ -319,67 +330,69 @@
                   </div>
                   
                   <div class="mb-3">
-                    <table id="items" class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">STT</th>
-                                <th scope="col">Tên món</th>
-                                <th scope="col">SL</th>
-                                <th scope="col">Đơn giá</th>
-                                <th scope="col">Thành tiền</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>Sản phẩm 1</td>
-                                <td>1</td>
-                                <td>500.000 VNĐ</td>
-                                <td>500.000 VNĐ</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Sản phẩm 2</td>
-                                <td>1</td>
-                                <td>1.000.000 VNĐ</td>
-                                <td>1.000.000 VNĐ</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mb-3">
-                  <label for="totalAmount" class="form-label">Tổng tiền:</label>
-                  <span id="totalAmount">1.500.000 VNĐ</span>
-              </div>
-              
-              <div class="mb-3">
-                  <label for="discount" class="form-label">Chiết khấu:</label>
-                  <span id="discount">0</span>
-              </div>
-              
-              <div class="mb-3">
-                  <label for="amountToPay" class="form-label">Khách phải trả:</label>
-                  <span id="amountToPay">1.500.000 VNĐ</span>
-              </div>
-              
-              <div class="mb-3">
-                  <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
-                  <span id="customerPaid">1.500.000 VNĐ</span>
-              </div>
-              
-              <div class="mb-3">
-                  <label for="changeToGive" class="form-label">Trả lại:</label>
-                  <span id="changeToGive">0 VNĐ</span>
-              </div>
-              
+                      <table id="items" class="table">
+                          <thead>
+                              <tr>
+                                  <th scope="col">STT</th>
+                                  <th scope="col">Tên món</th>
+                                  <th scope="col">SL</th>
+                                  <th scope="col">Đơn giá</th>
+                                  <th scope="col">Thành tiền</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td>1</td>
+                                  <td>Sản phẩm 1</td>
+                                  <td>1</td>
+                                  <td>500.000 VNĐ</td>
+                                  <td>500.000 VNĐ</td>
+                              </tr>
+                              <tr>
+                                  <td>2</td>
+                                  <td>Sản phẩm 2</td>
+                                  <td>1</td>
+                                  <td>1.000.000 VNĐ</td>
+                                  <td>1.000.000 VNĐ</td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  <div class="mb-3">
+                      <label for="totalAmount" class="form-label">Tổng tiền:</label>
+                      <span id="totalAmount">1.500.000 VNĐ</span>
+                  </div>
+                  
+                  <div class="mb-3">
+                      <label for="discount" class="form-label">Chiết khấu:</label>
+                      <span id="discount">0</span>
+                  </div>
+                  
+                  <div class="mb-3">
+                      <label for="amountToPay" class="form-label">Khách phải trả:</label>
+                      <span id="amountToPay">1.500.000 VNĐ</span>
+                  </div>
+                  
+                  <div class="mb-3">
+                      <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
+                      <span id="customerPaid">1.500.000 VNĐ</span>
+                  </div>
+                  
+                  <div class="mb-3">
+                      <label for="changeToGive" class="form-label">Trả lại:</label>
+                      <span id="changeToGive">0 VNĐ</span>
+                  </div>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-primary" onclick="printInvoice()">In hóa đơn</button>
-            </div>
-            </div>
-        </div>
-    </div>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                  <button type="button" class="btn btn-primary" onclick="printInvoice()">In hóa đơn</button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
 
     </div>
   </div>
