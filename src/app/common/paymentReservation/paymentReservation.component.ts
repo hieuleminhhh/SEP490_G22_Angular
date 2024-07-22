@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ReservationService } from '../../../service/reservation.service';
 import { Router } from '@angular/router';
+import { CheckoutService } from '../../../service/checkout.service';
 
 @Component({
   selector: 'app-paymentReservation',
@@ -17,7 +18,7 @@ export class PaymentReservationComponent implements OnInit {
   cartItem: any;
   ispayment: boolean = false;
 
-  constructor(private reservationService: ReservationService, private router: Router) {
+  constructor(private reservationService: ReservationService, private router: Router, private checkoutService: CheckoutService) {
 
   }
 
@@ -97,7 +98,8 @@ export class PaymentReservationComponent implements OnInit {
         this.reservationService.clearCart();
         sessionStorage.setItem('data', JSON.stringify(this.data));
         sessionStorage.setItem('cartItem', JSON.stringify(this.cartItem));
-        window.location.reload();
+        // window.location.reload();
+        this.checkVnPay(request);
       },
       error: error => {
         if (error.error instanceof ErrorEvent) {
@@ -109,4 +111,19 @@ export class PaymentReservationComponent implements OnInit {
       }
     });
   }
+
+  checkVnPay(data: any) {
+    console.log('Data being sent:', data);
+    this.checkoutService.getVnPays(data).subscribe(response => {
+      if (response.url) {
+        window.location.href = response.url; // Redirect đến URL trả về
+      } else {
+        console.error('Unexpected response format', response);
+      }
+    }, error => {
+      console.error('Error during payment initiation', error);
+      console.error('Error details:', error.error); // Kiểm tra chi tiết lỗi từ server
+    });
+  }
+
 }

@@ -16,7 +16,6 @@ export class PaymentComponent implements OnInit {
   data: any;
   orderCancelled: boolean = false;
   guestPhone: string | null = null;
-  selectedPaymentMethod: string | null = null;
 
   constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router, private checkoutService: CheckoutService) { } // Inject Router
 
@@ -24,25 +23,7 @@ export class PaymentComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.request = params;
       this.guestPhone = params['guestPhone'];
-      this.selectedPaymentMethod = params['paymentmethod'];
-      console.log(this.selectedPaymentMethod);
-      this.checkoutSuccess().then(() => {
-        if (this.selectedPaymentMethod === 'banking') {
-          this.checkVnPay();
-        }
-      });
-    });
-  }
-
-  checkVnPay() {
-    this.checkoutService.getVnPay(this.data).subscribe(response => {
-      if (response.url) {
-        window.location.href = response.url; // Redirect đến URL trả về
-      } else {
-        console.error('Unexpected response format', response);
-      }
-    }, error => {
-      console.error('Error during payment initiation', error);
+      this.checkoutSuccess();
     });
   }
 

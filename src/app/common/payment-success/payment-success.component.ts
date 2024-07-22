@@ -21,10 +21,12 @@ export class PaymentSuccessComponent implements OnInit {
     private http: HttpClient
   ) { }
 
-
   success: boolean = true;
+  guestPhone:string ='';
 
   ngOnInit() {
+    this.guestPhone = sessionStorage.getItem('guestPhone') || '';
+    sessionStorage.removeItem('guestPhone');
     this.route.queryParams.subscribe(params => {
       const responseCode = params['vnp_ResponseCode'];
       const orderInfo = params['vnp_OrderInfo'];
@@ -45,8 +47,8 @@ export class PaymentSuccessComponent implements OnInit {
   }
 
   extractOrderId(orderInfo: string): number | null {
-    const match = orderInfo.match(/\d+$/); // Tìm số ở cuối chuỗi
-    return match ? Number(match[0]) : null; // Chuyển đổi chuỗi thành số
+    const match = orderInfo.match(/\d+$/);
+    return match ? Number(match[0]) : null;
   }
 
   cancelOrder(orderId: number|null) {
@@ -60,5 +62,13 @@ export class PaymentSuccessComponent implements OnInit {
       }
     );
   }
-
+  viewOrder(){
+    console.log(this.guestPhone);
+    if(this.guestPhone){
+      this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone} });
+    }
+    else{
+      this.router.navigate(['/paymentReservation']);
+    }
+  }
 }
