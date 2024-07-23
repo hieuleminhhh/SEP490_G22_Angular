@@ -58,6 +58,9 @@ export class UpdateOfflineOrderComponent implements OnInit {
   customerPaid: number | null = null;
   addressId: number | null = null;
   addNew: any = {};
+  dbItems: any[] = []; // Added dbItems property
+  newlyAddedItems: any[] = [];
+  invoice: any = {};
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService,
      private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService ) { }
   @ViewChild('formModal') formModal!: ElementRef;
@@ -144,25 +147,120 @@ export class UpdateOfflineOrderComponent implements OnInit {
     return isNaN(parsedDate.getTime()) ? null : parsedDate;
   }
   
-  
   addItem(item: any) {
-    // Find if the item already exists in selectedItems
-    const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-  
-    if (index !== -1) {
-      // If the item already exists, increase its quantity and update the total price
-      this.selectedItems[index].quantity++;
-      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
-    } else {
-      // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
-      // Use discountedPrice if available, otherwise fallback to price
+    const selectedIndex = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
+    const dbIndex = this.dbItems.findIndex(dbItem => this.itemsAreEqual(dbItem, item));
+    
+    if (selectedIndex !== -1) {
+      // If the item already exists in selectedItems, increase its quantity and update the total price
+      this.selectedItems[selectedIndex].quantity++;
+      this.selectedItems[selectedIndex].totalPrice = this.selectedItems[selectedIndex].quantity * this.selectedItems[selectedIndex].unitPrice;
+    } else if (dbIndex !== -1) {
+      // If the item exists in the db, calculate the difference and add it to selectedItems
+      const existingDbItem = this.dbItems[dbIndex];
+      const existingQuantity = existingDbItem.quantity;
+      const additionalQuantity = 1; // We are adding 1 item
+      const newQuantity = existingQuantity + additionalQuantity; // Total quantity after addition
       const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
-      this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
+      
+      // Add the difference to selectedItems
+      this.selectedItems.push({ 
+        ...item, 
+        quantity: additionalQuantity, 
+        unitPrice: unitPrice, 
+        totalPrice: additionalQuantity * unitPrice 
+      });
+      
+      // Update the existing item in dbItems with the new quantity
+      this.dbItems[dbIndex].quantity = newQuantity;
+    } else {
+      // If the item does not exist in selectedItems and also not in the db, add it to selectedItems with quantity 1 and set the total price
+      const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
+      this.selectedItems.push({ 
+        ...item, 
+        quantity: 1, 
+        unitPrice: unitPrice, 
+        totalPrice: unitPrice 
+      });
+  
+      // Track newly added items
+      this.newlyAddedItems.push({ 
+        ...item, 
+        quantity: 1, 
+        unitPrice: unitPrice, 
+        totalPrice: unitPrice 
+      });
     }
-
+    
     // Recalculate totalAmount after adding item
     this.calculateTotalAmount();
   }
+  
+  updateOrderOffline(tableId: number) {
+    const orderDetails = this.newlyAddedItems.map(item => ({
+      dishId: item.dishId,
+      comboId: item.comboId,
+      unitPrice: item.unitPrice,
+      quantity: item.quantity,
+      discountedPrice: item.discountedPrice
+    }));
+    
+    const guestPhone = this.addNew.guestPhone || '';
+    
+    // Construct the order object
+    const updatedOrder = {
+      tableId: tableId,
+      guestAddress: this.addNew.guestAddress,
+      consigneeName: this.addNew.consigneeName,
+      orderDate: new Date().toISOString(), 
+      receivingOrder: new Date().toISOString(), 
+      totalAmount: this.calculateTotalAmount(), 
+      guestPhone: guestPhone,
+      note: "This is a special request note.",
+      type: 4,
+      status: 3,
+      orderDetails: orderDetails
+    };
+    
+    // Call the service method to update the order
+    this.orderService.updateOrderOffline(updatedOrder).subscribe(
+      response => {
+        console.log('Offline order updated successfully:', response);
+        this.successMessage = 'Offline order updated successfully!';
+        setTimeout(() => this.successMessage = '', 5000);
+       
+      },
+      error => {
+        console.error('Error updating offline order:', error);
+        if (error.error && error.error.errors) {
+          console.error('Validation errors:', error.error.errors);
+        }
+      }
+    );
+  }
+  loadInvoice(invoiceId: number): void {
+    this.invoiceService.getInvoiceById(invoiceId).subscribe(
+      data => {
+        this.invoice = data;
+      },
+      error => {
+        console.error('Error fetching invoice:', error);
+      }
+    );
+  }
+  
+  itemsAreEqual(item1: any, item2: any): boolean {
+    if (item1.hasOwnProperty('itemName') && item2.hasOwnProperty('itemName')) {
+      return item1.itemName === item2.itemName;
+    }
+    
+    if (item1.hasOwnProperty('nameCombo') && item2.hasOwnProperty('nameCombo')) {
+      return item1.nameCombo === item2.nameCombo;
+    }
+    return false;
+  }
+  
+  
   
   selectCategory(category: string) {
     this.searchCategory = category;
@@ -210,6 +308,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
       }
     );
   }
+
   onSearch() {
     if (this.showingDishes) {
       this.loadListDishes(this.searchCategory,this.search);
@@ -231,19 +330,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
     this.showingCombos = true;
     this.searchCategory = ''; 
 }
-
-
   
-  itemsAreEqual(item1: any, item2: any): boolean {
-    if (item1.hasOwnProperty('itemName') && item2.hasOwnProperty('itemName')) {
-      return item1.itemName === item2.itemName;
-    }
-    
-    if (item1.hasOwnProperty('nameCombo') && item2.hasOwnProperty('nameCombo')) {
-      return item1.nameCombo === item2.nameCombo;
-    }
-    return false;
-  }
   removeItem(index: number) {
     this.selectedItems.splice(index, 1);
   }
@@ -388,66 +475,37 @@ export class UpdateOfflineOrderComponent implements OnInit {
       }
     );
   }
-  updateOrderOffline( tableId: number) {
-    const orderDetails = this.selectedItems.map(item => ({
-      dishId: item.dishId,
-      comboId: item.comboId,
-      unitPrice: item.unitPrice,
-      quantity: item.quantity,
-      discountedPrice: item.discountedPrice
-    }));
-    const guestPhone = this.addNew.guestPhone || '';
-    // Construct the order object
-    const updatedOrder = {
-      tableId: tableId,
-      guestAddress: this.addNew.guestAddress,
-      consigneeName: this.addNew.consigneeName,
-      orderDate: new Date().toISOString(), 
-      receivingOrder: new Date().toISOString(), 
-      totalAmount: this.calculateTotalAmount(), 
-      guestPhone: guestPhone,
-      note: "This is a special request note.",
-      type: 4,
-      status: 3,
-      orderDetails: orderDetails
-    };
-  
-    // Call the service method to update the order
-    this.orderService.updateOrderOffline(updatedOrder).subscribe(
-      response => {
-        console.log('Offline order updated successfully:', response);
-        this.successMessage = 'Offline order updated successfully!';
-        setTimeout(() => this.successMessage = '', 5000);
-      },
-      error => {
-        console.error('Error updating offline order:', error);
-        if (error.error && error.error.errors) {
-          console.error('Validation errors:', error.error.errors);
-        }
-      }
-    );
-  }  
+ 
   createInvoiceOffline(orderId: number) {
     const totalAmount = this.calculateTotalAmount();
     const currentDate = new Date();
     const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
     const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0;
+  
     const invoiceData = {
       orderId: this.orderId,
-      paymentTime: currentDate.toISOString(), 
+      paymentTime: currentDate.toISOString(),
       paymentAmount: totalAmount,
       discountId: 0,
       taxcode: 'ZXCVBNM',
       paymentStatus: 1,
-      amountReceived: paymentMethodValue === 0 ? customerPaidAmount : totalAmount, 
-      returnAmount: paymentMethodValue === 0 ? customerPaidAmount - totalAmount : 0, 
-      paymentMethods: paymentMethodValue, 
-      description: 'azzvbb' 
+      amountReceived: paymentMethodValue === 0 ? customerPaidAmount : totalAmount,
+      returnAmount: paymentMethodValue === 0 ? customerPaidAmount - totalAmount : 0,
+      paymentMethods: paymentMethodValue,
+      description: 'azzvbb'
     };
+  
+    console.log('Creating invoice with data:', invoiceData);
   
     this.invoiceService.createInvoiceOffline(invoiceData).subscribe(
       response => {
         console.log('Invoice created successfully:', response);
+        if (response && response.invoiceId) {
+          console.log(response.invoiceId);
+          this.loadInvoice(response.invoiceId);
+        } else {
+          console.error('No invoiceId returned from the service.');
+        }
         this.successMessage = 'Invoice created successfully!';
         setTimeout(() => this.successMessage = '', 5000);
       },
@@ -457,6 +515,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
       }
     );
   }
+  
   
   loadAddresses() {
     this.orderService.ListAddress().subscribe(

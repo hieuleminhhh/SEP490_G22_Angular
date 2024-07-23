@@ -15,6 +15,14 @@ export class InvoiceService {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
-    return this.http.post<any>(url, {}, httpOptions);
+    return this.http.post<any>(url, invoiceData, httpOptions);
+  }
+  
+  getInvoiceById(invoiceId: number): Observable<any> {
+    const url = `${this.apiUrl}/Invoice/${invoiceId}`;
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.get<any>(url, httpOptions);
   }
 }

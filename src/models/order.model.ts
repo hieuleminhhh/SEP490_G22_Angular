@@ -116,4 +116,9 @@ export interface SelectedItem {
   imageUrl: string;
   totalPrice: number;
 }
+export interface AddNewOrderResponse {
+  message: string;
+  invoiceId: number;
+}
+
 

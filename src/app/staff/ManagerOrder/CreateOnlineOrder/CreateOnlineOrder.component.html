@@ -112,8 +112,11 @@
                   <strong>Tổng cộng đơn:</strong> {{ calculateTotalAmount() | currency:'USD':'symbol-narrow':'1.2-2' }}
                 </div>
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
+                  <button class="btn btn-primary btn-lg" (click)="createOrder()">
+                    Lưu lại
+                  </button>
                   <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
-                    Thanh toán
+                    Tạo đơn
                   </button>
                   <button class="btn btn-danger btn-lg" >
                     Hủy
@@ -235,7 +238,7 @@
                   </div>
                 </div>
               </div>
-
+              
             </div>
           </div>
         </div>
