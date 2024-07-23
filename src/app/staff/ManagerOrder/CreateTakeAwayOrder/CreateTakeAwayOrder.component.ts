@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,6 +12,7 @@ import { ManagerComboService } from '../../../../service/managercombo.service';
 import { ManagerDishService } from '../../../../service/managerdish.service';
 import { ManagerOrderService } from '../../../../service/managerorder.service';
 import { SidebarOrderComponent } from '../../SidebarOrder/SidebarOrder.component';
+import { InvoiceService } from '../../../../service/invoice.service';
 
 @Component({
   selector: 'app-CreateTakeAwayOrder',
@@ -22,7 +23,8 @@ import { SidebarOrderComponent } from '../../SidebarOrder/SidebarOrder.component
 })
 export class CreateTakeAwayOrderComponent implements OnInit {
 
-  constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService : ManagerOrderService,  private cd: ChangeDetectorRef ) { }
+  constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService,
+     private orderService : ManagerOrderService,  private cd: ChangeDetectorRef, private invoiceService: InvoiceService, private route: ActivatedRoute,) { }
   @ViewChild('formModal') formModal!: ElementRef;
   dishes: ListAllDishes[] = [];
   combo: ListAllCombo[] = [];
@@ -44,6 +46,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   paymentMethod: string = '0';
   customerPaid: number | null = null;
   paymentAmount: number = 0;
+  invoice: any = {};
   addNew: AddNewOrder = {
     guestPhone: '',
     email: '',
@@ -128,6 +131,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       }
     );
   }
+
   onSearch() {
     if (this.showingDishes) {
       this.loadListDishes(this.searchCategory,this.search);
@@ -165,8 +169,12 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     // Recalculate totalAmount after adding item
     this.calculateTotalAmount();
   }
-  
-  
+  clearCart() {
+    this.selectedItems = [];
+    this.selectedAddress = "Khách lẻ"
+    this.selectCategory('Món chính');
+    this.successMessage = "Tất cả các mặt hàng đã được xóa khỏi giỏ hàng.";
+  }
   itemsAreEqual(item1: any, item2: any): boolean {
     if (item1.hasOwnProperty('itemName') && item2.hasOwnProperty('itemName')) {
       return item1.itemName === item2.itemName;
@@ -251,8 +259,13 @@ createOrder() {
   this.orderService.AddNewOrder(this.addNew).subscribe(
     response => {
       console.log('Order created successfully:', response);
+      if (response && response.invoiceId) {
+        // Fetch the invoice using the returned invoiceId
+        this.loadInvoice(response.invoiceId);
+      } else {
+        console.error('No invoiceId returned from the service.');
+      }
       this.successMessage = 'Đơn hàng đã được tạo thành công!';
-      this.selectedItems = [];
       setTimeout(() => this.successMessage = '', 5000);
     },
     error => {
@@ -263,6 +276,19 @@ createOrder() {
     }
   );
 }
+
+loadInvoice(invoiceId: number): void {
+  // Fetch invoice data by ID
+  this.invoiceService.getInvoiceById(invoiceId).subscribe(
+    data => {
+      this.invoice = data;
+    },
+    error => {
+      console.error('Error fetching invoice:', error);
+    }
+  );
+}
+
 
   
 

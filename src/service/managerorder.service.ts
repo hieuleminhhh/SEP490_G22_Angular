@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
-import { AddNewOrder, ListAllOrder, ManagerOrderByTableId } from '../models/order.model';
+import { AddNewOrder, AddNewOrderResponse, ListAllOrder, ManagerOrderByTableId } from '../models/order.model';
 import { AddNewAddress, Address } from '../models/address.model';
 
 const httpOptions = {
@@ -34,9 +34,9 @@ export class ManagerOrderService {
     const url = `${this.apiUrl}/orders/${orderId}/status`;
     return this.http.patch<any>(url, { status });
   }
-  AddNewOrder(newOrder: AddNewOrder): Observable<AddNewOrder> {
+  AddNewOrder(newOrder: any): Observable<AddNewOrderResponse> {
     const url = `${this.apiUrl}/Cart/AddNewOrderTakeAway`;
-    return this.http.post<AddNewOrder>(url, newOrder, httpOptions);
+    return this.http.post<AddNewOrderResponse>(url, newOrder, httpOptions);
   }
   ListAddress(): Observable<Address[]> {
     const url = `${this.apiUrl}/Guest/ListAddress`;
@@ -56,7 +56,7 @@ export class ManagerOrderService {
   }
   updateOrderOffline(orderData: any): Observable<any> {
     const url = `${this.apiUrl}/orders/updateOrderDetails/${orderData.tableId}`;
-    return this.http.put<any>(url, orderData, httpOptions);
+    return this.http.post<any>(url, orderData, httpOptions);
   }
 }
 
