@@ -113,15 +113,12 @@
                 </div>
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
                   <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
-                    Thanh toán
+                    Tạo đơn
                   </button>
-                  <button class="btn btn-danger btn-lg" >
+                  <button class="btn btn-danger btn-lg" (click)="clearCart()" >
                     Hủy
                   </button>
                 </div>
-              </div>
-              <div *ngIf="successMessage" class="alert alert-success" role="alert">
-                {{ successMessage }}
               </div>
             </div>
             
@@ -222,20 +219,46 @@
                     <div class="modal-body">
                       <!-- Thông tin hóa đơn -->
                       <div class="mb-3">
-                        <label for="invoiceDetails" class="form-label">Chi tiết hóa đơn:</label>
-                        <textarea class="form-control" id="invoiceDetails" rows="4">Thông tin chi tiết của hóa đơn...</textarea>
+                        <label for="price" class="form-label">Tổng tiền phải trả:</label>
+                        {{ calculateTotalAmount() | currency:'USD':'symbol-narrow':'1.2-2' }}
                       </div>
-                      <!-- Nút in hóa đơn -->
-                      <button type="button" class="btn btn-secondary">In hóa đơn</button>
+              
+                      <!-- Template for CreateTakeAwayOrderComponent -->
+                      <div class="mb-3">
+                        <label class="form-label">Phương thức thanh toán:</label>
+                        <div>
+                          <input type="radio" id="cash" name="paymentMethod" value= "0" [(ngModel)]="paymentMethod">
+                          <label for="cash">Tiền mặt</label>
+                        </div>
+                        <div>
+                          <input type="radio" id="bank" name="paymentMethod" value= "1" [(ngModel)]="paymentMethod">
+                          <label for="bank">Ngân hàng</label>
+                        </div>
+                      </div>
+              
+                      <div class="mb-3" *ngIf="paymentMethod === '0'">
+                        <label for="customerPaid" class="form-label">Tiền khách trả:</label>
+                        <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid">
+                      </div>
+              
+                      <div class="mb-3" *ngIf="paymentMethod === '1'">
+                        <label for="qrCode" class="form-label"></label>
+                        <img id="qrCode" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" class="img-fluid">
+                      </div>
                     </div>
+              
                     <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                      <button type="button" class="btn btn-primary">Xác nhận thanh toán</button>
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Đóng</button>
+                      <button type="button" class="btn btn-primary"
+                      data-bs-toggle="modal" data-bs-target="#cfpaymentModal"
+                      (click)="createOrder()">
+                Xác nhận
+                      </button>        
                     </div>
                   </div>
                 </div>
               </div>
-
+              
             </div>
           </div>
         </div>

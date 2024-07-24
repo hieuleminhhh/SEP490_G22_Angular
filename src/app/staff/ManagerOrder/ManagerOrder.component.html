@@ -175,17 +175,26 @@
                       <div class="col-md-6">
                         <div class="d-flex justify-content-between mb-2">
                           <span class="fw-bold label">Tạm tính:</span>
-                          <span class="value">{{ orderDetail.totalAmount }}</span>
+                          <span class="value">{{ orderDetail.totalAmount | currency }}</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                           <span class="fw-bold label">Khuyến mãi:</span>
                           <!-- <span class="value">{{ orderDetail.discount | currency }}</span> -->
                         </div>
+                        <!-- <div class="d-flex justify-content-between mb-2">
+                          <span class="fw-bold label">Tiền khách trả:</span>
+                          <span class="value">{{ orderDetail.additionalPayment | currency }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                          <span class="fw-bold label">Tiền trả lại:</span>
+                          <span class="value">{{ orderDetail.returnAmount | currency }}</span>
+                        </div> -->
                         <div class="d-flex justify-content-between">
                           <span class="fw-bold label">Tổng cộng:</span>
-                          <span class="value">{{ orderDetail.totalAmount }}</span>
+                          <span class="value">{{ orderDetail.totalAmount | currency }}</span>
                         </div>
                       </div>
+                      
                     </div>
                   </div>
                 </div>
