@@ -41,6 +41,9 @@ export class CreateOnlineOrderComponent implements OnInit {
   receivingDate: string = '';
   receivingTime: string = '';
   timeOptions: string[] = [];
+  paymentMethod: string = '0';
+  customerPaid: number | null = null;
+  paymentAmount: number = 0;
   addNew: AddNewOrder = {
     guestPhone: '',
     email: '',
@@ -335,5 +338,35 @@ setDefaultReceivingTime() {
     if (modalBackdrop && modalBackdrop.parentNode) {
       modalBackdrop.parentNode.removeChild(modalBackdrop);
     }
+  }
+  clearCart() {
+    this.selectedItems = [];
+    this.selectCategory('Món chính');
+    this.successMessage = "Tất cả các mặt hàng đã được xóa khỏi giỏ hàng.";
+    this.addNew = {
+      consigneeName: '',
+      guestPhone: '',
+      guestAddress: '',
+      email: '',
+      addressId: 0,  // Assuming addressId is of type number
+      orderDate: null,  // Assuming orderDate is of type Date or null
+      status: 0,     // Assuming status is of type number
+      recevingOrder: null,  // Assuming recevingOrder is of type boolean or null
+      orderDetails: [],  // Assuming orderDetails is of type array
+      totalAmount: 0,   // Assuming totalAmount is of type number
+      deposits: 0,     // Assuming deposits is of type array or any other type
+      note: '',  
+      type: 0, 
+      paymentTime: '',
+    paymentAmount: 0,
+    discountId: 0,
+    taxcode: '',
+    paymentStatus: 0,
+    amountReceived: 0,
+    returnAmount: 0,
+    paymentMethods: 0,
+    description: ''      // Assuming note is of type string
+      // Add more properties as required by the AddNewOrder type/interface
+    };
   }
 }
