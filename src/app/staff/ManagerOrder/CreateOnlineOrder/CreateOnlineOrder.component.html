@@ -82,9 +82,16 @@
                       <td>
                         <div class="d-flex align-items-center">
                           <img [src]="item.imageUrl" alt="Item image" class="img-thumbnail me-2" style="width: 70px; height: 50px;">
-                          <p class="mb-0">{{ item.itemName || item.nameCombo }}</p>
+                          <p class="mb-0">
+                            <span class="clickable-item" (click)="openNoteDialog(item)">
+                              {{ item.itemName }}
+                            </span>
+                            <span *ngIf="item.nameCombo">
+                              {{ item.nameCombo }}
+                            </span>
+                          </p>
                         </div>
-                      </td>
+                      </td>                      
                       <td>
                         <div class="d-flex align-items-center">
                           <input type="number" class="form-control text-center small-input" [(ngModel)]="item.quantity" (change)="validateQuantity(i)" min="1" max="100">
@@ -225,17 +232,21 @@
               
                       <!-- Template for CreateTakeAwayOrderComponent -->
                       <div class="mb-3">
-                        <label class="form-label">Phương thức thanh toán:</label>
+                        <label class="form-label">Hình thức thanh toán:</label>
                         <div>
-                          <input type="radio" id="cash" name="paymentMethod" value= "0" [(ngModel)]="paymentMethod">
+                          <input type="radio" id="cash" name="paymentMethod" value="0" [(ngModel)]="paymentMethod">
                           <label for="cash">Tiền mặt</label>
                         </div>
                         <div>
-                          <input type="radio" id="bank" name="paymentMethod" value= "1" [(ngModel)]="paymentMethod">
-                          <label for="bank">Ngân hàng</label>
+                          <input type="radio" id="bank" name="paymentMethod" value="1" [(ngModel)]="paymentMethod">
+                          <label for="bank">Chuyển khoản ngân hàng</label>
+                        </div>
+                        <div>
+                          <input type="radio" id="cod" name="paymentMethod" value="2" [(ngModel)]="paymentMethod">
+                          <label for="cod">Thanh toán khi nhận hàng</label>
                         </div>
                       </div>
-              
+                      
                       <div class="mb-3" *ngIf="paymentMethod === '0'">
                         <label for="customerPaid" class="form-label">Tiền khách trả:</label>
                         <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid">
@@ -263,6 +274,98 @@
           </div>
         </div>
       </main>
+      <!-- Template for cffff -->
+    <div class="modal fade" id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="paymentModalLabel">HÓA ĐƠN THANH TOÁN</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <!-- Success message -->
+                <div class="text-center mb-3">
+                    <div class="d-flex justify-content-center align-items-center flex-column">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
+                            <path d="M8 16a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5.586l-3-3a.5.5 0 0 1 .707-.707L7 9.293l4.646-4.647a.5.5 0 0 1 .708.707l-5 5a.5.5 0 0 1-.708 0z"/>
+                        </svg>
+                        <h4 class="mt-2">Tạo đơn hàng thành công</h4>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="orderID" class="form-label">Mã hóa đơn: </label>
+                    <span id="orderID">{{ invoice?.invoiceId || 'N/A' }}</span>
+                </div>
+                <div class="mb-3">
+                    <label for="phoneNumber" class="form-label">Số điện thoại: </label>
+                    <span id="phoneNumber">{{ invoice?.guestPhone || 'N/A' }}</span>
+                </div>
+                <div class="mb-3">
+                    <label for="customerName" class="form-label">Tên khách hàng:</label>
+                    <span id="customerName">{{ invoice?.consigneeName || 'N/A' }}</span>
+                </div>
+                <div class="mb-3">
+                    <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
+                    <span id="orderDate">{{ invoice?.orderDate | date:'dd/MM/yyyy' || 'N/A' }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <table id="items" class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">STT</th>
+                                <th scope="col">Tên món</th>
+                                <th scope="col">SL</th>
+                                <th scope="col">Đơn giá</th>
+                                <th scope="col">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of invoice?.itemInvoice; let i = index">
+                                <td>{{ i + 1 }}</td>
+                                <td>{{ item.itemName }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.unitPrice | currency:'VND' }}</td>
+                                <td>{{ item.price | currency:'VND' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mb-3">
+                    <label for="totalAmount" class="form-label">Tổng tiền:</label>
+                    <span id="totalAmount">{{ invoice?.totalAmount | currency:'VND' || 'N/A' }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="discount" class="form-label">Chiết khấu:</label>
+                    <span id="discount">{{ invoice?.discount || '0' }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="amountToPay" class="form-label">Tiền thu của khách:</label>
+                    <span id="amountToPay">{{ invoice?.totalAmount | currency:'VND' || 'N/A' }}</span>
+                </div>
+                
+                <!-- <div class="mb-3">
+                    <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
+                    <span id="customerPaid">{{ invoice?.amountReceived | currency:'VND' || 'N/A' }}</span>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="changeToGive" class="form-label">Trả lại:</label>
+                    <span id="changeToGive">{{ invoice?.returnAmount | currency:'VND' || '0 VNĐ' }}</span>
+                </div> -->
+            </div>            
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearCart()">Đóng</button>
+                  <button type="button" class="btn btn-primary" onclick="printInvoice()">In hóa đơn</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+
     </div>
   </div>
 </body>

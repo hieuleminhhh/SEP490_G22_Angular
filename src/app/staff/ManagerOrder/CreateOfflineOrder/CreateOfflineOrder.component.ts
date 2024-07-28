@@ -13,6 +13,9 @@ import { ManagerDishService } from '../../../../service/managerdish.service';
 import { ManagerComboService } from '../../../../service/managercombo.service';
 import { ManagerOrderDetailService } from '../../../../service/managerorderDetail.service';
 import { AddOrderDetail, ListOrderDetailByOrder } from '../../../../models/orderDetail.model';
+import { InvoiceService } from '../../../../service/invoice.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../common/material/ConfirmDialog/ConfirmDialog.component';
 @Component({
     selector: 'app-create-offline-order',
     templateUrl: './CreateOfflineOrder.component.html',
@@ -51,7 +54,8 @@ export class CreateOfflineOrderComponent implements OnInit {
     email:'antaiquan@gmail.com',
   };
   addNew: any = {};
-  constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService, private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService ) { }
+  constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService,
+   private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService, private dialog: MatDialog ) { }
   @ViewChild('formModal') formModal!: ElementRef;
   ngOnInit() {
     this.loadListDishes();
@@ -360,46 +364,79 @@ export class CreateOfflineOrderComponent implements OnInit {
         }
       );
     }
-  createOrderOffline(tableId: number) {
-    const orderDetails = this.selectedItems.map(item => ({
-      dishId: item.dishId,
-      comboId: item.comboId,
-      unitPrice: item.unitPrice,
-      quantity: item.quantity,
-      discountedPrice: item.discountedPrice
-    }));
-    const guestPhone = this.addNew.guestPhone || '';
-    // Construct the order object
-    const newOrder = {
-      tableId: tableId,
-      guestAddress: this.addNew.guestAddress,
-      consigneeName: this.addNew.consigneeName,
-      orderDate: new Date().toISOString(), 
-      receivingOrder: new Date().toISOString(), 
-      totalAmount: this.calculateTotalAmount(), 
-      guestPhone: guestPhone,
-      note: "This is a special request note.",
-      type: 4,
-      status : 3,
-      orderDetails: orderDetails
-    };
+    createOrderOffline(tableId: number): void {
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        width: '300px', // Set a smaller width
+        disableClose: true,
+        autoFocus: true,
+        hasBackdrop: true,
+        position: { top: '-950px', left: '50%' }, // Position the dialog at the top center
+        panelClass: 'custom-dialog-container' // Add custom CSS class
+      });
+      
+    
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          // Proceed with creating the order
+          this.actualCreateOrderOffline(tableId);
+        }
+      });
+    }
+    
+    
+    
   
-    // Call the service method to create the order
-    this.orderService.createOrderOffline(newOrder).subscribe(
+    actualCreateOrderOffline(tableId: number): void {
+      const orderDetails = this.selectedItems.map(item => ({
+        dishId: item.dishId,
+        comboId: item.comboId,
+        unitPrice: item.unitPrice,
+        quantity: item.quantity,
+        discountedPrice: item.discountedPrice
+      }));
+  
+      const guestPhone = this.addNew.guestPhone || '';
+      const newOrder = {
+        tableId: tableId,
+        guestAddress: this.addNew.guestAddress,
+        consigneeName: this.addNew.consigneeName,
+        orderDate: new Date().toISOString(),
+        receivingOrder: new Date().toISOString(),
+        totalAmount: this.calculateTotalAmount(),
+        guestPhone: guestPhone,
+        note: "This is a special request note.",
+        type: 4,
+        status: 3,
+        orderDetails: orderDetails
+      };
+  
+      this.orderService.createOrderOffline(newOrder).subscribe(
+        response => {
+          console.log('Offline order created successfully:', response);
+          this.successMessage = 'Offline order created successfully!';
+          setTimeout(() => this.successMessage = '', 5000);
+        },
+        error => {
+          console.error('Error creating offline order:', error);
+          if (error.error && error.error.errors) {
+            console.error('Validation errors:', error.error.errors);
+          }
+        }
+      );
+    }
+  createInvoiceOffline(orderId: number) {
+    this.invoiceService.createInvoiceOffline(orderId).subscribe(
       response => {
-        console.log('Offline order created successfully:', response);
-        this.successMessage = 'Offline order created successfully!';
+        console.log('Invoice created successfully:', response);
+        this.successMessage = 'Invoice created successfully!';
         setTimeout(() => this.successMessage = '', 5000);
       },
       error => {
-        console.error('Error creating offline order:', error);
-        if (error.error && error.error.errors) {
-          console.error('Validation errors:', error.error.errors);
-        }
+        console.error('Error creating invoice:', error);
+        this.errorMessage = 'Failed to create invoice. Please try again later.';
       }
     );
   }
-  
     clearForm() {
       this.newAddress = { consigneeName: '', guestPhone: '', guestAddress: '' , email: '' };
     }
@@ -419,4 +456,5 @@ export class CreateOfflineOrderComponent implements OnInit {
         modalBackdrop.parentNode.removeChild(modalBackdrop);
       }
     }
+    
 }

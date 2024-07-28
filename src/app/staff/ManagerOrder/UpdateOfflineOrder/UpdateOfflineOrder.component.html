@@ -235,14 +235,14 @@
          </div>
                 <!-- Template for CreateTakeAwayOrderComponent -->
                 <div class="mb-3">
-                  <label class="form-label">Phương thức thanh toán:</label>
+                  <label class="form-label">Hình thức thanh toán:</label>
                   <div>
                     <input type="radio" id="cash" name="paymentMethod" value= "0" [(ngModel)]="paymentMethod">
                     <label for="cash">Tiền mặt</label>
                   </div>
                   <div>
                     <input type="radio" id="bank" name="paymentMethod" value= "1" [(ngModel)]="paymentMethod">
-                    <label for="bank">Ngân hàng</label>
+                    <label for="bank">Chuyển khoản ngân hàng</label>
                   </div>
                 </div>
         
@@ -316,7 +316,7 @@
                         <tbody>
                             <tr *ngFor="let item of invoice?.itemInvoice; let i = index">
                                 <td>{{ i + 1 }}</td>
-                                <td>{{ item.itemName }}</td>
+                                <td>{{ item.itemName || item.nameCombo }}</td>
                                 <td>{{ item.quantity }}</td>
                                 <td>{{ item.unitPrice | currency:'VND' }}</td>
                                 <td>{{ item.price | currency:'VND' }}</td>
