@@ -12,16 +12,20 @@ import { AddNewOrder } from '../../../../models/order.model';
 import { AddOrderDetail } from '../../../../models/orderDetail.model';
 import { ManagerComboService } from '../../../../service/managercombo.service';
 import { ManagerOrderService } from '../../../../service/managerorder.service';
+import { InvoiceService } from '../../../../service/invoice.service';
+import { NoteDialogComponent } from '../../../common/material/NoteDialog/NoteDialog.component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 @Component({
   selector: 'app-CreateOnlineOrder',
   templateUrl: './CreateOnlineOrder.component.html',
   styleUrls: ['./CreateOnlineOrder.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, MatDialogModule]
 })
 export class CreateOnlineOrderComponent implements OnInit {
 
-  constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService : ManagerOrderService) { }
+  constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService : ManagerOrderService,
+     private invoiceService: InvoiceService,private dialog: MatDialog) { }
   @ViewChild('formModal') formModal!: ElementRef;
   dishes: ListAllDishes[] = [];
   combo: ListAllCombo[] = [];
@@ -68,6 +72,7 @@ export class CreateOnlineOrderComponent implements OnInit {
     paymentMethods: 0,
     description: ''
   };
+  invoice: any = {};
   ngOnInit() {
     this.loadListDishes();
     this.loadListCombo();
@@ -191,36 +196,113 @@ export class CreateOnlineOrderComponent implements OnInit {
 formatDateTime(date: string, time: string): string {
     return `${date}T${time}:00.000Z`;
 }
+openNoteDialog(item: any): void {
+  const dialogRef = this.dialog.open(NoteDialogComponent, {
+    width: '300px',
+    data: { note: item.note },
+    position: {
+      left: '500px', // Adjust the horizontal position
+      top: '-900px' // Adjust the vertical position
+    }
+  });
 
-  
-  createOrder() {
-    const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
-      itemId: item.id,
-      quantity: item.quantity,
-      price: item.price,
-      unitPrice: item.totalPrice,
-      dishId: item.dishId,
-      comboId: item.comboId
-    }));
-    this.combineDateTime();
-    this.addNew.totalAmount = this.calculateTotalAmount();
-    this.addNew.orderDetails = orderDetails;
-    this.addNew.orderDate = this.getVietnamTime();
-    
-    console.log('Order Details:', orderDetails);
-    this.orderService.AddNewOrder(this.addNew).subscribe(
-      response => {
-        console.log('Order created successfully:', response);
-        this.successMessage = 'Đơn hàng đã được tạo thành công!';
-        this.clearForm(); // Clear the form after successful order creation
-        this.setDefaultReceivingTime(); // Reset the default receiving time
-        setTimeout(() => this.successMessage = '', 5000);
-      },
-      error => {
-        console.error('Error creating order:', error);
-      }
-    );
+  dialogRef.afterClosed().subscribe(result => {
+    if (result !== undefined) {
+      item.note = result;
+    }
+  });
+}
+
+createOrder() {
+  // Ensure selectedItems is defined
+  if (!this.selectedItems || this.selectedItems.length === 0) {
+    console.error('No items selected for the order.');
+    return;
   }
+
+  // Map selected items to order details
+  const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
+    itemId: item.id,
+    quantity: item.quantity,
+    price: item.price,
+    unitPrice: item.totalPrice,
+    dishId: item.dishId,
+    comboId: item.comboId,
+    orderTime: new Date(),
+    note: item.note
+  }));
+
+  // Calculate total amount and set various properties
+  const totalAmount = this.calculateTotalAmount();
+  const currentDate = new Date();
+  const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
+  const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; // Convert paymentMethod to number
+
+  let amountReceived = totalAmount;
+  let returnAmount = 0;
+
+  // Set amountReceived and returnAmount based on payment method
+  if (paymentMethodValue === 0) { // Cash
+    amountReceived = customerPaidAmount;
+    returnAmount = customerPaidAmount - totalAmount;
+  } else if (paymentMethodValue === 2) { // COD
+    amountReceived = 0;
+    returnAmount = 0;
+  }
+
+  this.addNew = {
+    ...this.addNew, // Spread existing properties if any
+    totalAmount,
+    orderDetails,
+    orderDate: this.getVietnamTime(),
+    recevingOrder: currentDate.toISOString(),
+    paymentTime: currentDate.toISOString(),
+    paymentAmount: totalAmount,
+    amountReceived,
+    returnAmount,
+    paymentMethods: paymentMethodValue,
+    description: 'Order payment description',
+    discountId: 1,
+    taxcode: 'ABCD',
+    paymentStatus: 0,
+  };
+
+  // Log order details for debugging
+  console.log('Order Details:', orderDetails);
+
+  // Call the service to add the new order
+  this.orderService.AddNewOrder(this.addNew).subscribe(
+    response => {
+      console.log('Order created successfully:', response);
+      if (response && response.invoiceId) {
+        // Fetch the invoice using the returned invoiceId
+        this.loadInvoice(response.invoiceId);
+      } else {
+        console.error('No invoiceId returned from the service.');
+      }
+      this.successMessage = 'Đơn hàng đã được tạo thành công!';
+      setTimeout(() => this.successMessage = '', 5000);
+    },
+    error => {
+      console.error('Error creating order:', error);
+      if (error && error.error && error.error.message) {
+        console.error('Inner exception:', error.error.message);
+      }
+    }
+  );
+}
+
+loadInvoice(invoiceId: number): void {
+  // Fetch invoice data by ID
+  this.invoiceService.getInvoiceById(invoiceId).subscribe(
+    data => {
+      this.invoice = data;
+    },
+    error => {
+      console.error('Error fetching invoice:', error);
+    }
+  );
+}
 generateTimeOptions() {
   const startHour = 9; // 9 AM
   const endHour = 21; // 9 PM
