@@ -76,11 +76,19 @@
                   <tbody>
                     <tr *ngFor="let item of selectedItems; let i = index">
                       <td>
-                        <div class="d-flex align-items-center">
-                          <img [src]="item.imageUrl" alt="Item image" class="img-thumbnail me-2" style="width: 70px; height: 50px;">
-                          <p class="mb-0">{{ item.itemName || item.nameCombo }}</p>
-                        </div>
-                      </td>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <img [src]="item.imageUrl" alt="Item image" class="img-thumbnail me-2" style="width: 70px; height: 50px;">
+                            <p class="mb-0">
+                              <span class="clickable-item" (click)="openNoteDialog(item)">
+                                {{ item.itemName }}
+                              </span>
+                              <span *ngIf="item.nameCombo">
+                                {{ item.nameCombo }}
+                              </span>
+                            </p>
+                          </div>
+                        </td>  
                       <td>
                         <div class="d-flex align-items-center">
                           <input type="number" class="form-control text-center small-input" [(ngModel)]="item.quantity" (change)="validateQuantity(i)" min="1" max="100">
@@ -339,7 +347,7 @@
                         <tbody>
                             <tr *ngFor="let item of invoice?.itemInvoice; let i = index">
                                 <td>{{ i + 1 }}</td>
-                                <td>{{ item.itemName }}</td>
+                                <td>{{ item.itemName || item.nameCombo }}</td>
                                 <td>{{ item.quantity }}</td>
                                 <td>{{ item.unitPrice | currency:'VND' }}</td>
                                 <td>{{ item.price | currency:'VND' }}</td>

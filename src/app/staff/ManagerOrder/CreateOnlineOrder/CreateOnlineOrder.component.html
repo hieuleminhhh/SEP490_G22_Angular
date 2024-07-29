@@ -324,7 +324,7 @@
                         <tbody>
                             <tr *ngFor="let item of invoice?.itemInvoice; let i = index">
                                 <td>{{ i + 1 }}</td>
-                                <td>{{ item.itemName }}</td>
+                                <td>{{ item.itemName || item.nameCombo }}</td>
                                 <td>{{ item.quantity }}</td>
                                 <td>{{ item.unitPrice | currency:'VND' }}</td>
                                 <td>{{ item.price | currency:'VND' }}</td>

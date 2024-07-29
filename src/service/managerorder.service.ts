@@ -58,5 +58,9 @@ export class ManagerOrderService {
     const url = `${this.apiUrl}/orders/updateOrderDetails/${orderData.tableId}`;
     return this.http.post<any>(url, orderData, httpOptions);
   }
+  getOrderById(orderId: number): Observable<any> {
+    const url = `${this.apiUrl}/orders/GetOrderDetails/${orderId}`;
+    return this.http.get<any>(url);
+  }  
 }
 

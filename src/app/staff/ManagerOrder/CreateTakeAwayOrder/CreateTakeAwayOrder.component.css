@@ -141,6 +141,8 @@
     max-height: 200px; /* Adjust this value as needed */
     overflow-y: auto;
   }
-  
+  .clickable-item {
+    cursor: pointer; /* Change cursor to indicate that this part is clickable */
+  }
   
   
