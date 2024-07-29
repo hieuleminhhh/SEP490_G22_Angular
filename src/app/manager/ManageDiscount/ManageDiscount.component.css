@@ -1,0 +1,383 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  height: 400px;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.sidebar {
+  width: 20%;
+  padding: 20px;
+  background-color: #fff;
+  border-right: 1px solid #ddd;
+}
+
+.sidebar .search,
+.sidebar .status,
+.sidebar .record-count {
+  margin-bottom: 20px;
+}
+
+.sidebar label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.sidebar input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.sidebar .status-options label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.sidebar .record-count select {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.main-content {
+  width: 80%;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header h2 {
+  margin: 0;
+}
+
+.add-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.add-button:hover {
+  background-color: #45a049;
+}
+
+.program-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+
+.program-table th, .program-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.program-table th {
+  background-color: #f2f2f2;
+}
+
+.no-results {
+  text-align: center;
+}
+
+.no-results-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-size: 18px;
+  color: #888;
+}
+
+.no-results-message .icon {
+  width: 50px;
+  height: 50px;
+  /* background: url('path/to/your/icon.png') no-repeat center center; */
+  background-size: contain;
+  margin-right: 10px;
+}
+
+
+/* Existing styles remain the same */
+
+/* Style cho nền mờ khi hiển thị modal */
+.modal {
+  display: none; /* Ẩn modal mặc định */
+  position: fixed; /* Hiển thị modal cố định khi cuộn trang */
+  z-index: 1000; /* Độ sâu của modal */
+  left: 0;
+  top: 0;
+  width: 100%; /* Thay đổi chiều rộng về 100% */
+  height: 100%; /* Thay đổi chiều cao về 100% */
+  overflow: auto; /* Cho phép cuộn khi modal dài hơn trang */
+  background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
+}
+
+.modal-dialog {
+  max-width: 100%;
+  margin: 0 auto; /* Căn giữa theo chiều ngang */
+  display: flex;
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  height: 100%;
+}
+
+.modal-content {
+  background-color: #fefefe; /* Màu nền của modal */
+  padding: 20px;
+  border: 1px solid #ccc; /* Viền xung quanh */
+  width: 100%;
+  max-width: 1000px; /* Chiều rộng tối đa */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng cho modal */
+  border-radius: 8px; /* Bo góc */
+  position: relative; /* Để close button có thể được căn chỉnh chính xác */
+}
+
+.close {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+  width: calc(100% - 20px); /* Để padding không vượt ra ngoài */
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.amount-container {
+  display: flex;
+  align-items: center;
+}
+
+.amount-container input {
+  flex: 1;
+}
+
+.amount-container select {
+  margin-left: 10px;
+}
+
+.add-condition-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: block;
+  margin: 20px 0;
+}
+
+.add-condition-button:hover {
+  background-color: #45a049;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-button,
+.cancel-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  color: white;
+}
+
+.save-button {
+  background-color: #4caf50;
+}
+
+.save-button:hover {
+  background-color: #45a049;
+}
+
+.cancel-button {
+  background-color: #f44336;
+  margin-left: 10px;
+}
+
+.cancel-button:hover {
+  background-color: #e53935;
+}
+
+.form-group .radio-group {
+  display: flex;
+  gap: 20px; /* Khoảng cách giữa các nhãn */
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  width: 200px;
+}
+
+.radio-group label input{
+  display: flex;
+  align-items: center;
+  width: 50px;
+}
+
+/* Điều chỉnh input-group */
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px; /* Khoảng cách giữa các input groups */
+  position: relative;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+.input-group span {
+  font-weight: bold;
+}
+
+.input-group input {
+  flex: 1; /* Để input chiếm hết không gian còn lại */
+  padding: 8px 0; /* Padding trên và dưới */
+  border: none; /* Xóa viền mặc định */
+  border-bottom: 1px solid #ced4da; /* Thêm viền dưới */
+  box-sizing: border-box; /* Đảm bảo padding không làm tăng kích thước input */
+  text-align: center; /* Căn chỉnh văn bản ở giữa */
+  width: 80%; /* Độ rộng của input */
+}
+
+.input-group input:focus {
+  outline: none; /* Xóa đường viền mặc định khi focus */
+  border-bottom: 2px solid #007bff; /* Đổi màu viền dưới khi focus */
+}
+
+.input-group input::placeholder {
+  color: #6c757d; /* Màu của placeholder */
+  opacity: 1; /* Để placeholder không bị mờ */
+}
+
+.input-unit {
+  position: absolute; /* Định vị tuyệt đối */
+  right: 10%; /* Đặt ký hiệu ở phía bên phải của input */
+  bottom: 12px; /* Đặt ký hiệu ở giữa chiều cao của input */
+  color: #6c757d; /* Màu của ký hiệu */
+  font-size: 14px; /* Kích thước font của ký hiệu */
+}
+.form-control {
+  flex: 1; /* Để input chiếm hết không gian còn lại */
+  padding: 8px; /* Padding cho input */
+  border: 1px solid #ced4da; /* Viền input */
+  border-radius: 4px; /* Bo góc input */
+  box-sizing: border-box; /* Đảm bảo padding không làm tăng kích thước input */
+}
+
+.amount-container {
+  display: flex;
+  gap: 10px; /* Khoảng cách giữa input và select */
+}
+
+.add-condition-button {
+  background-color: white;
+  color: black;
+  padding: 10px;
+  border: 1px solid #ced4da; /* Viền input */
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: block;
+  margin: 20px 0;
+}
+
+.add-condition-button:hover {
+  background-color: #45a049;
+}
+
+.horizontal-form-group {
+  display: flex;
+  align-items: center;
+  gap: 40px; /* Khoảng cách giữa label và select */
+}
+
+.horizontal-form-group label {
+  margin-bottom: 0; /* Đảm bảo label không có khoảng cách bên dưới */
+  min-width: 50px; /* Độ rộng tối thiểu cho label để căn chỉnh đẹp hơn */
+}
+
+.horizontal-form-group select {
+  flex: 1; /* Để select chiếm hết không gian còn lại */
+  padding: 8px; /* Padding cho select */
+  border: 1px solid #ced4da; /* Viền select */
+  border-radius: 4px; /* Bo góc select */
+  box-sizing: border-box; /* Đảm bảo padding không làm tăng kích thước select */
+}
+.delete-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #dc3545; /* Optional: color of the delete icon */
+  font-size: 1,3em; /* Adjust size as needed */
+}
+
+.text-right {
+  text-align: right;
+}
+
+.input-group .delete-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.input-group .delete-icon:hover {
+  color: black; /* Màu khi hover */
+}
