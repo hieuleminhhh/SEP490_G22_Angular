@@ -11,7 +11,7 @@
         <div class="inner-wrap">
           <div class="filter-cell">
             <select class="form-control" (change)="onCategoryChange($event)" *ngIf="category$ | async as categories">
-              <option value="*">Thế loại </option>
+              <option value="*">Thực đơn</option>
               <option *ngFor="let category of categories" [value]="category.categoryName">
                 {{ category.categoryName }}
               </option>

@@ -15,6 +15,7 @@ export class CookingManagementComponent implements OnInit {
   currentView: string = 'order-layout';
   dateFrom: string = '';
   dateTo: string = '';
+  dateNow: string = '';
   order: any;
   filteredOrders: any[] = [];
 
@@ -24,6 +25,7 @@ export class CookingManagementComponent implements OnInit {
     const today = new Date().toISOString().split('T')[0];
     this.dateFrom = today;
     this.dateTo = today;
+    this.dateNow = today;
     this.getOrders('1-4');
   }
 
@@ -42,7 +44,8 @@ export class CookingManagementComponent implements OnInit {
   getOrders(type: string): void {
     this.cookingService.getOrders(type).subscribe(
       response => {
-        this.order = response.data || []; // Đảm bảo rằng order luôn là một mảng
+        this.order = response.data || [];
+        console.log(this.order);
         this.order.forEach((o: { dishesServed: number; }) => {
           o.dishesServed = o.dishesServed || 0; // Đặt giá trị mặc định nếu không có
         });
@@ -56,7 +59,9 @@ export class CookingManagementComponent implements OnInit {
   getOrder(type: string): void {
     this.cookingService.getOrders(type).subscribe(
       response => {
-        this.order = response.data || []; // Đảm bảo rằng order luôn là một mảng
+        this.order = response.data || [];
+        console.log(this.order);
+
         this.order.forEach((o: { dishesServed: number; }) => {
           o.dishesServed = o.dishesServed || 0; // Đặt giá trị mặc định nếu không có
         });
@@ -78,14 +83,15 @@ export class CookingManagementComponent implements OnInit {
         const orderDate = new Date(order.recevingOrder);
         return orderDate >= fromDate && orderDate <= toDate;
       });
+      console.log(this.filteredOrders);
     } else {
       this.filteredOrders = this.order;
     }
   }
 
-  completeOrder(order: any): void {
+  completeDish(orderDetailId: number, quantity:number): void {
     // Thực hiện hành động khi nút hoàn thành được nhấn
-    console.log('Đơn hàng đã hoàn thành:', order);
+    console.log('Đơn hàng đã hoàn thành:', orderDetailId, quantity);
     // Ví dụ: gọi service để cập nhật trạng thái đơn hàng
   }
 }

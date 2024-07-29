@@ -163,3 +163,19 @@ th {
 .input-group {
   width: 100%;
 }
+
+.align-items-center {
+  display: flex;
+  align-items: center; /* Căn giữa theo chiều dọc */
+  justify-content: center;
+}
+
+.align-items-center .form-control-sm {
+  margin-right: 10px; /* Khoảng cách giữa input và button */
+}
+
+.input-short {
+  width: 80px; /* Đặt độ rộng mong muốn cho input */
+  max-width: 80px; /* Đảm bảo rằng input không mở rộng hơn độ rộng mong muốn */
+  flex-shrink: 0; /* Ngăn input co lại khi trong container flex */
+}

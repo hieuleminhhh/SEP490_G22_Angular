@@ -24,7 +24,8 @@
       <div class="col-md-3" *ngIf="currentView === 'booking-order'">
         <div class="input-group">
           <label class="input-group-text" for="dateFrom">Từ ngày</label>
-          <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom" (change)="onDateFromChange()">
+          <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom" [min]="dateNow"
+            (change)="onDateFromChange()">
         </div>
       </div>
       <div class="col-md-3" *ngIf="currentView === 'booking-order'">
@@ -50,32 +51,28 @@
                   <th>Số lượng</th>
                   <th>Thời gian gọi món</th>
                   <th>Ghi chú</th>
-                  <th>Số lượng phục vụ</th>
+                  <th>Số lượng hoàn thành</th>
                 </tr>
               </thead>
               <tbody>
                 <ng-container *ngFor="let order of order">
                   <tr>
-                    <td>{{order.itemName}}</td>
+                    <td>{{order.itemName || order.comboName}}</td>
                     <td>{{order.quantity}}</td>
                     <td>{{order.orderTime | date:'dd/MM/yyyy - HH:mm' }}</td>
                     <td>{{order.note ? null: 'trống'}}</td>
-                    <td>
+                    <td class="align-items-center">
                       <input type="number" [(ngModel)]="order.dishesServed" [ngModelOptions]="{standalone: true}"
                         [attr.min]="order.dishesServed" [attr.max]="order.quantity"
-                        class="form-control form-control-sm" />
-                      <button type="button" class="btn btn-primary btn-sm" (click)="completeOrder(order)">
+                        class="form-control form-control-sm input-short" />
+                      <button type="button" class="btn btn-primary btn-sm" (click)="completeDish(order.orderDetailId, order.quantity)">
                         Hoàn thành
                       </button>
                     </td>
-                    <td>
-
-                    </td>
+                    <td></td>
                   </tr>
                 </ng-container>
               </tbody>
-
-
             </table>
           </div>
           <br>
@@ -107,22 +104,26 @@
                   <th>Số lượng</th>
                   <th>Thời gian giao hàng</th>
                   <th>Ghi chú</th>
-                  <th>Số lượng phục vụ</th>
+                  <th>Số lượng hoàn thành</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
                 <ng-container *ngFor="let order of filteredOrders">
                   <tr>
-                    <td>{{order.itemName}}</td>
+                    <td>{{order.itemName || order.comboDetailsForChef?.[0]?.comboName}}</td>
                     <td>{{order.quantity}}</td>
                     <td>{{order.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</td>
                     <td>{{order.note ? null: 'trống'}}</td>
-                    <td>{{order.dishesServed ? null:0}}</td>
-                    <td>
-                      <button type="button" class="btn btn-primary btn-sm">Chi
-                        tiết</button>
+                    <td class="align-items-center">
+                      <input type="number" [(ngModel)]="order.dishesServed" [ngModelOptions]="{standalone: true}"
+                        [attr.min]="order.dishesServed" [attr.max]="order.quantity"
+                        class="form-control form-control-sm input-short" />
+                      <button type="button" class="btn btn-primary btn-sm" (click)="completeDish(order.orderDetailId, order.quantity)">
+                        Hoàn thành
+                      </button>
                     </td>
+                    <td></td>
                   </tr>
                 </ng-container>
               </tbody>
