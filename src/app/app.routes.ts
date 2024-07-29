@@ -23,6 +23,7 @@ import { ViewTableOrderComponent } from './staff/ManagerOrder/ViewTableOrder/Vie
 import { CreateOfflineOrderComponent } from './staff/ManagerOrder/CreateOfflineOrder/CreateOfflineOrder.component';
 import { UpdateOfflineOrderComponent } from './staff/ManagerOrder/UpdateOfflineOrder/UpdateOfflineOrder.component';
 import { PaymentSuccessComponent } from './common/payment-success/payment-success.component';
+import { ManageDiscountComponent } from './manager/ManageDiscount/ManageDiscount.component';
 
 
 export const routes: Routes = [
@@ -49,5 +50,6 @@ export const routes: Routes = [
     {'path': 'listTable', component:ViewTableOrderComponent},
     {'path': 'createOffline', component:CreateOfflineOrderComponent},
     {'path': 'updateOffline' , component:UpdateOfflineOrderComponent},
-    {'path': 'paymentSuccess' , component:PaymentSuccessComponent}
+    {'path': 'paymentSuccess' , component:PaymentSuccessComponent},
+    {'path': 'manageDiscount' , component:ManageDiscountComponent}
 ];
