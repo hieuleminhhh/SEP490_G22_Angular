@@ -10,9 +10,7 @@
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div class="container mt-5">
           <h2 class="text-center mb-4">Đơn hàng tại quán bàn {{ tableId }}</h2>
-          <div *ngIf="errorMessage" class="error-message">
-            {{ errorMessage }}
-          </div>
+
           <div class="row">
             <!-- Left column for address and cart details -->
             <div class="col-md-6">
@@ -94,13 +92,8 @@
                       </td>
                       <td>
                         <div class="d-flex align-items-center">
-                          <input 
-                            type="number" 
-                            class="form-control text-center small-input" 
-                            [(ngModel)]="item.dishesServed" 
-                            (ngModelChange)="item.dishesServed = item.dishesServed || 0">
+                          <input type="number" class="form-control text-center small-input" [(ngModel)]="item.dishesServed">
                         </div>
-                        
                       </td>
                       <td>
                         <div *ngIf="item.discountedPrice" class="d-flex align-items-center">
@@ -125,7 +118,7 @@
                 </div>
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
                   <button class="btn btn-primary btn-lg" (click)="createOrderOffline(tableId)">
-                    Lưu lại
+                    Tạo đơn
                   </button>
                 </div>
               </div>

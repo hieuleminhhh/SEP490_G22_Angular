@@ -1,0 +1,32 @@
+/* Applies to the label and container */
+.dialog-title {
+    margin-bottom: 0px; /* Space between title and content */
+    font-size: 20px; /* Adjust font size if needed */
+    padding: 16px; /* Add padding to ensure title is not too close to the edge */
+  }
+  
+  .dialog-content {
+    padding: 0 16px; /* Padding around content to prevent overlap with the title */
+  }
+  
+  .note-form-field {
+    width: 100%; /* Make form field take full width available */
+    margin-bottom: 16px; /* Space below the form field to separate it from other elements */
+  }
+  
+  /* Targets the input element within mat-form-field */
+  .note-form-field .mat-form-field-infix input {
+    color: red; /* Sets the text color of the input field to red */
+  }
+  
+  /* Optionally, to target placeholder color */
+  .note-form-field .mat-form-field-infix input::placeholder {
+    color: red; /* Sets the placeholder text color to red */
+  }
+  
+  .dialog-actions {
+    padding: 8px 16px; /* Padding around action buttons */
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+  }
+  

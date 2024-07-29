@@ -252,14 +252,14 @@
         
                 <!-- Template for CreateTakeAwayOrderComponent -->
                 <div class="mb-3">
-                  <label class="form-label">Phương thức thanh toán:</label>
+                  <label class="form-label">Hình thức thanh toán:</label>
                   <div>
                     <input type="radio" id="cash" name="paymentMethod" value= "0" [(ngModel)]="paymentMethod">
                     <label for="cash">Tiền mặt</label>
                   </div>
                   <div>
                     <input type="radio" id="bank" name="paymentMethod" value= "1" [(ngModel)]="paymentMethod">
-                    <label for="bank">Ngân hàng</label>
+                    <label for="bank">Chuyển khoản ngân hàng</label>
                   </div>
                 </div>
         
@@ -279,7 +279,7 @@
                 <button type="button" class="btn btn-primary"
                 data-bs-toggle="modal" data-bs-target="#cfpaymentModal"
                 (click)="createOrder()">
-          Xác nhận thanh toán
+                Xác nhận
                 </button>        
               </div>
             </div>
