@@ -71,7 +71,6 @@
                     <tr *ngIf="selectedItems.length > 0">
                       <th scope="col">Tên món</th>
                       <th scope="col">Số lượng</th>
-                      <th scope="col">Số lượng hoàn thành</th>
                       <th scope="col">Giá món</th>
                       <th scope="col">Tổng</th>
                       <th scope="col"></th> <!-- Column for delete button -->
@@ -89,16 +88,6 @@
                         <div class="d-flex align-items-center">
                           <input type="number" class="form-control text-center small-input" [(ngModel)]="item.quantity" (change)="validateQuantity(i)" min="1" max="100">
                         </div>
-                      </td>
-                      <td>
-                        <div class="d-flex align-items-center">
-                          <input
-                            type="number"
-                            class="form-control text-center small-input"
-                            [(ngModel)]="item.dishesServed"
-                            (ngModelChange)="item.dishesServed = item.dishesServed || 0">
-                        </div>
-
                       </td>
                       <td>
                         <div *ngIf="item.discountedPrice" class="d-flex align-items-center">

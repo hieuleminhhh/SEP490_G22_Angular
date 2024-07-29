@@ -36,9 +36,9 @@ export interface ListAllOrder {
 }
 export interface AddNewOrder {
   guestPhone: string | null;
-  email: string;
+  email: string | null;
   addressId: number | null;
-  guestAddress: string;
+  guestAddress: string | null;
   consigneeName: string;
   orderDate: Date | null;
   status: number;

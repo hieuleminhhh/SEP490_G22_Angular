@@ -394,8 +394,9 @@ export class CreateOfflineOrderComponent implements OnInit {
         quantity: item.quantity,
         discountedPrice: item.discountedPrice
       }));
-  
-      const guestPhone = this.addNew.guestPhone || '';
+    
+      const guestPhone = this.addNew.guestPhone ? this.addNew.guestPhone : '';
+    
       const newOrder = {
         tableId: tableId,
         guestAddress: this.addNew.guestAddress,
@@ -409,7 +410,7 @@ export class CreateOfflineOrderComponent implements OnInit {
         status: 3,
         orderDetails: orderDetails
       };
-  
+      
       this.orderService.createOrderOffline(newOrder).subscribe(
         response => {
           console.log('Offline order created successfully:', response);
@@ -424,6 +425,7 @@ export class CreateOfflineOrderComponent implements OnInit {
         }
       );
     }
+    
   createInvoiceOffline(orderId: number) {
     this.invoiceService.createInvoiceOffline(orderId).subscribe(
       response => {
