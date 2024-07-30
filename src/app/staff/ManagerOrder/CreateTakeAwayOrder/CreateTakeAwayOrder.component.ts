@@ -172,6 +172,35 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     // Recalculate totalAmount after adding item
     this.calculateTotalAmount();
   }
+  increaseQuantity(index: number): void {
+    if (this.selectedItems[index].quantity < 100) {
+      this.selectedItems[index].quantity++;
+      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+      this.validateQuantity(index);
+      this.calculateTotalAmount();
+    }
+  }
+  
+  decreaseQuantity(index: number): void {
+    if (this.selectedItems[index].quantity > 1) {
+      this.selectedItems[index].quantity--;
+      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+      this.validateQuantity(index);
+      this.calculateTotalAmount();
+    }
+  }
+  validateQuantity(index: number): void {
+    const item = this.selectedItems[index];
+    if (item.quantity < 1) {
+      item.quantity = 1;
+    } else if (item.quantity > 100) {
+      item.quantity = 100;
+    }
+    // Update the total price after validating the quantity
+    item.totalPrice = item.quantity * item.unitPrice;
+    // Recalculate total amount
+    this.calculateTotalAmount();
+  }
   clearCart() {
     this.selectedItems = [];
     this.selectedAddress = "Khách lẻ"
@@ -331,17 +360,7 @@ loadInvoice(invoiceId: number): void {
       this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
     }
   }
-  
-  validateQuantity(index: number) {
-    const item = this.selectedItems[index];
-    if (item.quantity < 1) {
-      item.quantity = 1;
-    } else if (item.quantity > 100) {
-      item.quantity = 100;
-    }
-    this.updateQuantity(index, item.quantity);
-  }
-  
+
 
   toggleDropdown() {
     if (!this.selectedAddress) {
