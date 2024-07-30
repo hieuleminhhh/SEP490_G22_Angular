@@ -15,12 +15,13 @@ import { ManagerOrderService } from '../../../../service/managerorder.service';
 import { InvoiceService } from '../../../../service/invoice.service';
 import { NoteDialogComponent } from '../../../common/material/NoteDialog/NoteDialog.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { CurrencyFormatPipe } from '../../../common/material/currencyFormat/currencyFormat.component';
 @Component({
   selector: 'app-CreateOnlineOrder',
   templateUrl: './CreateOnlineOrder.component.html',
   styleUrls: ['./CreateOnlineOrder.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, MatDialogModule]
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, MatDialogModule, CurrencyFormatPipe]
 })
 export class CreateOnlineOrderComponent implements OnInit {
 

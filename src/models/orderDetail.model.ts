@@ -37,6 +37,7 @@ export interface ListOrderDetailByOrder{
   deposits:number;
   guestAddress:string;
   consigneeName:string;
+  type: number;
   orderDetails:ListOrderDetail[];
 }
 export interface AddOrderDetail{

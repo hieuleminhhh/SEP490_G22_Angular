@@ -16,12 +16,13 @@ import { AddOrderDetail, ListOrderDetailByOrder } from '../../../../models/order
 import { InvoiceService } from '../../../../service/invoice.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../common/material/ConfirmDialog/ConfirmDialog.component';
+import { CurrencyFormatPipe } from '../../../common/material/currencyFormat/currencyFormat.component';
 @Component({
     selector: 'app-create-offline-order',
     templateUrl: './CreateOfflineOrder.component.html',
     styleUrls: ['./CreateOfflineOrder.component.css'],
     standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
+    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe]
 })
 export class CreateOfflineOrderComponent implements OnInit {
   tableId: number = 0;

@@ -98,13 +98,13 @@
                         </td>
                       <td>
                         <div *ngIf="item.discountedPrice" class="d-flex align-items-center">
-                          <span>{{ item.discountedPrice}} VNĐ</span>
+                          <span>{{ item.discountedPrice | currencyFormat }}</span>
                         </div>
                         <div *ngIf="!item.discountedPrice" class="d-flex align-items-center">
-                          <span>{{ item.price }} VNĐ</span>
+                          <span>{{ item.price | currencyFormat  }}</span>
                         </div>
                       </td>
-                      <td>{{ item.totalPrice}} VNĐ</td>
+                      <td>{{ item.totalPrice | currencyFormat }}</td>
                       <td>
                         <button class="btn btn-danger btn-sm" (click)="removeItem(i)">
                           <i class="fas fa-times"></i>
@@ -115,7 +115,7 @@
                 </table>
                 
                 <div *ngIf="selectedItems.length > 0" class="total-amount mt-3">
-                  <strong>Tổng cộng đơn:</strong> {{ calculateTotalAmount() | currency:'USD':'symbol-narrow':'1.2-2' }}
+                  <strong>Tổng cộng đơn:</strong> {{ calculateTotalAmount() | currencyFormat  }}
                 </div>
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
                   <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
@@ -174,11 +174,11 @@
                           <div class="dish-details">
                             <div class="dish-name">{{ dish.itemName }}</div>
                             <div *ngIf="dish.discountedPrice" class="dish-price">
-                              <span class="text-decoration-line-through">{{ dish.price | currency }}</span>
+                              <span class="text-decoration-line-through">{{ dish.price | currencyFormat  }}</span>
                               <br>
-                              <span style="color: red">{{ dish.discountedPrice | currency }}</span>
+                              <span style="color: red">{{ dish.discountedPrice | currencyFormat  }}</span>
                             </div>
-                            <div *ngIf="!dish.discountedPrice" class="dish-price">{{ dish.price | currency }}</div>
+                            <div *ngIf="!dish.discountedPrice" class="dish-price">{{ dish.price | currencyFormat  }}</div>
                           </div>
                         </div>
                       </div>
@@ -198,7 +198,7 @@
                         <div class="card-body text-center">
                           <div class="combo-details">
                             <div class="combo-name">{{ cb.nameCombo }}</div>
-                            <div class="combo-price">{{ cb.price | currency }}</div>
+                            <div class="combo-price">{{ cb.price | currencyFormat  }}</div>
                           </div>
                         </div>
                       </div>
@@ -250,7 +250,7 @@
                 <!-- Thông tin hóa đơn -->
                 <div class="mb-3">
                   <label for="price" class="form-label">Tổng tiền phải trả:</label>
-                  {{ calculateTotalAmount() | currency:'USD':'symbol-narrow':'1.2-2' }}
+                  {{ calculateTotalAmount() |currencyFormat  }}
                 </div>
         
                 <!-- Template for CreateTakeAwayOrderComponent -->
@@ -343,15 +343,15 @@
                                 <td>{{ i + 1 }}</td>
                                 <td>{{ item.itemName || item.nameCombo }}</td>
                                 <td>{{ item.quantity }}</td>
-                                <td>{{ item.unitPrice | currency:'VND' }}</td>
-                                <td>{{ item.price | currency:'VND' }}</td>
+                                <td>{{ item.unitPrice | currencyFormat  }}</td>
+                                <td>{{ item.price | currencyFormat  }}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="mb-3">
                     <label for="totalAmount" class="form-label">Tổng tiền:</label>
-                    <span id="totalAmount">{{ invoice?.totalAmount | currency:'VND' || 'N/A' }}</span>
+                    <span id="totalAmount">{{ invoice?.totalAmount | currencyFormat  }}</span>
                 </div>
                 
                 <div class="mb-3">
@@ -361,17 +361,17 @@
                 
                 <div class="mb-3">
                     <label for="amountToPay" class="form-label">Khách phải trả:</label>
-                    <span id="amountToPay">{{ invoice?.totalAmount | currency:'VND' || 'N/A' }}</span>
+                    <span id="amountToPay">{{ invoice?.totalAmount | currencyFormat }}</span>
                 </div>
                 
                 <div class="mb-3">
                     <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
-                    <span id="customerPaid">{{ invoice?.amountReceived | currency:'VND' || 'N/A' }}</span>
+                    <span id="customerPaid">{{ invoice?.amountReceived | currencyFormat }}</span>
                 </div>
                 
                 <div class="mb-3">
                     <label for="changeToGive" class="form-label">Trả lại:</label>
-                    <span id="changeToGive">{{ invoice?.returnAmount | currency:'VND' || '0 VNĐ' }}</span>
+                    <span id="changeToGive">{{ invoice?.returnAmount | currencyFormat  }}</span>
                 </div>
             </div>            
               <div class="modal-footer">
