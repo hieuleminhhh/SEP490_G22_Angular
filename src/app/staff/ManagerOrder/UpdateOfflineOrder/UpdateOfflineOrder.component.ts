@@ -74,6 +74,173 @@ export class UpdateOfflineOrderComponent implements OnInit {
       this.loadListOrderByTable(this.tableId);
     });
   }
+  addItem(item: any) {
+    // Gọi API để lấy dữ liệu từ database
+    this.orderService.getOrderById(this.orderId).subscribe(
+      (dbItemResponse: any) => {
+        // In ra toàn bộ dữ liệu phản hồi để kiểm tra cấu trúc
+        console.log('DB Item Response:', dbItemResponse);
+  
+        // Giả định rằng dbItemResponse chứa danh sách các mục từ cơ sở dữ liệu
+        this.dbItems = dbItemResponse;
+  
+        // Log the current state of dbItems and selectedItems
+        console.log('Current DB Items:', this.dbItems);
+        console.log('Current Selected Items:', this.selectedItems);
+  
+        // Tiếp tục xử lý item
+        const selectedIndex = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
+        const dbIndex = this.dbItems.findIndex(dbItem => this.itemsAreEqual(dbItem, item));
+  
+        console.log('Selected Index:', selectedIndex);
+        console.log('DB Index:', dbIndex);
+  
+        if (dbIndex !== -1) {
+          console.log('Item already exists in dbItems, skipping');
+        } else if (selectedIndex !== -1) {
+          console.log('Item already exists in selectedItems, skipping');
+        } else {
+          // Nếu item không tồn tại trong selectedItems và cũng không có trong db, thêm vào selectedItems và newlyAddedItems với số lượng 1
+          console.log('Item is new, adding to selectedItems and newlyAddedItems');
+          const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
+          this.selectedItems.push({
+            ...item,
+            quantity: 1,
+            unitPrice: unitPrice,
+            totalPrice: unitPrice
+          });
+  
+          this.newlyAddedItems.push({
+            ...item,
+            quantity: 1,
+            unitPrice: unitPrice,
+            totalPrice: unitPrice
+          });
+  
+          console.log('Newly Added Item:', item);
+        }
+  
+        // In ra dữ liệu của newlyAddedItems để kiểm tra
+        console.log('Newly added items:', this.newlyAddedItems);
+      },
+      (error: any) => {
+        // Xử lý lỗi gọi API
+        console.error('Error fetching item data:', error);
+      }
+    );
+  }
+  
+  
+  
+  
+  
+  increaseQuantity(index: number): void {
+    if (this.selectedItems[index].quantity < 100) {
+      this.selectedItems[index].quantity++;
+      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+      this.validateQuantity(index);
+      this.calculateTotalAmount();
+  
+      // Update newlyAddedItems
+      const newlyAddedIndex = this.newlyAddedItems.findIndex(newItem => this.itemsAreEqual(newItem, this.selectedItems[index]));
+      if (newlyAddedIndex !== -1) {
+        this.newlyAddedItems[newlyAddedIndex].quantity++;
+        this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * this.newlyAddedItems[newlyAddedIndex].unitPrice;
+      } else {
+        this.newlyAddedItems.push({
+          ...this.selectedItems[index],
+          quantity: 1,
+          unitPrice: this.selectedItems[index].unitPrice,
+          totalPrice: this.selectedItems[index].unitPrice
+        });
+      }
+      console.log('Updated newlyAddedItems:', this.newlyAddedItems);
+    }
+  }
+  
+  decreaseQuantity(index: number): void {
+    if (this.selectedItems[index].quantity > 1) {
+      this.selectedItems[index].quantity--;
+      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+      this.validateQuantity(index);
+      this.calculateTotalAmount();
+  
+      // Update newlyAddedItems
+      const newlyAddedIndex = this.newlyAddedItems.findIndex(newItem => this.itemsAreEqual(newItem, this.selectedItems[index]));
+      if (newlyAddedIndex !== -1) {
+        if (this.newlyAddedItems[newlyAddedIndex].quantity > 1) {
+          this.newlyAddedItems[newlyAddedIndex].quantity--;
+          this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * this.newlyAddedItems[newlyAddedIndex].unitPrice;
+        } else {
+          this.newlyAddedItems.splice(newlyAddedIndex, 1);
+        }
+      } else {
+        // Handle the case where the item was not newly added but decreased
+        const unitPrice = this.selectedItems[index].unitPrice;
+        this.newlyAddedItems.push({
+          ...this.selectedItems[index],
+          quantity: -1,
+          unitPrice: unitPrice,
+          totalPrice: -unitPrice
+        });
+      }
+      console.log('Updated newlyAddedItems:', this.newlyAddedItems);
+    }
+  }
+  
+  validateQuantity(index: number): void {
+    const item = this.selectedItems[index];
+    if (item.quantity < 1) {
+      item.quantity = 1;
+    } else if (item.quantity > 100) {
+      item.quantity = 100;
+    }
+    // Update the total price after validating the quantity
+    item.totalPrice = item.quantity * item.unitPrice;
+    // Recalculate total amount
+    this.calculateTotalAmount();
+  }
+  itemsAreEqual(item1: any, item2: any): boolean {
+    return (item1.dishId === item2.dishId && item1.comboId === item2.comboId);
+  }
+  
+updateOrderOffline(tableId: number) {
+    // Chỉ lấy các mục mới thêm vào để cập nhật vào DB
+    const orderDetails = this.newlyAddedItems.map(item => ({
+        dishId: item.dishId || null,
+        comboId: item.comboId || null,
+        quantity: item.quantity,
+        note: item.note || '', // Assuming you have a note property or set it to an empty string
+        orderTime: new Date().toISOString() // Assuming you want the current time
+    }));
+
+    // In ra dữ liệu trước khi gửi
+    console.log('Updating offline order with details:', orderDetails);
+
+    // Construct the order object
+    const updatedOrder = {
+        tableId: tableId,
+        orderDetails: orderDetails
+    };
+
+    // Call the service method to update the order
+    this.orderService.updateOrderOffline(updatedOrder).subscribe(
+        response => {
+            console.log('Offline order updated successfully:', response);
+            this.successMessage = 'Offline order updated successfully!';
+            setTimeout(() => this.successMessage = '', 5000);
+
+            // Clear newlyAddedItems after successful update
+            this.newlyAddedItems = [];
+        },
+        error => {
+            console.error('Error updating offline order:', error);
+            if (error.error && error.error.errors) {
+                console.error('Validation errors:', error.error.errors);
+            }
+        }
+    );
+}
 
   loadListOrderByTable(tableId: number): void {
     console.log('Loading orders for table ID:', tableId);
@@ -84,16 +251,15 @@ export class UpdateOfflineOrderComponent implements OnInit {
             if (orderItem) {
               let itemName = orderItem.dish?.itemName ?? '';
               let nameCombo = orderItem.combo?.nameCombo ?? '';
-              let displayName = itemName || nameCombo;
-              const totalPrice = orderItem.dish?.discountedPrice
-                ? orderItem.dish.discountedPrice * orderItem.quantity
-                : orderItem.dish?.price * orderItem.quantity;
+              const unitPrice = orderItem.dish?.discountedPrice ?? orderItem.dish?.price ?? orderItem.combo?.discountedPrice ?? orderItem.combo?.price ?? 0;
+              const totalPrice = unitPrice * orderItem.quantity;
 
               return {
                 orderDetailId: orderItem.orderDetailId,
                 dishId: orderItem.dishId,
                 comboId: orderItem.comboId,
-                itemName: displayName,
+                itemName: itemName,
+                nameCombo: nameCombo,
                 unitPrice: orderItem.unitPrice,
                 dishesServed: orderItem.dishesServed || 0,
                 price: orderItem.dish?.price || orderItem.combo?.price || 0,
@@ -139,6 +305,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
       }
     );
   }
+
   
   private parseDateString(dateStr: string): Date | null {
     if (!dateStr) return null; // Handle empty date strings
@@ -147,97 +314,6 @@ export class UpdateOfflineOrderComponent implements OnInit {
     return isNaN(parsedDate.getTime()) ? null : parsedDate;
   }
   
-  addItem(item: any) {
-    const selectedIndex = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-    const dbIndex = this.dbItems.findIndex(dbItem => this.itemsAreEqual(dbItem, item));
-    
-    if (selectedIndex !== -1) {
-      // If the item already exists in selectedItems, increase its quantity and update the total price
-      this.selectedItems[selectedIndex].quantity++;
-      this.selectedItems[selectedIndex].totalPrice = this.selectedItems[selectedIndex].quantity * this.selectedItems[selectedIndex].unitPrice;
-    } else if (dbIndex !== -1) {
-      // If the item exists in the db, calculate the difference and add it to selectedItems
-      const existingDbItem = this.dbItems[dbIndex];
-      const existingQuantity = existingDbItem.quantity;
-      const additionalQuantity = 1; // We are adding 1 item
-      const newQuantity = existingQuantity + additionalQuantity; // Total quantity after addition
-      const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
-      
-      // Add the difference to selectedItems
-      this.selectedItems.push({ 
-        ...item, 
-        quantity: additionalQuantity, 
-        unitPrice: unitPrice, 
-        totalPrice: additionalQuantity * unitPrice 
-      });
-      
-      // Update the existing item in dbItems with the new quantity
-      this.dbItems[dbIndex].quantity = newQuantity;
-    } else {
-      // If the item does not exist in selectedItems and also not in the db, add it to selectedItems with quantity 1 and set the total price
-      const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
-      this.selectedItems.push({ 
-        ...item, 
-        quantity: 1, 
-        unitPrice: unitPrice, 
-        totalPrice: unitPrice 
-      });
-  
-      // Track newly added items
-      this.newlyAddedItems.push({ 
-        ...item, 
-        quantity: 1, 
-        unitPrice: unitPrice, 
-        totalPrice: unitPrice 
-      });
-    }
-    
-    // Recalculate totalAmount after adding item
-    this.calculateTotalAmount();
-  }
-  
-  updateOrderOffline(tableId: number) {
-    const orderDetails = this.newlyAddedItems.map(item => ({
-      dishId: item.dishId,
-      comboId: item.comboId,
-      unitPrice: item.unitPrice,
-      quantity: item.quantity,
-      discountedPrice: item.discountedPrice
-    }));
-    
-    const guestPhone = this.addNew.guestPhone || '';
-    
-    // Construct the order object
-    const updatedOrder = {
-      tableId: tableId,
-      guestAddress: this.addNew.guestAddress,
-      consigneeName: this.addNew.consigneeName,
-      orderDate: new Date().toISOString(), 
-      receivingOrder: new Date().toISOString(), 
-      totalAmount: this.calculateTotalAmount(), 
-      guestPhone: guestPhone,
-      note: "This is a special request note.",
-      type: 4,
-      status: 3,
-      orderDetails: orderDetails
-    };
-    
-    // Call the service method to update the order
-    this.orderService.updateOrderOffline(updatedOrder).subscribe(
-      response => {
-        console.log('Offline order updated successfully:', response);
-        this.successMessage = 'Offline order updated successfully!';
-        setTimeout(() => this.successMessage = '', 5000);
-       
-      },
-      error => {
-        console.error('Error updating offline order:', error);
-        if (error.error && error.error.errors) {
-          console.error('Validation errors:', error.error.errors);
-        }
-      }
-    );
-  }
   loadInvoice(invoiceId: number): void {
     this.invoiceService.getInvoiceById(invoiceId).subscribe(
       data => {
@@ -249,16 +325,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
     );
   }
   
-  itemsAreEqual(item1: any, item2: any): boolean {
-    if (item1.hasOwnProperty('itemName') && item2.hasOwnProperty('itemName')) {
-      return item1.itemName === item2.itemName;
-    }
-    
-    if (item1.hasOwnProperty('nameCombo') && item2.hasOwnProperty('nameCombo')) {
-      return item1.nameCombo === item2.nameCombo;
-    }
-    return false;
-  }
+ 
   
   
   
@@ -385,15 +452,6 @@ export class UpdateOfflineOrderComponent implements OnInit {
       }
     }
     
-    validateQuantity(index: number) {
-      const item = this.selectedItems[index];
-      if (item.quantity < 1) {
-        item.quantity = 1;
-      } else if (item.quantity > 100) {
-        item.quantity = 100;
-      }
-      this.updateQuantity(index, item.quantity);
-    }
     toggleDropdown() {
       if (!this.selectedAddress) {
         this.selectedAddress = "Khách lẻ";

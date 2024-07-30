@@ -13,6 +13,8 @@ import { ManagerDishService } from '../../../../service/managerdish.service';
 import { ManagerOrderService } from '../../../../service/managerorder.service';
 import { SidebarOrderComponent } from '../../SidebarOrder/SidebarOrder.component';
 import { InvoiceService } from '../../../../service/invoice.service';
+import { NoteDialogComponent } from '../../../common/material/NoteDialog/NoteDialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-CreateTakeAwayOrder',
@@ -24,7 +26,8 @@ import { InvoiceService } from '../../../../service/invoice.service';
 export class CreateTakeAwayOrderComponent implements OnInit {
 
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService,
-     private orderService : ManagerOrderService,  private cd: ChangeDetectorRef, private invoiceService: InvoiceService, private route: ActivatedRoute,) { }
+     private orderService : ManagerOrderService,  private cd: ChangeDetectorRef, private invoiceService: InvoiceService,
+    private route: ActivatedRoute, private dialog: MatDialog) { }
   @ViewChild('formModal') formModal!: ElementRef;
   dishes: ListAllDishes[] = [];
   combo: ListAllCombo[] = [];
@@ -169,11 +172,43 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     // Recalculate totalAmount after adding item
     this.calculateTotalAmount();
   }
+  increaseQuantity(index: number): void {
+    if (this.selectedItems[index].quantity < 100) {
+      this.selectedItems[index].quantity++;
+      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+      this.validateQuantity(index);
+      this.calculateTotalAmount();
+    }
+  }
+  
+  decreaseQuantity(index: number): void {
+    if (this.selectedItems[index].quantity > 1) {
+      this.selectedItems[index].quantity--;
+      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+      this.validateQuantity(index);
+      this.calculateTotalAmount();
+    }
+  }
+  validateQuantity(index: number): void {
+    const item = this.selectedItems[index];
+    if (item.quantity < 1) {
+      item.quantity = 1;
+    } else if (item.quantity > 100) {
+      item.quantity = 100;
+    }
+    // Update the total price after validating the quantity
+    item.totalPrice = item.quantity * item.unitPrice;
+    // Recalculate total amount
+    this.calculateTotalAmount();
+  }
   clearCart() {
     this.selectedItems = [];
     this.selectedAddress = "Khách lẻ"
     this.selectCategory('Món chính');
     this.successMessage = "Tất cả các mặt hàng đã được xóa khỏi giỏ hàng.";
+    this.addNew.guestPhone = null;
+    this.addNew.email = null;
+    this.addNew.guestAddress = null;
   }
   itemsAreEqual(item1: any, item2: any): boolean {
     if (item1.hasOwnProperty('itemName') && item2.hasOwnProperty('itemName')) {
@@ -197,6 +232,22 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.showDropdown = false;
     console.log('Selected Address:', this.addNew);
 }
+openNoteDialog(item: any): void {
+  const dialogRef = this.dialog.open(NoteDialogComponent, {
+    width: '300px',
+    data: { note: item.note },
+    position: {
+      left: '500px',
+      top: '-900px'
+    }
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result !== undefined) {
+      item.note = result;
+    }
+  });
+}
 
 
 createOrder() {
@@ -213,7 +264,8 @@ createOrder() {
     price: item.price,
     unitPrice: item.totalPrice,
     dishId: item.dishId,
-    comboId: item.comboId
+    comboId: item.comboId,
+    note: item.note
   }));
 
   // Calculate total amount and set various properties
@@ -308,17 +360,7 @@ loadInvoice(invoiceId: number): void {
       this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
     }
   }
-  
-  validateQuantity(index: number) {
-    const item = this.selectedItems[index];
-    if (item.quantity < 1) {
-      item.quantity = 1;
-    } else if (item.quantity > 100) {
-      item.quantity = 100;
-    }
-    this.updateQuantity(index, item.quantity);
-  }
-  
+
 
   toggleDropdown() {
     if (!this.selectedAddress) {

@@ -19,10 +19,6 @@ export class ConfirmDialogComponent {
 
   onConfirm(): void {
     this.dialogRef.close(true);
-    this.router.navigate(['/listTable']).then(() => {
-      setTimeout(() => {
-        window.location.reload();
-      }, 5000); // Reload after 5 seconds
-    });
+    this.router.navigate(['/listTable']);
   }
 }

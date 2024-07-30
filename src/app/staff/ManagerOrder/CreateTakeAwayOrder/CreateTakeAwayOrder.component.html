@@ -76,16 +76,26 @@
                   <tbody>
                     <tr *ngFor="let item of selectedItems; let i = index">
                       <td>
-                        <div class="d-flex align-items-center">
-                          <img [src]="item.imageUrl" alt="Item image" class="img-thumbnail me-2" style="width: 70px; height: 50px;">
-                          <p class="mb-0">{{ item.itemName || item.nameCombo }}</p>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="d-flex align-items-center">
-                          <input type="number" class="form-control text-center small-input" [(ngModel)]="item.quantity" (change)="validateQuantity(i)" min="1" max="100">
-                        </div>
-                      </td>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <img [src]="item.imageUrl" alt="Item image" class="img-thumbnail me-2" style="width: 70px; height: 50px;">
+                            <p class="mb-0">
+                              <span class="clickable-item" (click)="openNoteDialog(item)">
+                                {{ item.itemName }}
+                              </span>
+                              <span *ngIf="item.nameCombo">
+                                {{ item.nameCombo }}
+                              </span>
+                            </p>
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <button class="btn btn-outline-secondary btn-sm" (click)="decreaseQuantity(i)">-</button>
+                            <input type="number" class="form-control text-center small-input mx-2 no-spinners rounded-input" [(ngModel)]="item.quantity" (change)="validateQuantity(i)" min="1" max="100">
+                            <button class="btn btn-outline-secondary btn-sm" (click)="increaseQuantity(i)">+</button>
+                          </div>
+                        </td>
                       <td>
                         <div *ngIf="item.discountedPrice" class="d-flex align-items-center">
                           <span>{{ item.discountedPrice}} VNĐ</span>
@@ -151,12 +161,12 @@
                 <input type="text" class="form-control" placeholder="Tìm kiếm món ăn..." [(ngModel)]="search" (input)="onSearch()">
               </div>
               
-              <!-- Dishes Section -->
-              <div class="dishes-section" *ngIf="showingDishes && dishes">
+               <!-- Dishes Section -->
+               <div class="dishes-section" *ngIf="showingDishes && dishes">
                 <div class="row">
                   <ng-container *ngFor="let list of dishes">
                     <div class="col-lg-4 col-md-6 mb-4" *ngFor="let dish of list.items">
-                      <div class="card h-100">
+                      <div class="card h-100" (click)="addItem(dish)">
                         <div class="image-container">
                           <img class="card-img-top" [src]="dish.imageUrl" alt="Dish image">
                         </div>
@@ -164,16 +174,12 @@
                           <div class="dish-details">
                             <div class="dish-name">{{ dish.itemName }}</div>
                             <div *ngIf="dish.discountedPrice" class="dish-price">
-                              <span class="text-decoration-line-through">{{ dish.price | currency:'VND' }}</span>
+                              <span class="text-decoration-line-through">{{ dish.price | currency }}</span>
                               <br>
-                              <span style="color: red">{{ dish.discountedPrice | currency:'VND' }}</span>
+                              <span style="color: red">{{ dish.discountedPrice | currency }}</span>
                             </div>
-                            <div *ngIf="!dish.discountedPrice" class="dish-price">{{ dish.price | currency:'VND' }}
-                            </div>
+                            <div *ngIf="!dish.discountedPrice" class="dish-price">{{ dish.price | currency }}</div>
                           </div>
-                          <button class="btn btn-sm btn-outline-primary" (click)="addItem(dish)">
-                            <i class="fas fa-plus"></i> Thêm
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -185,7 +191,7 @@
                 <div class="row">
                   <ng-container *ngFor="let list of combo">
                     <div class="col-lg-4 col-md-6 mb-4" *ngFor="let cb of list.items">
-                      <div class="card h-100">
+                      <div class="card h-100" (click)="addItem(cb)">
                         <div class="image-container">
                           <img class="card-img-top" [src]="cb.imageUrl" alt="Combo image">
                         </div>
@@ -194,9 +200,6 @@
                             <div class="combo-name">{{ cb.nameCombo }}</div>
                             <div class="combo-price">{{ cb.price | currency }}</div>
                           </div>
-                          <button class="btn btn-sm btn-outline-primary" (click)="addItem(cb)">
-                            <i class="fas fa-plus"></i> Thêm
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -339,7 +342,7 @@
                         <tbody>
                             <tr *ngFor="let item of invoice?.itemInvoice; let i = index">
                                 <td>{{ i + 1 }}</td>
-                                <td>{{ item.itemName }}</td>
+                                <td>{{ item.itemName || item.nameCombo }}</td>
                                 <td>{{ item.quantity }}</td>
                                 <td>{{ item.unitPrice | currency:'VND' }}</td>
                                 <td>{{ item.price | currency:'VND' }}</td>
