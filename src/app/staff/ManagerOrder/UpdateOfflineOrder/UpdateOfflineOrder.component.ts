@@ -75,131 +75,135 @@ export class UpdateOfflineOrderComponent implements OnInit {
     });
   }
   addItem(item: any) {
-    // Call API to fetch data from database
+    // Gọi API để lấy dữ liệu từ database
     this.orderService.getOrderById(this.orderId).subscribe(
       (dbItemResponse: any) => {
-        // Log response for debugging
+        // In ra toàn bộ dữ liệu phản hồi để kiểm tra cấu trúc
         console.log('DB Item Response:', dbItemResponse);
   
-        // Assume dbItemResponse contains the list of items from the database
+        // Giả định rằng dbItemResponse chứa danh sách các mục từ cơ sở dữ liệu
         this.dbItems = dbItemResponse;
   
         // Log the current state of dbItems and selectedItems
         console.log('Current DB Items:', this.dbItems);
         console.log('Current Selected Items:', this.selectedItems);
   
-        // Helper function to find the index of an item
-        const findIndexInList = (list: any[], item: any) => {
-          return list.findIndex(listItem => this.itemsAreEqual(listItem, item));
-        };
+        // Tiếp tục xử lý item
+        const selectedIndex = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
+        const dbIndex = this.dbItems.findIndex(dbItem => this.itemsAreEqual(dbItem, item));
   
-        const selectedIndex = findIndexInList(this.selectedItems, item);
-        const dbIndex = findIndexInList(this.dbItems, item);
-        const newlyAddedIndex = findIndexInList(this.newlyAddedItems, item);
+        console.log('Selected Index:', selectedIndex);
+        console.log('DB Index:', dbIndex);
   
-        const additionalQuantity = 1; // New quantity added
-        const unitPrice = item.discountedPrice || item.price;
-        const totalPrice = additionalQuantity * unitPrice;
-  
-        if (selectedIndex !== -1) {
-          // Item exists in selectedItems, update quantity and total price
-          console.log('Item exists in selectedItems, updating quantity and total price');
-          const existingItem = this.selectedItems[selectedIndex];
-          existingItem.quantity += additionalQuantity;
-          existingItem.totalPrice = existingItem.quantity * unitPrice;
-  
-          // Update newlyAddedItems if item exists there
-          if (newlyAddedIndex !== -1) {
-            this.newlyAddedItems[newlyAddedIndex].quantity += additionalQuantity;
-            this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * unitPrice;
-          } else {
-            // Add new item to newlyAddedItems if not already there
-            if (dbIndex !== -1) {
-              const dbItem = this.dbItems[dbIndex];
-              const quantityToAdd = Math.max(0, existingItem.quantity - (dbItem.quantity || 0));
-              if (quantityToAdd > 0) {
-                this.newlyAddedItems.push({
-                  ...item,
-                  quantity: quantityToAdd,
-                  unitPrice: unitPrice,
-                  totalPrice: quantityToAdd * unitPrice
-                });
-              }
-            }
-          }
-        } else if (dbIndex !== -1) {
-          // Item exists in dbItems, add to selectedItems and newlyAddedItems
-          console.log('Item exists in dbItems, adding to selectedItems and newlyAddedItems');
-          const dbItem = this.dbItems[dbIndex];
-  
-          // Add or update item in selectedItems
-          const existingSelectedItemIndex = findIndexInList(this.selectedItems, item);
-          if (existingSelectedItemIndex !== -1) {
-            this.selectedItems[existingSelectedItemIndex].quantity += additionalQuantity;
-            this.selectedItems[existingSelectedItemIndex].totalPrice = this.selectedItems[existingSelectedItemIndex].quantity * unitPrice;
-          } else {
-            this.selectedItems.push({
-              ...dbItem,
-              quantity: additionalQuantity,
-              unitPrice: unitPrice,
-              totalPrice: additionalQuantity * unitPrice
-            });
-          }
-  
-          // Add or update item in newlyAddedItems
-          const existingNewlyAddedItemIndex = findIndexInList(this.newlyAddedItems, item);
-          if (existingNewlyAddedItemIndex === -1) {
-            this.newlyAddedItems.push({
-              ...dbItem,
-              quantity: additionalQuantity,
-              unitPrice: unitPrice,
-              totalPrice: additionalQuantity * unitPrice
-            });
-          } else {
-            this.newlyAddedItems[existingNewlyAddedItemIndex].quantity += additionalQuantity;
-            this.newlyAddedItems[existingNewlyAddedItemIndex].totalPrice = this.newlyAddedItems[existingNewlyAddedItemIndex].quantity * unitPrice;
-          }
+        if (dbIndex !== -1) {
+          console.log('Item already exists in dbItems, skipping');
+        } else if (selectedIndex !== -1) {
+          console.log('Item already exists in selectedItems, skipping');
         } else {
-          // Item is new, add to selectedItems and newlyAddedItems
+          // Nếu item không tồn tại trong selectedItems và cũng không có trong db, thêm vào selectedItems và newlyAddedItems với số lượng 1
           console.log('Item is new, adding to selectedItems and newlyAddedItems');
+          const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
           this.selectedItems.push({
             ...item,
-            quantity: additionalQuantity,
+            quantity: 1,
             unitPrice: unitPrice,
-            totalPrice: totalPrice
+            totalPrice: unitPrice
           });
   
           this.newlyAddedItems.push({
             ...item,
-            quantity: additionalQuantity,
+            quantity: 1,
             unitPrice: unitPrice,
-            totalPrice: totalPrice
+            totalPrice: unitPrice
           });
   
           console.log('Newly Added Item:', item);
         }
   
-        // Log newlyAddedItems for debugging
+        // In ra dữ liệu của newlyAddedItems để kiểm tra
         console.log('Newly added items:', this.newlyAddedItems);
       },
       (error: any) => {
-        // Handle API error
+        // Xử lý lỗi gọi API
         console.error('Error fetching item data:', error);
       }
     );
   }
   
-  itemsAreEqual(item1: any, item2: any): boolean {
-    const isEqual = (item1.dishId === item2.dishId || item1.comboId === item2.comboId) &&
-                    (item1.dishId != null || item1.comboId != null);
   
-    // Log the items being compared and the result of comparison
-    console.log('Comparing items:', item1, item2, 'Result:', isEqual);
   
-    return isEqual;
+  
+  
+  increaseQuantity(index: number): void {
+    if (this.selectedItems[index].quantity < 100) {
+      this.selectedItems[index].quantity++;
+      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+      this.validateQuantity(index);
+      this.calculateTotalAmount();
+  
+      // Update newlyAddedItems
+      const newlyAddedIndex = this.newlyAddedItems.findIndex(newItem => this.itemsAreEqual(newItem, this.selectedItems[index]));
+      if (newlyAddedIndex !== -1) {
+        this.newlyAddedItems[newlyAddedIndex].quantity++;
+        this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * this.newlyAddedItems[newlyAddedIndex].unitPrice;
+      } else {
+        this.newlyAddedItems.push({
+          ...this.selectedItems[index],
+          quantity: 1,
+          unitPrice: this.selectedItems[index].unitPrice,
+          totalPrice: this.selectedItems[index].unitPrice
+        });
+      }
+      console.log('Updated newlyAddedItems:', this.newlyAddedItems);
+    }
   }
   
-
+  decreaseQuantity(index: number): void {
+    if (this.selectedItems[index].quantity > 1) {
+      this.selectedItems[index].quantity--;
+      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+      this.validateQuantity(index);
+      this.calculateTotalAmount();
+  
+      // Update newlyAddedItems
+      const newlyAddedIndex = this.newlyAddedItems.findIndex(newItem => this.itemsAreEqual(newItem, this.selectedItems[index]));
+      if (newlyAddedIndex !== -1) {
+        if (this.newlyAddedItems[newlyAddedIndex].quantity > 1) {
+          this.newlyAddedItems[newlyAddedIndex].quantity--;
+          this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * this.newlyAddedItems[newlyAddedIndex].unitPrice;
+        } else {
+          this.newlyAddedItems.splice(newlyAddedIndex, 1);
+        }
+      } else {
+        // Handle the case where the item was not newly added but decreased
+        const unitPrice = this.selectedItems[index].unitPrice;
+        this.newlyAddedItems.push({
+          ...this.selectedItems[index],
+          quantity: -1,
+          unitPrice: unitPrice,
+          totalPrice: -unitPrice
+        });
+      }
+      console.log('Updated newlyAddedItems:', this.newlyAddedItems);
+    }
+  }
+  
+  validateQuantity(index: number): void {
+    const item = this.selectedItems[index];
+    if (item.quantity < 1) {
+      item.quantity = 1;
+    } else if (item.quantity > 100) {
+      item.quantity = 100;
+    }
+    // Update the total price after validating the quantity
+    item.totalPrice = item.quantity * item.unitPrice;
+    // Recalculate total amount
+    this.calculateTotalAmount();
+  }
+  itemsAreEqual(item1: any, item2: any): boolean {
+    return (item1.dishId === item2.dishId && item1.comboId === item2.comboId);
+  }
+  
 updateOrderOffline(tableId: number) {
     // Chỉ lấy các mục mới thêm vào để cập nhật vào DB
     const orderDetails = this.newlyAddedItems.map(item => ({
@@ -448,15 +452,6 @@ updateOrderOffline(tableId: number) {
       }
     }
     
-    validateQuantity(index: number) {
-      const item = this.selectedItems[index];
-      if (item.quantity < 1) {
-        item.quantity = 1;
-      } else if (item.quantity > 100) {
-        item.quantity = 100;
-      }
-      this.updateQuantity(index, item.quantity);
-    }
     toggleDropdown() {
       if (!this.selectedAddress) {
         this.selectedAddress = "Khách lẻ";

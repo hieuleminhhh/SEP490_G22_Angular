@@ -94,7 +94,9 @@
                       </td>                      
                       <td>
                         <div class="d-flex align-items-center">
-                          <input type="number" class="form-control text-center small-input" [(ngModel)]="item.quantity" (change)="validateQuantity(i)" min="1" max="100">
+                          <button class="btn btn-outline-secondary btn-sm" (click)="decreaseQuantity(i)">-</button>
+                          <input type="number" class="form-control text-center small-input mx-2 no-spinners rounded-input" [(ngModel)]="item.quantity" (change)="validateQuantity(i)" min="1" max="100">
+                          <button class="btn btn-outline-secondary btn-sm" (click)="increaseQuantity(i)">+</button>
                         </div>
                       </td>
                       <td>
@@ -168,7 +170,7 @@
                 <div class="row">
                   <ng-container *ngFor="let list of dishes">
                     <div class="col-lg-4 col-md-6 mb-4" *ngFor="let dish of list.items">
-                      <div class="card h-100">
+                      <div class="card h-100" (click)="addItem(dish)">
                         <div class="image-container">
                           <img class="card-img-top" [src]="dish.imageUrl" alt="Dish image">
                         </div>
@@ -182,9 +184,6 @@
                             </div>
                             <div *ngIf="!dish.discountedPrice" class="dish-price">{{ dish.price | currency }}</div>
                           </div>
-                          <button class="btn btn-sm btn-outline-primary" (click)="addItem(dish)">
-                            <i class="fas fa-plus"></i> Thêm
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -196,7 +195,7 @@
                 <div class="row">
                   <ng-container *ngFor="let list of combo">
                     <div class="col-lg-4 col-md-6 mb-4" *ngFor="let cb of list.items">
-                      <div class="card h-100">
+                      <div class="card h-100" (click)="addItem(cb)">
                         <div class="image-container">
                           <img class="card-img-top" [src]="cb.imageUrl" alt="Combo image">
                         </div>
@@ -205,9 +204,6 @@
                             <div class="combo-name">{{ cb.nameCombo }}</div>
                             <div class="combo-price">{{ cb.price | currency }}</div>
                           </div>
-                          <button class="btn btn-sm btn-outline-primary" (click)="addItem(cb)">
-                            <i class="fas fa-plus"></i> Thêm
-                          </button>
                         </div>
                       </div>
                     </div>

@@ -108,26 +108,77 @@ export class CreateOfflineOrderComponent implements OnInit {
     const parsedDate = new Date(dateStr);
     return isNaN(parsedDate.getTime()) ? null : parsedDate;
   }
+  itemsAreEqual(item1: any, item2: any): boolean {
+    if (item1.hasOwnProperty('itemName') && item2.hasOwnProperty('itemName')) {
+      return item1.itemName === item2.itemName;
+    }
+    
+    if (item1.hasOwnProperty('nameCombo') && item2.hasOwnProperty('nameCombo')) {
+      return item1.nameCombo === item2.nameCombo;
+    }
+    return false;
+  }
+  // addItem(item: any) {
+  //   // Find if the item already exists in selectedItems
+  //   const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
   
+  //   if (index !== -1) {
+  //     // If the item already exists, increase its quantity and update the total price
+  //     this.increaseQuantity(index);
+  //   } else {
+  //     // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
+  //     // Use discountedPrice if available, otherwise fallback to price
+  //     const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
+  //     this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
+  //   }
   
+  //   // Recalculate totalAmount after adding item
+  //   this.calculateTotalAmount();
+  // }
   addItem(item: any) {
     // Find if the item already exists in selectedItems
     const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
   
-    if (index !== -1) {
-      // If the item already exists, increase its quantity and update the total price
-      this.selectedItems[index].quantity++;
-      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
-    } else {
+    if (index === -1) {
       // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
-      // Use discountedPrice if available, otherwise fallback to price
       const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
       this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
+      
+      // Recalculate totalAmount after adding item
+      this.calculateTotalAmount();
     }
-
-    // Recalculate totalAmount after adding item
+  }
+  
+  increaseQuantity(index: number): void {
+    if (this.selectedItems[index].quantity < 100) {
+      this.selectedItems[index].quantity++;
+      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+      this.validateQuantity(index);
+      this.calculateTotalAmount();
+    }
+  }
+  
+  decreaseQuantity(index: number): void {
+    if (this.selectedItems[index].quantity > 1) {
+      this.selectedItems[index].quantity--;
+      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+      this.validateQuantity(index);
+      this.calculateTotalAmount();
+    }
+  }
+  validateQuantity(index: number): void {
+    const item = this.selectedItems[index];
+    if (item.quantity < 1) {
+      item.quantity = 1;
+    } else if (item.quantity > 100) {
+      item.quantity = 100;
+    }
+    // Update the total price after validating the quantity
+    item.totalPrice = item.quantity * item.unitPrice;
+    // Recalculate total amount
     this.calculateTotalAmount();
   }
+  
   
   selectCategory(category: string) {
     this.searchCategory = category;
@@ -199,16 +250,7 @@ export class CreateOfflineOrderComponent implements OnInit {
 
 
   
-  itemsAreEqual(item1: any, item2: any): boolean {
-    if (item1.hasOwnProperty('itemName') && item2.hasOwnProperty('itemName')) {
-      return item1.itemName === item2.itemName;
-    }
-    
-    if (item1.hasOwnProperty('nameCombo') && item2.hasOwnProperty('nameCombo')) {
-      return item1.nameCombo === item2.nameCombo;
-    }
-    return false;
-  }
+  
   removeItem(index: number) {
     this.selectedItems.splice(index, 1);
   }
@@ -263,15 +305,7 @@ export class CreateOfflineOrderComponent implements OnInit {
       }
     }
     
-    validateQuantity(index: number) {
-      const item = this.selectedItems[index];
-      if (item.quantity < 1) {
-        item.quantity = 1;
-      } else if (item.quantity > 100) {
-        item.quantity = 100;
-      }
-      this.updateQuantity(index, item.quantity);
-    }
+
     toggleDropdown() {
       if (!this.selectedAddress) {
         this.selectedAddress = "Khách lẻ";
@@ -352,6 +386,8 @@ export class CreateOfflineOrderComponent implements OnInit {
       }
     );
   }
+
+  
     loadAddresses() {
       this.orderService.ListAddress().subscribe(
         (response: Address[]) => {
