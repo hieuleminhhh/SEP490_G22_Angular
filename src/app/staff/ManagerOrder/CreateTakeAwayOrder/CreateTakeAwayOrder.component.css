@@ -169,4 +169,13 @@ input.rounded-input {
   padding: 0;
   text-align: center;
 }
+@media print {
+  .modal-content {
+    border: none;
+    box-shadow: none;
+  }
+  .modal-header, .modal-footer {
+    display: none;
+  }
+}
 

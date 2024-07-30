@@ -159,34 +159,45 @@ export class UpdateOfflineOrderComponent implements OnInit {
   }
   
   decreaseQuantity(index: number): void {
-    if (this.selectedItems[index].quantity > 1) {
-      this.selectedItems[index].quantity--;
-      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+    const currentItem = this.selectedItems[index];
+    
+    if (currentItem.quantity > 1) {
+      currentItem.quantity--;
+      currentItem.totalPrice = currentItem.quantity * currentItem.unitPrice;
+      
       this.validateQuantity(index);
       this.calculateTotalAmount();
-  
+      
       // Update newlyAddedItems
-      const newlyAddedIndex = this.newlyAddedItems.findIndex(newItem => this.itemsAreEqual(newItem, this.selectedItems[index]));
+      const newlyAddedIndex = this.newlyAddedItems.findIndex(newItem => this.itemsAreEqual(newItem, currentItem));
+      
       if (newlyAddedIndex !== -1) {
-        if (this.newlyAddedItems[newlyAddedIndex].quantity > 1) {
-          this.newlyAddedItems[newlyAddedIndex].quantity--;
-          this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * this.newlyAddedItems[newlyAddedIndex].unitPrice;
-        } else {
+        // Update quantity in newlyAddedItems
+        const newlyAddedItem = this.newlyAddedItems[newlyAddedIndex];
+        newlyAddedItem.quantity--;
+        newlyAddedItem.totalPrice = newlyAddedItem.quantity * newlyAddedItem.unitPrice;
+  
+        // Remove item if quantity becomes 0
+        if (newlyAddedItem.quantity === 0) {
           this.newlyAddedItems.splice(newlyAddedIndex, 1);
         }
       } else {
-        // Handle the case where the item was not newly added but decreased
-        const unitPrice = this.selectedItems[index].unitPrice;
+        // Add to newlyAddedItems with adjusted quantity
         this.newlyAddedItems.push({
-          ...this.selectedItems[index],
+          ...currentItem,
           quantity: -1,
-          unitPrice: unitPrice,
-          totalPrice: -unitPrice
+          totalPrice: -currentItem.unitPrice
         });
       }
+  
       console.log('Updated newlyAddedItems:', this.newlyAddedItems);
     }
   }
+  
+  
+
+  
+  
   
   validateQuantity(index: number): void {
     const item = this.selectedItems[index];
@@ -203,7 +214,32 @@ export class UpdateOfflineOrderComponent implements OnInit {
   itemsAreEqual(item1: any, item2: any): boolean {
     return (item1.dishId === item2.dishId && item1.comboId === item2.comboId);
   }
-  
+  removeItem(index: number) {
+    const removedItem = this.selectedItems[index];
+    console.log('Removing item:', removedItem);
+
+    this.selectedItems.splice(index, 1);
+    console.log('Updated selectedItems:', this.selectedItems);
+
+    // Remove the item from newlyAddedItems if it exists
+    const newlyAddedIndex = this.newlyAddedItems.findIndex(item => this.itemsAreEqual(item, removedItem));
+    if (newlyAddedIndex !== -1) {
+        this.newlyAddedItems.splice(newlyAddedIndex, 1);
+        console.log('Removed from newlyAddedItems:', this.newlyAddedItems);
+    }
+
+    // Add the removed item to newlyAddedItems with quantity 0
+    const unitPrice = removedItem.discountedPrice ? removedItem.discountedPrice : removedItem.price;
+    this.newlyAddedItems.push({
+        ...removedItem,
+        quantity: 0,
+        unitPrice: unitPrice,
+        totalPrice: unitPrice
+    });
+
+    console.log('Updated newlyAddedItems:', this.newlyAddedItems);
+}
+
 updateOrderOffline(tableId: number) {
     // Chỉ lấy các mục mới thêm vào để cập nhật vào DB
     const orderDetails = this.newlyAddedItems.map(item => ({
@@ -228,6 +264,7 @@ updateOrderOffline(tableId: number) {
         response => {
             console.log('Offline order updated successfully:', response);
             this.successMessage = 'Offline order updated successfully!';
+            this.closeModal();
             setTimeout(() => this.successMessage = '', 5000);
 
             // Clear newlyAddedItems after successful update
@@ -398,9 +435,8 @@ updateOrderOffline(tableId: number) {
     this.searchCategory = ''; 
 }
   
-  removeItem(index: number) {
-    this.selectedItems.splice(index, 1);
-  }
+
+
   generateTimeOptions() {
     const startHour = 9; // 9 AM
     const endHour = 21; // 9 PM
@@ -533,7 +569,9 @@ updateOrderOffline(tableId: number) {
       }
     );
   }
- 
+  closeAndRedirect(): void {
+    this.router.navigate(['/listTable']);
+  }
   createInvoiceOffline(orderId: number) {
     const totalAmount = this.calculateTotalAmount();
     const currentDate = new Date();
@@ -606,5 +644,77 @@ updateOrderOffline(tableId: number) {
         modalBackdrop.parentNode.removeChild(modalBackdrop);
       }
     }
-
+    reloadPage() {
+      window.location.reload();
+    }
+    printInvoice(): void {
+      const printWindow = window.open('', '', 'height=600,width=800');
+      
+      // Write the content to the new window
+      printWindow?.document.write('<html><head><title>Invoice</title>');
+      printWindow?.document.write(`
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 20px;
+          }
+          .header h1 {
+            margin: 0;
+          }
+          .header p {
+            margin: 5px 0;
+          }
+          hr {
+            margin: 20px 0;
+            border: 0;
+            border-top: 1px solid #000;
+          }
+          .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+          }
+          .table th {
+            background-color: #f2f2f2;
+          }
+          .text-right {
+            text-align: right;
+          }
+        </style>
+      `);
+      printWindow?.document.write('</head><body>');
+    
+      // Add restaurant information
+      printWindow?.document.write(`
+        <div class="header">
+          <h1>Quán ăn Eating House</h1>
+          <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
+          <p>Hotline: 0393578176 - 0987654321</p>
+          <p>Email: eatinghouse@gmail.com</p>
+          <hr>
+        </div>
+      `);
+    
+      // Extract the modal-body content
+      const modalBodyContent = document.querySelector('#cfpaymentModal .modal-body')?.innerHTML || '';
+      printWindow?.document.write(modalBodyContent);
+    
+      printWindow?.document.write('</body></html>');
+      
+      // Close the document to finish writing
+      printWindow?.document.close();
+      
+      // Print the content
+      printWindow?.focus();
+      printWindow?.print();
+    }
 }
