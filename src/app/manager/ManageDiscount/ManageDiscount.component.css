@@ -122,13 +122,22 @@ body {
 }
 
 
-/* Existing styles remain the same */
-
 /* Style cho nền mờ khi hiển thị modal */
 .modal {
   display: none; /* Ẩn modal mặc định */
   position: fixed; /* Hiển thị modal cố định khi cuộn trang */
   z-index: 1000; /* Độ sâu của modal */
+  left: 0;
+  top: 0;
+  width: 100%; /* Thay đổi chiều rộng về 100% */
+  height: 100%; /* Thay đổi chiều cao về 100% */
+  overflow: auto; /* Cho phép cuộn khi modal dài hơn trang */
+  background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
+}
+.modal-dish {
+  display: none; /* Ẩn modal mặc định */
+  position: fixed; /* Hiển thị modal cố định khi cuộn trang */
+  z-index: 1200; /* Độ sâu của modal */
   left: 0;
   top: 0;
   width: 100%; /* Thay đổi chiều rộng về 100% */
@@ -152,6 +161,17 @@ body {
   border: 1px solid #ccc; /* Viền xung quanh */
   width: 100%;
   max-width: 1000px; /* Chiều rộng tối đa */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng cho modal */
+  border-radius: 8px; /* Bo góc */
+  position: relative; /* Để close button có thể được căn chỉnh chính xác */
+}
+
+.modal-content-dish {
+  background-color: #fefefe; /* Màu nền của modal */
+  padding: 20px;
+  border: 1px solid #ccc; /* Viền xung quanh */
+  width: 100%;
+  max-width: 600px; /* Chiều rộng tối đa */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng cho modal */
   border-radius: 8px; /* Bo góc */
   position: relative; /* Để close button có thể được căn chỉnh chính xác */
@@ -380,4 +400,21 @@ body {
 
 .input-group .delete-icon:hover {
   color: black; /* Màu khi hover */
+}
+
+.spaced-input-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.spaced-input-group label {
+  margin-right: 10px; /* Adjust the margin as needed */
+  width: 100px;
+}
+.dish {
+  border: 1px solid #ccc; /* Thêm border cho toàn bộ class dish */
+  padding: 10px;
+  margin-bottom: 10px; /* Khoảng cách giữa các khung */
+  border-radius: 5px; /* Bo góc */
 }
