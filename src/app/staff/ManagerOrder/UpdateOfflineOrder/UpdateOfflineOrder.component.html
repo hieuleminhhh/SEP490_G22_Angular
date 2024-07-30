@@ -91,7 +91,7 @@
                   <strong>Tổng cộng đơn:</strong> {{ calculateTotalAmount() | currency:'USD':'symbol-narrow':'1.2-2' }}
                 </div>
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
-                  <button class="btn btn-primary btn-lg" (click)="updateOrderOffline(tableId)">
+                  <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#confirmModal" >
                     Lưu lại
                   </button>
                   <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
@@ -102,6 +102,23 @@
                   </button>
                 </div>
                 
+              </div>
+            </div>
+            <div #formModal class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Xác nhận đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn lưu lại không?</p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="reloadPage()" >Không</button>
+                    <button type="button" class="btn btn-primary" (click)="updateOrderOffline(tableId)">Có</button>
+                  </div>
+                </div>
               </div>
             </div>
             
@@ -269,19 +286,19 @@
     <div class="modal fade" id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
           <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="paymentModalLabel">HÓA ĐƠN THANH TOÁN</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
+               <!-- Success message -->
+               <div class="text-center mb-3">
+                <div class="d-flex justify-content-center align-items-center flex-column">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
+                        <path d="M8 16a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5.586l-3-3a.5.5 0 0 1 .707-.707L7 9.293l4.646-4.647a.5.5 0 0 1 .708.707l-5 5a.5.5 0 0 1-.708 0z"/>
+                    </svg>
+                    <h4 class="mt-2">Tạo đơn hàng thành công</h4>
+                </div>
+            </div>
               <div class="modal-body">
-                <!-- Success message -->
-                <div class="text-center mb-3">
-                    <div class="d-flex justify-content-center align-items-center flex-column">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
-                            <path d="M8 16a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5.586l-3-3a.5.5 0 0 1 .707-.707L7 9.293l4.646-4.647a.5.5 0 0 1 .708.707l-5 5a.5.5 0 0 1-.708 0z"/>
-                        </svg>
-                        <h4 class="mt-2">Tạo đơn hàng thành công</h4>
-                    </div>
+               
+                <div class="modal-header d-flex justify-content-center align-items-center text-center">
+                  <h5 class="modal-title" id="paymentModalLabel">HÓA ĐƠN THANH TOÁN</h5>
                 </div>
                 
                 <div class="mb-3">
@@ -349,8 +366,8 @@
                 </div>
             </div>            
               <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Đóng</button>
-                  <button type="button" class="btn btn-primary" onclick="printInvoice()">In hóa đơn</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeAndRedirect()">Đóng</button>
+                  <button type="button" class="btn btn-primary" (click)="printInvoice()">In hóa đơn</button>
               </div>
           </div>
       </div>
