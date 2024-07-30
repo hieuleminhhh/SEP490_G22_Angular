@@ -13,6 +13,10 @@ export class DiscountService {
     return this.http.get(url);
   }
 
+  getListDish(): Observable<any> {
+    const url = `https://localhost:7188/api/Dish`;
+    return this.http.get(url);
+  }
 
 
 }
