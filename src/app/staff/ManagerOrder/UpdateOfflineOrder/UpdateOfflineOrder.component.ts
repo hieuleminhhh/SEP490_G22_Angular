@@ -15,12 +15,13 @@ import { ManagerOrderDetailService } from '../../../../service/managerorderDetai
 import { AddOrderDetail, ListOrderDetailByOrder } from '../../../../models/orderDetail.model';
 import { OrderItem, SelectedItem } from '../../../../models/order.model';
 import { InvoiceService } from '../../../../service/invoice.service';
+import { CurrencyFormatPipe } from '../../../common/material/currencyFormat/currencyFormat.component';
 @Component({
   selector: 'app-UpdateOfflineOrder',
   templateUrl: './UpdateOfflineOrder.component.html',
   styleUrls: ['./UpdateOfflineOrder.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe]
 })
 export class UpdateOfflineOrderComponent implements OnInit {
   orderId: number = 0;

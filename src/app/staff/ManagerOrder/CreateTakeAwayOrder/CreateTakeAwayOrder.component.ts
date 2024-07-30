@@ -15,13 +15,14 @@ import { SidebarOrderComponent } from '../../SidebarOrder/SidebarOrder.component
 import { InvoiceService } from '../../../../service/invoice.service';
 import { NoteDialogComponent } from '../../../common/material/NoteDialog/NoteDialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { CurrencyFormatPipe } from '../../../common/material/currencyFormat/currencyFormat.component';
 
 @Component({
   selector: 'app-CreateTakeAwayOrder',
   templateUrl: './CreateTakeAwayOrder.component.html',
   styleUrls: ['./CreateTakeAwayOrder.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe]
 })
 export class CreateTakeAwayOrderComponent implements OnInit {
 

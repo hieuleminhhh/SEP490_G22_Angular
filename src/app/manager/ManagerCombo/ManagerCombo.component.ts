@@ -7,13 +7,14 @@ import { SideBarComponent } from '../SideBar/SideBar.component';
 import { ManagerComboService } from '../../../service/managercombo.service';
 import { AddNewCombo, ListAllCombo, UpdateCombo } from '../../../models/combo.model';
 import { AddNewDish, Dish, ManagerDish } from '../../../models/dish.model';
+import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 
 @Component({
   selector: 'app-ManagerCombo',
   templateUrl: './ManagerCombo.component.html',
   styleUrls: ['./ManagerCombo.component.css'],
   standalone: true,
-  imports: [SideBarComponent, RouterModule, CommonModule, FormsModule, HeaderComponent]
+  imports: [SideBarComponent, RouterModule, CommonModule, FormsModule, HeaderComponent, CurrencyFormatPipe]
 })
 export class ManagerComboComponent implements OnInit {
   @ViewChild('addComboModal') addComboModal!: ElementRef;

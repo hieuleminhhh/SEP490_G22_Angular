@@ -69,7 +69,7 @@
           <table class="table table-striped table-hover">
             <thead class="table-header-light">
               <tr>
-                <th scope="col">Số thứ tự</th>
+                <th scope="col">Mã đơn hàng</th>
                 <th scope="col">Tên khách hàng</th>
                 <th scope="col">Số điện thoại</th>
                 <th scope="col">Thời gian đặt hàng</th>
@@ -80,14 +80,14 @@
               </tr>
             </thead>
             <tbody>
-              <ng-container *ngFor="let orderList of orders; let i = index">
-                <tr *ngFor="let order of orderList.items; let j = index">
-                  <td>{{ (currentPage - 1) * pageSize + i * orders[0].items.length + j + 1 }}</td>
+              <ng-container *ngFor="let orderList of orders; ">
+                <tr *ngFor="let order of orderList.items;">
+                  <td>{{ order.orderId }}</td>
                   <td>{{ order.consigneeName || 'Khách lẻ' }}</td>
                   <td>{{ order.guestPhone || '------------' }}</td>
                   <td>{{ order.orderDate }}</td>
                   <td>{{ order.recevingOrder }}</td>
-                  <td>{{ order.totalAmount }}</td>
+                  <td>{{ order.totalAmount | currencyFormat }}</td>
                   <td>
                     <select (change)="onStatusChange($event, order.orderId)" [(ngModel)]="order.status" [ngStyle]="{'color': getStatusColor(order.status)}">
                       <option *ngFor="let status of statuses" [value]="status.value">{{ status.text }}</option>
@@ -128,10 +128,24 @@
               <div class="modal-body">
                 <div *ngIf="orderDetail; else loadingOrError">
                   <div class="mb-3">
-                    <span class="fw-bold">Tên khách hàng:</span> {{ orderDetail.consigneeName }}
+                    <span class="fw-bold">Mã đơn hàng:</span> {{ orderDetail.orderId || 'Khách lẻ' }}
                   </div>
                   <div class="mb-3">
-                    <span class="fw-bold">Số điện thoại:</span> {{ orderDetail.guestPhone }}
+                    <span class="fw-bold">Loại đơn:</span>
+                    <ng-container [ngSwitch]="orderDetail.type">
+                      <span *ngSwitchCase="1">Mang về</span>
+                      <span *ngSwitchCase="2">Online</span>
+                      <span *ngSwitchCase="3">Đặt bàn</span>
+                      <span *ngSwitchCase="4">Tại chỗ</span>
+                      <span *ngSwitchDefault>Khách lẻ</span>
+                    </ng-container>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <span class="fw-bold">Tên khách hàng:</span> {{ orderDetail.consigneeName || 'Khách lẻ' }}
+                  </div>
+                  <div class="mb-3">
+                    <span class="fw-bold">Số điện thoại:</span> {{ orderDetail.guestPhone || '------------------'}}
                   </div>
                   <div class="mb-3">
                     <span class="fw-bold">Thời gian đặt hàng:</span> {{ orderDetail.orderDate | date:'medium' }}
@@ -159,13 +173,13 @@
                           <td>{{ item.quantity }}</td>
                           <td>
                             <ng-container *ngIf="item.discountedPrice">
-                              <span>{{ item.discountedPrice }}</span>
+                              <span>{{ item.discountedPrice | currencyFormat }}</span>
                             </ng-container>
                             <ng-container *ngIf="!item.discountedPrice">
-                              <span>{{ item.price }}</span>
+                              <span>{{ item.price | currencyFormat }}</span>
                             </ng-container>
                           </td>
-                          <td>{{ item.unitPrice }}</td>
+                          <td>{{ item.unitPrice | currencyFormat }}</td>
                         </tr>
                       </ng-container>              
                     </tbody>
@@ -175,7 +189,7 @@
                       <div class="col-md-6">
                         <div class="d-flex justify-content-between mb-2">
                           <span class="fw-bold label">Tạm tính:</span>
-                          <span class="value">{{ orderDetail.totalAmount | currency }}</span>
+                          <span class="value">{{ orderDetail.totalAmount | currencyFormat }}</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                           <span class="fw-bold label">Khuyến mãi:</span>
@@ -191,7 +205,7 @@
                         </div> -->
                         <div class="d-flex justify-content-between">
                           <span class="fw-bold label">Tổng cộng:</span>
-                          <span class="value">{{ orderDetail.totalAmount | currency }}</span>
+                          <span class="value">{{ orderDetail.totalAmount | currencyFormat }}</span>
                         </div>
                       </div>
                       
