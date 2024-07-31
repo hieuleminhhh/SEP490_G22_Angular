@@ -48,7 +48,7 @@
                   <ng-container *ngFor="let list of combo">
                     <tr *ngFor="let combo of list.items">
                       <td>{{ combo.nameCombo }}</td>
-                      <td>{{ combo.price }}</td>
+                      <td>{{ combo.price | currencyFormat  }}</td>
                       <td>{{ combo.note }}</td>
                       <td>
                         <img [src]="combo.imageUrl" [alt]="combo.nameCombo" *ngIf="combo.imageUrl" style="width: 200px; height: 200px; object-fit: cover;">

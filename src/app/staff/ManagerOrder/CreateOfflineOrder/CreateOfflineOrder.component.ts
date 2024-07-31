@@ -16,12 +16,13 @@ import { AddOrderDetail, ListOrderDetailByOrder } from '../../../../models/order
 import { InvoiceService } from '../../../../service/invoice.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../common/material/ConfirmDialog/ConfirmDialog.component';
+import { CurrencyFormatPipe } from '../../../common/material/currencyFormat/currencyFormat.component';
 @Component({
     selector: 'app-create-offline-order',
     templateUrl: './CreateOfflineOrder.component.html',
     styleUrls: ['./CreateOfflineOrder.component.css'],
     standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
+    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe]
 })
 export class CreateOfflineOrderComponent implements OnInit {
   tableId: number = 0;
@@ -399,30 +400,9 @@ export class CreateOfflineOrderComponent implements OnInit {
           console.error('Error fetching addresses:', error);
         }
       );
-    }
+    } 
+    
     createOrderOffline(tableId: number): void {
-      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-        width: '300px', // Set a smaller width
-        disableClose: true,
-        autoFocus: true,
-        hasBackdrop: true,
-        position: { top: '-950px', left: '50%' }, // Position the dialog at the top center
-        panelClass: 'custom-dialog-container' // Add custom CSS class
-      });
-      
-    
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          // Proceed with creating the order
-          this.actualCreateOrderOffline(tableId);
-        }
-      });
-    }
-    
-    
-    
-  
-    actualCreateOrderOffline(tableId: number): void {
       const orderDetails = this.selectedItems.map(item => ({
         dishId: item.dishId,
         comboId: item.comboId,
@@ -451,7 +431,9 @@ export class CreateOfflineOrderComponent implements OnInit {
         response => {
           console.log('Offline order created successfully:', response);
           this.successMessage = 'Offline order created successfully!';
+          this.closeModal();
           setTimeout(() => this.successMessage = '', 5000);
+          this.router.navigate(['/listTable']); 
         },
         error => {
           console.error('Error creating offline order:', error);
@@ -461,7 +443,19 @@ export class CreateOfflineOrderComponent implements OnInit {
         }
       );
     }
-    
+    confirmOrder(): void {
+      this.createOrderOffline(this.tableId);
+    }
+    closeModal() {
+      const modalElement = this.formModal.nativeElement;
+      modalElement.classList.remove('show');
+      modalElement.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
+      if (modalBackdrop && modalBackdrop.parentNode) {
+        modalBackdrop.parentNode.removeChild(modalBackdrop);
+      }
+    }
   createInvoiceOffline(orderId: number) {
     this.invoiceService.createInvoiceOffline(orderId).subscribe(
       response => {
@@ -484,15 +478,6 @@ export class CreateOfflineOrderComponent implements OnInit {
       this.addErrors = {};
     }
   
-    closeModal() {
-      const modalElement = this.formModal.nativeElement;
-      modalElement.classList.remove('show');
-      modalElement.style.display = 'none';
-      document.body.classList.remove('modal-open');
-      const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
-      if (modalBackdrop && modalBackdrop.parentNode) {
-        modalBackdrop.parentNode.removeChild(modalBackdrop);
-      }
-    }
+    
     
 }

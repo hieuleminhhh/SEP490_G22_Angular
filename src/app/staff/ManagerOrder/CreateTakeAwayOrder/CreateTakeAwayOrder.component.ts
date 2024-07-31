@@ -15,13 +15,15 @@ import { SidebarOrderComponent } from '../../SidebarOrder/SidebarOrder.component
 import { InvoiceService } from '../../../../service/invoice.service';
 import { NoteDialogComponent } from '../../../common/material/NoteDialog/NoteDialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { CurrencyFormatPipe } from '../../../common/material/currencyFormat/currencyFormat.component';
+import { DateFormatPipe } from '../../../common/material/dateFormat/dateFormat.component';
 
 @Component({
   selector: 'app-CreateTakeAwayOrder',
   templateUrl: './CreateTakeAwayOrder.component.html',
   styleUrls: ['./CreateTakeAwayOrder.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe]
 })
 export class CreateTakeAwayOrderComponent implements OnInit {
 
@@ -341,8 +343,91 @@ loadInvoice(invoiceId: number): void {
   );
 }
 
+printInvoice(): void {
+  const printWindow = window.open('', '', 'height=600,width=800');
 
-  
+  // Write the content to the new window
+  printWindow?.document.write('<html><head><title>Invoice</title>');
+  printWindow?.document.write(`
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .header h1 {
+        margin: 0;
+      }
+      .header p {
+        margin: 5px 0;
+      }
+      hr {
+        margin: 20px 0;
+        border: 0;
+        border-top: 1px solid #000;
+      }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      .table th, .table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      .table th {
+        background-color: #f2f2f2;
+      }
+      .text-right {
+        text-align: right;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 20px;
+        border-top: 1px solid #000;
+        padding-top: 10px;
+        font-style: italic;
+      }
+    </style>
+  `);
+  printWindow?.document.write('</head><body>');
+
+  // Add restaurant information
+  printWindow?.document.write(`
+    <div class="header">
+      <h1>Eating House</h1>
+      <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
+      <p>Hotline: 0393578176 - 0987654321</p>
+      <p>Email: eatinghouse@gmail.com</p>
+      <hr>
+    </div>
+  `);
+
+  // Extract the modal-body content
+  const modalBodyContent = document.querySelector('#cfpaymentModal .modal-body')?.innerHTML || '';
+  printWindow?.document.write(modalBodyContent);
+
+  // Add footer
+  printWindow?.document.write(`
+    <div class="footer">
+      CẢM ƠN QUÝ KHÁCH VÀ HẸN GẶP LẠI
+    </div>
+  `);
+
+  printWindow?.document.write('</body></html>');
+
+  // Close the document to finish writing
+  printWindow?.document.close();
+
+  // Print the content
+  printWindow?.focus();
+  printWindow?.print();
+}
+
 
   getVietnamTime(): Date {
     const now = new Date();

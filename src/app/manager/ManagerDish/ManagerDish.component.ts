@@ -7,13 +7,14 @@ import { FormsModule } from '@angular/forms';
 import { Category } from '../../../models/category.model';
 import { AddNewDish, ListAllDishes, ManagerDish, UpdateDish } from '../../../models/dish.model';
 import { HeaderComponent } from "../Header/Header.component";
+import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 
 @Component({
     selector: 'app-ManagerDish',
     templateUrl: './ManagerDish.component.html',
     styleUrls: ['./ManagerDish.component.css'],
     standalone: true,
-    imports: [SideBarComponent, RouterModule, CommonModule, FormsModule, HeaderComponent]
+    imports: [SideBarComponent, RouterModule, CommonModule, FormsModule, HeaderComponent,CurrencyFormatPipe]
 })
 export class ManagerDishComponent implements OnInit {
   @ViewChild('addDishModal') addDishModal!: ElementRef;

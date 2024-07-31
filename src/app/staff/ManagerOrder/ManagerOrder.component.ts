@@ -7,13 +7,15 @@ import { FormsModule } from '@angular/forms';
 import { ManagerOrderDetailService } from '../../../service/managerorderDetail.service';
 import { ListOrderDetailByOrder } from '../../../models/orderDetail.model';
 import { SidebarOrderComponent } from "../SidebarOrder/SidebarOrder.component";
+import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
+import { DateFormatPipe } from '../../common/material/dateFormat/dateFormat.component';
 
 @Component({
     selector: 'app-ManagerOrder',
     templateUrl: './ManagerOrder.component.html',
     styleUrls: ['./ManagerOrder.component.css'],
     standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
+    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe]
 })
 export class ManagerOrderComponent implements OnInit {
   orders: ListAllOrder[] = [];
@@ -187,4 +189,5 @@ export class ManagerOrderComponent implements OnInit {
     const day = ('0' + date.getDate()).slice(-2); // Add leading zero if day is < 10
     return `${year}-${month}-${day}`;
   }
+
 }
