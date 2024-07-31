@@ -16,12 +16,13 @@ import { AddOrderDetail, ListOrderDetailByOrder } from '../../../../models/order
 import { OrderItem, SelectedItem } from '../../../../models/order.model';
 import { InvoiceService } from '../../../../service/invoice.service';
 import { CurrencyFormatPipe } from '../../../common/material/currencyFormat/currencyFormat.component';
+import { DateFormatPipe } from '../../../common/material/dateFormat/dateFormat.component';
 @Component({
   selector: 'app-UpdateOfflineOrder',
   templateUrl: './UpdateOfflineOrder.component.html',
   styleUrls: ['./UpdateOfflineOrder.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe]
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe]
 })
 export class UpdateOfflineOrderComponent implements OnInit {
   orderId: number = 0;
@@ -714,7 +715,7 @@ updateOrderOffline(tableId: number) {
       // Add restaurant information
       printWindow?.document.write(`
         <div class="header">
-          <h1>Quán ăn Eating House</h1>
+          <h1>Eating House</h1>
           <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
           <p>Hotline: 0393578176 - 0987654321</p>
           <p>Email: eatinghouse@gmail.com</p>
