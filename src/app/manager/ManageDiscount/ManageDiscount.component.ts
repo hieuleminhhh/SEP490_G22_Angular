@@ -19,28 +19,29 @@ export class ManageDiscountComponent implements OnInit {
   filteredData: any[] = [];
   dish: any[] = [];
 
-  promotion = {
-    name: '',
-    status: 'active',
-    note: '',
-    type: 'order',
-    discountType: 'discount-order',
-    autoApply: false,
-    conditions: [
-      {
-        totalAmount: '',
-        percent: ''
-      }
-    ]
-  };
+  selectedDishes: { [key: number]: string[] } = {};
 
-  selectedIndex: number | undefined;
+  currentIndex: number = 0;
+
+  promotion: any = {
+    discountName: '',
+    note: '',
+    discountStatus: 'true',
+    startTime: new Date().toISOString(),
+    endTime: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString(),
+    type: '0',
+    conditions: [{
+      totalAmount: 0,
+      percent: 0
+    }]
+  };
 
   constructor(private discountService: DiscountService) { }
 
   ngOnInit(): void {
     this.getListDiscount();
-    this.dateNow = new Date().toISOString().split('T')[0]; // Thiết lập giá trị ban đầu cho dateNow
+    this.dateNow = new Date().toISOString().split('T')[0];
+
   }
 
   getListDiscount(): void {
@@ -89,9 +90,6 @@ export class ManageDiscountComponent implements OnInit {
     if (addModal) {
       addModal.classList.add('show');
       addModal.style.display = 'block';
-      addModal.removeAttribute('aria-hidden');
-      addModal.setAttribute('aria-modal', 'true');
-      addModal.setAttribute('role', 'dialog');
     }
   }
 
@@ -100,14 +98,39 @@ export class ManageDiscountComponent implements OnInit {
     if (addModal) {
       addModal.classList.remove('show');
       addModal.style.display = 'none';
-      addModal.setAttribute('aria-hidden', 'true');
-      addModal.removeAttribute('aria-modal');
-      addModal.removeAttribute('role');
     }
+    window.location.reload();
   }
 
   savePromotion(): void {
-    console.log('Saving promotion:', this.promotion);
+    if (!this.promotion.conditions || this.promotion.conditions.length === 0) {
+      console.error('No conditions available.');
+      alert('Vui lòng thêm điều kiện khuyến mại.');
+      return;
+    }
+
+    const promotionData = {
+      discountPercent: Number(this.promotion.conditions[0].percent) || 0, // Chuyển đổi thành số
+      discountStatus: this.promotion.discountStatus === 'true', // Chuyển đổi chuỗi thành boolean
+      discountName: this.promotion.discountName || '', // Đảm bảo không phải null hoặc undefined
+      type: Number(this.promotion.type), // Chuyển đổi thành số
+      startTime: new Date(this.promotion.startTime).toISOString(), // Đảm bảo định dạng ISO
+      endTime: new Date(this.promotion.endTime).toISOString(), // Đảm bảo định dạng ISO
+      note: this.promotion.note || '', // Đảm bảo không phải null hoặc undefined
+      totalMoney: Number(this.promotion.conditions[0].totalAmount) || 0 // Chuyển đổi thành số
+    };
+
+    console.log('Sending promotion data:', promotionData);
+
+    this.discountService.createDiscount(promotionData).subscribe(
+      response => {
+        console.log('Promotion saved successfully', response);
+      },
+      error => {
+        console.error('Error saving promotion:', error.message || error);
+        alert('Có lỗi xảy ra khi lưu chương trình khuyến mại. Vui lòng kiểm tra lại.');
+      }
+    );
     this.closePopup();
   }
 
@@ -137,15 +160,19 @@ export class ManageDiscountComponent implements OnInit {
   }
 
   openDishModal(index: number): void {
-    this.selectedIndex = index;
+    this.currentIndex = index;
+    if (this.selectedDishes[index]) {
+      this.dish.forEach(dish => {
+        dish.selected = this.selectedDishes[index].includes(dish.itemName);
+      });
+    } else {
+      this.dish.forEach(dish => (dish.selected = false));
+    }
     this.getListDish();
     const dishModal = document.getElementById('dishModal');
     if (dishModal) {
       dishModal.classList.add('show');
       dishModal.style.display = 'block';
-      dishModal.removeAttribute('aria-hidden');
-      dishModal.setAttribute('aria-modal', 'true');
-      dishModal.setAttribute('role', 'dialog');
     }
   }
 
@@ -154,9 +181,6 @@ export class ManageDiscountComponent implements OnInit {
     if (dishModal) {
       dishModal.classList.remove('show');
       dishModal.style.display = 'none';
-      dishModal.setAttribute('aria-hidden', 'true');
-      dishModal.removeAttribute('aria-modal');
-      dishModal.removeAttribute('role');
     }
   }
 
@@ -167,11 +191,16 @@ export class ManageDiscountComponent implements OnInit {
     });
   }
 
-  selectDishes(): void {
-    const selectedDishes = this.dish.filter(dish => dish.selected).map(dish => dish.itemName);
-    if (this.selectedIndex !== undefined) {
-      // Implement logic to add selected dishes to the promotion conditions
-    }
+  selectDishes() {
+    const selectedDishNames = this.dish.filter(dish => dish.selected).map(dish => dish.itemName);
+    this.selectedDishes[this.currentIndex] = selectedDishNames;
     this.closeDishModal();
+  }
+  removeDish(conditionIndex: number, dishName: string) {
+    this.selectedDishes[conditionIndex] = this.selectedDishes[conditionIndex].filter(dish => dish !== dishName);
+  }
+
+  clearDish(index: number) {
+    this.selectedDishes[index] = [];
   }
 }

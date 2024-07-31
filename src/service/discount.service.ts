@@ -17,6 +17,9 @@ export class DiscountService {
     const url = `https://localhost:7188/api/Dish`;
     return this.http.get(url);
   }
-
+  createDiscount(request:any): Observable<any> {
+    const url = `https://localhost:7188/api/Discounts`;
+    return this.http.post(url,request);
+  }
 
 }
