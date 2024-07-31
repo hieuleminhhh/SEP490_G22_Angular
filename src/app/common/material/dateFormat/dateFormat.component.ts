@@ -10,7 +10,7 @@ registerLocaleData(localeVi, 'vi-VN');
   standalone: true
 })
 export class DateFormatPipe implements PipeTransform {
-  transform(value: string | Date, format: string = 'dd/MM/yyyy HH:mm:ss', locale: string = 'vi-VN'): string {
+  transform(value: string | Date, format: string = 'dd/MM/yyyy HH:mm', locale: string = 'vi-VN'): string {
     if (!value) return '';
 
     let date: Date;

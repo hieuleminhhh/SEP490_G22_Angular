@@ -334,7 +334,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
-                    <span id="orderDate">{{ invoice?.orderDate | date:'dd/MM/yyyy' || 'N/A' }}</span>
+                    <span id="orderDate">{{ invoice?.orderDate | dateFormat }}</span>
                 </div>
                 
                 <div class="mb-3">

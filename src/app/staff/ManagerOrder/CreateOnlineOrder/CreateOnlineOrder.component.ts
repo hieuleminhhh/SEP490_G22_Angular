@@ -16,12 +16,13 @@ import { InvoiceService } from '../../../../service/invoice.service';
 import { NoteDialogComponent } from '../../../common/material/NoteDialog/NoteDialog.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CurrencyFormatPipe } from '../../../common/material/currencyFormat/currencyFormat.component';
+import { DateFormatPipe } from '../../../common/material/dateFormat/dateFormat.component';
 @Component({
   selector: 'app-CreateOnlineOrder',
   templateUrl: './CreateOnlineOrder.component.html',
   styleUrls: ['./CreateOnlineOrder.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, MatDialogModule, CurrencyFormatPipe]
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, MatDialogModule, CurrencyFormatPipe, DateFormatPipe]
 })
 export class CreateOnlineOrderComponent implements OnInit {
 
@@ -527,7 +528,7 @@ setDefaultReceivingTime() {
     // Add restaurant information
     printWindow?.document.write(`
       <div class="header">
-        <h1>Quán ăn Eating House</h1>
+        <h1>Eating House</h1>
         <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
         <p>Hotline: 0393578176 - 0987654321</p>
         <p>Email: eatinghouse@gmail.com</p>
