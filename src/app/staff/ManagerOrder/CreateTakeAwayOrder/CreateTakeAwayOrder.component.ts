@@ -344,7 +344,7 @@ loadInvoice(invoiceId: number): void {
 
 printInvoice(): void {
   const printWindow = window.open('', '', 'height=600,width=800');
-  
+
   // Write the content to the new window
   printWindow?.document.write('<html><head><title>Invoice</title>');
   printWindow?.document.write(`
@@ -384,6 +384,13 @@ printInvoice(): void {
       .text-right {
         text-align: right;
       }
+      .footer {
+        text-align: center;
+        margin-top: 20px;
+        border-top: 1px solid #000;
+        padding-top: 10px;
+        font-style: italic;
+      }
     </style>
   `);
   printWindow?.document.write('</head><body>');
@@ -403,11 +410,18 @@ printInvoice(): void {
   const modalBodyContent = document.querySelector('#cfpaymentModal .modal-body')?.innerHTML || '';
   printWindow?.document.write(modalBodyContent);
 
+  // Add footer
+  printWindow?.document.write(`
+    <div class="footer">
+      CẢM ƠN QUÝ KHÁCH VÀ HẸN GẶP LẠI
+    </div>
+  `);
+
   printWindow?.document.write('</body></html>');
-  
+
   // Close the document to finish writing
   printWindow?.document.close();
-  
+
   // Print the content
   printWindow?.focus();
   printWindow?.print();

@@ -131,10 +131,6 @@ export class UpdateOfflineOrderComponent implements OnInit {
     );
   }
   
-  
-  
-  
-  
   increaseQuantity(index: number): void {
     if (this.selectedItems[index].quantity < 100) {
       this.selectedItems[index].quantity++;
@@ -570,6 +566,20 @@ updateOrderOffline(tableId: number) {
       }
     );
   }
+  cancelOrderForTable(tableId: number): void {
+    const status = 5; // The status to set when canceling the order
+
+    this.orderService.CancelOrderForTable(tableId, status).subscribe(
+      response => {
+        this.closeModal();
+        console.log('Order canceled successfully:', response);
+        this.router.navigate(['/listTable']); 
+      },
+      error => {
+        console.error('Error canceling order:', error);
+      }
+    );
+  }
   closeAndRedirect(): void {
     this.router.navigate(['/listTable']);
   }
@@ -650,7 +660,7 @@ updateOrderOffline(tableId: number) {
     }
     printInvoice(): void {
       const printWindow = window.open('', '', 'height=600,width=800');
-      
+    
       // Write the content to the new window
       printWindow?.document.write('<html><head><title>Invoice</title>');
       printWindow?.document.write(`
@@ -690,6 +700,13 @@ updateOrderOffline(tableId: number) {
           .text-right {
             text-align: right;
           }
+          .footer {
+            text-align: center;
+            margin-top: 20px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+            font-style: italic;
+          }
         </style>
       `);
       printWindow?.document.write('</head><body>');
@@ -709,13 +726,21 @@ updateOrderOffline(tableId: number) {
       const modalBodyContent = document.querySelector('#cfpaymentModal .modal-body')?.innerHTML || '';
       printWindow?.document.write(modalBodyContent);
     
+      // Add footer
+      printWindow?.document.write(`
+        <div class="footer">
+          CẢM ƠN QUÝ KHÁCH VÀ HẸN GẶP LẠI
+        </div>
+      `);
+    
       printWindow?.document.write('</body></html>');
-      
+    
       // Close the document to finish writing
       printWindow?.document.close();
-      
+    
       // Print the content
       printWindow?.focus();
       printWindow?.print();
     }
-}
+  
+  }

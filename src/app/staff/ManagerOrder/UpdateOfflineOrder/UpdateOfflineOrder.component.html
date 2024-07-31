@@ -97,13 +97,14 @@
                   <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
                     Thanh toán
                   </button>
-                  <button class="btn btn-danger btn-lg" >
+                  <button class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#cancelModal">
                     Hủy
                   </button>
                 </div>
                 
               </div>
             </div>
+            <!-- Xac nhan don -->
             <div #formModal class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -121,7 +122,70 @@
                 </div>
               </div>
             </div>
-            
+             <!-- Xac nhan huy don -->
+             <div #formModal class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">Xác nhận hủy</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Bạn có chắc chắn muốn hủy đơn hàng này không?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-danger" (click)="cancelOrderForTable(tableId)">Hủy</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Xac nhan thanh toan -->
+  <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="paymentModalLabel">Thông tin thanh toán</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Thông tin hóa đơn -->
+         <div class="mb-3">
+         <label for="price" class="form-label">Tổng tiền phải trả:</label>
+         {{ calculateTotalAmount() | currency:'USD':'symbol-narrow':'1.2-2' }}
+         </div>
+                <!-- Template for CreateTakeAwayOrderComponent -->
+                <div class="mb-3">
+                  <label class="form-label">Hình thức thanh toán:</label>
+                  <div>
+                    <input type="radio" id="cash" name="paymentMethod" value= "0" [(ngModel)]="paymentMethod">
+                    <label for="cash">Tiền mặt</label>
+                  </div>
+                  <div>
+                    <input type="radio" id="bank" name="paymentMethod" value= "1" [(ngModel)]="paymentMethod">
+                    <label for="bank">Chuyển khoản ngân hàng</label>
+                  </div>
+                </div>
+        
+                <div class="mb-3" *ngIf="paymentMethod === '0'">
+                  <label for="customerPaid" class="form-label">Tiền khách trả:</label>
+                  <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid">
+                </div>
+        
+                <div class="mb-3" *ngIf="paymentMethod === '1'">
+                  <label for="qrCode" class="form-label">Mã QR:</label>
+                  <img id="qrCode" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" class="img-fluid">
+                </div>
+              </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal"  (click)="createInvoiceOffline(orderId)">
+             Xác nhận thanh toán
+         </button>
+         </div>
+      </div>
+    </div>
+  </div>
             <!-- Right column for dishes and combos -->
             <div class="col-md-6">
               <div class="category-buttons">
@@ -235,52 +299,7 @@
     </div>
   </div>
 
-  <!-- Modal -->
-  <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="paymentModalLabel">Thông tin thanh toán</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Thông tin hóa đơn -->
-         <div class="mb-3">
-         <label for="price" class="form-label">Tổng tiền phải trả:</label>
-         {{ calculateTotalAmount() | currency:'USD':'symbol-narrow':'1.2-2' }}
-         </div>
-                <!-- Template for CreateTakeAwayOrderComponent -->
-                <div class="mb-3">
-                  <label class="form-label">Hình thức thanh toán:</label>
-                  <div>
-                    <input type="radio" id="cash" name="paymentMethod" value= "0" [(ngModel)]="paymentMethod">
-                    <label for="cash">Tiền mặt</label>
-                  </div>
-                  <div>
-                    <input type="radio" id="bank" name="paymentMethod" value= "1" [(ngModel)]="paymentMethod">
-                    <label for="bank">Chuyển khoản ngân hàng</label>
-                  </div>
-                </div>
-        
-                <div class="mb-3" *ngIf="paymentMethod === '0'">
-                  <label for="customerPaid" class="form-label">Tiền khách trả:</label>
-                  <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid">
-                </div>
-        
-                <div class="mb-3" *ngIf="paymentMethod === '1'">
-                  <label for="qrCode" class="form-label">Mã QR:</label>
-                  <img id="qrCode" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" class="img-fluid">
-                </div>
-              </div>
-         <div class="modal-footer">
-           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal"  (click)="createInvoiceOffline(orderId)">
-             Xác nhận thanh toán
-         </button>
-         </div>
-      </div>
-    </div>
-  </div>
+  
   
  <!-- Template for cffff -->
     <div class="modal fade" id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
