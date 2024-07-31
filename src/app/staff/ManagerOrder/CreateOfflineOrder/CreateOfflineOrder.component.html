@@ -91,8 +91,16 @@
                           <button class="btn btn-outline-secondary btn-sm" (click)="increaseQuantity(i)">+</button>
                         </div>
                       </td>
-                      
-                                          
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <input
+                            type="number"
+                            class="form-control text-center small-input"
+                            [(ngModel)]="item.dishesServed"
+                            (ngModelChange)="item.dishesServed = item.dishesServed || 0">
+                        </div>
+
+                      </td>
                       <td>
                         <div *ngIf="item.discountedPrice" class="d-flex align-items-center">
                           <span>{{ item.discountedPrice | currencyFormat  }}</span>
@@ -119,32 +127,13 @@
                     Tạo đơn
                   </button>
                 </div>
-                
+
               </div>
 
               <div *ngIf="successMessage" class="alert alert-success" role="alert">
                 {{ successMessage }}
               </div>
             </div>
-            <!-- Confirmation Modal -->
-<div #formModal class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="confirmModalLabel">Xác nhận đơn hàng</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Bạn có chắc chắn muốn tạo đơn hàng này không?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        <button type="button" class="btn btn-primary" (click)="confirmOrder()">Xác nhận</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 
             <!-- Right column for dishes and combos -->
             <div class="col-md-6">
@@ -178,7 +167,8 @@
               <div class="search-bar mt-3">
                 <input type="text" class="form-control" placeholder="Tìm kiếm món ăn..." [(ngModel)]="search" (input)="onSearch()">
               </div>
-            <!-- Dishes Section -->
+
+              <!-- Dishes Section -->
               <div class="dishes-section" *ngIf="showingDishes && dishes">
                 <div class="row">
                   <ng-container *ngFor="let list of dishes">
@@ -221,7 +211,7 @@
                       </div>
                     </div>
                   </ng-container>
-              
+
                 </div>
               </div>
             </div>
