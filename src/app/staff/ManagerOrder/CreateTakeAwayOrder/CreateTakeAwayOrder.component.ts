@@ -17,6 +17,7 @@ import { NoteDialogComponent } from '../../../common/material/NoteDialog/NoteDia
 import { MatDialog } from '@angular/material/dialog';
 import { CurrencyFormatPipe } from '../../../common/material/currencyFormat/currencyFormat.component';
 import { DateFormatPipe } from '../../../common/material/dateFormat/dateFormat.component';
+import { ItemInvoice } from '../../../../models/invoice.model';
 
 @Component({
   selector: 'app-CreateTakeAwayOrder',
@@ -342,91 +343,154 @@ loadInvoice(invoiceId: number): void {
     }
   );
 }
-
 printInvoice(): void {
-  const printWindow = window.open('', '', 'height=600,width=800');
+  console.log('Invoice data before update:', this.invoice);
+  if (this.invoice.invoiceId) {
+    const printWindow = window.open('', '', 'height=600,width=800');
 
-  // Write the content to the new window
-  printWindow?.document.write('<html><head><title>Invoice</title>');
-  printWindow?.document.write(`
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-      .header {
-        text-align: center;
-        margin-bottom: 20px;
-      }
-      .header h1 {
-        margin: 0;
-      }
-      .header p {
-        margin: 5px 0;
-      }
-      hr {
-        margin: 20px 0;
-        border: 0;
-        border-top: 1px solid #000;
-      }
-      .table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-      }
-      .table th, .table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-      }
-      .table th {
-        background-color: #f2f2f2;
-      }
-      .text-right {
-        text-align: right;
-      }
-      .footer {
-        text-align: center;
-        margin-top: 20px;
-        border-top: 1px solid #000;
-        padding-top: 10px;
-        font-style: italic;
-      }
-    </style>
-  `);
-  printWindow?.document.write('</head><body>');
+    // Write the content to the new window
+    printWindow?.document.write('<html><head><title>Invoice</title>');
+    printWindow?.document.write(`
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+        }
+        .header {
+          text-align: center;
+          margin-bottom: 20px;
+        }
+        .header h1 {
+          margin: 0;
+        }
+        .header p {
+          margin: 5px 0;
+        }
+        hr {
+          margin: 20px 0;
+          border: 0;
+          border-top: 1px solid #000;
+        }
+        .table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 20px;
+        }
+        .table th, .table td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: left;
+        }
+        .table th {
+          background-color: #f2f2f2;
+        }
+        .text-right {
+          text-align: right;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 20px;
+          border-top: 1px solid #000;
+          padding-top: 10px;
+          font-style: italic;
+        }
+      </style>
+    `);
+    printWindow?.document.write('</head><body>');
 
-  // Add restaurant information
-  printWindow?.document.write(`
-    <div class="header">
-      <h1>Eating House</h1>
-      <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
-      <p>Hotline: 0393578176 - 0987654321</p>
-      <p>Email: eatinghouse@gmail.com</p>
-      <hr>
-    </div>
-  `);
+    // Add restaurant information
+    printWindow?.document.write(`
+      <div class="header">
+        <h1>Eating House</h1>
+        <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
+        <p>Hotline: 0393578176 - 0987654321</p>
+        <p>Email: eatinghouse@gmail.com</p>
+        <hr>
+      </div>
+    `);
 
-  // Extract the modal-body content
-  const modalBodyContent = document.querySelector('#cfpaymentModal .modal-body')?.innerHTML || '';
-  printWindow?.document.write(modalBodyContent);
+    // Add invoice information
+    printWindow?.document.write(`
+      <div class="mb-3">
+        <label for="orderID" class="form-label">Mã hóa đơn: </label>
+        <span id="orderID">${this.invoice?.invoiceId || 'N/A'}</span>
+      </div>
+      <div class="mb-3">
+        <label for="customerName" class="form-label">Tên khách hàng:</label>
+        <span id="customerName">${this.invoice.consigneeName || 'Khách lẻ'}</span>
+      </div>
+      <div class="mb-3">
+        <label for="phoneNumber" class="form-label">Số điện thoại: </label>
+        <span id="phoneNumber">${this.invoice.guestPhone || 'N/A'}</span>
+      </div>
+      <div class="mb-3">
+        <label for="address" class="form-label">Địa chỉ:</label>
+        <span id="address">${this.invoice.address || 'N/A'}</span>
+      </div>
+      <div class="mb-3">
+        <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
+        <span id="orderDate">${this.invoice?.orderDate}</span>
+      </div>
+      <div class="mb-3">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Tên món</th>
+              <th>SL</th>
+              <th>Đơn giá</th>
+              <th>Thành tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(this.invoice?.itemInvoice || []).map((item: ItemInvoice, i: number) => `
+              <tr>
+                <td>${i + 1}</td>
+                <td>${item.itemName || item.nameCombo}</td>
+                <td>${item.quantity}</td>
+                <td>${item.unitPrice}</td>
+                <td>${item.price}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="mb-3">
+        <label for="totalAmount" class="form-label">Tổng tiền:</label>
+        <span id="totalAmount">${this.invoice.totalAmount}</span>
+      </div>
+      <div class="mb-3">
+        <label for="discount" class="form-label">Chiết khấu:</label>
+        <span id="discount">${this.invoice.discount}</span>
+      </div>
+      <div class="mb-3">
+        <label for="amountToPay" class="form-label">Khách phải trả:</label>
+        <span id="amountToPay">${this.invoice.totalAmount}</span>
+      </div>
+      <div class="mb-3">
+        <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
+        <span id="customerPaid">${this.invoice.amountReceived}</span>
+      </div>
+      <div class="mb-3">
+        <label for="changeToGive" class="form-label">Trả lại:</label>
+        <span id="changeToGive">${this.invoice.returnAmount}</span>
+      </div>
+    `);
 
-  // Add footer
-  printWindow?.document.write(`
-    <div class="footer">
-      CẢM ƠN QUÝ KHÁCH VÀ HẸN GẶP LẠI
-    </div>
-  `);
+    // Footer
+    printWindow?.document.write(`
+      <div class="footer">
+        <p>Cảm ơn quý khách. Hẹn gặp lại!</p>
+      </div>
+    `);
 
-  printWindow?.document.write('</body></html>');
-
-  // Close the document to finish writing
-  printWindow?.document.close();
-
-  // Print the content
-  printWindow?.focus();
-  printWindow?.print();
+    // Close the document and print
+    printWindow?.document.write('</body></html>');
+    printWindow?.document.close();
+    printWindow?.print();
+  }
 }
+
 
 
   getVietnamTime(): Date {
@@ -551,5 +615,6 @@ saveAddress() {
       modalBackdrop.parentNode.removeChild(modalBackdrop);
     }
   }
+
 
 }
