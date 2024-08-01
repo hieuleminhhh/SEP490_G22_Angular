@@ -55,14 +55,14 @@
                 <div>x{{ item.quantity }}</div>
               </div>
               <div class="col-3 text-right">
-                <div class="price">{{ item.unitPrice }}₫</div>
+                <div class="price">{{ item.unitPrice | currencyFormat}}</div>
               </div>
             </div>
           </div>
 
           <div class="order-footer d-flex justify-content-end align-items-center mt-3">
             <div class="mr-3">
-              <span class="total-price">Thành tiền: {{ order.totalAmount }}₫</span>
+              <span class="total-price">Thành tiền: {{ order.totalAmount | currencyFormat}}</span>
             </div>
             <div>
               <button class="btn btn-primary btn-sm"(click)="reorder(order.orderId)">Mua Lại</button>

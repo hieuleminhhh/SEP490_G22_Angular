@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { ReservationService } from '../../../service/reservation.service';
 import { Router } from '@angular/router';
 import { CheckoutService } from '../../../service/checkout.service';
+import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
 
 @Component({
   selector: 'app-paymentReservation',
   standalone: true,
   templateUrl: './paymentReservation.component.html',
   styleUrls: ['./paymentReservation.component.css'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, CurrencyFormatPipe]
 })
 export class PaymentReservationComponent implements OnInit {
 

@@ -48,7 +48,7 @@
                     <h4>{{ item.nameCombo }}</h4>
                   </div>
                   <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>{{ item.price }}₫</span>
+                    <span>{{ item.price | currencyFormat}}</span>
                     <button *ngIf="!isReser;" (click)="addToCart(item, 'combo')" class="add-to-cart js-add-to-cart btn small-btn" >Thêm vào giỏ hàng</button>
                     <button *ngIf="isReser;"(click)="addToCart(item, 'combo')" class="add-to-cart js-add-to-cart btn small-btn" >Thêm vào đặt bàn</button>
                   </p>
@@ -69,8 +69,8 @@
                   </div>
                   <p class="price">
                     <span class="price-container">
-                      <span *ngIf="item.discountedPrice" class="discounted-price">{{ item.discountedPrice }}₫</span>
-                      <span [class]="item.discountedPrice ? 'original-price' : 'no-discount'">{{ item.price }}₫</span>
+                      <span *ngIf="item.discountedPrice" class="discounted-price">{{ item.discountedPrice | currencyFormat}}</span>
+                      <span [class]="item.discountedPrice ? 'original-price' : 'no-discount'">{{ item.price | currencyFormat}}</span>
                     </span>
                     <span class="button-container">
                       <button *ngIf="!isReser;" (click)="addToCart(item, 'dish')" class="add-to-cart js-add-to-cart btn small-btn" >Thêm vào giỏ hàng</button>
@@ -130,7 +130,7 @@
       </div>
       <div class="info-container">
         <h2>{{ selectedItem.nameCombo || selectedItem.itemName }}</h2>
-        <p> {{ selectedItem.discountedPrice || selectedItem.price }}₫</p>
+        <p> {{ selectedItem.discountedPrice || selectedItem.price | currencyFormat}}</p>
         <p>{{ selectedItem.itemDescription }}</p>
         <!-- Add more detailed information as needed -->
         <button  *ngIf="!isReser;" (click)="addToCart(selectedItem, 'dish')" class="add-to-cart btn" style="margin-left: 200px;">Thêm vào giỏ hàng</button>

@@ -14,7 +14,7 @@
         <tr>
             <td><img class="img-fluid" [src]="item.imageUrl" alt="Item Image" style="max-width: 100%; height: 56px;"></td>
             <td>{{ item.itemName||item.nameCombo }}</td>
-            <td>{{ item.discountedPrice || item.price }} đ</td>
+            <td>{{ item.discountedPrice || item.price | currencyFormat}} </td>
             <td>
               <a (click)="decreaseQuantity(item)" class="icon" style="cursor: pointer;">
                 <i class="fas fa-minus" style="color: black; font-size: 10px;"></i>
@@ -24,7 +24,7 @@
                 <i class="fas fa-plus" style="color: black; font-size: 10px;"></i>
               </a>
             </td>
-            <td><span class="price"> {{ getTotalPrice(item) }}₫</span></td>
+            <td><span class="price"> {{ getTotalPrice(item) | currencyFormat}}</span></td>
             <td><button class="delete icon-button" (click)="removeItem(item)">🗑️</button></td>
         </tr>
     </tbody>
@@ -34,7 +34,7 @@
 <div class="summary" *ngIf="cartItems && cartItems.length > 0;">
   <div class="summary-content">
     <a (click)="navigateToMenu()"><i class="fas fa-arrow-left"></i>Tiếp tục chọn món</a>
-    <p>Tổng cộng: <span id="total">{{ getTotalCartPrice() }} đ</span></p>
+    <p>Tổng cộng: <span id="total">{{ getTotalCartPrice() | currencyFormat}} </span></p>
   </div>
 </div>
 

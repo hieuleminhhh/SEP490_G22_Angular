@@ -7,13 +7,14 @@ import { FormsModule } from '@angular/forms';
 import { CheckoutService } from '../../../service/checkout.service';
 import { CartService } from '../../../service/cart.service';
 import { HttpClient } from '@angular/common/http';
+import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css'],
-  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, MatDialogModule]
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, MatDialogModule, CurrencyFormatPipe]
 })
 export class CheckoutComponent implements OnInit {
   selectedService: string = 'service1';

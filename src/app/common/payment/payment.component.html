@@ -92,13 +92,13 @@
                         <div>{{ item.itemName || item.nameCombo }}</div>
                       </div>
                       <div class="col">
-                        <div>{{ item.discountedPrice || item.price }}₫</div>
+                        <div>{{ item.discountedPrice || item.price | currencyFormat}}</div>
                       </div>
                       <div class="col">
                         <span>{{ item.quantity }}</span>
                       </div>
                       <div class="col price-close" style="align-items:center;">
-                        <span class="price">{{ item.unitPrice}}₫</span>
+                        <span class="price">{{ item.unitPrice | currencyFormat}}</span>
                       </div>
                     </div>
                   </div>
@@ -109,13 +109,13 @@
             <div class="col-12 panel-footer basket-footer">
               <div class="row">
                 <div class="col-12 text-right">
-                  <div class="dive">Phí giao hàng: <span class="very emphasized">-----₫</span></div>
+                  <div class="dive">Phí giao hàng: <span class="very emphasized">-----</span></div>
                 </div>
               </div>
               <hr>
               <div class="row">
                 <div class="col-12 text-right">
-                  <div class="dive">Tổng hóa đơn: <span class="very emphasized">{{data?.totalAmount}}₫</span></div>
+                  <div class="dive">Tổng hóa đơn: <span class="very emphasized">{{data?.totalAmount | currencyFormat}}</span></div>
                 </div>
               </div>
             </div>
