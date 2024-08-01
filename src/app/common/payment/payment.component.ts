@@ -3,13 +3,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { CheckoutService } from '../../../service/checkout.service';
+import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
 
 @Component({
   selector: 'app-payment',
   standalone: true,
   templateUrl: './payment.component.html',
   styleUrls: ['./payment.component.css'],
-  imports: [CommonModule]
+  imports: [CommonModule, CurrencyFormatPipe]
 })
 export class PaymentComponent implements OnInit {
   request: any;

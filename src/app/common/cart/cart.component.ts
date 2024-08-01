@@ -5,13 +5,14 @@ import { CommonModule } from '@angular/common';
 import { Dish } from '../../../models/dish.model';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css'],
-  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule]
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, CurrencyFormatPipe]
 })
 export class CartComponent implements OnInit, OnDestroy {
 

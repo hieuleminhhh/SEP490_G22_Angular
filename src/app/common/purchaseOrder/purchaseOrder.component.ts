@@ -5,13 +5,14 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { PurchaseOrderService } from '../../../service/purchaseOrder.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
 
 @Component({
   selector: 'app-purchaseOrder',
   standalone: true,
   templateUrl: './purchaseOrder.component.html',
   styleUrls: ['./purchaseOrder.component.css'],
-  imports: [CommonModule, FormsModule, HttpClientModule]
+  imports: [CommonModule, FormsModule, HttpClientModule, CurrencyFormatPipe]
 })
 export class PurchaseOrderComponent implements OnInit, OnDestroy {
   phoneNumber: string = '';

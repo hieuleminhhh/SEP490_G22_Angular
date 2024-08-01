@@ -6,13 +6,14 @@ import { CartService } from '../../../service/cart.service';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ReservationService } from '../../../service/reservation.service';
+import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
 
 @Component({
   selector: 'app-booking',
   standalone: true,
   templateUrl: './booking.component.html',
   styleUrls: ['./booking.component.css'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, CurrencyFormatPipe]
 })
 export class BookingComponent implements OnInit {
   reservation = {

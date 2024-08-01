@@ -40,7 +40,7 @@
                   <div>{{ item.itemName||item.nameCombo }}</div>
                 </div>
                 <div class="col">
-                  <div>{{ item.discountedPrice || item.price }}₫</div>
+                  <div>{{ item.discountedPrice || item.price | currencyFormat}}</div>
                 </div>
                 <div class="col">
                   <a (click)="decreaseQuantity(item)" class="icon">
@@ -52,7 +52,7 @@
                   </a>
                 </div>
                 <div class="col price-close" style="align-items:center;">
-                  <span class="price"> {{ getTotalPrice(item) }}₫</span>
+                  <span class="price"> {{ getTotalPrice(item) | currencyFormat}}</span>
                   <span class="close" (click)="removeItem(item)">&#10005;</span>
                 </div>
               </div>
@@ -65,7 +65,7 @@
         <hr>
         <div class="row">
           <div class="col-12 text-right">
-            <div class="dive">Tổng hóa đơn: <span class="very emphasized">{{ getTotalCartPrice() }}₫</span></div>
+            <div class="dive">Tổng hóa đơn: <span class="very emphasized">{{ getTotalCartPrice() | currencyFormat}}</span></div>
           </div>
         </div>
       </div>

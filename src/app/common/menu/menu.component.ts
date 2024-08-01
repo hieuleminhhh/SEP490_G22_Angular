@@ -10,13 +10,14 @@ import { CategoryService } from '../../../service/category.service';
 import { Combo } from '../../../models/combo.model';
 import { ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
 
 @Component({
   selector: 'app-menu',
   standalone: true,
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.css'],
-  imports: [HttpClientModule, AsyncPipe, CommonModule, FormsModule]
+  imports: [HttpClientModule, AsyncPipe, CommonModule, FormsModule, CurrencyFormatPipe]
 })
 export class MenuComponent {
   http = inject(HttpClient);
