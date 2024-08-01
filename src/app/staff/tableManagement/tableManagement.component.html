@@ -385,13 +385,13 @@
                         <div>{{ item.itemName || item.nameCombo }}</div>
                       </div>
                       <div class="col">
-                        <div>{{ item.discountedPrice || item.price }}₫</div>
+                        <div>{{ item.discountedPrice || item.price | currencyFormat}}</div>
                       </div>
                       <div class="col">
                         <span>{{ item.quantity }}</span>
                       </div>
                       <div class="col price-close" style="align-items:center;">
-                        <span class="price">{{ item.unitPrice }}₫</span>
+                        <span class="price">{{ item.unitPrice | currencyFormat}}</span>
                       </div>
                     </div>
                   </div>

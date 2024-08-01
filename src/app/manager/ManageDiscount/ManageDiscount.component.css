@@ -123,7 +123,8 @@ body {
 
 
 /* Style cho nền mờ khi hiển thị modal */
-.modal {
+
+.modal, .modal-dish {
   display: none; /* Ẩn modal mặc định */
   position: fixed; /* Hiển thị modal cố định khi cuộn trang */
   z-index: 1000; /* Độ sâu của modal */
@@ -134,19 +135,13 @@ body {
   overflow: auto; /* Cho phép cuộn khi modal dài hơn trang */
   background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
 }
+
+/* Tăng độ sâu của modal-dish để nó luôn ở trên modal thông thường */
 .modal-dish {
-  display: none; /* Ẩn modal mặc định */
-  position: fixed; /* Hiển thị modal cố định khi cuộn trang */
-  z-index: 1200; /* Độ sâu của modal */
-  left: 0;
-  top: 0;
-  width: 100%; /* Thay đổi chiều rộng về 100% */
-  height: 100%; /* Thay đổi chiều cao về 100% */
-  overflow: auto; /* Cho phép cuộn khi modal dài hơn trang */
-  background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
+  z-index: 1200;
 }
 
-.modal-dialog {
+.modal-dialog, .modal-dialog-dish {
   max-width: 100%;
   margin: 0 auto; /* Căn giữa theo chiều ngang */
   display: flex;
@@ -155,27 +150,22 @@ body {
   height: 100%;
 }
 
-.modal-content {
+.modal-content, .modal-content-dish {
   background-color: #fefefe; /* Màu nền của modal */
   padding: 20px;
   border: 1px solid #ccc; /* Viền xung quanh */
   width: 100%;
-  max-width: 1000px; /* Chiều rộng tối đa */
+  max-width: 1000px; /* Chiều rộng tối đa cho modal thông thường */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng cho modal */
   border-radius: 8px; /* Bo góc */
   position: relative; /* Để close button có thể được căn chỉnh chính xác */
 }
 
+/* Giới hạn chiều rộng tối đa của modal-content-dish */
 .modal-content-dish {
-  background-color: #fefefe; /* Màu nền của modal */
-  padding: 20px;
-  border: 1px solid #ccc; /* Viền xung quanh */
-  width: 100%;
-  max-width: 600px; /* Chiều rộng tối đa */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng cho modal */
-  border-radius: 8px; /* Bo góc */
-  position: relative; /* Để close button có thể được căn chỉnh chính xác */
+  max-width: 600px; /* Chiều rộng tối đa cho modal dish */
 }
+
 
 .close {
   color: #aaa;
@@ -333,6 +323,7 @@ body {
   bottom: 12px; /* Đặt ký hiệu ở giữa chiều cao của input */
   color: #6c757d; /* Màu của ký hiệu */
   font-size: 14px; /* Kích thước font của ký hiệu */
+
 }
 .form-control {
   flex: 1; /* Để input chiếm hết không gian còn lại */
@@ -417,4 +408,40 @@ body {
   padding: 10px;
   margin-bottom: 10px; /* Khoảng cách giữa các khung */
   border-radius: 5px; /* Bo góc */
+}
+ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+ul li {
+  margin-left: 150px;
+  margin-bottom: 5px;
+}
+.selected-dishes {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1; /* Để input chiếm hết không gian còn lại */
+  padding: 8px 0; /* Padding trên và dưới */
+  border: none; /* Xóa viền mặc định */
+  border-bottom: 1px solid #ced4da; /* Thêm viền dưới */
+  box-sizing: border-box; /* Đảm bảo padding không làm tăng kích thước input */
+  text-align: center; /* Căn chỉnh văn bản ở giữa */
+  width: 80%; /* Độ rộng của input */
+  margin-right: 400px;
+}
+
+.dish-tag {
+  background-color: #e0e0e0;
+  border-radius: 3px;
+  padding: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.remove-icon {
+  margin-left: 5px;
+  cursor: pointer;
 }

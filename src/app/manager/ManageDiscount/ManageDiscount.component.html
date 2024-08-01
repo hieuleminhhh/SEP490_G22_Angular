@@ -62,21 +62,20 @@
 
   </div>
   <!-- Modal Add Discount -->
-<div class="modal fade" id="addDiscountModal" tabindex="-1" role="dialog" aria-labelledby="addDiscountModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <span class="close" (click)="closePopup()">&times;</span>
-      <h3>Thêm chương trình khuyến mại</h3>
-      <br>
-      <form (ngSubmit)="savePromotion()">
+  <div class="modal fade" id="addDiscountModal" tabindex="-1" role="dialog" aria-labelledby="addDiscountModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <span class="close" (click)="closePopup()">&times;</span>
+        <h3>Thêm chương trình khuyến mại</h3>
+        <br>
+        <form (ngSubmit)="savePromotion()">
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
                 <label for="program-name">Tên chương trình</label>
-                <input type="text" id="program-name" placeholder="Tên chương trình khuyến mại"
-                  [(ngModel)]="promotion.name" name="programName">
+                <input type="text" id="program-name" placeholder="Tên chương trình khuyến mại" [(ngModel)]="promotion.discountName" name="programName">
               </div>
-
               <div class="form-group">
                 <label for="note">Ghi chú</label>
                 <input type="text" id="note" placeholder="Ghi chú" [(ngModel)]="promotion.note" name="note">
@@ -86,10 +85,8 @@
               <div class="form-group">
                 <label>Trạng thái</label>
                 <div class="radio-group">
-                  <label><input type="radio" name="status" value="active" [(ngModel)]="promotion.status"
-                      name="statusActive"> Kích hoạt</label>
-                  <label><input type="radio" name="status" value="inactive" [(ngModel)]="promotion.status"
-                      name="statusInactive"> Chưa áp dụng</label>
+                  <label><input type="radio" name="status" value="true" [(ngModel)]="promotion.discountStatus" name="statusActive"> Kích hoạt</label>
+                  <label><input type="radio" name="status" value="false" [(ngModel)]="promotion.discountStatus" name="statusInactive"> Chưa áp dụng</label>
                 </div>
               </div>
               <div class="form-group">
@@ -97,50 +94,42 @@
                 <div class="horizontal-form-group">
                   <div class="input-group">
                     <label for="dateFrom">Từ</label>
-                    <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom" [min]="dateNow"
-                      name="dateFrom" (change)="onDateFromChange()">
+                    <input type="date" id="dateFrom" class="form-control" [(ngModel)]="promotion.startTime" name="dateFrom">
                   </div>
                   <div class="input-group">
                     <label for="dateTo">Đến</label>
-                    <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo" [min]="dateFrom"
-                      name="dateTo" (change)="onDateToChange()">
+                    <input type="date" id="dateTo" class="form-control" [(ngModel)]="promotion.endTime" name="dateTo">
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
-
           <div class="row">
             <div class="col-md-6">
               <div class="form-group horizontal-form-group">
                 <label for="promotion-type">Khuyến mại theo</label>
                 <select id="promotion-type" [(ngModel)]="promotion.type" name="promotionType">
-                  <option value="order">Đơn hàng</option>
-                  <option value="dish">Món ăn</option>
+                  <option value="0">Đơn hàng</option>
+                  <option value="1">Món ăn</option>
                 </select>
               </div>
             </div>
           </div>
-
-          <!-- Các phần tử bên dưới chỉ hiện nếu chọn "Đơn hàng" -->
-          <div *ngIf="promotion.type === 'order'">
+          <div *ngIf="promotion.type === '0'">
             <div class="form-group">
               <div class="row">
                 <div class="horizontal-form-group" *ngFor="let condition of promotion.conditions; let i = index">
                   <div class="col-md-4">
                     <div class="input-group">
                       <label for="total-amount-{{i}}">Tổng tiền hàng</label>
-                      <input type="text" id="total-amount-{{i}}" placeholder="0" [(ngModel)]="condition.totalAmount"
-                        name="totalAmount-{{i}}" (input)="formatCurrency($event, i)">
+                      <input type="text" id="total-amount-{{i}}" placeholder="0" [(ngModel)]="condition.totalAmount" name="totalAmount-{{i}}">
                       <span class="input-unit">VND</span>
                     </div>
                   </div>
                   <div class="col-md-3">
                     <div class="input-group">
                       <label for="percent-{{i}}">Giảm giá</label>
-                      <input type="number" id="percent-{{i}}" placeholder="0" [(ngModel)]="condition.percent"
-                        name="percent-{{i}}">
+                      <input type="number" id="percent-{{i}}" placeholder="0" [(ngModel)]="condition.percent" name="percent-{{i}}">
                       <span class="input-unit">%</span>
                     </div>
                   </div>
@@ -154,16 +143,17 @@
             </div>
             <button type="button" class="add-condition-button" (click)="addCondition()">+ Thêm điều kiện</button>
           </div>
-
-          <!-- Các phần tử bên dưới chỉ hiện nếu chọn "món ăn" -->
-          <div *ngIf="promotion.type === 'dish'">
+          <div *ngIf="promotion.type === '1'">
             <div class="row dish" *ngFor="let condition of promotion.conditions; let i = index">
               <div class="col-md-12">
                 <div class="input-group spaced-input-group">
                   <label for="dish-{{i}}">Món ăn</label>
-                  <input type="text" id="dish-{{i}}" name="dish-{{i}}" style="margin-right: 350px;">
-                  <i class="fas fa-list input-unit" style="margin-right: 300px;" (click)="openDishModal(i)"></i>
-                  <button class="delete-icon" (click)="clearPercent(i)">
+                  <div *ngIf="!selectedDishes[i]?.length" class="selected-dishes"></div>
+                  <div *ngIf="selectedDishes[i]?.length" class="selected-dishes">
+                    <span class="dish-tag" *ngFor="let dishName of selectedDishes[i]">{{ dishName }} <i class="fas fa-times remove-icon" (click)="removeDish(i, dishName)"></i></span>
+                  </div>
+                  <i class="fas fa-list input-unit" (click)="openDishModal(i)" style="margin-right: 300px;"></i>
+                  <button class="delete-icon" (click)="clearDish(i)">
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 </div>
@@ -171,16 +161,14 @@
               <div class="col-md-12">
                 <div class="input-group spaced-input-group">
                   <label for="percent-{{i}}">Giảm giá</label>
-                  <input type="number" id="percent-{{i}}" placeholder="0" [(ngModel)]="condition.percent"
-                    name="percent-{{i}}" style="margin-right: 600px;">
-                  <span class="input-unit" style="margin-right: 530px;">%</span>
+                  <input type="number" id="percent-{{i}}" placeholder="0" [(ngModel)]="condition.percent" name="percent-{{i}}"
+                  style="margin-right: 500px;">
+                  <span class="input-unit" style="margin-right: 500px;">%</span>
                 </div>
               </div>
             </div>
             <button type="button" class="add-condition-button" (click)="addCondition()">+ Thêm điều kiện</button>
           </div>
-
-
           <div class="form-actions">
             <button type="submit" class="save-button">Lưu</button>
             <button type="button" class="cancel-button" (click)="closePopup()">Bỏ qua</button>
@@ -189,9 +177,9 @@
       </div>
     </div>
   </div>
- <!-- Modal Dish -->
+  <!-- Modal Dish -->
 <div class="modal-dish fade" id="dishModal" tabindex="-1" role="dialog" aria-labelledby="dishModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog-dish" role="document">
     <div class="modal-content-dish">
       <div class="modal-header">
         <h5 class="modal-title" id="dishModalLabel">Danh sách món ăn</h5>

@@ -10,6 +10,7 @@ import { debounceTime, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Table, TableReservationResponse } from '../../../models/table.model';
 import { DatePipe } from '@angular/common';
+import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 
 
 @Component({
@@ -17,7 +18,7 @@ import { DatePipe } from '@angular/common';
   standalone: true,
   templateUrl: './tableManagement.component.html',
   styleUrls: ['./tableManagement.component.css'],
-  imports: [CommonModule, FormsModule, NgxPaginationModule],
+  imports: [CommonModule, FormsModule, NgxPaginationModule, CurrencyFormatPipe],
   providers: [DatePipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
