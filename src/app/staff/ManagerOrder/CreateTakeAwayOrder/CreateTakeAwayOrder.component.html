@@ -295,92 +295,97 @@
     <!-- Template for cffff -->
     <div class="modal fade" id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
-          <div class="modal-content">
-                     <!-- Success message -->
-                     <div class="text-center mb-3">
-                      <div class="d-flex justify-content-center align-items-center flex-column">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
-                              <path d="M8 16a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5.586l-3-3a.5.5 0 0 1 .707-.707L7 9.293l4.646-4.647a.5.5 0 0 1 .708.707l-5 5a.5.5 0 0 1-.708 0z"/>
-                          </svg>
-                          <h4 class="mt-2">Tạo đơn hàng thành công</h4>
-                      </div>
-                  </div>        
-              <div class="modal-body">
-                <div class="modal-header d-flex justify-content-center align-items-center text-center">
-                  <h5 class="modal-title" id="paymentModalLabel">HÓA ĐƠN THANH TOÁN</h5>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="orderID" class="form-label">Mã hóa đơn: </label>
-                    <span id="orderID">{{ invoice?.invoiceId || 'N/A' }}</span>
-                </div>
-                <div class="mb-3">
-                    <label for="phoneNumber" class="form-label">Số điện thoại: </label>
-                    <span id="phoneNumber">{{ invoice?.guestPhone || 'N/A' }}</span>
-                </div>
-                <div class="mb-3">
-                    <label for="customerName" class="form-label">Tên khách hàng:</label>
-                    <span id="customerName">{{ invoice?.consigneeName || 'N/A' }}</span>
-                </div>
-                <div class="mb-3">
-                    <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
-                    <span id="orderDate">{{ invoice?.orderDate | dateFormat }}</span>
-                </div>
-                
-                <div class="mb-3">
-                    <table id="items" class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">STT</th>
-                                <th scope="col">Tên món</th>
-                                <th scope="col">SL</th>
-                                <th scope="col">Đơn giá</th>
-                                <th scope="col">Thành tiền</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let item of invoice?.itemInvoice; let i = index">
-                                <td>{{ i + 1 }}</td>
-                                <td>{{ item.itemName || item.nameCombo }}</td>
-                                <td>{{ item.quantity }}</td>
-                                <td>{{ item.unitPrice | currencyFormat  }}</td>
-                                <td>{{ item.price | currencyFormat  }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mb-3">
-                    <label for="totalAmount" class="form-label">Tổng tiền:</label>
-                    <span id="totalAmount">{{ invoice?.totalAmount | currencyFormat  }}</span>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="discount" class="form-label">Chiết khấu:</label>
-                    <span id="discount">{{ invoice?.discount || '0' }}</span>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="amountToPay" class="form-label">Khách phải trả:</label>
-                    <span id="amountToPay">{{ invoice?.totalAmount | currencyFormat }}</span>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
-                    <span id="customerPaid">{{ invoice?.amountReceived | currencyFormat }}</span>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="changeToGive" class="form-label">Trả lại:</label>
-                    <span id="changeToGive">{{ invoice?.returnAmount | currencyFormat  }}</span>
-                </div>
-            </div>            
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearCart()">Đóng</button>
-                  <button type="button" class="btn btn-primary" (click)="printInvoice()">In hóa đơn</button>
-              </div>
+        <div class="modal-content">
+          <!-- Success message -->
+          <div class="text-center mb-3">
+            <div class="d-flex justify-content-center align-items-center flex-column">
+              <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
+                <path d="M8 16a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5.586l-3-3a.5.5 0 0 1 .707-.707L7 9.293l4.646-4.647a.5.5 0 0 1 .708.707l-5 5a.5.5 0 0 1-.708 0z"/>
+              </svg>
+              <h4 class="mt-2">Tạo đơn hàng thành công</h4>
+            </div>
           </div>
+          <div class="modal-body">
+            <div class="modal-header d-flex justify-content-center align-items-center text-center">
+              <h5 class="modal-title" id="paymentModalLabel">HÓA ĐƠN THANH TOÁN</h5>
+            </div>
+            <div class="mb-3">
+              <label for="orderID" class="form-label">Mã hóa đơn: </label>
+              <span id="orderID">{{ invoice?.invoiceId || 'N/A' }}</span>
+            </div>
+            <div class="mb-3" *ngIf="invoice.isUpdated; else editTemplate">
+              <label for="customerName" class="form-label">Tên khách hàng:</label>
+              <span id="customerName">{{ invoice.consigneeName || 'Khách lẻ' }}</span>
+            </div>
+            <ng-template #editTemplate>
+              <div class="mb-3">
+                <label for="customerName" class="form-label">Tên khách hàng:</label>
+                <input id="customerName" class="form-control" [(ngModel)]="invoice.consigneeName" placeholder="Khách lẻ" />
+              </div>
+              <div class="mb-3">
+                <label for="phoneNumber" class="form-label">Số điện thoại: </label>
+                <input id="phoneNumber" class="form-control" [(ngModel)]="invoice.guestPhone" placeholder="N/A" />
+              </div>
+              <div class="mb-3">
+                <label for="address" class="form-label">Địa chỉ:</label>
+                <input id="address" class="form-control" [(ngModel)]="invoice.address" placeholder="N/A" />
+              </div>
+            </ng-template>
+            <div class="mb-3">
+              <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
+              <span id="orderDate">{{ invoice?.orderDate | dateFormat }}</span>
+            </div>
+            <div class="mb-3">
+              <table id="items" class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">STT</th>
+                    <th scope="col">Tên món</th>
+                    <th scope="col">SL</th>
+                    <th scope="col">Đơn giá</th>
+                    <th scope="col">Thành tiền</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of invoice?.itemInvoice; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ item.itemName || item.nameCombo }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.unitPrice | currencyFormat }}</td>
+                    <td>{{ item.price | currencyFormat }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="mb-3">
+              <label for="totalAmount" class="form-label">Tổng tiền:</label>
+              <span id="totalAmount">{{ invoice?.totalAmount | currencyFormat }}</span>
+            </div>
+            <div class="mb-3">
+              <label for="discount" class="form-label">Chiết khấu:</label>
+              <span id="discount">{{ invoice?.discount || '0' }}</span>
+            </div>
+            <div class="mb-3">
+              <label for="amountToPay" class="form-label">Khách phải trả:</label>
+              <span id="amountToPay">{{ invoice?.totalAmount | currencyFormat }}</span>
+            </div>
+            <div class="mb-3">
+              <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
+              <span id="customerPaid">{{ invoice?.amountReceived | currencyFormat }}</span>
+            </div>
+            <div class="mb-3">
+              <label for="changeToGive" class="form-label">Trả lại:</label>
+              <span id="changeToGive">{{ invoice?.returnAmount | currencyFormat }}</span>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearCart()">Đóng</button>
+            <button type="button" class="btn btn-primary" (click)="printInvoice()">In hóa đơn</button>
+          </div>
+        </div>
       </div>
-  </div>
+    </div>
+    
   
     </div>
   </div>
