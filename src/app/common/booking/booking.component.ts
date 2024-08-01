@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Dish } from '../../../models/dish.model';
 import { CartService } from '../../../service/cart.service';
@@ -7,13 +7,15 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ReservationService } from '../../../service/reservation.service';
 import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
+import { MatDialog } from '@angular/material/dialog';
+import { MenuComponent } from '../menu/menu.component';
 
 @Component({
   selector: 'app-booking',
   standalone: true,
   templateUrl: './booking.component.html',
   styleUrls: ['./booking.component.css'],
-  imports: [CommonModule, FormsModule, CurrencyFormatPipe]
+  imports: [CommonModule, FormsModule, CurrencyFormatPipe, MenuComponent]
 })
 export class BookingComponent implements OnInit {
   reservation = {
@@ -25,17 +27,18 @@ export class BookingComponent implements OnInit {
     notes: ''
   };
   itemQuantityMap: { [key: string]: number } = {};
-
   private cartSubscription!: Subscription;
-  minDate: string; // Ngày nhận tối thiểu là ngày hiện tại
-  maxDate: string; // Ngày nhận tối đa là ngày hiện tại + 7 ngày
+  minDate: string;
+  maxDate: string;
   availableHours: string[] = [];
-
   consigneeName: string = '';
   guestPhone: string = '';
   note: string = '';
+  availableTimes: string[] = [];
+  formSubmitted = false;
+  cartItems: Dish[] = [];
 
-  constructor(private reservationService: ReservationService, private router: Router) {
+  constructor(private reservationService: ReservationService, private router: Router,public dialog: MatDialog) {
     const today = new Date();
     this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
     const maxDate = new Date();
@@ -51,10 +54,7 @@ export class BookingComponent implements OnInit {
     };
     this.generateAvailableHours();
   }
-  availableTimes: string[] = [];
-  formSubmitted = false;
 
-  cartItems: Dish[] = [];
 
   ngOnInit(): void {
     this.updateTimes();
@@ -210,8 +210,14 @@ export class BookingComponent implements OnInit {
       this.reservationService.removeFromCart(item.comboId, 'Combo');
     }
   }
-  navigateToMenu() {
-    sessionStorage.setItem('isReser', JSON.stringify(true));
-    this.router.navigate(['/menu']);
+
+  isMenuPopupOpen = false;
+
+  openMenuPopup(): void {
+    this.isMenuPopupOpen = true;
+  }
+
+  closeMenuPopup(): void {
+    this.isMenuPopupOpen = false;
   }
 }
