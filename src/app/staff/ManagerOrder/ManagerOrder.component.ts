@@ -122,7 +122,12 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
-
+  areAllDishesServedEqualToQuantity(): boolean {
+    if (!this.orderDetail || !this.orderDetail.orderDetails) {
+      return false;
+    }
+    return this.orderDetail.orderDetails.every(item => Number(item.dishesServed) === item.quantity);
+  }
   onStatusChange(event: Event, orderId: number): void {
     const selectElement = event.target as HTMLSelectElement;
     const selectedStatus = parseInt(selectElement.value, 10);

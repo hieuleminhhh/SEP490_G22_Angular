@@ -167,6 +167,9 @@
               <tr>
                 <th>Món ăn</th>
                 <th>Số lượng</th>
+                <ng-container *ngIf="!(orderDetail?.type === 2 && orderDetail?.status === 1)">
+                <th>Hoàn thành</th>
+              </ng-container>
                 <th>Giá</th>
                 <th>Tổng số tiền</th>
               </tr>
@@ -179,6 +182,11 @@
                     <ng-template #comboNameTemplate>{{ item.nameCombo }}</ng-template>
                   </td>
                   <td>{{ item.quantity }}</td>
+                  <ng-container *ngIf="!(orderDetail?.type === 2 && orderDetail?.status === 1)">
+                  <td>                  
+                      {{ item.dishesServed }}                  
+                  </td>
+                </ng-container>
                   <td>
                     <ng-container *ngIf="item.discountedPrice">
                       <span>{{ item.discountedPrice | currencyFormat }}</span>
@@ -229,10 +237,26 @@
           </div>
         </ng-template>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer d-flex justify-content-between">
+        <div>
+          <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 1">
+            <button type="button" class="btn btn-primary me-2">Chấp nhận đơn hàng</button>
+            <button type="button" class="btn btn-danger me-2">Hủy đơn</button>
+          </ng-container>
+          <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 2">
+            <button type="button" class="btn btn-success me-2" 
+                    *ngIf="areAllDishesServedEqualToQuantity()">Hoàn thành</button>
+            <button type="button" class="btn btn-danger me-2">Hủy đơn</button>
+          </ng-container>
+          <ng-container *ngIf="orderDetail?.type === 1 && orderDetail?.status === 2">
+            <button type="button" class="btn btn-success me-2"
+                    *ngIf="areAllDishesServedEqualToQuantity()">Hoàn thành</button>
+            <button type="button" class="btn btn-danger me-2">Hủy đơn</button>
+          </ng-container>
+        </div>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        <button type="button" class="btn btn-primary">Chấp nhận đơn hàng</button>
       </div>
+      
     </div>
   </div>
 </div>

@@ -326,10 +326,6 @@
                 <label for="phoneNumber" class="form-label">Số điện thoại: </label>
                 <input id="phoneNumber" class="form-control" [(ngModel)]="invoice.guestPhone" placeholder="N/A" />
               </div>
-              <div class="mb-3">
-                <label for="address" class="form-label">Địa chỉ:</label>
-                <input id="address" class="form-control" [(ngModel)]="invoice.address" placeholder="N/A" />
-              </div>
             </ng-template>
             <div class="mb-3">
               <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
@@ -362,7 +358,7 @@
               <span id="totalAmount">{{ invoice?.totalAmount | currencyFormat }}</span>
             </div>
             <div class="mb-3">
-              <label for="discount" class="form-label">Chiết khấu:</label>
+              <label for="discount" class="form-label">Khuyến mãi:</label>
               <span id="discount">{{ invoice?.discount || '0' }}</span>
             </div>
             <div class="mb-3">
