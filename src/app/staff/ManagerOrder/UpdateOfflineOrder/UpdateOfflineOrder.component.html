@@ -39,7 +39,7 @@
                     <tr *ngIf="selectedItems.length > 0">
                       <th scope="col">Tên món</th>
                       <th scope="col">Số lượng</th>
-                      <th scope="col">Số lượng hoàn thành</th>
+                      <th scope="col">Hoàn thành</th>
                       <th scope="col">Giá món</th>
                       <th scope="col">Tổng</th>
                       <th scope="col"></th> <!-- Column for delete button -->
@@ -323,14 +323,20 @@
                     <label for="orderID" class="form-label">Mã hóa đơn: </label>
                     <span id="orderID">{{ invoice?.invoiceId || 'N/A' }}</span>
                 </div>
-                <div class="mb-3">
-                    <label for="phoneNumber" class="form-label">Số điện thoại: </label>
-                    <span id="phoneNumber">{{ invoice?.guestPhone || '------------' }}</span>
+                <div class="mb-3" *ngIf="invoice.isUpdated; else editTemplate">
+                  <label for="customerName" class="form-label">Tên khách hàng:</label>
+                  <span id="customerName">{{ invoice.consigneeName || 'Khách lẻ' }}</span>
                 </div>
-                <div class="mb-3">
+                <ng-template #editTemplate>
+                  <div class="mb-3">
                     <label for="customerName" class="form-label">Tên khách hàng:</label>
-                    <span id="customerName">{{ invoice?.consigneeName || 'Khách lẻ' }}</span>
-                </div>
+                    <input id="customerName" class="form-control" [(ngModel)]="invoice.consigneeName" placeholder="Khách lẻ" />
+                  </div>
+                  <div class="mb-3">
+                    <label for="phoneNumber" class="form-label">Số điện thoại: </label>
+                    <input id="phoneNumber" class="form-control" [(ngModel)]="invoice.guestPhone" placeholder="N/A" />
+                  </div>
+                </ng-template>
                 <div class="mb-3">
                     <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
                     <span id="orderDate">{{ invoice?.orderDate | dateFormat }}</span>
@@ -352,8 +358,9 @@
                                 <td>{{ i + 1 }}</td>
                                 <td>{{ item.itemName || item.nameCombo }}</td>
                                 <td>{{ item.quantity }}</td>
-                                <td>{{ item.unitPrice | currencyFormat  }}</td>
                                 <td>{{ item.price | currencyFormat  }}</td>
+                                <td>{{ item.unitPrice | currencyFormat  }}</td>
+                                
                             </tr>
                         </tbody>
                     </table>
