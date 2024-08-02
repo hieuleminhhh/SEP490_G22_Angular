@@ -17,17 +17,21 @@ import { NoteDialogComponent } from '../../../common/material/NoteDialog/NoteDia
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CurrencyFormatPipe } from '../../../common/material/currencyFormat/currencyFormat.component';
 import { DateFormatPipe } from '../../../common/material/dateFormat/dateFormat.component';
+import { ItemInvoice } from '../../../../models/invoice.model';
+import { DiscountService } from '../../../../service/discount.service';
+import { PercentagePipe } from '../../../common/material/percentFormat/percentFormat.component';
+import { Discount } from '../../../../models/discount.model';
 @Component({
   selector: 'app-CreateOnlineOrder',
   templateUrl: './CreateOnlineOrder.component.html',
   styleUrls: ['./CreateOnlineOrder.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, MatDialogModule, CurrencyFormatPipe, DateFormatPipe]
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, MatDialogModule, CurrencyFormatPipe, DateFormatPipe, PercentagePipe]
 })
 export class CreateOnlineOrderComponent implements OnInit {
 
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService : ManagerOrderService,
-     private invoiceService: InvoiceService,private dialog: MatDialog) { }
+     private invoiceService: InvoiceService,private dialog: MatDialog, private discountService: DiscountService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   dishes: ListAllDishes[] = [];
   combo: ListAllCombo[] = [];
@@ -47,9 +51,15 @@ export class CreateOnlineOrderComponent implements OnInit {
   receivingDate: string = '';
   receivingTime: string = '';
   timeOptions: string[] = [];
+  discount: any = {};
+  selectedDiscount: any | null = null;
   paymentMethod: string = '0';
   customerPaid: number | null = null;
   paymentAmount: number = 0;
+  selectedDiscountName: string = '';
+  selectedDiscountPercent: number = 0;
+  totalAmountAfterDiscount: number = 0;
+  totalAmount: number = 0;
   addNew: AddNewOrder = {
     guestPhone: '',
     email: '',
@@ -83,6 +93,11 @@ export class CreateOnlineOrderComponent implements OnInit {
     this.generateTimeOptions();
     this.setDefaultReceivingTime();
     this.selectCategory('Món chính');
+    this.LoadActiveDiscounts();
+    this.calculateAndSetTotalAmount();
+    this.selectedDiscount = null;
+    console.log("Select discount "+this.selectedDiscount); // Xem giá trị hiện tại của selectedDiscount
+
   }
   selectCategory(searchCategory: string) {
     this.selectedCategory = searchCategory;
@@ -156,7 +171,7 @@ increaseQuantity(index: number): void {
     this.selectedItems[index].quantity++;
     this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
     this.validateQuantity(index);
-    this.calculateTotalAmount();
+    this.calculateAndSetTotalAmount();
   }
 }
 
@@ -165,7 +180,7 @@ decreaseQuantity(index: number): void {
     this.selectedItems[index].quantity--;
     this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
     this.validateQuantity(index);
-    this.calculateTotalAmount();
+    this.calculateAndSetTotalAmount();
   }
 }
 validateQuantity(index: number): void {
@@ -178,26 +193,27 @@ validateQuantity(index: number): void {
   // Update the total price after validating the quantity
   item.totalPrice = item.quantity * item.unitPrice;
   // Recalculate total amount
-  this.calculateTotalAmount();
+  this.calculateAndSetTotalAmount();
 }
-  addItem(item: any) {
-    // Find if the item already exists in selectedItems
-    const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
+addItem(item: any) {
+  // Find if the item already exists in selectedItems
+  const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
   
-    if (index !== -1) {
-      // If the item already exists, increase its quantity and update the total price
-      this.selectedItems[index].quantity++;
-      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
-    } else {
-      // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
-      // Use discountedPrice if available, otherwise fallback to price
-      const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
-      this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
-    }
-
-    // Recalculate totalAmount after adding item
-    this.calculateTotalAmount();
+  if (index !== -1) {
+    // If the item already exists, increase its quantity and update the total price
+    this.selectedItems[index].quantity++;
+    this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+  } else {
+    // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
+    // Use discountedPrice if available, otherwise fallback to price
+    const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
+    this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
   }
+
+  // Recalculate totalAmount and totalAmountAfterDiscount after adding item
+  this.calculateAndSetTotalAmount();
+}
+
   
   
   itemsAreEqual(item1: any, item2: any): boolean {
@@ -263,7 +279,7 @@ createOrder() {
   }));
 
   // Calculate total amount and set various properties
-  const totalAmount = this.calculateTotalAmount();
+  const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
   const currentDate = new Date();
   const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
   const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; // Convert paymentMethod to number
@@ -300,7 +316,7 @@ createOrder() {
     returnAmount,
     paymentMethods: paymentMethodValue,
     description: 'Order payment description',
-    discountId: 1,
+    discountId: this.selectedDiscount,
     taxcode: 'ABCD',
     paymentStatus: 0,
   };
@@ -382,9 +398,7 @@ setDefaultReceivingTime() {
     const vietnamOffset = 7 * 3600000;
     return new Date(now.getTime() + utcOffset + vietnamOffset);
   }
-  calculateTotalAmount(): number {
-   return this.selectedItems.reduce((total, item) => total + item.totalPrice, 0);
-  }
+
   updateQuantity(index: number, newQuantity: number) {
     if (newQuantity >= 1 && newQuantity <= 100) {
       this.selectedItems[index].quantity = newQuantity;
@@ -481,87 +495,206 @@ setDefaultReceivingTime() {
     };
   }
   printInvoice(): void {
-    const printWindow = window.open('', '', 'height=600,width=800');
+    console.log('Invoice data before update:', this.invoice);
+    if (this.invoice.invoiceId) {
+      const printWindow = window.open('', '', 'height=600,width=800');
   
-    // Write the content to the new window
-    printWindow?.document.write('<html><head><title>Invoice</title>');
-    printWindow?.document.write(`
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          margin: 20px;
-        }
-        .header {
-          text-align: center;
-          margin-bottom: 20px;
-        }
-        .header h1 {
-          margin: 0;
-        }
-        .header p {
-          margin: 5px 0;
-        }
-        hr {
-          margin: 20px 0;
-          border: 0;
-          border-top: 1px solid #000;
-        }
-        .table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 20px;
-        }
-        .table th, .table td {
-          border: 1px solid #ddd;
-          padding: 8px;
-          text-align: left;
-        }
-        .table th {
-          background-color: #f2f2f2;
-        }
-        .text-right {
-          text-align: right;
-        }
-        .footer {
-          text-align: center;
-          margin-top: 20px;
-          border-top: 1px solid #000;
-          padding-top: 10px;
-          font-style: italic;
-        }
-      </style>
-    `);
-    printWindow?.document.write('</head><body>');
+      // Write the content to the new window
+      printWindow?.document.write('<html><head><title>Invoice</title>');
+      printWindow?.document.write(`
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 20px;
+          }
+          .header h1 {
+            margin: 0;
+          }
+          .header p {
+            margin: 5px 0;
+          }
+          hr {
+            margin: 20px 0;
+            border: 0;
+            border-top: 1px solid #000;
+          }
+          .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+          }
+          .table th {
+            background-color: #f2f2f2;
+          }
+          .text-right {
+            text-align: right;
+          }
+          .footer {
+            text-align: center;
+            margin-top: 20px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+            font-style: italic;
+          }
+        </style>
+      `);
+      printWindow?.document.write('</head><body>');
   
-    // Add restaurant information
-    printWindow?.document.write(`
-      <div class="header">
-        <h1>Eating House</h1>
-        <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
-        <p>Hotline: 0393578176 - 0987654321</p>
-        <p>Email: eatinghouse@gmail.com</p>
-        <hr>
-      </div>
-    `);
+      // Add restaurant information
+      printWindow?.document.write(`
+        <div class="header">
+          <h1>Eating House</h1>
+          <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
+          <p>Hotline: 0393578176 - 0987654321</p>
+          <p>Email: eatinghouse@gmail.com</p>
+          <hr>
+        </div>
+      `);
   
-    // Extract the modal-body content
-    const modalBodyContent = document.querySelector('#cfpaymentModal .modal-body')?.innerHTML || '';
-    printWindow?.document.write(modalBodyContent);
+      // Add invoice information
+      printWindow?.document.write(`
+        <div class="mb-3">
+          <label for="orderID" class="form-label">Mã hóa đơn: </label>
+          <span id="orderID">${this.invoice?.invoiceId || 'N/A'}</span>
+        </div>
+        <div class="mb-3">
+          <label for="customerName" class="form-label">Tên khách hàng:</label>
+          <span id="customerName">${this.invoice.consigneeName || 'Khách lẻ'}</span>
+        </div>
+        <div class="mb-3">
+          <label for="phoneNumber" class="form-label">Số điện thoại: </label>
+          <span id="phoneNumber">${this.invoice.guestPhone || 'N/A'}</span>
+        </div>
+        <div class="mb-3">
+          <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
+          <span id="orderDate">${this.invoice?.orderDate}</span>
+        </div>
+        <div class="mb-3">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>STT</th>
+                <th>Tên món</th>
+                <th>SL</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${(this.invoice?.itemInvoice || []).map((item: ItemInvoice, i: number) => `
+                <tr>
+                  <td>${i + 1}</td>
+                  <td>${item.itemName || item.nameCombo}</td>
+                  <td>${item.quantity}</td>
+                  <td>${item.unitPrice}</td>
+                  <td>${item.price}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div class="mb-3">
+          <label for="totalAmount" class="form-label">Tổng tiền:</label>
+          <span id="totalAmount">${this.invoice.totalAmount}</span>
+        </div>
+        <div class="mb-3">
+          <label for="discount" class="form-label">Khuyến mãi:</label>
+          <span id="discount">${this.invoice.discount || 0}</span>
+        </div>
+        <div class="mb-3">
+          <label for="amountToPay" class="form-label">Khách phải trả:</label>
+          <span id="amountToPay">${this.invoice.totalAmount}</span>
+        </div>
+        <div class="mb-3">
+          <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
+          <span id="customerPaid">${this.invoice.amountReceived}</span>
+        </div>
+        <div class="mb-3">
+          <label for="changeToGive" class="form-label">Trả lại:</label>
+          <span id="changeToGive">${this.invoice.returnAmount}</span>
+        </div>
+      `);
   
-    // Add footer
-    printWindow?.document.write(`
-      <div class="footer">
-        CẢM ƠN QUÝ KHÁCH VÀ HẸN GẶP LẠI
-      </div>
-    `);
+      // Footer
+      printWindow?.document.write(`
+        <div class="footer">
+          <p>Cảm ơn quý khách. Hẹn gặp lại!</p>
+        </div>
+      `);
   
-    printWindow?.document.write('</body></html>');
-  
-    // Close the document to finish writing
-    printWindow?.document.close();
-  
-    // Print the content
-    printWindow?.focus();
-    printWindow?.print();
+      // Close the document and print
+      printWindow?.document.write('</body></html>');
+      printWindow?.document.close();
+      printWindow?.print();
+    }
   }
+  LoadActiveDiscounts(): void {
+    this.discountService.getActiveDiscounts().subscribe((data) => {
+      this.discount = data;
+    }, (error) => {
+      console.error('Error fetching active discounts:', error);
+    });
+  }
+  onItemClick(discount: any) {
+    this.selectedDiscount = discount.discountId;
+    this.selectedDiscountName = discount.discountName;
+    this.selectedDiscountPercent = discount.discountPercent;
+    console.log('Discount selected:', this.selectedDiscount)
+  }
+ // Method to apply the discount
+ applyDiscount() {
+  if (this.selectedDiscount !== null) {
+    // Find the selected discount
+    const discount = this.discount.find((d: Discount) => d.discountId === this.selectedDiscount);
+    if (discount) {
+      this.selectedDiscountName = discount.discountName;
+      this.selectedDiscountPercent = discount.discountPercent;
+
+      // Recalculate the total amount with the discount applied
+      this.updateTotalAmountWithDiscount();
+
+      // Optionally close the modal programmatically
+      this.closeModal();
+    }
+  } else {
+    // No discount selected, set totalAmountAfterDiscount to totalAmount
+    this.totalAmountAfterDiscount = this.calculateTotalAmount();
+    console.error('No discount selected.');
+  }
+}
+
+
+// Method to calculate the total amount before discount
+calculateTotalAmount(): number {
+  return this.selectedItems.reduce((total, item) => total + item.totalPrice, 0);
+}
+calculateAndSetTotalAmount() {
+  this.totalAmount = this.calculateTotalAmount();
+  if (this.selectedDiscount !== null) {
+    this.updateTotalAmountWithDiscount();
+  } else {
+    this.totalAmountAfterDiscount = this.totalAmount; // Khi không có discount
+  }
+}
+
+updateTotalAmountWithDiscount() {
+  const totalAmount = this.calculateTotalAmount();
+  console.log('Total Amount:', totalAmount); // Kiểm tra giá trị totalAmount
+  const discountAmount = totalAmount * (this.selectedDiscountPercent / 100);
+  console.log('Discount Amount:', discountAmount); // Kiểm tra giá trị discountAmount
+  this.totalAmountAfterDiscount = totalAmount - discountAmount;
+  console.log('Total Amount After Discount:', this.totalAmountAfterDiscount); // Kiểm tra giá trị totalAmountAfterDiscount
+}
+
+
+
 }

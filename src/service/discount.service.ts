@@ -21,5 +21,8 @@ export class DiscountService {
     const url = `https://localhost:7188/api/Discounts`;
     return this.http.post(url,request);
   }
-
+  getActiveDiscounts(): Observable<any> {
+    const url = `https://localhost:7188/api/Discounts/active`;
+    return this.http.get(url);
+  }
 }
