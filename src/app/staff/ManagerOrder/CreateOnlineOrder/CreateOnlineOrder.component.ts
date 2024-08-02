@@ -57,7 +57,7 @@ export class CreateOnlineOrderComponent implements OnInit {
     guestAddress: '',
     consigneeName: '',
     orderDate: new Date(),
-    status: 1,
+    status: 2,
     recevingOrder: '',
     totalAmount: 0,
     deposits: 0,
@@ -270,14 +270,21 @@ createOrder() {
 
   let amountReceived = totalAmount;
   let returnAmount = 0;
-
+  let deposits = 0;
   // Set amountReceived and returnAmount based on payment method
   if (paymentMethodValue === 0) { // Cash
     amountReceived = customerPaidAmount;
     returnAmount = customerPaidAmount - totalAmount;
-  } else if (paymentMethodValue === 2) { // COD
+  } 
+  else if (paymentMethodValue === 1) { // COD
     amountReceived = 0;
     returnAmount = 0;
+    deposits = 100;
+  }
+  else if (paymentMethodValue === 2) { // COD
+    amountReceived = 0;
+    returnAmount = 0;
+    deposits = 100;
   }
 
   this.addNew = {
@@ -289,6 +296,7 @@ createOrder() {
     paymentTime: currentDate.toISOString(),
     paymentAmount: totalAmount,
     amountReceived,
+    deposits : deposits,
     returnAmount,
     paymentMethods: paymentMethodValue,
     description: 'Order payment description',
