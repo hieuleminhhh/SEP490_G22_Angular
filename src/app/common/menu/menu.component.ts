@@ -1,6 +1,6 @@
 import { ReservationService } from './../../../service/reservation.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, Inject, inject } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 import { Dish } from '../../../models/dish.model';
 import { AsyncPipe, CommonModule } from '@angular/common';
@@ -43,13 +43,17 @@ export class MenuComponent {
     sessionStorage.removeItem('isReser');
   }
 
-  constructor(private cartService: CartService, private reservationService: ReservationService, private categoryService: CategoryService, private cdr: ChangeDetectorRef) {
+  constructor(private cartService: CartService, private reservationService: ReservationService,
+    private categoryService: CategoryService, private cdr: ChangeDetectorRef,
+    ) {
     this.dishs$ = this.getDish();
     this.category$ = this.getCategory();
     this.combo$ = this.getCombo();
     const isReserString = sessionStorage.getItem('isReser');
     this.isReser = isReserString !== null ? JSON.parse(isReserString) : false;
   }
+
+
 
   private getDish(categoryName?: string, sortOption?: string): Observable<Dish[]> {
     let apiUrl = 'https://localhost:7188/api/Dish';
