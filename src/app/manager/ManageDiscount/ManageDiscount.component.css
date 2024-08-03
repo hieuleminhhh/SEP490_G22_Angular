@@ -4,7 +4,6 @@ body {
   margin: 0;
   padding: 0;
   display: flex;
-  height: 400px;
 }
 
 .container {
@@ -287,11 +286,19 @@ body {
   margin-bottom: 15px; /* Khoảng cách giữa các input groups */
   position: relative;
 }
+.input-group input[type="checkbox"] {
+  width: 16px; /* Adjust width as needed */
+  height: 16px; /* Adjust height as needed */
+  max-width: 16px;
+  margin-right: 10px; /* Space between checkbox and label */
+  margin-left: 0; /* Remove any left margin */
+}
 
 .input-group label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
+  margin-top: 5px;
 }
 .input-group span {
   font-weight: bold;
@@ -319,7 +326,7 @@ body {
 
 .input-unit {
   position: absolute; /* Định vị tuyệt đối */
-  right: 10%; /* Đặt ký hiệu ở phía bên phải của input */
+  right: 0%; /* Đặt ký hiệu ở phía bên phải của input */
   bottom: 12px; /* Đặt ký hiệu ở giữa chiều cao của input */
   color: #6c757d; /* Màu của ký hiệu */
   font-size: 14px; /* Kích thước font của ký hiệu */
@@ -445,3 +452,15 @@ ul li {
   margin-left: 5px;
   cursor: pointer;
 }
+.no-arrows::-webkit-inner-spin-button,
+.no-arrows::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+.no-arrows {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
