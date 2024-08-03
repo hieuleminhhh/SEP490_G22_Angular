@@ -644,12 +644,12 @@ setDefaultReceivingTime() {
       console.error('Error fetching active discounts:', error);
     });
   }
-  onItemClick(discount: any) {
+  onItemClick(discount: Discount) {
     this.selectedDiscount = discount.discountId;
     this.selectedDiscountName = discount.discountName;
     this.selectedDiscountPercent = discount.discountPercent;
-    console.log('Discount selected:', this.selectedDiscount)
-  }
+    console.log('Discount selected:', this.selectedDiscount);
+  }  
  // Method to apply the discount
  applyDiscount() {
   if (this.selectedDiscount !== null) {
