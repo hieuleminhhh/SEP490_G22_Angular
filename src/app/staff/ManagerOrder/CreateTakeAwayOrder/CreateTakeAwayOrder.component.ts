@@ -424,10 +424,6 @@ printInvoice(): void {
         <span id="phoneNumber">${this.invoice.guestPhone || 'N/A'}</span>
       </div>
       <div class="mb-3">
-        <label for="address" class="form-label">Địa chỉ:</label>
-        <span id="address">${this.invoice.address || 'N/A'}</span>
-      </div>
-      <div class="mb-3">
         <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
         <span id="orderDate">${this.invoice?.orderDate}</span>
       </div>
@@ -460,8 +456,8 @@ printInvoice(): void {
         <span id="totalAmount">${this.invoice.totalAmount}</span>
       </div>
       <div class="mb-3">
-        <label for="discount" class="form-label">Chiết khấu:</label>
-        <span id="discount">${this.invoice.discount}</span>
+        <label for="discount" class="form-label">Khuyến mãi:</label>
+        <span id="discount">${this.invoice.discount || 0}</span>
       </div>
       <div class="mb-3">
         <label for="amountToPay" class="form-label">Khách phải trả:</label>

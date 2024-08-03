@@ -116,10 +116,26 @@
                     </tr>
                   </tbody>
                 </table>
-                
-                <div *ngIf="selectedItems.length > 0" class="total-amount mt-3">
-                  <strong>Tổng cộng đơn:</strong> {{ calculateTotalAmount() | currencyFormat  }}
-                </div>
+                <!-- <button class="btn btn-primary btn-sm" (click)="openDiscountDialog(item)"> -->
+                  <button class="btn btn-primary btn-sm" *ngIf="selectedItems.length > 0" data-bs-toggle="modal" data-bs-target="#discountModal">
+                    <i class="fas fa-tags me-2"></i> <!-- Biểu tượng Font Awesome -->
+                    Khuyến mãi
+                  </button>
+                  <div *ngIf="selectedDiscount" class="mt-2">
+                    <strong>Giảm giá:</strong>
+                    <span>{{ selectedDiscountName }} - {{ selectedDiscountPercent | percentage }}</span>
+                  </div>
+                  <br>
+                  <strong>Tổng cộng đơn:</strong>
+                  <span *ngIf="selectedDiscount === null">
+                    {{ totalAmount | currencyFormat }}
+                  </span>
+                  
+                  <span *ngIf="selectedDiscount !== null">
+                    {{ totalAmountAfterDiscount | currencyFormat }}
+                  </span>
+                  
+                  
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
                   <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
                     Tạo đơn
@@ -127,6 +143,34 @@
                   <button class="btn btn-danger btn-lg" (click)="clearCart()" >
                     Hủy
                   </button>
+                </div>
+              </div>
+            </div>
+            <!-- Discount Modal -->
+            <div class="modal fade" #formModal id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="discountModalLabel">Chọn giảm giá</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <ul class="list-group">
+                      <li *ngFor="let discounts of discount" class="list-group-item list-group-item-action">
+                        <label class="d-flex align-items-center w-100 m-0" (click)="onItemClick(discounts)">
+                          <input type="radio" name="selectedDiscount" [value]="discounts.discountId" class="me-2" />
+                          <span>{{ discounts.discountName }} - {{ discounts.discountPercent | percentage }} -- {{ discounts.note }}</span>
+                        </label>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  
+                  <!-- applyDiscount() -->
+                  <div class="modal-footer"> 
+                    <button type="button" class="btn btn-primary"  (click)="applyDiscount()">Áp dụng</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -271,7 +315,7 @@
         </div>
       </main>
       <!-- Template for cffff -->
-    <div class="modal fade" id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
+    <div class="modal fade" #formModal id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
           <div class="modal-content">
                               <!-- Success message -->
@@ -292,14 +336,20 @@
                     <label for="orderID" class="form-label">Mã hóa đơn: </label>
                     <span id="orderID">{{ invoice?.invoiceId || 'N/A' }}</span>
                 </div>
-                <div class="mb-3">
-                    <label for="phoneNumber" class="form-label">Số điện thoại: </label>
-                    <span id="phoneNumber">{{ invoice?.guestPhone || 'N/A' }}</span>
+                <div class="mb-3" *ngIf="invoice.isUpdated; else editTemplate">
+                  <label for="customerName" class="form-label">Tên khách hàng:</label>
+                  <span id="customerName">{{ invoice.consigneeName || 'Khách lẻ' }}</span>
                 </div>
-                <div class="mb-3">
+                <ng-template #editTemplate>
+                  <div class="mb-3">
                     <label for="customerName" class="form-label">Tên khách hàng:</label>
-                    <span id="customerName">{{ invoice?.consigneeName || 'N/A' }}</span>
-                </div>
+                    <input id="customerName" class="form-control" [(ngModel)]="invoice.consigneeName" placeholder="Khách lẻ" />
+                  </div>
+                  <div class="mb-3">
+                    <label for="phoneNumber" class="form-label">Số điện thoại: </label>
+                    <input id="phoneNumber" class="form-control" [(ngModel)]="invoice.guestPhone" placeholder="N/A" />
+                  </div>
+                </ng-template>
                 <div class="mb-3">
                     <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
                     <span id="orderDate">{{ invoice?.orderDate | dateFormat }}</span>
@@ -323,6 +373,8 @@
                                 <td>{{ item.quantity }}</td>
                                 <td>{{ item.unitPrice | currencyFormat }}</td>
                                 <td>{{ item.price | currencyFormat }}</td>
+                                
+                                
                             </tr>
                         </tbody>
                     </table>
