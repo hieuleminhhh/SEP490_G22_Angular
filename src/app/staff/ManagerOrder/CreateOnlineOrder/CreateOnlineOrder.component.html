@@ -116,6 +116,11 @@
                     </tr>
                   </tbody>
                 </table>
+                <div *ngIf="selectedItems.length > 0" class="mt-2">
+                  <strong>Tạm tính:</strong>             
+                  {{ totalAmount | currencyFormat }}
+                  <br>
+                </div>
                 <!-- <button class="btn btn-primary btn-sm" (click)="openDiscountDialog(item)"> -->
                   <button class="btn btn-primary btn-sm" *ngIf="selectedItems.length > 0" data-bs-toggle="modal" data-bs-target="#discountModal">
                     <i class="fas fa-tags me-2"></i> <!-- Biểu tượng Font Awesome -->
@@ -126,7 +131,8 @@
                     <span>{{ selectedDiscountName }} - {{ selectedDiscountPercent | percentage }}</span>
                   </div>
                   <br>
-                  <strong>Tổng cộng đơn:</strong>
+                  <div *ngIf="selectedItems.length > 0" class="mt-2">
+                  <strong>Tổng số tiền:</strong>
                   <span *ngIf="selectedDiscount === null">
                     {{ totalAmount | currencyFormat }}
                   </span>
@@ -134,6 +140,7 @@
                   <span *ngIf="selectedDiscount !== null">
                     {{ totalAmountAfterDiscount | currencyFormat }}
                   </span>
+                </div>
                   
                   
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
@@ -371,8 +378,9 @@
                                 <td>{{ i + 1 }}</td>
                                 <td>{{ item.itemName || item.nameCombo }}</td>
                                 <td>{{ item.quantity }}</td>
-                                <td>{{ item.unitPrice | currencyFormat }}</td>
                                 <td>{{ item.price | currencyFormat }}</td>
+                                <td>{{ item.unitPrice | currencyFormat }}</td>
+                               
                                 
                                 
                             </tr>
@@ -380,18 +388,21 @@
                     </table>
                 </div>
                 <div class="mb-3">
-                    <label for="totalAmount" class="form-label">Tổng tiền:</label>
-                    <span id="totalAmount">{{ invoice?.totalAmount | currencyFormat }}</span>
+                    <label for="totalOrder" class="form-label">Tiền hàng:</label>
+                    <span id="totalOrder">{{ invoice?.totalAmount | currencyFormat }}</span>
                 </div>
                 
                 <div class="mb-3">
-                    <label for="discount" class="form-label">Chiết khấu:</label>
-                    <span id="discount">{{ invoice?.discount || '0' }}</span>
+                    <label for="discount" class="form-label">Giảm giá:</label>
+                    <span id="discount">{{ invoice?.discountName || '0' }} - {{invoice?.discountPercent}}</span>
                 </div>
-                
+                <div class="mb-3">
+                  <label for="totalAmount" class="form-label">Tổng tiền:</label>
+                  <span id="totalAmount">{{ invoice?.paymentAmount | currencyFormat }}</span>
+              </div>
                 <div class="mb-3">
                     <label for="amountToPay" class="form-label">Tiền thu của khách:</label>
-                    <span id="amountToPay">{{ invoice?.totalAmount | currencyFormat }}</span>
+                    <span id="amountToPay">{{ invoice?.paymentAmount | currencyFormat }}</span>
                 </div>
                 
                 <!-- <div class="mb-3">
