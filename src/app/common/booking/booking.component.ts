@@ -40,10 +40,10 @@ export class BookingComponent implements OnInit {
 
   constructor(private reservationService: ReservationService, private router: Router,public dialog: MatDialog) {
     const today = new Date();
-    this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
+    this.minDate = this.formatDate(today);
     const maxDate = new Date();
     maxDate.setDate(today.getDate() + 7);
-    this.maxDate = this.formatDate(maxDate); // Ngày nhận tối đa là ngày hiện tại + 7 ngày
+    this.maxDate = this.formatDate(maxDate);
     this.reservation = {
       name: '',
       phone: '',
@@ -215,6 +215,8 @@ export class BookingComponent implements OnInit {
 
   openMenuPopup(): void {
     this.isMenuPopupOpen = true;
+    sessionStorage.setItem('isReser', JSON.stringify('false'));
+
   }
 
   closeMenuPopup(): void {
