@@ -11,8 +11,6 @@ import { DiscountService } from '../../../service/discount.service';
   imports: [CommonModule, FormsModule]
 })
 export class ManageDiscountComponent implements OnInit {
-  dateFrom: string = '';
-  dateTo: string = '';
   dateNow: string = '';
 
   data: any[] = [];
@@ -27,8 +25,8 @@ export class ManageDiscountComponent implements OnInit {
     discountName: '',
     note: '',
     discountStatus: 'true',
-    startTime: new Date().toISOString(),
-    endTime: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString(),
+    startTime: '',
+    endTime: '',
     type: '1',
     conditions: [{
       totalAmount: null, percent: null, quantityLimit: null
@@ -37,15 +35,20 @@ export class ManageDiscountComponent implements OnInit {
 
   conditions: any[] = [
     { quantityLimit: null, noLimit: false },
-    // Thêm các điều kiện khác nếu cần
   ];
+
   promotionData: any;
-  // @ViewChild('promotionForm') promotionForm!: NgForm;
+  detailDiscount: any[] = [];
+  isEditing: boolean = false;
+
   constructor(private discountService: DiscountService) { }
 
   ngOnInit(): void {
     this.getListDiscount();
-    this.dateNow = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0];
+    this.dateNow = today;
+    this.promotion.startTime = today;
+    this.promotion.endTime = today;
 
     // Khởi tạo conditions đồng bộ với promotion.conditions
     this.conditions = this.promotion.conditions.map(() => ({
@@ -70,7 +73,7 @@ export class ManageDiscountComponent implements OnInit {
     const status = (document.querySelector('input[name="status"]:checked') as HTMLInputElement)?.value || 'all';
     const search = (document.getElementById('search') as HTMLInputElement)?.value.toLowerCase() || '';
 
-    this.filteredData = this.data.filter(program => {
+    const filtered = this.data.filter(program => {
       const matchesStatus = (status === 'all') ||
         (status === 'active' && program.discountStatus === true) ||
         (status === 'inactive' && program.discountStatus === false);
@@ -78,6 +81,19 @@ export class ManageDiscountComponent implements OnInit {
 
       return matchesStatus && matchesSearch;
     });
+
+    // Loại bỏ các mục trùng lặp
+    const uniquePrograms = filtered.filter((program, index, self) =>
+      index === self.findIndex((p) => (
+        p.discountName === program.discountName &&
+        p.startTime === program.startTime &&
+        p.endTime === program.endTime &&
+        p.type === program.type &&
+        p.discountStatus === program.discountStatus
+      ))
+    );
+
+    this.filteredData = uniquePrograms;
   }
 
   getListDish(): void {
@@ -232,13 +248,12 @@ export class ManageDiscountComponent implements OnInit {
   }
 
   onDateFromChange(): void {
-    if (this.dateTo < this.dateFrom) {
-      this.dateTo = this.dateFrom;
+    if (this.promotion.endTime < this.promotion.startTime) {
+      this.promotion.endTime = this.promotion.startTime;
     }
-  }
-
-  onDateToChange(): void {
-    // Custom logic if needed
+    if (this.detailDiscount[0].endTime < this.detailDiscount[0].startTime) {
+      this.detailDiscount[0].endTime = this.detailDiscount[0].startTime;
+    }
   }
 
   formatCurrency(event: any, index: number): void {
@@ -269,6 +284,8 @@ export class ManageDiscountComponent implements OnInit {
     }
   }
 
+
+
   closeDishModal(): void {
     const dishModal = document.getElementById('dishModal');
     if (dishModal) {
@@ -276,7 +293,49 @@ export class ManageDiscountComponent implements OnInit {
       dishModal.style.display = 'none';
     }
   }
+  openDetailDiscountModal(id: number): void {
+    this.getDetailDiscounts(id);
+  }
 
+  closeDetailDiscountModal(): void {
+    this.detailDiscount = []; // Xóa nội dung khi đóng modal
+    const detailModal = document.getElementById('detailDiscountModal');
+    if (detailModal) {
+      detailModal.classList.remove('show');
+      detailModal.style.display = 'none';
+    }
+  }
+  convertDateToInputFormat(date: string): string {
+    const dateObj = new Date(date);
+    return dateObj.toISOString().split('T')[0];
+  }
+  getDetailDiscounts(id: number): void {
+    this.discountService.getDetailDiscounts(id).subscribe(
+      response => {
+        if (response && response.length > 0) {
+          // Chuyển đổi định dạng ngày cho tất cả các phần tử trong mảng
+          response.forEach((discount: { startTime: string; endTime: string; }) => {
+            discount.startTime = this.convertDateToInputFormat(discount.startTime);
+            discount.endTime = this.convertDateToInputFormat(discount.endTime);
+          });
+        }
+        this.detailDiscount = response || [];
+        console.log(this.detailDiscount); // Kiểm tra dữ liệu sau khi chuyển đổi
+        this.showModal();
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
+
+  showModal(): void {
+    const detailModal = document.getElementById('detailDiscountModal');
+    if (detailModal) {
+      detailModal.classList.add('show');
+      detailModal.style.display = 'block';
+    }
+  }
   toggleAllDishes(event: any): void {
     const checked = event.target.checked;
     this.dish.forEach(dish => {
@@ -304,5 +363,14 @@ export class ManageDiscountComponent implements OnInit {
     }
 
     console.log('Checkbox changed for index:', index, 'New noLimit value:', this.conditions[index].noLimit);
+  }
+
+  toggleEditMode() {
+    this.isEditing = !this.isEditing;
+  }
+
+  saveChanges() {
+    // Hàm lưu thay đổi của bạn...
+    this.isEditing = false;
   }
 }

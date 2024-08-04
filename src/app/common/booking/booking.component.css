@@ -233,7 +233,8 @@ tr:hover {
   margin-top: 0 !important;
 }
 ::ng-deep .filter-grid{
-  top: 0 !important;
+  max-width: 1000px !important;
+  position: absolute !important;
 }
 
 /* Modal styles */
@@ -254,7 +255,7 @@ tr:hover {
   display: flex;
   justify-content: center; /* Căn giữa theo chiều ngang */
   align-items: center; /* Căn giữa theo chiều dọc */
-  height: 100%;
+  height: 20%;
 }
 .modal-content {
   background-color: #fefefe; /* Màu nền của modal */
@@ -265,6 +266,7 @@ tr:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng cho modal */
   border-radius: 8px; /* Bo góc */
   position: relative; /* Để close button có thể được căn chỉnh chính xác */
+  margin: 0 auto;
 }
 
 .close {
@@ -272,6 +274,8 @@ tr:hover {
   float: right;
   font-size: 28px;
   font-weight: bold;
+  width: 20px;
+  margin-bottom: 20px;
 }
 
 .close:hover,
