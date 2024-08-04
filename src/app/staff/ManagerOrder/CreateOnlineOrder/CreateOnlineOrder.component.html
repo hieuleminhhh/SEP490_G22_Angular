@@ -128,9 +128,10 @@
                   </button>
                   <div *ngIf="selectedDiscount" class="mt-2">
                     <strong>Giảm giá:</strong>
-                    <span>{{ selectedDiscountName }} - {{ selectedDiscountPercent | percentage }}</span>
-                  </div>
+                    <span>{{ selectedDiscountName }} ({{ selectedDiscountPercent | percentage }})</span>
+                  </div>                  
                   <br>
+                  <hr>
                   <div *ngIf="selectedItems.length > 0" class="mt-2">
                   <strong>Tổng số tiền:</strong>
                   <span *ngIf="selectedDiscount === null">
@@ -163,20 +164,27 @@
                   </div>
                   <div class="modal-body">
                     <ul class="list-group">
-                      <li *ngFor="let discounts of discount" class="list-group-item list-group-item-action">
-                        <label class="d-flex align-items-center w-100 m-0" (click)="onItemClick(discounts)">
-                          <input type="radio" name="selectedDiscount" [value]="discounts.discountId" class="me-2" />
-                          <span>{{ discounts.discountName }} - {{ discounts.discountPercent | percentage }} -- {{ discounts.note }}</span>
-                        </label>
-                      </li>
+                        <li *ngFor="let discounts of discount" class="list-group-item list-group-item-action">
+                            <label class="d-flex align-items-center w-100 m-0" (click)="onItemClick(discounts)">
+                                <input type="radio" name="selectedDiscount" [value]="discounts.discountId" 
+                                       [checked]="discounts.discountId === selectedDiscount" class="me-2" />
+                                       <span *ngIf="discounts.quantityLimit > 0 || discounts.totalMoney > 0">
+                                        {{ discounts.discountName }} - {{ discounts.discountPercent | percentage }}
+                                        <span *ngIf="discounts.totalMoney > 0">(Giảm giá theo tổng hóa đơn thanh toán {{ discounts.totalMoney | currencyFormat }})</span>
+                                        <span *ngIf="discounts.quantityLimit > 0">(Số lượng có hạn {{ discounts.quantityLimit }})</span>                                      
+                                      </span>
+                                      
+                            </label>
+                        </li>
                     </ul>
-                  </div>
+                </div>
+                
                   
                   
                   <!-- applyDiscount() -->
                   <div class="modal-footer"> 
                     <button type="button" class="btn btn-primary"  (click)="applyDiscount()">Áp dụng</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearSelectedDiscount()">Đóng</button>
                   </div>
                 </div>
               </div>
@@ -393,27 +401,25 @@
                 </div>
                 
                 <div class="mb-3">
-                    <label for="discount" class="form-label">Giảm giá:</label>
-                    <span id="discount">{{ invoice?.discountName || '0' }} - {{invoice?.discountPercent}}</span>
+                  <label for="discount" class="form-label">Khuyến mãi:</label>
+                  <span id="discount">
+                    {{ invoice?.discountName || '0' }} ({{ invoice?.discountPercent || '0' }}%)
+                  </span>
                 </div>
+                
+                
+                <hr>
+                
                 <div class="mb-3">
                   <label for="totalAmount" class="form-label">Tổng tiền:</label>
                   <span id="totalAmount">{{ invoice?.paymentAmount | currencyFormat }}</span>
-              </div>
+                </div>
+                
                 <div class="mb-3">
                     <label for="amountToPay" class="form-label">Tiền thu của khách:</label>
                     <span id="amountToPay">{{ invoice?.paymentAmount | currencyFormat }}</span>
                 </div>
-                
-                <!-- <div class="mb-3">
-                    <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
-                    <span id="customerPaid">{{ invoice?.amountReceived | currency:'VND' || 'N/A' }}</span>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="changeToGive" class="form-label">Trả lại:</label>
-                    <span id="changeToGive">{{ invoice?.returnAmount | currency:'VND' || '0 VNĐ' }}</span>
-                </div> -->
+              
             </div>            
               <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearCart()">Đóng</button>

@@ -52,10 +52,10 @@ export class CreateOnlineOrderComponent implements OnInit {
   receivingTime: string = '';
   timeOptions: string[] = [];
   discount: any = {};
-  selectedDiscount: any | null = null;
   paymentMethod: string = '0';
   customerPaid: number | null = null;
   paymentAmount: number = 0;
+  selectedDiscount: any | null = null;
   selectedDiscountName: string = '';
   selectedDiscountPercent: number = 0;
   totalAmountAfterDiscount: number = 0;
@@ -445,6 +445,7 @@ setDefaultReceivingTime() {
     description: ''      // Assuming note is of type string
       // Add more properties as required by the AddNewOrder type/interface
     };
+    
   }
   
 
@@ -466,6 +467,10 @@ setDefaultReceivingTime() {
   }
   clearCart() {
     this.selectedItems = [];
+    this.selectedDiscount = null;
+    this.selectedDiscount = null;
+    this.selectedDiscountName = '';
+    this.selectedDiscountPercent = 0;
     this.selectCategory('Món chính');
     this.successMessage = "Tất cả các mặt hàng đã được xóa khỏi giỏ hàng.";
     this.addNew = {
@@ -494,149 +499,154 @@ setDefaultReceivingTime() {
       // Add more properties as required by the AddNewOrder type/interface
     };
   }
-  printInvoice(): void {
-    console.log('Invoice data before update:', this.invoice);
-    if (this.invoice.invoiceId) {
-      const printWindow = window.open('', '', 'height=600,width=800');
-  
-      // Write the content to the new window
-      printWindow?.document.write('<html><head><title>Invoice</title>');
-      printWindow?.document.write(`
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-          }
-          .header {
-            text-align: center;
-            margin-bottom: 20px;
-          }
-          .header h1 {
-            margin: 0;
-          }
-          .header p {
-            margin: 5px 0;
-          }
-          hr {
-            margin: 20px 0;
-            border: 0;
-            border-top: 1px solid #000;
-          }
-          .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-          }
-          .table th, .table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-          }
-          .table th {
-            background-color: #f2f2f2;
-          }
-          .text-right {
-            text-align: right;
-          }
-          .footer {
-            text-align: center;
-            margin-top: 20px;
-            border-top: 1px solid #000;
-            padding-top: 10px;
-            font-style: italic;
-          }
-        </style>
-      `);
-      printWindow?.document.write('</head><body>');
-  
-      // Add restaurant information
-      printWindow?.document.write(`
-        <div class="header">
-          <h1>Eating House</h1>
-          <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
-          <p>Hotline: 0393578176 - 0987654321</p>
-          <p>Email: eatinghouse@gmail.com</p>
-          <hr>
-        </div>
-      `);
-  
-      // Add invoice information
-      printWindow?.document.write(`
-        <div class="mb-3">
-          <label for="orderID" class="form-label">Mã hóa đơn: </label>
-          <span id="orderID">${this.invoice?.invoiceId || 'N/A'}</span>
-        </div>
-        <div class="mb-3">
-          <label for="customerName" class="form-label">Tên khách hàng:</label>
-          <span id="customerName">${this.invoice.consigneeName || 'Khách lẻ'}</span>
-        </div>
-        <div class="mb-3">
-          <label for="phoneNumber" class="form-label">Số điện thoại: </label>
-          <span id="phoneNumber">${this.invoice.guestPhone || 'N/A'}</span>
-        </div>
-        <div class="mb-3">
-          <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
-          <span id="orderDate">${this.invoice?.orderDate}</span>
-        </div>
-        <div class="mb-3">
-          <table class="table">
-            <thead>
+  clearSelectedDiscount() {
+    this.selectedDiscount = null;
+    this.selectedDiscountName = '';
+    this.selectedDiscountPercent = 0;
+}
+
+printInvoice(): void {
+  console.log('Invoice data before update:', this.invoice);
+  if (this.invoice.invoiceId) {
+    const printWindow = window.open('', '', 'height=600,width=800');
+
+    // Write the content to the new window
+    printWindow?.document.write('<html><head><title>Invoice</title>');
+    printWindow?.document.write(`
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+        }
+        .header {
+          text-align: center;
+          margin-bottom: 20px;
+        }
+        .header h1 {
+          margin: 0;
+        }
+        .header p {
+          margin: 5px 0;
+        }
+        hr {
+          margin: 20px 0;
+          border: 0;
+          border-top: 1px solid #000;
+        }
+        .table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 20px;
+        }
+        .table th, .table td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: left;
+        }
+        .table th {
+          background-color: #f2f2f2;
+        }
+        .text-right {
+          text-align: right;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 20px;
+          border-top: 1px solid #000;
+          padding-top: 10px;
+          font-style: italic;
+        }
+      </style>
+    `);
+    printWindow?.document.write('</head><body>');
+
+    // Add restaurant information
+    printWindow?.document.write(`
+      <div class="header">
+        <h1>Eating House</h1>
+        <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
+        <p>Hotline: 0393578176 - 0987654321</p>
+        <p>Email: eatinghouse@gmail.com</p>
+        <hr>
+      </div>
+    `);
+
+    // Add invoice information
+    printWindow?.document.write(`
+      <div class="mb-3">
+        <label for="orderID" class="form-label">Mã hóa đơn: </label>
+        <span id="orderID">${this.invoice?.invoiceId || 'N/A'}</span>
+      </div>
+      <div class="mb-3">
+        <label for="customerName" class="form-label">Tên khách hàng:</label>
+        <span id="customerName">${this.invoice.consigneeName || 'Khách lẻ'}</span>
+      </div>
+      <div class="mb-3">
+        <label for="phoneNumber" class="form-label">Số điện thoại: </label>
+        <span id="phoneNumber">${this.invoice.guestPhone || 'N/A'}</span>
+      </div>
+      <div class="mb-3">
+        <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
+        <span id="orderDate">${this.invoice?.orderDate}</span>
+      </div>
+      <div class="mb-3">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Tên món</th>
+              <th>SL</th>
+              <th>Đơn giá</th>
+              <th>Thành tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(this.invoice?.itemInvoice || []).map((item: any, i: number) => `
               <tr>
-                <th>STT</th>
-                <th>Tên món</th>
-                <th>SL</th>
-                <th>Đơn giá</th>
-                <th>Thành tiền</th>
+                <td>${i + 1}</td>
+                <td>${item.itemName || item.nameCombo}</td>
+                <td>${item.quantity}</td>
+                <td>${item.unitPrice}</td>
+                <td>${item.price}</td>
               </tr>
-            </thead>
-            <tbody>
-              ${(this.invoice?.itemInvoice || []).map((item: ItemInvoice, i: number) => `
-                <tr>
-                  <td>${i + 1}</td>
-                  <td>${item.itemName || item.nameCombo}</td>
-                  <td>${item.quantity}</td>
-                  <td>${item.unitPrice}</td>
-                  <td>${item.price}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-        <div class="mb-3">
-          <label for="totalAmount" class="form-label">Tổng tiền:</label>
-          <span id="totalAmount">${this.invoice.totalAmount}</span>
-        </div>
-        <div class="mb-3">
-          <label for="discount" class="form-label">Khuyến mãi:</label>
-          <span id="discount">${this.invoice.discount || 0}</span>
-        </div>
-        <div class="mb-3">
-          <label for="amountToPay" class="form-label">Khách phải trả:</label>
-          <span id="amountToPay">${this.invoice.totalAmount}</span>
-        </div>
-        <div class="mb-3">
-          <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
-          <span id="customerPaid">${this.invoice.amountReceived}</span>
-        </div>
-        <div class="mb-3">
-          <label for="changeToGive" class="form-label">Trả lại:</label>
-          <span id="changeToGive">${this.invoice.returnAmount}</span>
-        </div>
-      `);
-  
-      // Footer
-      printWindow?.document.write(`
-        <div class="footer">
-          <p>Cảm ơn quý khách. Hẹn gặp lại!</p>
-        </div>
-      `);
-  
-      // Close the document and print
-      printWindow?.document.write('</body></html>');
-      printWindow?.document.close();
-      printWindow?.print();
-    }
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="mb-3">
+        <label for="totalOrder" class="form-label">Tiền hàng:</label>
+        <span id="totalOrder">${this.invoice?.totalAmount}</span>
+      </div>
+      <div class="mb-3">
+        <label for="discount" class="form-label">Giảm giá:</label>
+        <span id="discount">${this.invoice?.discountName || '0'} (${this.invoice?.discountPercent || '0'}%)</span>
+      </div>
+      <hr>
+      <div class="mb-3">
+        <label for="totalAmount" class="form-label">Tổng tiền:</label>
+        <span id="totalAmount">${this.invoice?.paymentAmount}</span>
+      </div>
+      <div class="mb-3">
+        <label for="amountToPay" class="form-label">Tiền thu của khách:</label>
+        <span id="amountToPay">${this.invoice?.paymentAmount}</span>
+      </div>
+    `);
+
+    // Add footer
+    printWindow?.document.write(`
+      <div class="footer">
+        <p>Cảm ơn quý khách và hẹn gặp lại!</p>
+      </div>
+    `);
+
+    printWindow?.document.write('</body></html>');
+
+    // Print the content
+    printWindow?.document.close();
+    printWindow?.print();
   }
+}
+
   LoadActiveDiscounts(): void {
     this.discountService.getActiveDiscounts().subscribe((data) => {
       this.discount = data;
