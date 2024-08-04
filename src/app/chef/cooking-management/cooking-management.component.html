@@ -61,14 +61,26 @@
                     <td>{{order.quantity}}</td>
                     <td>{{order.orderTime | date:'dd/MM/yyyy - HH:mm' }}</td>
                     <td>{{order.note ? null: 'trống'}}</td>
-                    <td class="align-items-center">
-                      <input type="number" [(ngModel)]="order.dishesServed" [ngModelOptions]="{standalone: true}"
-                        [attr.min]="order.dishesServed" [attr.max]="order.quantity"
-                        class="form-control form-control-sm input-short" />
-                      <button type="button" class="btn btn-primary btn-sm" (click)="completeDish(order.orderDetailId, order.quantity)">
-                        Hoàn thành
-                      </button>
+                    <td>
+                      <form [formGroup]="forms[order.orderDetailId]" (ngSubmit)="completeDish(order.orderDetailId)" class="form-inline">
+                        <div class="form-group">
+                          <input type="number" formControlName="dishesServed" min="0" [attr.max]="order.quantity"
+                            class="form-control form-control-sm input-short" />
+                          <button type="submit" class="btn btn-primary btn-sm">Hoàn thành</button>
+                        </div>
+                      </form>
+                      <div *ngIf="forms[order.orderDetailId].controls['dishesServed'].invalid &&
+                                  (forms[order.orderDetailId].controls['dishesServed'].dirty || forms[order.orderDetailId].controls['dishesServed'].touched)"
+                           class="error-message">
+                        <small class="text-danger" *ngIf="forms[order.orderDetailId].controls['dishesServed'].errors?.['required']">
+                          Số lượng là bắt buộc.
+                        </small>
+                        <small class="text-danger" *ngIf="forms[order.orderDetailId].controls['dishesServed'].errors?.['max']">
+                          Số lượng không thể lớn hơn {{order.quantity}}.
+                        </small>
+                      </div>
                     </td>
+
                     <td></td>
                   </tr>
                 </ng-container>
@@ -115,14 +127,26 @@
                     <td>{{order.quantity}}</td>
                     <td>{{order.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</td>
                     <td>{{order.note ? null: 'trống'}}</td>
-                    <td class="align-items-center">
-                      <input type="number" [(ngModel)]="order.dishesServed" [ngModelOptions]="{standalone: true}"
-                        [attr.min]="order.dishesServed" [attr.max]="order.quantity"
-                        class="form-control form-control-sm input-short" />
-                      <button type="button" class="btn btn-primary btn-sm" (click)="completeDish(order.orderDetailId, order.quantity)">
-                        Hoàn thành
-                      </button>
+                    <td>
+                      <form [formGroup]="forms[order.orderDetailId]" (ngSubmit)="completeDish(order.orderDetailId)" class="form-inline">
+                        <div class="form-group">
+                          <input type="number" formControlName="dishesServed" min="0" [attr.max]="order.quantity"
+                            class="form-control form-control-sm input-short" />
+                          <button type="submit" class="btn btn-primary btn-sm">Hoàn thành</button>
+                        </div>
+                      </form>
+                      <div *ngIf="forms[order.orderDetailId].controls['dishesServed'].invalid &&
+                                  (forms[order.orderDetailId].controls['dishesServed'].dirty || forms[order.orderDetailId].controls['dishesServed'].touched)"
+                           class="error-message">
+                        <small class="text-danger" *ngIf="forms[order.orderDetailId].controls['dishesServed'].errors?.['required']">
+                          Số lượng là bắt buộc.
+                        </small>
+                        <small class="text-danger" *ngIf="forms[order.orderDetailId].controls['dishesServed'].errors?.['max']">
+                          Số lượng không thể lớn hơn {{order.quantity}}.
+                        </small>
+                      </div>
                     </td>
+
                     <td></td>
                   </tr>
                 </ng-container>

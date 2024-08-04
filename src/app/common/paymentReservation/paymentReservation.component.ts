@@ -89,7 +89,8 @@ export class PaymentReservationComponent implements OnInit {
         unitPrice: this.getTotalPrice(item),
         quantity: item.quantity,
         dishId: item.dishId,
-        comboId: item.comboId
+        comboId: item.comboId,
+        orderTime: localISOTime
       }))
     };
     console.log("Request Object:", request);
