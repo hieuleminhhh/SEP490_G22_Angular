@@ -1,7 +1,7 @@
 import { ReservationService } from './../../../service/reservation.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Component, Inject, inject } from '@angular/core';
-import { catchError, map, Observable, of } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs';
 import { Dish } from '../../../models/dish.model';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { CartService } from '../../../service/cart.service';
@@ -37,6 +37,10 @@ export class MenuComponent {
   currentPage = 1; // Trang hiện tại
   itemsPerPage = 4; // Số bản ghi trên mỗi trang
   totalItems = 0; // Tổng số bản ghi
+
+  private filteredDataSubject: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+  filteredData$: Observable<any[]> = this.filteredDataSubject.asObservable();
+  allData: any[] = [];
 
   ngOnInit(): void {
     this.loadDishes();
@@ -143,24 +147,23 @@ export class MenuComponent {
   private loadDishes() {
     if (this.selectedFilter === 'Category') {
       this.dishs$ = this.getDish(this.selectedCategory, this.selectedSortOption);
-
-      // this.dishs$.subscribe(
-      //   (data: Dish[]) => {
-      //     this.totalItems = data.length;
-      //     console.log(this.totalItems);
-      //     console.log(data);
-      //     this.paginateData(data);
-      //   },
-      //   (error: any) => {
-      //     console.error('Error fetching dishs:', error);
-      //   }
-      // );
+      this.dishs$.subscribe(
+        (data: Dish[]) => {
+          this.allData = data;
+          this.totalItems = data.length;
+          this.filterList();  // Initial filtering
+        },
+        (error: any) => {
+          console.error('Error fetching dishes:', error);
+        }
+      );
     } else if (this.selectedFilter === 'Combo') {
       this.combo$ = this.getCombo(this.selectedSortOption);
       this.combo$.subscribe(
         (data: Combo[]) => {
+          this.allData = data;
           this.totalItems = data.length;
-          this.paginateData(data);
+          this.filterList();  // Initial filtering
         },
         (error: any) => {
           console.error('Error fetching combos:', error);
@@ -281,6 +284,11 @@ export class MenuComponent {
       // Xử lý thông báo lỗi nếu số trang nhập không hợp lệ
       console.log('Invalid page number');
     }
+  }
+  filterList(): void {
+    const search = (document.getElementById('search') as HTMLInputElement)?.value.toLowerCase() || '';
+    const filtered = this.allData.filter(item => item.itemName.toLowerCase().includes(search));
+    this.filteredDataSubject.next(filtered);
   }
 
 

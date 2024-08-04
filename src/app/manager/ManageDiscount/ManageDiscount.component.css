@@ -123,7 +123,7 @@ body {
 
 /* Style cho nền mờ khi hiển thị modal */
 
-.modal, .modal-dish {
+.modal, .modal-dish,.modal-detail {
   display: none; /* Ẩn modal mặc định */
   position: fixed; /* Hiển thị modal cố định khi cuộn trang */
   z-index: 1000; /* Độ sâu của modal */
@@ -140,7 +140,7 @@ body {
   z-index: 1200;
 }
 
-.modal-dialog, .modal-dialog-dish {
+.modal-dialog, .modal-dialog-dish, .modal-dialog-detail {
   max-width: 100%;
   margin: 0 auto; /* Căn giữa theo chiều ngang */
   display: flex;
@@ -149,7 +149,7 @@ body {
   height: 100%;
 }
 
-.modal-content, .modal-content-dish {
+.modal-content, .modal-content-dish, .modal-content-detail {
   background-color: #fefefe; /* Màu nền của modal */
   padding: 20px;
   border: 1px solid #ccc; /* Viền xung quanh */
@@ -163,6 +163,9 @@ body {
 /* Giới hạn chiều rộng tối đa của modal-content-dish */
 .modal-content-dish {
   max-width: 600px; /* Chiều rộng tối đa cho modal dish */
+}
+.modal-content-detail {
+  max-width: 650px;
 }
 
 

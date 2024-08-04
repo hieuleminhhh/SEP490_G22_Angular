@@ -39,4 +39,9 @@ export class DiscountService {
     const url = `https://localhost:7188/api/Discounts/active`;
     return this.http.get(url);
   }
+  getDetailDiscounts(id:number): Observable<any> {
+    const url = `https://localhost:7188/api/Discounts/${id}`;
+    return this.http.get(url);
+  }
+
 }
