@@ -170,7 +170,8 @@ export class CheckoutComponent implements OnInit {
         unitPrice: this.getTotalPrice(item),
         quantity: item.quantity,
         dishId: item.dishId,
-        comboId: item.comboId
+        comboId: item.comboId,
+        orderTime: new Date().toISOString()
       }))
     };
     console.log(request);

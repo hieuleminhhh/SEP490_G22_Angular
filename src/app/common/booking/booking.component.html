@@ -43,7 +43,7 @@
     <div class="content">
       <p class="center-text">Quý khách có muốn chọn món ngay không?</p>
       <div class="right-content" (click)="openMenuPopup()">
-        <a ><i class="fas fa-plus-circle icon"></i></a>
+        <a><i class="fas fa-plus-circle icon"></i></a>
         <p>Đặt trước món</p>
       </div>
     </div>
@@ -55,9 +55,10 @@
   <div class="modal-dialog" role="document"></div>
   <div class="modal-content">
     <span class="close" (click)="closeMenuPopup()">&times;</span>
-    <app-menu></app-menu>
+    <app-menu [isReser]="true"></app-menu> <!-- Pass the value here -->
   </div>
 </div>
+
 
 <div class="reservation-form" style="max-height: 500px;">
   <h2>Đặt Bàn</h2>

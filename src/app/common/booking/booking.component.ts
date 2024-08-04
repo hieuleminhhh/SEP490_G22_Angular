@@ -132,7 +132,8 @@ export class BookingComponent implements OnInit {
           unitPrice: this.getTotalPrice(item),
           quantity: item.quantity,
           dishId: item.dishId,
-          comboId: item.comboId
+          comboId: item.comboId,
+          orderTime: new Date().toISOString()
         }))
       };
       console.log(request);
@@ -215,7 +216,6 @@ export class BookingComponent implements OnInit {
 
   openMenuPopup(): void {
     this.isMenuPopupOpen = true;
-    sessionStorage.setItem('isReser', JSON.stringify('false'));
 
   }
 
