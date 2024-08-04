@@ -18,19 +18,22 @@ import { MatDialog } from '@angular/material/dialog';
 import { CurrencyFormatPipe } from '../../../common/material/currencyFormat/currencyFormat.component';
 import { DateFormatPipe } from '../../../common/material/dateFormat/dateFormat.component';
 import { ItemInvoice } from '../../../../models/invoice.model';
+import { PercentagePipe } from '../../../common/material/percentFormat/percentFormat.component';
+import { Discount } from '../../../../models/discount.model';
+import { DiscountService } from '../../../../service/discount.service';
 
 @Component({
   selector: 'app-CreateTakeAwayOrder',
   templateUrl: './CreateTakeAwayOrder.component.html',
   styleUrls: ['./CreateTakeAwayOrder.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe]
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe]
 })
 export class CreateTakeAwayOrderComponent implements OnInit {
 
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService,
      private orderService : ManagerOrderService,  private cd: ChangeDetectorRef, private invoiceService: InvoiceService,
-    private route: ActivatedRoute, private dialog: MatDialog) { }
+    private route: ActivatedRoute, private dialog: MatDialog, private discountService: DiscountService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   dishes: ListAllDishes[] = [];
   combo: ListAllCombo[] = [];
@@ -41,6 +44,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   currentPage: number = 1;
   pageSize: number = 5;
   totalCount: number = 0;
+  discount: any = {};
   searchCategory: string = '';
   search: string = '';
   showingDishes: boolean = true;
@@ -53,6 +57,11 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   customerPaid: number | null = null;
   paymentAmount: number = 0;
   invoice: any = {};
+  selectedDiscount: any | null = null;
+  selectedDiscountName: string = '';
+  selectedDiscountPercent: number = 0;
+  totalAmountAfterDiscount: number = 0;
+  totalAmount: number = 0;
   addNew: AddNewOrder = {
     guestPhone: '',
     email: '',
@@ -90,6 +99,9 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.loadAddresses();
     this.selectedAddress = "Khách lẻ"
     this.selectCategory('Món chính');
+    this.LoadActiveDiscounts();
+    this.calculateAndSetTotalAmount();
+    this.selectedDiscount = null;
   }
   selectCategory(category: string) {
     this.searchCategory = category;
@@ -157,30 +169,30 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.showingCombos = true;
     this.searchCategory = ''; 
 }
-  addItem(item: any) {
-    // Find if the item already exists in selectedItems
-    const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
+addItem(item: any) {
+  // Find if the item already exists in selectedItems
+  const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
   
-    if (index !== -1) {
-      // If the item already exists, increase its quantity and update the total price
-      this.selectedItems[index].quantity++;
-      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
-    } else {
-      // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
-      // Use discountedPrice if available, otherwise fallback to price
-      const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
-      this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
-    }
-
-    // Recalculate totalAmount after adding item
-    this.calculateTotalAmount();
+  if (index !== -1) {
+    // If the item already exists, increase its quantity and update the total price
+    this.selectedItems[index].quantity++;
+    this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+  } else {
+    // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
+    // Use discountedPrice if available, otherwise fallback to price
+    const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
+    this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
   }
+
+  // Recalculate totalAmount and totalAmountAfterDiscount after adding item
+  this.calculateAndSetTotalAmount();
+}
   increaseQuantity(index: number): void {
     if (this.selectedItems[index].quantity < 100) {
       this.selectedItems[index].quantity++;
       this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
       this.validateQuantity(index);
-      this.calculateTotalAmount();
+      this.calculateAndSetTotalAmount();
     }
   }
   
@@ -189,7 +201,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       this.selectedItems[index].quantity--;
       this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
       this.validateQuantity(index);
-      this.calculateTotalAmount();
+      this.calculateAndSetTotalAmount();
     }
   }
   validateQuantity(index: number): void {
@@ -204,7 +216,15 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     // Recalculate total amount
     this.calculateTotalAmount();
   }
+  clearSelectedDiscount() {
+    this.selectedDiscount = null;
+    this.selectedDiscountName = '';
+    this.selectedDiscountPercent = 0;
+}
   clearCart() {
+    this.selectedDiscount = null;
+    this.selectedDiscountName = '';
+    this.selectedDiscountPercent = 0;
     this.selectedItems = [];
     this.selectedAddress = "Khách lẻ"
     this.selectCategory('Món chính');
@@ -272,7 +292,7 @@ createOrder() {
   }));
 
   // Calculate total amount and set various properties
-  const totalAmount = this.calculateTotalAmount();
+  const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
   const currentDate = new Date();
   const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
   const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; // Convert paymentMethod to number
@@ -289,7 +309,7 @@ createOrder() {
     returnAmount: paymentMethodValue === 0 ? customerPaidAmount - totalAmount : 0,
     paymentMethods: paymentMethodValue,
     description: 'Order payment description',
-    discountId: 1,
+    discountId: this.selectedDiscount,
     taxcode: 'ABCD',
     paymentStatus: 1,
   };
@@ -444,48 +464,44 @@ printInvoice(): void {
                 <td>${i + 1}</td>
                 <td>${item.itemName || item.nameCombo}</td>
                 <td>${item.quantity}</td>
-                <td>${item.unitPrice}</td>
-                <td>${item.price}</td>
+                <td>${item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
+                <td>${item.unitPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
               </tr>
             `).join('')}
           </tbody>
         </table>
       </div>
       <div class="mb-3">
-        <label for="totalAmount" class="form-label">Tổng tiền:</label>
-        <span id="totalAmount">${this.invoice.totalAmount}</span>
+        <label for="totalOrder" class="form-label">Tiền hàng:</label>
+        <span id="totalOrder">${this.invoice?.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
       </div>
       <div class="mb-3">
         <label for="discount" class="form-label">Khuyến mãi:</label>
-        <span id="discount">${this.invoice.discount || 0}</span>
+         <span id="discount">${this.invoice?.discountName || '0'} (${this.invoice?.discountPercent || '0'}%)</span>
       </div>
+      <hr>
       <div class="mb-3">
-        <label for="amountToPay" class="form-label">Khách phải trả:</label>
-        <span id="amountToPay">${this.invoice.totalAmount}</span>
-      </div>
-      <div class="mb-3">
-        <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
-        <span id="customerPaid">${this.invoice.amountReceived}</span>
-      </div>
-      <div class="mb-3">
-        <label for="changeToGive" class="form-label">Trả lại:</label>
-        <span id="changeToGive">${this.invoice.returnAmount}</span>
+        <label for="totalAmount" class="form-label">Tổng tiền:</label>
+        <span id="totalAmount">${this.invoice?.paymentAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
       </div>
     `);
 
-    // Footer
+    // Add footer
     printWindow?.document.write(`
       <div class="footer">
-        <p>Cảm ơn quý khách. Hẹn gặp lại!</p>
+        Cảm ơn quý khách và hẹn gặp lại!
       </div>
     `);
 
-    // Close the document and print
+    // Close the document and trigger print
     printWindow?.document.write('</body></html>');
     printWindow?.document.close();
     printWindow?.print();
+  } else {
+    console.error('Invoice ID is not defined.');
   }
 }
+
 
 
 
@@ -496,9 +512,6 @@ printInvoice(): void {
     return new Date(now.getTime() + utcOffset + vietnamOffset);
   }
 
-  calculateTotalAmount(): number {
-   return this.selectedItems.reduce((total, item) => total + item.totalPrice, 0);
-  }
   updateQuantity(index: number, newQuantity: number) {
     if (newQuantity >= 1 && newQuantity <= 100) {
       this.selectedItems[index].quantity = newQuantity;
@@ -611,6 +624,56 @@ saveAddress() {
       modalBackdrop.parentNode.removeChild(modalBackdrop);
     }
   }
-
-
+  LoadActiveDiscounts(): void {
+    this.discountService.getActiveDiscounts().subscribe((data) => {
+      this.discount = data;
+    }, (error) => {
+      console.error('Error fetching active discounts:', error);
+    });
+  }
+  onItemClick(discount: Discount) {
+    this.selectedDiscount = discount.discountId;
+    this.selectedDiscountName = discount.discountName;
+    this.selectedDiscountPercent = discount.discountPercent;
+    console.log('Discount selected:', this.selectedDiscount);
+  }  
+  applyDiscount() {
+    if (this.selectedDiscount !== null) {
+      // Find the selected discount
+      const discount = this.discount.find((d: Discount) => d.discountId === this.selectedDiscount);
+      if (discount) {
+        this.selectedDiscountName = discount.discountName;
+        this.selectedDiscountPercent = discount.discountPercent;
+  
+        // Recalculate the total amount with the discount applied
+        this.updateTotalAmountWithDiscount();
+  
+        // Optionally close the modal programmatically
+        this.closeModal();
+      }
+    } else {
+      // No discount selected, set totalAmountAfterDiscount to totalAmount
+      this.totalAmountAfterDiscount = this.calculateTotalAmount();
+      console.error('No discount selected.');
+    }
+  }
+  updateTotalAmountWithDiscount() {
+    const totalAmount = this.calculateTotalAmount();
+    console.log('Total Amount:', totalAmount); // Kiểm tra giá trị totalAmount
+    const discountAmount = totalAmount * (this.selectedDiscountPercent / 100);
+    console.log('Discount Amount:', discountAmount); // Kiểm tra giá trị discountAmount
+    this.totalAmountAfterDiscount = totalAmount - discountAmount;
+    console.log('Total Amount After Discount:', this.totalAmountAfterDiscount); // Kiểm tra giá trị totalAmountAfterDiscount
+  }
+  calculateTotalAmount(): number {
+    return this.selectedItems.reduce((total, item) => total + item.totalPrice, 0);
+  }
+  calculateAndSetTotalAmount() {
+    this.totalAmount = this.calculateTotalAmount();
+    if (this.selectedDiscount !== null) {
+      this.updateTotalAmountWithDiscount();
+    } else {
+      this.totalAmountAfterDiscount = this.totalAmount; // Khi không có discount
+    }
+  }
 }
