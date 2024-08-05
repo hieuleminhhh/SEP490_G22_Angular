@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CookingService } from '../../../service/cooking.service';
 
 @Component({
   selector: 'app-cooking-management',
   standalone: true,
   templateUrl: './cooking-management.component.html',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   styleUrls: ['./cooking-management.component.css']
 })
 export class CookingManagementComponent implements OnInit {
@@ -18,8 +18,11 @@ export class CookingManagementComponent implements OnInit {
   dateNow: string = '';
   order: any;
   filteredOrders: any[] = [];
+  forms: { [key: number]: FormGroup } = {};
 
-  constructor(private cookingService: CookingService) { }
+  constructor(private cookingService: CookingService, private fb: FormBuilder) {
+
+  }
 
   ngOnInit(): void {
     const today = new Date().toISOString().split('T')[0];
@@ -27,6 +30,7 @@ export class CookingManagementComponent implements OnInit {
     this.dateTo = today;
     this.dateNow = today;
     this.getOrders('1-4');
+    this.loadCompletedDishes();
   }
 
   setView(view: string) {
@@ -46,24 +50,9 @@ export class CookingManagementComponent implements OnInit {
       response => {
         this.order = response.data || [];
         console.log(this.order);
-        this.order.forEach((o: { dishesServed: number; }) => {
+        this.order.forEach((o: { orderDetailId: number; quantity: number; dishesServed: number }) => {
           o.dishesServed = o.dishesServed || 0; // Đặt giá trị mặc định nếu không có
-        });
-      },
-      error => {
-        console.error('Error:', error);
-        this.order = [];
-      }
-    );
-  }
-  getOrder(type: string): void {
-    this.cookingService.getOrders(type).subscribe(
-      response => {
-        this.order = response.data || [];
-        console.log(this.order);
-
-        this.order.forEach((o: { dishesServed: number; }) => {
-          o.dishesServed = o.dishesServed || 0; // Đặt giá trị mặc định nếu không có
+          this.initializeForm(o.orderDetailId, o.quantity);  // Khởi tạo FormGroup cho từng order
         });
         this.filterOrdersByDate();
       },
@@ -73,6 +62,34 @@ export class CookingManagementComponent implements OnInit {
         this.filteredOrders = [];
       }
     );
+  }
+  getOrder(type: string): void {
+    this.cookingService.getOrders(type).subscribe(
+      response => {
+        this.order = response.data || [];
+        console.log(this.order);
+
+        this.order.forEach((o: { orderDetailId: number; quantity: number; dishesServed: number }) => {
+          o.dishesServed = o.dishesServed || 0; // Đặt giá trị mặc định nếu không có
+          this.initializeForm(o.orderDetailId, o.quantity);  // Khởi tạo FormGroup cho từng order
+        });
+        this.filterOrdersByDate();
+      },
+      error => {
+        console.error('Error:', error);
+        this.order = [];
+        this.filteredOrders = [];
+      }
+    );
+  }
+  initializeForm(orderDetailId: number, orderQuantity: number): void {
+    this.forms[orderDetailId] = this.fb.group({
+      dishesServed: [0, [  // Giá trị mặc định
+        Validators.required,
+        Validators.min(1),
+        Validators.max(orderQuantity)  // Sử dụng giá trị từ order
+      ]]
+    });
   }
 
   filterOrdersByDate(): void {
@@ -89,9 +106,43 @@ export class CookingManagementComponent implements OnInit {
     }
   }
 
-  completeDish(orderDetailId: number, quantity:number): void {
-    // Thực hiện hành động khi nút hoàn thành được nhấn
-    console.log('Đơn hàng đã hoàn thành:', orderDetailId, quantity);
-    // Ví dụ: gọi service để cập nhật trạng thái đơn hàng
+  completeDish(orderDetailId: number): void {
+    const form = this.forms[orderDetailId];
+
+    if (form.invalid) {
+      alert('Số lượng nhập vào không hợp lệ!');
+      return;
+    }
+
+    // Lấy giá trị từ form
+    const dishesServed = form.value.dishesServed;
+
+    // Lưu món ăn đã hoàn thành vào session
+    this.updateSession(orderDetailId, dishesServed);
+
+    // Cập nhật lại số lượng món ăn trong danh sách
+    this.updateOrderQuantity(orderDetailId, dishesServed);
+  }
+
+  private updateSession(orderDetailId: number, dishesServed: number): void {
+    // Lưu thông tin món ăn đã hoàn thành vào localStorage
+    let completedDishes = JSON.parse(localStorage.getItem('completedDishes') || '[]');
+    completedDishes.push({ orderDetailId, dishesServed });
+    localStorage.setItem('completedDishes', JSON.stringify(completedDishes));
+  }
+
+  private updateOrderQuantity(orderDetailId: number, dishesServed: number): void {
+    // Cập nhật số lượng món ăn trong danh sách orders
+    const orderIndex = this.order.findIndex((o: { orderDetailId: number }) => o.orderDetailId === orderDetailId);
+    if (orderIndex !== -1) {
+      this.order[orderIndex].quantity -= dishesServed;
+      this.filteredOrders = [...this.order]; // Cập nhật filteredOrders nếu cần
+    }
+  }
+  private loadCompletedDishes(): void {
+    let completedDishes = JSON.parse(localStorage.getItem('completedDishes') || '[]');
+    completedDishes.forEach((dish: { orderDetailId: number; dishesServed: number }) => {
+      this.updateOrderQuantity(dish.orderDetailId, dish.dishesServed);
+    });
   }
 }

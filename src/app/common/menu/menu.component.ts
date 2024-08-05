@@ -1,6 +1,6 @@
 import { ReservationService } from './../../../service/reservation.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Component, Inject, inject } from '@angular/core';
+import { Component, Inject, inject, Input } from '@angular/core';
 import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs';
 import { Dish } from '../../../models/dish.model';
 import { AsyncPipe, CommonModule } from '@angular/common';
@@ -32,24 +32,27 @@ export class MenuComponent {
   selectedCategory: string = '';
   selectedSortOption: string = '';
   selectedFilter: 'Category' | 'Combo' = 'Category';
-  isReser: boolean = false;
+  @Input() isReser: boolean = false;
 
   currentPage = 1; // Trang hiện tại
   itemsPerPage = 4; // Số bản ghi trên mỗi trang
   totalItems = 0; // Tổng số bản ghi
 
-  private filteredDataSubject: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
-  filteredData$: Observable<any[]> = this.filteredDataSubject.asObservable();
+  filteredDataSubject = new BehaviorSubject<any[]>([]);
+  filteredData$ = this.filteredDataSubject.asObservable();
+
   allData: any[] = [];
 
   ngOnInit(): void {
     this.loadDishes();
     sessionStorage.removeItem('isReser');
+    console.log(this.isReser);
+
   }
 
   constructor(private cartService: CartService, private reservationService: ReservationService,
     private categoryService: CategoryService, private cdr: ChangeDetectorRef,
-    ) {
+  ) {
     this.dishs$ = this.getDish();
     this.category$ = this.getCategory();
     this.combo$ = this.getCombo();
@@ -151,7 +154,7 @@ export class MenuComponent {
         (data: Dish[]) => {
           this.allData = data;
           this.totalItems = data.length;
-          this.filterList();  // Initial filtering
+          this.filterList();  // Filtering dishes
         },
         (error: any) => {
           console.error('Error fetching dishes:', error);
@@ -163,14 +166,18 @@ export class MenuComponent {
         (data: Combo[]) => {
           this.allData = data;
           this.totalItems = data.length;
-          this.filterList();  // Initial filtering
+          this.filterList();  // Filtering combos
         },
         (error: any) => {
           console.error('Error fetching combos:', error);
         }
       );
     }
+    console.log('Selected Filter:', this.selectedFilter);
+    console.log('Filtered Data Observable:', this.filteredData$);
   }
+
+
 
   private getCombo(sortOption?: string): Observable<Combo[]> {
     let apiUrl = 'https://localhost:7188/api/Combo';
@@ -287,10 +294,16 @@ export class MenuComponent {
   }
   filterList(): void {
     const search = (document.getElementById('search') as HTMLInputElement)?.value.toLowerCase() || '';
-    const filtered = this.allData.filter(item => item.itemName.toLowerCase().includes(search));
+    console.log('Search term:', search);
+    console.log('All data:', this.allData);
+
+    const filtered = this.allData.filter(item =>
+      (item.itemName || item.nameCombo || '').toLowerCase().includes(search)
+    );
+    console.log('Filtered data:', filtered);
+
     this.filteredDataSubject.next(filtered);
   }
-
 
 }
 

@@ -174,8 +174,30 @@ th {
   margin-right: 10px; /* Khoảng cách giữa input và button */
 }
 
-.input-short {
-  width: 80px; /* Đặt độ rộng mong muốn cho input */
-  max-width: 80px; /* Đảm bảo rằng input không mở rộng hơn độ rộng mong muốn */
-  flex-shrink: 0; /* Ngăn input co lại khi trong container flex */
+/* Căn giữa các phần tử trong form */
+.form-inline {
+  display: flex;
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  width: 100%;
 }
+
+/* Căn giữa các phần tử trong form-group */
+.form-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Khoảng cách giữa input và button */
+}
+
+/* Điều chỉnh kích thước của input nếu cần */
+.input-short {
+  width: 100px; /* Thay đổi kích thước nếu cần */
+}
+
+/* Căn giữa thông báo lỗi */
+.error-message {
+  text-align: center;
+  margin-top: 0.5rem; /* Khoảng cách giữa form và thông báo lỗi */
+  color: red; /* Màu chữ của thông báo lỗi */
+  font-size: 0.875rem; /* Kích thước chữ nhỏ hơn cho thông báo lỗi */
+}
+
