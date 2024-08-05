@@ -66,5 +66,9 @@ export class ManagerOrderService {
     const url = `${this.apiUrl}/orders/CancelOrderForTable/${tableId}`;
     return this.http.put<any>(url, { status }, httpOptions);
   }
+  getQuantityOrderDetails(orderId: number): Observable<any> {
+    const url = `${this.apiUrl}/orders/GetDishOrderDetails/${orderId}`;
+    return this.http.get<any>(url);
+  }
 }
 

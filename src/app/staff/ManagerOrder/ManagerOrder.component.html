@@ -93,7 +93,11 @@
                   </td>
                   <td>
                     <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">Chi tiết</button>
+                    <button type="button" class="btn btn-warning btn-sm"  (click)="updateOrder(order.orderId)">
+                      Cập nhật
+                    </button>
                   </td>
+                 
                 </tr>
               </ng-container>
             </tbody>

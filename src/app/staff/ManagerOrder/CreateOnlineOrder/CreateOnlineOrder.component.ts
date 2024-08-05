@@ -328,12 +328,6 @@ createOrder() {
   this.orderService.AddNewOrder(this.addNew).subscribe(
     response => {
       console.log('Order created successfully:', response);
-      if (response && response.invoiceId) {
-        // Fetch the invoice using the returned invoiceId
-        this.loadInvoice(response.invoiceId);
-      } else {
-        console.error('No invoiceId returned from the service.');
-      }
       this.successMessage = 'Đơn hàng đã được tạo thành công!';
       setTimeout(() => this.successMessage = '', 5000);
     },

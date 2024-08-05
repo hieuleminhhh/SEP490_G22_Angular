@@ -30,6 +30,7 @@ export interface ListOrderDetailByOrder{
   orderDate:Date;
   status:number;
   recevingOrder:Date;
+  discountId:number;
   tableId:number;
   invoiceId:number;
   totalAmount:number;

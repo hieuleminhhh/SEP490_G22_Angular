@@ -168,7 +168,10 @@ input.rounded-input {
   padding: 0;
   text-align: center;
 }
-
+.modal-body {
+  max-height: 400px; /* Hoặc bất kỳ chiều cao tối đa nào bạn muốn */
+  overflow-y: auto;
+}
 
   
   

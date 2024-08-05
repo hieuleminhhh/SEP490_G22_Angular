@@ -178,4 +178,9 @@ input.rounded-input {
     display: none;
   }
 }
+.modal-body {
+  max-height: 400px; /* Hoặc bất kỳ chiều cao tối đa nào bạn muốn */
+  overflow-y: auto;
+}
+
 
