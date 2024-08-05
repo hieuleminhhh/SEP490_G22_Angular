@@ -101,7 +101,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.selectCategory('Món chính');
     this.LoadActiveDiscounts();
     this.calculateAndSetTotalAmount();
-    this.selectedDiscount = null;
+    console.log('ABBABABABA'+this.selectedDiscount);
   }
   selectCategory(category: string) {
     this.searchCategory = category;
@@ -288,6 +288,7 @@ createOrder() {
     unitPrice: item.totalPrice,
     dishId: item.dishId,
     comboId: item.comboId,
+    orderTime: new Date(),
     note: item.note
   }));
 
@@ -304,13 +305,12 @@ createOrder() {
     orderDate: this.getVietnamTime(),
     recevingOrder: currentDate.toISOString(),
     paymentTime: currentDate.toISOString(),
-    paymentAmount: totalAmount,
     amountReceived: paymentMethodValue === 0 ? customerPaidAmount : totalAmount,
     returnAmount: paymentMethodValue === 0 ? customerPaidAmount - totalAmount : 0,
     paymentMethods: paymentMethodValue,
     description: 'Order payment description',
     discountId: this.selectedDiscount,
-    taxcode: 'ABCD',
+    taxcode: '',
     paymentStatus: 1,
   };
 
@@ -334,13 +334,8 @@ createOrder() {
   this.orderService.AddNewOrder(this.addNew).subscribe(
     response => {
       console.log('Order created successfully:', response);
-      if (response && response.invoiceId) {
-        // Fetch the invoice using the returned invoiceId
-        this.loadInvoice(response.invoiceId);
-      } else {
-        console.error('No invoiceId returned from the service.');
-      }
       this.successMessage = 'Đơn hàng đã được tạo thành công!';
+      this.closeModal();
       setTimeout(() => this.successMessage = '', 5000);
     },
     error => {
@@ -352,17 +347,6 @@ createOrder() {
   );
 }
 
-loadInvoice(invoiceId: number): void {
-  // Fetch invoice data by ID
-  this.invoiceService.getInvoiceById(invoiceId).subscribe(
-    data => {
-      this.invoice = data;
-    },
-    error => {
-      console.error('Error fetching invoice:', error);
-    }
-  );
-}
 printInvoice(): void {
   console.log('Invoice data before update:', this.invoice);
   if (this.invoice.invoiceId) {
