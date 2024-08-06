@@ -91,7 +91,7 @@ export class CookingManagementComponent implements OnInit {
     }
   }
 
-  completeDish(orderDetailId: number): void {
+  completeDish(orderDetailId: number, itemNameOrComboName: string): void {
     const form = this.forms[orderDetailId];
 
     if (form.invalid) {
@@ -99,15 +99,15 @@ export class CookingManagementComponent implements OnInit {
       return;
     }
     const dishesServed = form.value.dishesServed;
-    this.updateLocal(orderDetailId, dishesServed);
+    this.updateLocal(dishesServed, itemNameOrComboName);
     this.updateOrderQuantity(orderDetailId, dishesServed);
     this.filterOrders();
     form.reset({ dishesServed: 0 });
   }
 
-  private updateLocal(orderDetailId: number, dishesServed: number): void {
+  private updateLocal(dishesServed: number,itemNameOrComboName:string): void {
     let completedDishes = JSON.parse(localStorage.getItem('completedDishes') || '[]');
-    completedDishes.push({ orderDetailId, dishesServed });
+    completedDishes.push({dishesServed, itemNameOrComboName });
     localStorage.setItem('completedDishes', JSON.stringify(completedDishes));
 
     console.log('Completed Dishes:', localStorage.getItem('completedDishes'));

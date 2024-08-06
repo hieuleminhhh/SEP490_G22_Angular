@@ -54,7 +54,7 @@ export const routes: Routes = [
     {'path': 'updateOffline' , component:UpdateOfflineOrderComponent},
     {'path': 'paymentSuccess' , component:PaymentSuccessComponent},
     {'path': 'manageDiscount' , component:ManageDiscountComponent},
-    {'path': 'fillDish' , component:FillDishComponent}
+    {'path': 'fillDish' , component:FillDishComponent},
     {'path': 'manageDiscount' , component:ManageDiscountComponent},
     {'path': 'updateOrder/:orderId' , component: UpdateOrderForGuestComponent}
 ];
