@@ -18,4 +18,10 @@ export class CookingService {
     const url = `https://localhost:7188/api/OrderDetailsForChef/update-dishes-served`;
     return this.http.put(url, request);
   }
+
+  getOrdersDish(key:string): Observable<any> {
+    const url = `https://localhost:7188/api/OrderDetailsForChef/searchforstaff?keyword=${key}`;
+    return this.http.get(url);
+  }
+
 }
