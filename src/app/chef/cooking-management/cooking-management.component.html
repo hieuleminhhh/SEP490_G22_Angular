@@ -9,7 +9,7 @@
                 (click)="getOrders('1-4')">Đơn hiện tại</a>
             </li>
             <li><a [class.active]="currentView === 'booking-order'" (click)="setView('booking-order')"
-                (click)="getOrder('2-3')">Đơn đặt hàng</a>
+                (click)="getOrders('2-3')">Đơn đặt hàng</a>
             </li>
           </ul>
         </li>
@@ -55,7 +55,7 @@
                 </tr>
               </thead>
               <tbody>
-                <ng-container *ngFor="let order of order">
+                <ng-container *ngFor="let order of filteredOrders">
                   <tr>
                     <td>{{order.itemName || order.comboName}}</td>
                     <td>{{order.quantity}}</td>
@@ -88,7 +88,7 @@
             </table>
           </div>
           <br>
-          <div *ngIf="!order || order.length === 0" style="text-align: center;">
+          <div *ngIf="!filteredOrders || filteredOrders.length < 1" style="text-align: center;">
             <p>Không có dữ liệu </p>
           </div>
           <!-- <div class="pagination" *ngIf="totalPages>0">
@@ -154,7 +154,7 @@
             </table>
           </div>
           <br>
-          <div *ngIf="!filteredOrders || filteredOrders.length === 0" style="text-align: center;">
+          <div *ngIf="!filteredOrders || filteredOrders.length < 1" style="text-align: center;">
             <p>Không có dữ liệu </p>
           </div>
           <!-- <div class="pagination" *ngIf="totalPages>0">

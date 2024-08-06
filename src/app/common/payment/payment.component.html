@@ -13,7 +13,7 @@
                 <label for="name">Họ tên :</label>
               </div>
               <div class="form-group">
-                <span style="float: left; font-weight: bold;" >{{data?.consigneeName}}</span>
+                <span style="float: left; font-weight: bold;">{{data?.consigneeName}}</span>
               </div>
               <div class="form-group">
                 <label for="email">Email :</label>
@@ -31,7 +31,8 @@
                 <label for="time">Thời gian nhận hàng:</label>
               </div>
               <div class="form-group">
-                <span style="float: left; font-weight: bold;">{{data?.receivingTime | date:'dd/MM/yyyy'}} - {{data?.receivingTime | date:'shortTime'}}</span>
+                <span style="float: left; font-weight: bold;">{{data?.receivingTime | date:'dd/MM/yyyy'}} -
+                  {{data?.receivingTime | date:'shortTime'}}</span>
               </div>
               <div class="form-group">
                 <label for="address">Địa chỉ nhận hàng:</label>
@@ -56,7 +57,8 @@
               <div class="col-md-12">
                 <h4 class="text-center"><b>Đặt hàng thành công !!!</b></h4>
                 <h4 class="text-center"><b>Đơn hàng của bạn đang được xử lý.</b></h4>
-                <h3 class="text-center"><b>Nhân viên của quán sẽ liên lạc lại với bạn trong ít phút để xác nhận đơn hàng.</b></h3>
+                <h3 class="text-center"><b>Nhân viên của quán sẽ liên lạc lại với bạn trong ít phút để xác nhận đơn
+                    hàng.</b></h3>
               </div>
             </div>
           </div>
@@ -86,7 +88,8 @@
                   <div class="row border-top border-bottom" *ngFor="let item of data?.orderDetails">
                     <div class="row main align-items-center">
                       <div class="col-2">
-                        <img class="img-fluid" [src]="item.imageUrl" alt="Item Image" style="max-width: 100%; height: 56px;">
+                        <img class="img-fluid" [src]="item.imageUrl" alt="Item Image"
+                          style="max-width: 100%; height: 56px;">
                       </div>
                       <div class="col">
                         <div>{{ item.itemName || item.nameCombo }}</div>
@@ -109,24 +112,24 @@
             <div class="col-12 panel-footer basket-footer">
               <div class="row">
                 <div class="col-12 text-right">
-                  <div class="dive">Phí giao hàng: <span class="very emphasized">-----</span></div>
+                  <div class="dive">Khuyến mãi: <span class="very emphasized">{{data?.discountPriceOrder | currencyFormat}}</span></div>
                 </div>
-              </div>
-              <hr>
-              <div class="row">
-                <div class="col-12 text-right">
-                  <div class="dive">Tổng hóa đơn: <span class="very emphasized">{{data?.totalAmount | currencyFormat}}</span></div>
+                <hr>
+                <div class="row">
+                  <div class="col-12 text-right">
+                    <div class="dive">Tổng hóa đơn: <span class="very emphasized">{{data?.totalAmount |
+                        currencyFormat}}</span></div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="back-to-shop">
-            <a routerLink="/menu" routerLinkActive="active"><i class="fas fa-arrow-left"></i>Thực đơn</a>
-            <button *ngIf="!orderCancelled" class="btn btn-danger" (click)="cancelOrder()">Hủy đơn hàng</button>
-            <button *ngIf="orderCancelled" class="btn btn-primary" (click)="reorder()">Mua lại</button>
+            <div class="back-to-shop">
+              <a routerLink="/menu" routerLinkActive="active"><i class="fas fa-arrow-left"></i>Thực đơn</a>
+              <button *ngIf="!orderCancelled" class="btn btn-danger" (click)="cancelOrder()">Hủy đơn hàng</button>
+              <button *ngIf="orderCancelled" class="btn btn-primary" (click)="reorder()">Mua lại</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>

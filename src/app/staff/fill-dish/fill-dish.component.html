@@ -1,0 +1,60 @@
+<div class="container">
+  <main class="main-content">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tên món</th>
+                    <th>Thời gian gọi món</th>
+                    <th>Số lượng hoàn thành</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let order of filteredOrders">
+                    <tr>
+                      <td>{{order.itemName || order.comboName}}</td>
+                      <td>{{order.quantity}}</td>
+                      <td>{{order.orderTime }}</td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Loại đơn - số bàn</th>
+                    <th>Thời gian gọi món</th>
+                    <th>Số lượng cần</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let order of filteredOrders">
+                    <tr>
+                      <td>{{order.itemName || order.comboName}}</td>
+                      <td>{{order.quantity}}</td>
+                      <td>{{order.orderTime }}</td>
+                      <td><button type="submit" class="btn btn-primary btn-sm">Lên món</button></td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>

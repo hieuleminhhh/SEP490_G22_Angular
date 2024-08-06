@@ -105,13 +105,13 @@
                 <div class="horizontal-form-group">
                   <div class="input-group">
                     <label for="dateFrom">Từ</label>
-                    <input type="date" id="dateFrom" class="form-control" [(ngModel)]="promotion.startTime" [min]="dateNow"
-                      name="dateFrom" (change)="onDateFromChange()">
+                    <input type="date" id="dateFrom" class="form-control" [(ngModel)]="promotion.startTime"
+                      [min]="dateNow" name="dateFrom" (change)="checkPromotionDates()">
                   </div>
                   <div class="input-group">
                     <label for="dateTo">Đến</label>
                     <input type="date" id="dateTo" class="form-control" [(ngModel)]="promotion.endTime" name="dateTo"
-                    [min]="promotion.startTime">
+                      [min]="promotion.startTime">
                   </div>
                 </div>
               </div>
@@ -234,17 +234,18 @@
       <div class="modal-content-dish">
         <div class="modal-header">
           <h5 class="modal-title" id="dishModalLabel">Danh sách món ăn</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeDishModal()">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <span class="close" (click)="closeDishModal()">&times;</span>
         </div>
         <div class="modal-body">
           <div>
             <input type="checkbox" id="selectAll" (change)="toggleAllDishes($event)">
             <label for="selectAll">Chọn tất cả</label>
           </div>
-          <ul>
-            <li *ngFor="let dish of dish; let index = index">
+          <div>
+            <input type="text" id="search-dish" placeholder="Tìm theo tên món ăn" (input)="filterDishes()">
+          </div>
+          <ul class="dish-list">
+            <li *ngFor="let dish of filteredDishes; let index = index">
               <input type="checkbox" [id]="'dish-' + index" [(ngModel)]="dish.selected">
               <label [for]="'dish-' + index">{{ dish.itemName }}</label>
             </li>
@@ -252,148 +253,153 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeDishModal()">Đóng</button>
-          <button type="button" class="btn btn-primary" (click)="selectDishes()">Chọn</button>
+          <button type="button" class="btn btn-primary" (click)="selectDishes()">Lưu</button>
         </div>
       </div>
     </div>
   </div>
 
- <!-- Modal chi tiết giảm giá -->
-<div class="modal-detail fade" id="detailDiscountModal" tabindex="-1" role="dialog"
-aria-labelledby="detailDiscountModalLabel" aria-hidden="true" *ngIf="detailDiscount">
-<div class="modal-dialog-detail" role="document">
-  <div class="modal-content-detail">
-    <div class="modal-header" style="margin-bottom: 30px;">
-      <h5 class="modal-title">Chi tiết chương trình giảm giá</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-        (click)="closeDetailDiscountModal()">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group" *ngIf="detailDiscount[0]">
-        <label for="program-name">Tên chương trình</label>
-        <input type="text" id="program-name" placeholder="Tên chương trình khuyến mại"
-          [(ngModel)]="detailDiscount[0].discountName" name="programName" class="form-control" [disabled]="!isEditing">
-      </div>
-      <div class="form-group" *ngIf="detailDiscount[0]">
-        <label for="note">Ghi chú</label>
-        <input type="text" id="note" placeholder="Ghi chú" [(ngModel)]="detailDiscount[0].note" name="note"
-          class="form-control" [disabled]="!isEditing">
-      </div>
-      <div class="form-group" *ngIf="detailDiscount[0]">
-        <label>Trạng thái</label>
-        <div class="radio-group" style="margin-left: 80px;">
-          <label>
-            <input type="radio" name="status" [value]="true" [(ngModel)]="detailDiscount[0].discountStatus" [disabled]="!isEditing"> Kích hoạt
-          </label>
-          <label>
-            <input type="radio" name="status" [value]="false" [(ngModel)]="detailDiscount[0].discountStatus" [disabled]="!isEditing"> Chưa áp dụng
-          </label>
+
+  <!-- Modal chi tiết giảm giá -->
+  <div class="modal-detail fade" id="detailDiscountModal" tabindex="-1" role="dialog"
+    aria-labelledby="detailDiscountModalLabel" aria-hidden="true" *ngIf="detailDiscount">
+    <div class="modal-dialog-detail" role="document">
+      <div class="modal-content-detail">
+        <div class="modal-header" style="margin-bottom: 30px;">
+          <h5 class="modal-title">Chi tiết chương trình giảm giá</h5>
+          <span class="close" (click)="closeDetailDiscountModal()">&times;</span>
         </div>
-      </div>
-
-      <div class="form-group" *ngIf="detailDiscount[0]">
-        <label style="margin-top: 26px;">Thời gian áp dụng</label>
-        <div class="horizontal-form-group">
-          <div class="input-group">
-            <label for="dateFrom">Từ</label>
-            <input type="date" id="dateFrom" class="form-control" [(ngModel)]="detailDiscount[0].startTime"
-              name="dateFrom" (change)="onDateFromChange()" [disabled]="!isEditing">
+        <div class="modal-body">
+          <div class="form-group" *ngIf="detailDiscount[0]">
+            <label for="program-name">Tên chương trình</label>
+            <input type="text" id="program-name" placeholder="Tên chương trình khuyến mại"
+              [(ngModel)]="detailDiscount[0].discountName" name="programName" class="form-control"
+              [disabled]="!isEditing">
           </div>
-          <div class="input-group">
-            <label for="dateTo">Đến</label>
-            <input type="date" id="dateTo" class="form-control" [(ngModel)]="detailDiscount[0].endTime"
-              name="dateTo" [disabled]="!isEditing">
+          <div class="form-group" *ngIf="detailDiscount[0]">
+            <label for="note">Ghi chú</label>
+            <input type="text" id="note" placeholder="Ghi chú" [(ngModel)]="detailDiscount[0].note" name="note"
+              class="form-control" [disabled]="!isEditing">
           </div>
-        </div>
-      </div>
+          <div class="form-group" *ngIf="detailDiscount[0]">
+            <label>Trạng thái</label>
+            <div class="radio-group" style="margin-left: 80px;">
+              <label>
+                <input type="radio" name="status-detail" [value]="true" [(ngModel)]="detailDiscount[0].discountStatus"
+                  [disabled]="!isEditing"> Kích hoạt
+              </label>
+              <label>
+                <input type="radio" name="status-detail" [value]="false" [(ngModel)]="detailDiscount[0].discountStatus"
+                  [disabled]="!isEditing"> Chưa áp dụng
+              </label>
+            </div>
+          </div>
 
-      <div class="form-group horizontal-form-group" *ngIf="detailDiscount[0]">
-        <label for="promotion-type">Khuyến mại theo</label>
-        <input type="text" id="promotion-type" class="form-control" [(ngModel)]="detailDiscount[0].type"
-          name="promotionType" disabled>
-      </div>
-
-      <div *ngIf="detailDiscount[0] && detailDiscount[0].type === 1">
-        <div class="form-group">
-          <div class="row dish" *ngFor="let condition of detailDiscount; let i = index">
-            <div class="col-md-12">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="input-group">
-                    <label for="total-amount-{{i}}">Tổng tiền đơn:</label>
-                    <input type="number" id="total-amount-{{i}}" [(ngModel)]="condition.totalMoney"
-                      name="totalAmount-{{i}}" class="no-arrows" [disabled]="!isEditing">
-                    <span class="input-unit">VND</span>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="input-group">
-                    <label for="percent-{{i}}">Giảm giá:</label>
-                    <input type="number" id="percent-{{i}}" [(ngModel)]="condition.discountPercent" name="percent-{{i}}"
-                      class="no-arrows" [disabled]="!isEditing">
-                    <span class="input-unit">%</span>
-                  </div>
-                </div>
+          <div class="form-group" *ngIf="detailDiscount[0]">
+            <label style="margin-top: 26px;">Thời gian áp dụng</label>
+            <div class="horizontal-form-group">
+              <div class="input-group">
+                <label for="dateFrom">Từ</label>
+                <input type="date" id="dateFrom" class="form-control" [(ngModel)]="detailDiscount[0].startTime"
+                  name="dateFrom" (change)="checkDetailDiscountDates()" [disabled]="!isEditing">
               </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="input-group">
-                    <label for="quantityLimit-{{i}}">Giới hạn:</label>
-                    <input type="number" id="quantityLimit-{{i}}" [(ngModel)]="condition.quantityLimit"
-                      name="quantityLimit-{{i}}" class="no-arrows" [disabled]="condition.noLimit || !isEditing">
-                    <span class="input-unit">đơn</span>
+              <div class="input-group">
+                <label for="dateTo">Đến</label>
+                <input type="date" id="dateTo" class="form-control" [(ngModel)]="detailDiscount[0].endTime"
+                  name="dateTo" [disabled]="!isEditing">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group horizontal-form-group" *ngIf="detailDiscount[0]">
+            <label for="promotion-type">Khuyến mại theo</label>
+            <input type="text" id="promotion-type" class="form-control" [(ngModel)]="detailDiscount[0].type"
+              name="promotionType" disabled>
+          </div>
+
+          <div *ngIf="detailDiscount[0] && detailDiscount[0].type === 1">
+            <div class="form-group">
+              <div class="row dish" *ngFor="let condition of detailDiscount; let i = index">
+                <div class="col-md-12">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <label for="total-amount-{{i}}">Tổng tiền đơn:</label>
+                        <input type="number" id="total-amount-{{i}}" [(ngModel)]="condition.totalMoney"
+                          name="totalAmount-{{i}}" class="no-arrows" [disabled]="!isEditing">
+                        <span class="input-unit">VND</span>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <label for="percent-{{i}}">Giảm giá:</label>
+                        <input type="number" id="percent-{{i}}" [(ngModel)]="condition.discountPercent"
+                          name="percent-{{i}}" class="no-arrows" [disabled]="!isEditing">
+                        <span class="input-unit">%</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="input-group" style="height: 41px;">
-                    <input type="checkbox" id="noLimit-{{i}}" [checked]="condition.noLimit"
-                      (change)="toggleLimit(i, $event)" [disabled]="!isEditing">
-                    <label for="noLimit-{{i}}">Không giới hạn số lượng đơn</label>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <label for="quantityLimit-{{i}}">Giới hạn:</label>
+                        <input type="number" id="quantityLimit-{{i}}" [(ngModel)]="condition.quantityLimit"
+                          name="quantityLimit-{{i}}" class="no-arrows" [disabled]="condition.noLimit || !isEditing">
+                        <span class="input-unit">đơn</span>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="input-group" style="height: 41px;">
+                        <input type="checkbox" id="noLimit-{{i}}"
+                          [checked]="condition.noLimit || condition.quantityLimit === null"
+                          (change)="toggleLimit(i, $event)" [disabled]="!isEditing">
+                        <label for="noLimit-{{i}}">Không giới hạn số lượng đơn</label>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div *ngIf="detailDiscount[0] && detailDiscount[0].type === 2">
-        <div class="row dish" *ngFor="let condition of detailDiscount; let i = index">
-          <div class="col-md-12">
-            <div class="input-group spaced-input-group">
-              <label for="dish-{{i}}">Món ăn:</label>
-              <div *ngIf="!selectedDishes[i]?.length" class="selected-dishes" style="margin-right: 0;"></div>
-              <div *ngIf="selectedDishes[i]?.length" class="selected-dishes" style="margin-right: 0;">
-                <span class="dish-tag" *ngFor="let dish of selectedDishes[i]">
-                  {{ dish.name }}
-                  <i class="fas fa-times remove-icon" (click)="removeDish(i, dish.id)"></i>
-                </span>
+          <div *ngIf="detailDiscount[0] && detailDiscount[0].type === 2">
+            <div class="row dish" *ngFor="let condition of detailDiscount; let i = index">
+              <div class="col-md-12">
+                <div class="input-group spaced-input-group">
+                  <label for="dish-{{i}}">Món ăn:</label>
+                  <div *ngIf="!condition.dishes?.length" class="selected-dishes" style="margin-right: 0;"></div>
+                  <div *ngIf="condition.dishes?.length" class="selected-dishes" style="margin-right: 0;">
+                    <span class="dish-tag" *ngFor="let dish of condition.dishes">
+                      {{ dish.itemName }}
+                      <i *ngIf="isEditing" class="fas fa-times remove-icon"
+                        (click)="removeDishDetail(i, dish.dishId)"></i>
+                    </span>
+                  </div>
+                  <i class="fas fa-list input-unit" *ngIf="isEditing" (click)="openDishModal(i)"></i>
+                </div>
               </div>
-              <i class="fas fa-list input-unit" *ngIf="isEditing" (click)="openDishModal(i)"></i>
-            </div>
-          </div>
-          <div class="col-md-12">
-            <div class="input-group spaced-input-group">
-              <label for="percent-{{i}}">Giảm giá:</label>
-              <input type="number" id="percent-{{i}}" placeholder="0" [(ngModel)]="condition.discountPercent"
-                name="percent-{{i}}" style="margin-right: 300px;" class="no-arrows" required #dis="ngModel" [disabled]="!isEditing">
-              <span class="input-unit" style="margin-right: 300px;">%</span>
+              <div class="col-md-12">
+                <div class="input-group spaced-input-group">
+                  <label for="percent-{{i}}">Giảm giá:</label>
+                  <input type="number" id="percent-{{i}}" [(ngModel)]="condition.discountPercent" name="percent-{{i}}"
+                    style="margin-right: 300px;" class="no-arrows" [disabled]="!isEditing">
+                  <span class="input-unit" style="margin-right: 300px;">%</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal"
+            (click)="closeDetailDiscountModal()">Đóng</button>
+          <button type="button" class="btn btn-primary" (click)="toggleEditMode()" [hidden]="isEditing">Chỉnh
+            sửa</button>
+          <button type="button" class="btn btn-success" (click)="saveChanges()" [hidden]="!isEditing">Lưu</button>
+        </div>
       </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-dismiss="modal"
-        (click)="closeDetailDiscountModal()">Đóng</button>
-      <button type="button" class="btn btn-primary" (click)="toggleEditMode()">Chỉnh sửa</button>
-      <button type="button" class="btn btn-success" (click)="saveChanges()" [hidden]="!isEditing">Lưu</button>
     </div>
   </div>
-</div>
-</div>
 
 
 </body>

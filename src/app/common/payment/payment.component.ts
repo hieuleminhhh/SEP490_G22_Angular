@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { CheckoutService } from '../../../service/checkout.service';
@@ -10,7 +10,7 @@ import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.co
   standalone: true,
   templateUrl: './payment.component.html',
   styleUrls: ['./payment.component.css'],
-  imports: [CommonModule, CurrencyFormatPipe]
+  imports: [CommonModule, CurrencyFormatPipe, RouterModule]
 })
 export class PaymentComponent implements OnInit {
   request: any;
