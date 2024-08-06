@@ -7,7 +7,7 @@
       
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div class="container mt-5">
-          <h2 class="text-center mb-4">Tạo đơn hàng online</h2>
+          <h2 class="text-center mb-4">Tạo đơn hàng trực tuyến</h2>
           <div class="row">
             <!-- Left column for address and cart details -->
             <div class="col-md-6">
@@ -272,54 +272,63 @@
               
 
               <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-lg">
                   <div class="modal-content">
                     <div class="modal-header">
-                      <h5 class="modal-title" id="paymentModalLabel">Thông tin thanh toán</h5>
+                      <h5 class="modal-title" id="paymentModalLabel">Thông tin đơn hàng</h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                      <!-- Thông tin hóa đơn -->
                       <div class="mb-3">
-                        <label for="price" class="form-label">Tổng tiền phải trả:</label>
-                        {{ calculateTotalAmount() | currencyFormat  }}
+                        <table id="items" class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th scope="col">STT</th>
+                              <th scope="col">Tên món</th>
+                              <th scope="col">SL</th>
+                              <th scope="col">Giá món</th>
+                              <th scope="col">Thành tiền</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of selectedItems; let i = index">
+                              <td>{{ i + 1 }}</td>
+                              <td>
+                                {{ item.itemName }}
+                                <span *ngIf="item.nameCombo">{{ item.nameCombo }}</span>
+                              </td>
+                              <td>{{ item.quantity }}</td>
+                              <td>{{ item.discountedPrice || item.price | currencyFormat }}</td>
+                              <td>{{ item.totalPrice | currencyFormat }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
-              
-                      <!-- Template for CreateTakeAwayOrderComponent -->
-                      <div class="mb-3">
-                        <label class="form-label">Hình thức thanh toán:</label>
-                        <div>
-                          <input type="radio" id="cash" name="paymentMethod" value="0" [(ngModel)]="paymentMethod">
-                          <label for="cash">Tiền mặt</label>
-                        </div>
-                        <div>
-                          <input type="radio" id="bank" name="paymentMethod" value="1" [(ngModel)]="paymentMethod">
-                          <label for="bank">Chuyển khoản ngân hàng</label>
-                        </div>
-                        <div>
-                          <input type="radio" id="cod" name="paymentMethod" value="2" [(ngModel)]="paymentMethod">
-                          <label for="cod">Thanh toán khi nhận hàng</label>
-                        </div>
+                      <div class="mt-3">
+                        <strong>Tạm tính:</strong> {{ totalAmount | currencyFormat }}
                       </div>
-                      
-                      <div class="mb-3" *ngIf="paymentMethod === '0'">
-                        <label for="customerPaid" class="form-label">Tiền khách trả:</label>
-                        <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid">
+                      <div class="mt-2" *ngIf="selectedDiscount">
+                        <strong>Giảm giá:</strong>
+                        <span>{{ selectedDiscountName }} ({{ selectedDiscountPercent | percentage }})</span>
                       </div>
-              
-                      <div class="mb-3" *ngIf="paymentMethod === '1'">
-                        <label for="qrCode" class="form-label"></label>
-                        <img id="qrCode" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" class="img-fluid">
+                        <div class="mt-2" *ngIf="selectedDiscount">
+                        <strong>Số tiền giảm:</strong> 
+                        <span>{{ totalAmount - totalAmountAfterDiscount | currencyFormat }}</span>
+                      </div>
+                      <hr>
+                      <div class="mt-2">
+                        <strong>Tổng số tiền:</strong> 
+                        <span *ngIf="selectedDiscount === null">
+                          {{ totalAmount | currencyFormat }}
+                        </span>
+                        <span *ngIf="selectedDiscount !== null">
+                          {{ totalAmountAfterDiscount | currencyFormat }}
+                        </span>
                       </div>
                     </div>
-              
                     <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Đóng</button>
-                      <button type="button" class="btn btn-primary"
-                      data-bs-toggle="modal" data-bs-target="#cfpaymentModal"
-                      (click)="createOrder()">
-                Xác nhận
-                      </button>        
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                      <button type="button" class="btn btn-primary" (click)="createOrder()">Xác nhận</button>
                     </div>
                   </div>
                 </div>

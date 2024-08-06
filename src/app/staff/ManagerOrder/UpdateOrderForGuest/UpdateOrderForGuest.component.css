@@ -1,10 +1,7 @@
-.custom-dialog {
-    position: fixed !important;
-    top: 0 !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    margin: 0 !important;
+.clickable-item {
+    cursor: pointer; /* Change cursor to indicate that this part is clickable */
   }
+  
   /* Hide arrows in input number */
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { 
@@ -29,9 +26,13 @@ input.rounded-input {
   padding: 0;
   text-align: center;
 }
+/* CSS */
 .disabled-input {
-  pointer-events: none; /* Ngăn cản các sự kiện chuột như nhấp chuột */
-  background-color: #f8f9fa; /* Màu nền sáng, tương tự như màu nền của trường nhập liệu */
-  border-color: #ced4da; /* Màu viền để trông như bị vô hiệu hóa */
-  color: #000; /* Màu văn bản là đen */
-}
+    pointer-events: none; /* Ngăn cản các sự kiện chuột như nhấp chuột */
+    background-color: #f8f9fa; /* Màu nền sáng, tương tự như màu nền của trường nhập liệu */
+    border-color: #ced4da; /* Màu viền để trông như bị vô hiệu hóa */
+    color: #000; /* Màu văn bản là đen */
+  }
+  
+  
+  

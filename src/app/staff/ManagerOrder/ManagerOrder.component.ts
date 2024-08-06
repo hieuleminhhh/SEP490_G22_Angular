@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ManagerOrderService } from '../../../service/managerorder.service';
 import { ListAllOrder } from '../../../models/order.model';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ManagerOrderDetailService } from '../../../service/managerorderDetail.service';
@@ -9,6 +9,7 @@ import { ListOrderDetailByOrder } from '../../../models/orderDetail.model';
 import { SidebarOrderComponent } from "../SidebarOrder/SidebarOrder.component";
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 import { DateFormatPipe } from '../../common/material/dateFormat/dateFormat.component';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-ManagerOrder',
@@ -25,6 +26,7 @@ export class ManagerOrderComponent implements OnInit {
   currentPage: number = 1;
   pageSize: number = 10;
   totalCount: number = 0;
+  selectedOrder: any = {};
   totalPagesArray: number[] = [];
   weeks: { start: string, end: string }[] = [];
   years: number[] = [];
@@ -48,12 +50,14 @@ export class ManagerOrderComponent implements OnInit {
   selectedStatus: number = 0;
   selectedFilter: string = 'Đặt hàng';
   selectedType: number = 0;
-  orderDetail: ListOrderDetailByOrder | undefined;
+  orderDetail: ListOrderDetailByOrder | null = null;
+  orderId: number = 0;
 
   constructor(
     private orderService: ManagerOrderService, 
     private orderDetailService: ManagerOrderDetailService, 
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
@@ -66,7 +70,18 @@ export class ManagerOrderComponent implements OnInit {
     this.dateFrom = this.formatDate(today);
     this.dateTo = this.formatDate(today);
   }
-
+  getOrder(orderId: number) {
+    this.orderDetailService.getOrderDetail(orderId).subscribe(
+      (response: ListOrderDetailByOrder) => {
+        this.selectedOrder = response;
+        console.log('Order details:', this.selectedOrder);
+        // Thực hiện logic bổ sung nếu cần
+      },
+      (error: HttpErrorResponse) => {
+        console.error('Error fetching order details:', error);
+      }
+    );
+  }
   loadListOrder(): void {
     this.orderService.ListOrders(
       this.currentPage, 
@@ -106,7 +121,9 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
-
+  updateOrder(orderId: number) {
+    this.router.navigate(['/updateOrder', orderId]);
+  }
   updateTotalPagesArray(totalPages: number): void {
     this.totalPagesArray = Array(totalPages).fill(0).map((x, i) => i + 1);
   }
