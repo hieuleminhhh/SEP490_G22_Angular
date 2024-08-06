@@ -26,6 +26,7 @@ import { PaymentSuccessComponent } from './common/payment-success/payment-succes
 import { ManageDiscountComponent } from './manager/ManageDiscount/ManageDiscount.component';
 import { FillDishComponent } from './staff/fill-dish/fill-dish.component';
 import { UpdateOrderForGuestComponent } from './staff/ManagerOrder/UpdateOrderForGuest/UpdateOrderForGuest.component';
+import { SettingComponent } from './admin/setting/setting.component';
 
 
 export const routes: Routes = [
@@ -56,5 +57,6 @@ export const routes: Routes = [
     {'path': 'manageDiscount' , component:ManageDiscountComponent},
     {'path': 'fillDish' , component:FillDishComponent},
     {'path': 'manageDiscount' , component:ManageDiscountComponent},
-    {'path': 'updateOrder/:orderId' , component: UpdateOrderForGuestComponent}
+    {'path': 'updateOrder/:orderId' , component: UpdateOrderForGuestComponent},
+    {'path': 'setting' , component: SettingComponent}
 ];
