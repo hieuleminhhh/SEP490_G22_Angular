@@ -31,4 +31,9 @@ export class CheckoutService {
     return this.http.post<any>(url, JSON.stringify(order), { headers });
   }
 
+  getListDiscount(): Observable<any> {
+    const url = `https://localhost:7188/api/Discounts/active`;
+    return this.http.get<any>(url);
+  }
+
 }

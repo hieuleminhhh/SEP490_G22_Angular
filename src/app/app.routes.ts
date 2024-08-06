@@ -24,6 +24,7 @@ import { CreateOfflineOrderComponent } from './staff/ManagerOrder/CreateOfflineO
 import { UpdateOfflineOrderComponent } from './staff/ManagerOrder/UpdateOfflineOrder/UpdateOfflineOrder.component';
 import { PaymentSuccessComponent } from './common/payment-success/payment-success.component';
 import { ManageDiscountComponent } from './manager/ManageDiscount/ManageDiscount.component';
+import { FillDishComponent } from './staff/fill-dish/fill-dish.component';
 import { UpdateOrderForGuestComponent } from './staff/ManagerOrder/UpdateOrderForGuest/UpdateOrderForGuest.component';
 
 
@@ -52,6 +53,8 @@ export const routes: Routes = [
     {'path': 'createOffline', component:CreateOfflineOrderComponent},
     {'path': 'updateOffline' , component:UpdateOfflineOrderComponent},
     {'path': 'paymentSuccess' , component:PaymentSuccessComponent},
+    {'path': 'manageDiscount' , component:ManageDiscountComponent},
+    {'path': 'fillDish' , component:FillDishComponent}
     {'path': 'manageDiscount' , component:ManageDiscountComponent},
     {'path': 'updateOrder/:orderId' , component: UpdateOrderForGuestComponent}
 ];

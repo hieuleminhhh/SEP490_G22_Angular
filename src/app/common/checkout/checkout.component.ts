@@ -8,13 +8,14 @@ import { CheckoutService } from '../../../service/checkout.service';
 import { CartService } from '../../../service/cart.service';
 import { HttpClient } from '@angular/common/http';
 import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
+import { PercentagePipe } from '../material/percentFormat/percentFormat.component';
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css'],
-  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, MatDialogModule, CurrencyFormatPipe]
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, MatDialogModule, CurrencyFormatPipe, PercentagePipe]
 })
 export class CheckoutComponent implements OnInit {
   selectedService: string = 'service1';
@@ -37,6 +38,12 @@ export class CheckoutComponent implements OnInit {
   minDate: string; // Ngày nhận tối thiểu là ngày hiện tại
   maxDate: string; // Ngày nhận tối đa là ngày hiện tại + 7 ngày
   availableHours: string[] = [];
+
+  discount: any;
+  discountInvalid: any
+  selectedDiscount: number | null = null;
+  selectedDiscountDetails: any = null;
+  selectedPromotion: boolean = false;
 
   constructor(private cartService: CartService, private http: HttpClient, private router: Router, private route: ActivatedRoute, private checkoutService: CheckoutService) {
     const today = new Date();
@@ -132,10 +139,29 @@ export class CheckoutComponent implements OnInit {
   }
 
   getTotalCartPrice(): number {
-    return parseFloat(this.cartItems.reduce((total, item) => {
+    const totalAmount = this.cartItems.reduce((total, item) => {
       const price = item.discountedPrice != null ? item.discountedPrice : item.price;
       return total + (price * item.quantity);
-    }, 0).toFixed(2));
+    }, 0);
+
+    if (this.selectedDiscountDetails) {
+      const discount = totalAmount * this.selectedDiscountDetails.discountPercent / 100;
+      return parseFloat((totalAmount - discount).toFixed(2));
+    }
+
+    return parseFloat(totalAmount.toFixed(2));
+  }
+
+  getDiscountAmount(): number {
+    if (this.selectedDiscountDetails) {
+      const totalAmount = this.cartItems.reduce((total, item) => {
+        const price = item.discountedPrice != null ? item.discountedPrice : item.price;
+        return total + (price * item.quantity);
+      }, 0);
+      const discount = totalAmount * this.selectedDiscountDetails.discountPercent / 100;
+      return parseFloat(discount.toFixed(2));
+    }
+    return 0;
   }
   onPaymentMethodChange(event: Event) {
     const inputElement = event.target as HTMLInputElement;
@@ -166,6 +192,7 @@ export class CheckoutComponent implements OnInit {
       deposits: 0,
       note: this.note,
       type: 2,
+      discountId: this.selectedDiscount,
       orderDetails: this.cartItems.map(item => ({
         unitPrice: this.getTotalPrice(item),
         quantity: item.quantity,
@@ -178,13 +205,14 @@ export class CheckoutComponent implements OnInit {
 
     this.checkoutService.submitOrder(request).subscribe({
       next: response => {
+        console.log(request.totalAmount);
         console.log('Order submitted successfully', response);
         this.cartService.clearCart();
         sessionStorage.removeItem('cartItems');
         if (this.selectedPaymentMethod === 'banking') {
           this.checkVnPay(this.guestPhone);
-        }else{
-          this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone} });
+        } else {
+          this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone } });
         }
 
       },
@@ -201,7 +229,7 @@ export class CheckoutComponent implements OnInit {
     });
   }
 
-  checkVnPay(guestPhone:string) {
+  checkVnPay(guestPhone: string) {
     sessionStorage.setItem('guestPhone', guestPhone);
     const url = `https://localhost:7188/api/Cart/checkoutsuccess/${guestPhone}`;
     this.http.get(url).subscribe(
@@ -219,4 +247,51 @@ export class CheckoutComponent implements OnInit {
     )
   }
 
+  openDiscountModal(): void {
+    this.getListDiscount();
+    const discountModal = document.getElementById('discountModal');
+    if (discountModal) {
+      discountModal.classList.add('show');
+      discountModal.style.display = 'block';
+    }
+    this.selectedPromotion = true;
+  }
+  closeDishModal(): void {
+    const discountModal = document.getElementById('discountModal');
+    if (discountModal) {
+      discountModal.classList.remove('show');
+      discountModal.style.display = 'none';
+    }
+  }
+
+  getListDiscount(): void {
+    this.checkoutService.getListDiscount().subscribe(
+      response => {
+        console.log(response);
+
+        this.discount = response.filter((d: { totalMoney: number; }) => d.totalMoney <= this.getTotalCartPrice());
+        this.discountInvalid = response.filter((d: { totalMoney: number; }) => d.totalMoney > this.getTotalCartPrice());
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
+  saveDiscount() {
+    if (this.selectedDiscount !== null) {
+      this.selectedDiscountDetails = this.discount.find((d: { discountId: number | null; }) => d.discountId === this.selectedDiscount);
+    } else {
+      this.selectedDiscountDetails = null;
+    }
+    console.log(this.selectedDiscountDetails);
+    this.closeDishModal();
+  }
+
+  onDiscountSelect(discountId: number) {
+    if (this.selectedDiscount === discountId) {
+      this.selectedDiscount = null; // Bỏ chọn nếu đã được chọn trước đó
+    } else {
+      this.selectedDiscount = discountId; // Chọn mã giảm giá mới
+    }
+  }
 }
