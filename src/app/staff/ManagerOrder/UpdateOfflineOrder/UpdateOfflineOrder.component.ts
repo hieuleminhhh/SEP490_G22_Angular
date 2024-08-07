@@ -189,85 +189,60 @@ export class UpdateOfflineOrderComponent implements OnInit {
     }
   }
   
-  async addItem(item: any): Promise<void> {
-    try {
-      // Kiểm tra sự tồn tại của món ăn trong cơ sở dữ liệu
-      const currentQuantities = await this.orderService.getQuantityOrderDetails(this.orderId).toPromise();
-      console.log("Current Quantities:", currentQuantities);
+  addItem(item: any) {
+    // Ensure that the item has a valid quantity
+    const quantity = item.quantity || 1;
+    const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
+    const totalPrice = quantity * unitPrice; // Calculate total price based on the quantity
   
-      // Tìm số lượng hiện tại của món ăn cụ thể dựa trên tên
-      const currentQuantityObj = currentQuantities.find(
-        (qtyObj: any) =>
-          (qtyObj.dishName === item.name && item.dishId !== null) ||
-          (qtyObj.comboName === item.name && item.comboId !== null)
-      );
-  
-      const currentQuantity = currentQuantityObj ? currentQuantityObj.quantity : 0;
-      console.log("Current Quantity for Item:", currentQuantity);
-  
-      // Tính giá đơn vị và tổng giá
-      const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
-      const quantityToAdd = 1; // Số lượng thêm vào mỗi lần gọi phương thức
-  
-      // Cập nhật selectedItems
-      const selectedIndex = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-  
-      if (selectedIndex !== -1) {
-        // Món ăn đã tồn tại trong selectedItems, tăng số lượng lên 1
-        console.log('Item already exists in selectedItems, incrementing quantity');
-        this.selectedItems[selectedIndex].quantity += quantityToAdd;
-        this.selectedItems[selectedIndex].totalPrice = this.selectedItems[selectedIndex].quantity * unitPrice;
-      } else {
-        // Món ăn chưa có trong selectedItems, thêm mới
-        console.log('Item is new, adding to selectedItems');
-        this.selectedItems.push({
-          ...item,
-          quantity: quantityToAdd, // Mặc định số lượng là 1 khi thêm mới
-          unitPrice: unitPrice,
-          totalPrice: quantityToAdd * unitPrice,
-          dishesServed: 0
-        });
-      }
-  
-      // Cập nhật newlyAddedItems
-      const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
-  
-      if (newlyAddedIndex !== -1) {
-        // Món ăn đã tồn tại trong newlyAddedItems, tăng số lượng lên 1
-        console.log('Item already exists in newlyAddedItems, incrementing quantity');
-        this.newlyAddedItems[newlyAddedIndex].quantity += quantityToAdd;
-        this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * unitPrice;
-      } else {
-        // Món ăn chưa có trong newlyAddedItems, thêm mới
-        console.log('Item is new, adding to newlyAddedItems');
-        const newItem = {
-          ...item,
-          quantity: quantityToAdd, // Mặc định số lượng là 1 khi thêm mới
-          totalPrice: quantityToAdd * unitPrice
-        };
-        this.newlyAddedItems.push(newItem);
-      }
-  
-      console.log('Selected Items:', this.selectedItems);
-      console.log('Newly Added Items:', this.newlyAddedItems);
-  
-      // Tính toán và cập nhật tổng số tiền
-      this.calculateAndSetTotalAmount();
-    } catch (error) {
-      console.error('Error adding or updating item:', error);
+    // Find if the item already exists in newlyAddedItems
+    const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
+
+    
+    // Find if the item already exists in selectedItems
+    const selectedIndex = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
+ 
+    if (newlyAddedIndex == -1) {
+      // Item already exists in newlyAddedItems, update the quantity
+     this.addOrUpdateNewlyAddedItem(item);
+    } else {
+      // Item is new, add to newlyAddedItems
+      console.log('Item is new, adding to newlyAddedItems');
+      this.newlyAddedItems.push({
+        ...item,
+        quantity: quantity,
+        unitPrice: unitPrice,
+        totalPrice: totalPrice,
+      });
     }
+  
+    if (selectedIndex !== -1) {
+      // Item already exists in selectedItems, update the quantity
+      console.log('Item already exists in selectedItems, updating quantity');
+      this.selectedItems[selectedIndex].quantity = quantity;
+      this.selectedItems[selectedIndex].totalPrice = totalPrice;
+    } else {
+      // Item is new, add to selectedItems
+      console.log('Item is new, adding to selectedItems');
+      this.selectedItems.push({
+        ...item,
+        quantity: quantity,
+        unitPrice: unitPrice,
+        totalPrice: totalPrice,
+        dishesServed: 0
+      });
+    }
+  
+    console.log('Newly Added Items:', this.newlyAddedItems);
+    console.log('Selected Items:', this.selectedItems);
+    
+    this.calculateAndSetTotalAmount();
   }
   
   
-  itemsAreEqual(item1: any, item2: any): boolean {
-    // Both dishId and comboId should be considered for equality check
-    const isSameDish = item1.dishId === item2.dishId && item1.dishId !== null;
-    const isSameCombo = item1.comboId === item2.comboId && item1.comboId !== null;
   
-    // Ensure that only one of dishId or comboId is used for comparison, not both
-    // This handles cases where only one ID is provided
-    return (isSameDish && item2.dishId !== null && item1.comboId === null) ||
-           (isSameCombo && item2.comboId !== null && item1.dishId === null);
+  itemsAreEqual(item1: any, item2: any): boolean {
+    return (item1.dishId === item2.dishId && item1.comboId === item2.comboId);
   }
   
   updateTotalPrice(index: number): void {

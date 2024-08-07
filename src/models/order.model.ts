@@ -16,6 +16,7 @@ export interface ManagerOrder {
   orderId: number;
   orderDate: Date;
   status: number;
+  type: number;
   recevingOrder:Date;
   accountId:number;
   tableIds: ListTables[];

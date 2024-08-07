@@ -64,7 +64,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
  selectedDiscountPercent: number = 0;
  totalAmountAfterDiscount: number = 0;
  totalAmount: number = 0;
- discount: Discount[] = [];
+ discounts: Discount[] = [];
  newAddress: AddNewAddress = {
    guestAddress: 'Ăn tại quán',
    consigneeName: '',
@@ -87,7 +87,8 @@ export class UpdateOrderForGuestComponent implements OnInit {
       this.orderId = +params['orderId'];
       this.getOrder(this.orderId);
     });
-    this.LoadActiveDiscounts(this.orderId);
+    this.LoadActiveDiscounts();
+    this.LoadActiveDiscountByOrderID(this.orderId);
     this.calculateAndSetTotalAmount();
     console.log('AAAA'+this.selectedDiscount);
     
@@ -470,15 +471,14 @@ export class UpdateOrderForGuestComponent implements OnInit {
     
       // Find if the item already exists in newlyAddedItems
       const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
+
       
       // Find if the item already exists in selectedItems
       const selectedIndex = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-      
-      if (newlyAddedIndex !== -1) {
+   
+      if (newlyAddedIndex == -1) {
         // Item already exists in newlyAddedItems, update the quantity
-        console.log('Item already exists in newlyAddedItems, updating quantity');
-        this.newlyAddedItems[newlyAddedIndex].quantity = quantity;
-        this.newlyAddedItems[newlyAddedIndex].totalPrice = totalPrice;
+       this.addOrUpdateNewlyAddedItem(item);
       } else {
         // Item is new, add to newlyAddedItems
         console.log('Item is new, adding to newlyAddedItems');
@@ -562,8 +562,9 @@ export class UpdateOrderForGuestComponent implements OnInit {
   applyDiscount(): void {
     if (this.selectedDiscount !== null) {
       // Find the selected discount
-      const discount = this.discount.find((d: Discount) => d.discountId === this.selectedDiscount);
+      const discount = this.discounts.find((d: Discount) => d.discountId === this.selectedDiscount);
       if (discount) {
+        this.selectedDiscount = discount.discountId;
         this.selectedDiscountName = discount.discountName;
         this.selectedDiscountPercent = discount.discountPercent;
   
@@ -600,39 +601,37 @@ export class UpdateOrderForGuestComponent implements OnInit {
       this.selectedDiscountName = '';
       this.selectedDiscountPercent = 0;
   }
-  onItemClick(discount: Discount) {
-    this.selectedDiscount = discount.discountId;
-    this.selectedDiscountName = discount.discountName;
-    this.selectedDiscountPercent = discount.discountPercent;
-    console.log('Discount selected:', this.selectedDiscount);
-  }  
+  LoadActiveDiscounts(): void {
+    this.discountService.getActiveDiscounts().subscribe((data) => {
+      this.discounts = data;
+      this.applyExistingDiscount();
+    }, (error) => {
+      console.error('Error fetching active discounts:', error);
+    });
+  }
  // Method to load active discounts and set selected discount
-  LoadActiveDiscounts(orderDiscountId: number): void {
-  this.discountService.getActiveDiscounts().subscribe(
+ LoadActiveDiscountByOrderID(orderDiscountId: number): void {
+  this.discountService.getDiscountByOrderId(orderDiscountId).subscribe(
     (data) => {
-      this.discount = data;
-      
-      // Find the discount based on orderDiscountId and set it as selectedDiscount
-      const discount = this.discount.find(d => d.discountId === orderDiscountId);
-      if (discount) {
-        this.selectedDiscount = discount.discountId;
-        this.selectedDiscountName = discount.discountName;
-        this.selectedDiscountPercent = discount.discountPercent;
+      if (data) {
+        this.selectedDiscount = data.discountId;
+        this.selectedDiscountName = data.discountName;
+        this.selectedDiscountPercent = data.discountPercent;
       } else {
         // Handle the case where the discount is not found
         this.selectedDiscount = null;
         this.selectedDiscountName = '';
         this.selectedDiscountPercent = 0;
       }
-      
-      console.log('Active Discounts:', this.discount);
+
       console.log('Selected Discount:', this.selectedDiscount);
     },
     (error) => {
-      console.error('Error fetching active discounts:', error);
+      console.error('Error fetching discount by order ID:', error);
     }
   );
 }
+
 
   getOrder(orderId: number): void {
     this.orderDetailService.getOrderDetail(orderId).subscribe(
@@ -641,7 +640,8 @@ export class UpdateOrderForGuestComponent implements OnInit {
         this.selectedItems = response.orderDetails;
         if (response.discountId) {
           this.selectedDiscount = response.discountId;
-          const discount = this.discount.find(d => d.discountId === response.discountId);
+          console.log('640,'+this.selectedDiscount);
+          const discount = this.discounts.find(d => d.discountId === response.discountId);
           if (discount) {
             this.selectedDiscountName = discount.discountName;
             this.selectedDiscountPercent = discount.discountPercent;
@@ -656,5 +656,82 @@ export class UpdateOrderForGuestComponent implements OnInit {
       }
     );
   }
+  updateOrderDetails(orderId: number): void {
+    // Extract newly added items to update in the DB
+    const orderDetails = this.newlyAddedItems.map(item => ({
+      dishId: item.dishId || null,
+      comboId: item.comboId || null,
+      quantity: item.quantity,
+      note: item.note || '', // Assuming you have a note property or set it to an empty string
+      orderTime: new Date().toISOString() // Assuming you want the current time
+    }));
+  
+    // Log the data before sending
+    console.log('Updating order details with newly added items:', orderDetails);
+  
+    // Construct the dto object
+    const dto = {
+      discountId: this.selectedDiscount || 0,
+
+      orderDetails: orderDetails
+    };
+  
+    // Call the service method to update the order details
+    this.orderService.updateOrderDetailsByOrderId(orderId, dto).subscribe(
+      response => {
+        console.log('Order details updated successfully:', response);
+        this.successMessage = 'Order details updated successfully!';
+        // Clear newlyAddedItems after successful update
+        this.newlyAddedItems = [];
+      },
+      (error: HttpErrorResponse) => {
+        console.error('Error updating order details:', error);
+        this.errorMessage = 'Error updating order details';
+      }
+    );
+  }
+  onItemClick(discount: Discount) {
+    this.selectedDiscount = discount.discountId;
+    this.selectedDiscountName = discount.discountName;
+    this.selectedDiscountPercent = discount.discountPercent;
+    console.log('Discount selected:', this.selectedDiscount);
+    this.updateOrderDetails(this.orderId)
+  }  
+  applyExistingDiscount(): void {
+    if (this.selectedDiscount !== null) {
+      const discount = this.discounts.find(d => d.discountId === this.selectedDiscount);
+      if (discount) {
+        this.selectedDiscountName = discount.discountName;
+        this.selectedDiscountPercent = discount.discountPercent;
+        this.calculateTotalAmountAfterDiscount();
+      }
+    }
+  }
+  UpdateOrderAndCreateInvoice(orderId: number): void {
+    if (orderId) { // Use the method parameter directly
+      const updateData = {
+        status: 0,
+        paymentTime: new Date().toISOString(), // Use the current date and time
+        paymentAmount: 0,
+        taxcode: "string",
+        accountId: 0,
+        amountReceived: 0,
+        returnAmount: 0,
+        paymentMethods: 0,
+        description: "string"
+      };
+  
+      this.invoiceService.updateStatusAndCreateInvoice(orderId, updateData).subscribe(
+        (response) => {
+          console.log('Order status updated and invoice created:', response);
+        },
+        (error: HttpErrorResponse) => {
+          console.error('Error updating order status and creating invoice:', error);
+          this.errorMessage = 'Error updating order status and creating invoice';
+        }
+      );
+    }
+  }
+  
   
 }
