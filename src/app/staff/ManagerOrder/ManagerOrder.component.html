@@ -63,7 +63,6 @@
                 <th scope="col">Tên khách hàng</th>
                 <th scope="col">Số điện thoại</th>
                 <th scope="col">Thời gian đặt hàng</th>
-                <th scope="col">Thời gian giao hàng</th>
                 <th scope="col">Tổng tiền</th>
                 <th scope="col">Trạng thái</th>
                 <th scope="col">##</th>
@@ -76,7 +75,6 @@
                   <td>{{ order.consigneeName || 'Khách lẻ' }}</td>
                   <td>{{ order.guestPhone || '------------' }}</td>
                   <td>{{ order.orderDate | dateFormat }}</td>
-                  <td>{{ order.recevingOrder | dateFormat }}</td>
                   <td>{{ order.totalAmount | currencyFormat }}</td>
                   <td>
                     <select (change)="onStatusChange($event, order.orderId)" [(ngModel)]="order.status" [ngStyle]="{'color': getStatusColor(order.status)}">
@@ -148,8 +146,11 @@
               <span *ngSwitchCase="3">Đang phục vụ</span>
               <span *ngSwitchCase="4">Hoàn thành</span>
               <span *ngSwitchCase="5">Hủy</span>
+              <span *ngSwitchCase="6">Đang chuẩn bị</span> <!-- Thanh toan Takeaway vs online -->
+              <span *ngSwitchCase="7">Đang giao hàng</span>  <!-- online -->
               <span *ngSwitchDefault>Chưa xác định</span>
             </ng-container>
+            
           </div>
           <div class="mb-3">
             <span class="fw-bold">Tên khách hàng:</span> {{ orderDetail.consigneeName || 'Khách lẻ' }}
@@ -241,24 +242,22 @@
             <button type="button" class="btn btn-primary me-2">Chấp nhận đơn hàng</button>
             <button type="button" class="btn btn-danger me-2">Hủy đơn</button>
           </ng-container>
+
           <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 2">
-            <button type="button" class="btn btn-success me-2" 
-            *ngIf="areAllDishesServedEqualToQuantity()">Hoàn thành</button>
+            <button type="button" class="btn btn-success me-2" data-bs-target="#paymentModalPrepay"  data-bs-toggle="modal"
+            *ngIf="!orderDetail?.invoiceId" 
+            >Thanh toán</button>
             <button type="button" class="btn btn-danger me-2">Hủy đơn</button>
           </ng-container>
+
           <ng-container *ngIf="orderDetail?.type === 1 && orderDetail?.status === 2">
-            <!-- Button for completing the order -->
-            <button type="button" class="btn btn-success me-2"
-                    *ngIf="areAllDishesServedEqualToQuantity()"
-                    data-bs-toggle="modal" data-bs-target="#paymentModal">
-              Hoàn thành
-            </button>
+
           
             <!-- Button for prepayment -->
-            <button type="button" class="btn btn-primary me-2"
+            <button type="button" class="btn btn-success me-2"
                     *ngIf="!orderDetail?.invoiceId"
                     data-bs-toggle="modal" data-bs-target="#paymentModalPrepay">
-              Thanh toán trước
+              Thanh toán
             </button>
           
             <!-- Button for canceling the order -->

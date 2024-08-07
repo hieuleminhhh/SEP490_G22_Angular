@@ -159,9 +159,20 @@ createDish(): void {
 onImageSelect(event: Event): void {
   const fileInput = event.target as HTMLInputElement;
   if (fileInput.files && fileInput.files.length > 0) {
-    this.selectedFile = fileInput.files[0];
-    const imageUrl = URL.createObjectURL(this.selectedFile);
-    this.addNew.imageUrl = imageUrl;
+    const file = fileInput.files[0];
+    
+    // Optional: Validate file size (e.g., 2MB max)
+    if (file.size > 2 * 1024 * 1024) {
+      this.addErrors.imageError = 'File size exceeds 2MB';
+
+      return;
+    }
+    // Create a URL for the selected file
+    this.selectedFile = file;
+    this.imageUrl = URL.createObjectURL(file);
+  } else {
+
+    this.addErrors.imageError = 'No file selected';
   }
 }
 saveDish(): void {
