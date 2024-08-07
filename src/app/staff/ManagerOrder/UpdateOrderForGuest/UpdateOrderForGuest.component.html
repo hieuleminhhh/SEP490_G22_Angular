@@ -9,7 +9,7 @@
       <!-- Main Content -->
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div class="container mt-5">
-          <h2 class="text-center mb-4">Đơn hàng</h2>
+          <h2 class="text-center mb-4">Đơn hàng {{orderId}}</h2>
           <button class="btn btn-primary mb-4">In Hóa Đơn Tạm</button>
 
 
@@ -111,7 +111,6 @@
                   <span *ngIf="selectedDiscount === null">
                     {{ totalAmount | currencyFormat }}
                   </span>
-
                   <span *ngIf="selectedDiscount !== null">
                     {{ totalAmountAfterDiscount | currencyFormat }}
                   </span>
@@ -143,7 +142,8 @@
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                       (click)="reloadPage()">Không</button>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Có</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                    (click)="updateOrderDetails(orderId)">Có</button>
                   </div>
                 </div>
               </div>
@@ -169,42 +169,36 @@
               </div>
             </div>
             <!-- Giam gia -->
-            <div class="modal fade" #formModal id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel"
-              aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="discountModalLabel">Chọn giảm giá</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <ul class="list-group">
-                      <li *ngFor="let discounts of discount" class="list-group-item list-group-item-action">
-                        <label class="d-flex align-items-center w-100 m-0" (click)="onItemClick(discounts)">
-                          <input type="radio" name="selectedDiscount" [value]="discounts.discountId"
-                            [checked]="discounts.discountId === selectedDiscount" class="me-2" />
-                          <span *ngIf="discounts.quantityLimit > 0 || discounts.totalMoney > 0">
-                            {{ discounts.discountName }} - {{ discounts.discountPercent | percentage }}
-                            <span *ngIf="discounts.totalMoney > 0">(Giảm giá theo tổng hóa đơn thanh toán {{
-                              discounts.totalMoney | currencyFormat }})</span>
-                            <span *ngIf="discounts.quantityLimit > 0">(Số lượng có hạn {{ discounts.quantityLimit
-                              }})</span>
-                          </span>
-
-                        </label>
-                      </li>
-                    </ul>
-                  </div>
-                  <!-- Apdung -->
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="applyDiscount()">Áp
-                      dụng</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                      (click)="clearSelectedDiscount()">Đóng</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+<!-- Discount Modal -->
+<div class="modal fade" #formModal id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="discountModalLabel">Chọn giảm giá</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group">
+          <li *ngFor="let discount of discounts" class="list-group-item list-group-item-action">
+            <label class="d-flex align-items-center w-100 m-0" (click)="onItemClick(discount)">
+              <input type="radio" name="selectedDiscount" [value]="discount.discountId"
+                [checked]="discount.discountId === selectedDiscount" class="me-2" />
+              <span *ngIf="discount.quantityLimit > 0 || discount.totalMoney > 0">
+                {{ discount.discountName }} - {{ discount.discountPercent | percentage }}
+                <span *ngIf="discount.totalMoney > 0">(Giảm giá theo tổng hóa đơn thanh toán {{ discount.totalMoney | currencyFormat }})</span>
+                <span *ngIf="discount.quantityLimit > 0">(Số lượng có hạn {{ discount.quantityLimit }})</span>
+              </span>
+            </label>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="applyDiscount()">Áp dụng</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearSelectedDiscount()">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
 
             <!-- Right column for dishes and combos -->
             <div class="col-md-6">
