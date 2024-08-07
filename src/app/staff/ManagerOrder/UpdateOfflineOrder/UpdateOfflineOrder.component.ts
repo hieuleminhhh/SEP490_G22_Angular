@@ -60,7 +60,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
   selectedDiscountPercent: number = 0;
   totalAmountAfterDiscount: number = 0;
   totalAmount: number = 0;
-  discount: Discount[] = [];
+  discounts: Discount[] = [];
   newAddress: AddNewAddress = {
     guestAddress: 'Ăn tại quán',
     consigneeName: '',
@@ -86,9 +86,10 @@ export class UpdateOfflineOrderComponent implements OnInit {
       this.tableId = +params['tableId']; 
       this.loadListOrderByTable(this.tableId);
     });
-    this.LoadActiveDiscounts(this.orderId);
+    this.LoadActiveDiscounts();
     this.calculateAndSetTotalAmount();
     this.selectedDiscount = null;
+    this.LoadActiveDiscountByOrderID(this.orderId);
   }
   increaseQuantity(index: number): void {
     const item = this.selectedItems[index];
@@ -188,23 +189,28 @@ export class UpdateOfflineOrderComponent implements OnInit {
       console.error('Error updating newly added items:', error);
     }
   }
-  
   addItem(item: any) {
+    console.log('Initial item:', item);
+  
     // Ensure that the item has a valid quantity
-    const quantity = item.quantity || 1;
+    let quantity = item.quantity;
+    if (quantity === undefined || quantity === null || isNaN(Number(quantity)) || Number(quantity) <= 0) {
+      quantity = 1; // Default quantity to 1 if it's invalid
+    } else {
+      quantity = Number(quantity);
+    }
+  
     const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
     const totalPrice = quantity * unitPrice; // Calculate total price based on the quantity
   
     // Find if the item already exists in newlyAddedItems
     const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
-
-    
-    // Find if the item already exists in selectedItems
     const selectedIndex = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
- 
-    if (newlyAddedIndex == -1) {
-      // Item already exists in newlyAddedItems, update the quantity
-     this.addOrUpdateNewlyAddedItem(item);
+  
+    if (newlyAddedIndex !== -1) {
+      // Item already exists in newlyAddedItems, update the quantity and totalPrice
+      this.newlyAddedItems[newlyAddedIndex].quantity += quantity;
+      this.newlyAddedItems[newlyAddedIndex].totalPrice += totalPrice;
     } else {
       // Item is new, add to newlyAddedItems
       console.log('Item is new, adding to newlyAddedItems');
@@ -217,10 +223,10 @@ export class UpdateOfflineOrderComponent implements OnInit {
     }
   
     if (selectedIndex !== -1) {
-      // Item already exists in selectedItems, update the quantity
+      // Item already exists in selectedItems, update the quantity and totalPrice
       console.log('Item already exists in selectedItems, updating quantity');
-      this.selectedItems[selectedIndex].quantity = quantity;
-      this.selectedItems[selectedIndex].totalPrice = totalPrice;
+      this.selectedItems[selectedIndex].quantity += quantity;
+      this.selectedItems[selectedIndex].totalPrice += totalPrice;
     } else {
       // Item is new, add to selectedItems
       console.log('Item is new, adding to selectedItems');
@@ -235,7 +241,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
   
     console.log('Newly Added Items:', this.newlyAddedItems);
     console.log('Selected Items:', this.selectedItems);
-    
+  
     this.calculateAndSetTotalAmount();
   }
   
@@ -244,6 +250,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
   itemsAreEqual(item1: any, item2: any): boolean {
     return (item1.dishId === item2.dishId && item1.comboId === item2.comboId);
   }
+
   
   updateTotalPrice(index: number): void {
     const item = this.selectedItems[index];
@@ -331,7 +338,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
     const unitPrice = removedItem.discountedPrice ? removedItem.discountedPrice : removedItem.price;
     this.newlyAddedItems.push({
         ...removedItem,
-        quantity: 0,
+        quantity: 102,
         unitPrice: unitPrice,
         totalPrice: unitPrice
     });
@@ -666,8 +673,7 @@ updateOrderOffline(tableId: number) {
     );
   }
   cancelOrderForTable(tableId: number): void {
-    const status = 5; // The status to set when canceling the order
-
+    const status = 5; 
     this.orderService.CancelOrderForTable(tableId, status).subscribe(
       response => {
         this.closeModal();
@@ -863,37 +869,50 @@ updateOrderOffline(tableId: number) {
       this.selectedDiscountPercent = discount.discountPercent;
       console.log('Discount selected:', this.selectedDiscount);
     }  
-   // Method to load active discounts and set selected discount
-    LoadActiveDiscounts(orderDiscountId: number): void {
-    this.discountService.getActiveDiscounts().subscribe(
-      (data) => {
-        this.discount = data;
-        
-        // Find the discount based on orderDiscountId and set it as selectedDiscount
-        const discount = this.discount.find(d => d.discountId === orderDiscountId);
+    LoadActiveDiscounts(): void {
+      this.discountService.getActiveDiscounts().subscribe((data) => {
+        this.discounts = data;
+        this.applyExistingDiscount();
+      }, (error) => {
+        console.error('Error fetching active discounts:', error);
+      });
+    }
+    applyExistingDiscount(): void {
+      if (this.selectedDiscount !== null) {
+        const discount = this.discounts.find(d => d.discountId === this.selectedDiscount);
         if (discount) {
-          this.selectedDiscount = discount.discountId;
           this.selectedDiscountName = discount.discountName;
           this.selectedDiscountPercent = discount.discountPercent;
+          this.calculateTotalAmountAfterDiscount();
+        }
+      }
+    }
+   // Method to load active discounts and set selected discount
+   LoadActiveDiscountByOrderID(orderDiscountId: number): void {
+    this.discountService.getDiscountByOrderId(orderDiscountId).subscribe(
+      (data) => {
+        if (data) {
+          this.selectedDiscount = data.discountId;
+          this.selectedDiscountName = data.discountName;
+          this.selectedDiscountPercent = data.discountPercent;
         } else {
           // Handle the case where the discount is not found
           this.selectedDiscount = null;
           this.selectedDiscountName = '';
           this.selectedDiscountPercent = 0;
         }
-        
-        console.log('Active Discounts:', this.discount);
+  
         console.log('Selected Discount:', this.selectedDiscount);
       },
       (error) => {
-        console.error('Error fetching active discounts:', error);
+        console.error('Error fetching discount by order ID:', error);
       }
     );
   }
     applyDiscount(): void {
       if (this.selectedDiscount !== null) {
         // Find the selected discount
-        const discount = this.discount.find((d: Discount) => d.discountId === this.selectedDiscount);
+        const discount = this.discounts.find((d: Discount) => d.discountId === this.selectedDiscount);
         if (discount) {
           this.selectedDiscountName = discount.discountName;
           this.selectedDiscountPercent = discount.discountPercent;

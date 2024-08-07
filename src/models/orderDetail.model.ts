@@ -1,3 +1,5 @@
+import { Table } from "./table.model";
+
 //guest
 export interface OrderDetail{
   orderDetailId:number;
@@ -46,6 +48,7 @@ export interface ListOrderDetailByOrder{
   returnAmount:number;
   paymentMethods:number;
   orderDetails:ListOrderDetail[];
+  tables: Table[]; 
 }
 export interface AddOrderDetail{
   unitPrice: number;

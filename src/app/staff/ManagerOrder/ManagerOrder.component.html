@@ -13,33 +13,16 @@
           <h1 class="text-center mb-4">Quản lý đơn hàng</h1>
           
           <!-- Buttons and search bar -->
-          <div class="mb-3 d-flex justify-content-between align-items-center">
-
+          <div class="mb-3 d-flex justify-content-center">
             <div class="input-group" style="max-width: 400px;">
               <input type="text" class="form-control" placeholder="Tìm kiếm..." aria-label="Search" aria-describedby="button-addon2" [(ngModel)]="search">
               <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="onSearch()">Tìm kiếm</button>
-            </div>
-            <div class="col-md-2">
-              <div class="input-group">
-                <label class="input-group-text" for="type">Loại đơn</label>
-                <select id="type" class="form-select" [(ngModel)]="selectedType" (change)="onSearch()">
-                  <option value="0">Tất cả</option>
-                  <option *ngFor="let type of types" [value]="type.value">{{ type.text }}</option>
-                </select>
-              </div>
             </div>
           </div>
           
           <!-- Select filters -->
           <div class="row mb-3">
-            <div class="col-md-3">
-              <div class="input-group">
-                <label class="input-group-text" for="time">Thời gian</label>
-                <select id="time" class="form-select" [(ngModel)]="selectedFilter" (change)="onSearch()">
-                  <option *ngFor="let option of filterByDate" [value]="option.value">{{ option.text }}</option>
-                </select>
-              </div>
-            </div>
+           
             <div class="col-md-3">
               <div class="input-group">
                 <label class="input-group-text" for="dateFrom">Từ ngày</label>
@@ -58,6 +41,15 @@
                 <select id="status" class="form-select" [(ngModel)]="selectedStatus" (change)="onSearch()">
                   <option value="0">Tất cả</option>
                   <option *ngFor="let status of statuses" [value]="status.value">{{ status.text }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="input-group">
+                <label class="input-group-text" for="type">Loại đơn</label>
+                <select id="type" class="form-select" [(ngModel)]="selectedType" (change)="onSearch()">
+                  <option value="0">Tất cả</option>
+                  <option *ngFor="let type of types" [value]="type.value">{{ type.text }}</option>
                 </select>
               </div>
             </div>
@@ -144,6 +136,9 @@
               <span *ngSwitchCase="4">Tại chỗ</span>
               <span *ngSwitchDefault>Khách lẻ</span>
             </ng-container>
+          </div>
+          <div *ngIf="orderDetail.tables && orderDetail.tables.length > 0" class="mb-3">
+            <span class="fw-bold">Bàn:</span> {{ orderDetail.tables[0].tableId }}
           </div>
           <div class="mb-3">
             <span class="fw-bold">Trạng thái đơn:</span>

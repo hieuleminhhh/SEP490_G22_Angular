@@ -13,6 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { PercentagePipe } from '../../common/material/percentFormat/percentFormat.component';
 import { InvoiceService } from '../../../service/invoice.service';
 import { ItemInvoice } from '../../../models/invoice.model';
+import { Table } from '../../../models/table.model';
 
 @Component({
     selector: 'app-ManagerOrder',
@@ -34,6 +35,7 @@ export class ManagerOrderComponent implements OnInit {
   totalPagesArray: number[] = [];
   weeks: { start: string, end: string }[] = [];
   years: number[] = [];
+
   statuses = [
     { value: 1, text: 'Đang chờ' },
     { value: 2, text: 'Đã chấp nhận' },
@@ -59,6 +61,8 @@ export class ManagerOrderComponent implements OnInit {
   paymentMethod: string = '0';
   customerPaid: number | null = null;
   paymentAmount: number = 0;
+  tables: Table[] = [];
+  tableId: number | null = null;
 
   constructor(
     private orderService: ManagerOrderService, 
@@ -118,13 +122,18 @@ export class ManagerOrderComponent implements OnInit {
     );
   }
   
-
   loadListOrderDetails(orderId: number) {
     console.log('Loading details for Order ID:', orderId);
     this.orderDetailService.getOrderDetail(orderId).subscribe(
       (orderDetail) => {
         this.orderDetail = orderDetail;
+        this.tables = orderDetail.tables; // Assigning tables to a separate variable
+        if (this.tables.length > 0) {
+          this.tableId = this.tables[0].tableId; // Extracting tableId from the first table
+        }
         console.log('Fetched order detail:', this.orderDetail);
+        console.log('Tables:', this.tables);
+        console.log('Table ID:', this.tableId); // Logging the tableId
       },
       (error) => {
         console.error('Error fetching order detail:', error);
