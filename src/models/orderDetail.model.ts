@@ -39,6 +39,12 @@ export interface ListOrderDetailByOrder{
   guestAddress:string;
   consigneeName:string;
   type: number;
+  discountPercent:number;
+  discountName:string;
+  quantityLimit:number;
+  amountReceived:number;
+  returnAmount:number;
+  paymentMethods:number;
   orderDetails:ListOrderDetail[];
 }
 export interface AddOrderDetail{
