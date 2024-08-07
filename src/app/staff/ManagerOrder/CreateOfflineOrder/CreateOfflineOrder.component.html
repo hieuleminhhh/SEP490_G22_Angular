@@ -118,21 +118,79 @@
                     </tr>
                   </tbody>
                 </table>
-
-                <div *ngIf="selectedItems.length > 0" class="total-amount mt-3">
-                  <strong>Tổng cộng đơn:</strong> {{ calculateTotalAmount() | currencyFormat  }}
+                <div *ngIf="selectedItems.length > 0" class="mt-2">
+                  <strong>Tạm tính:</strong>             
+                  {{ totalAmount | currencyFormat }}
+                  <br>
                 </div>
+                 <!-- <button class="btn btn-primary btn-sm" (click)="openDiscountDialog(item)"> -->
+                  <button class="btn btn-primary btn-sm" *ngIf="selectedItems.length > 0" data-bs-toggle="modal" data-bs-target="#discountModal">
+                    <i class="fas fa-tags me-2"></i> <!-- Biểu tượng Font Awesome -->
+                    Khuyến mãi
+                  </button>
+                  <div *ngIf="selectedDiscount" class="mt-2">
+                    <strong>Giảm giá:</strong>
+                    <span>{{ selectedDiscountName }} ({{ selectedDiscountPercent | percentage }})</span>
+                  </div>                    
+                  <br>
+                  <hr>
+                  <div *ngIf="selectedItems.length > 0" class="mt-2">
+                  <strong>Tổng số tiền:</strong>
+                  <span *ngIf="selectedDiscount === null">
+                    {{ totalAmount | currencyFormat }}
+                  </span>
+                  
+                  <span *ngIf="selectedDiscount !== null">
+                    {{ totalAmountAfterDiscount | currencyFormat }}
+                  </span>
+                </div>
+                  
+                  
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
-                  <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#confirmModal">
+                  <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
                     Tạo đơn
                   </button>
+                  <button class="btn btn-danger btn-lg" (click)="clearCart()" >
+                    Hủy
+                  </button>
                 </div>
-
               </div>
-
-              <div *ngIf="successMessage" class="alert alert-success" role="alert">
-                {{ successMessage }}
+                  <!-- Discount Modal -->
+            <div class="modal fade" #formModal id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="discountModalLabel">Chọn giảm giá</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <ul class="list-group">
+                        <li *ngFor="let discounts of discount" class="list-group-item list-group-item-action">
+                            <label class="d-flex align-items-center w-100 m-0" (click)="onItemClick(discounts)">
+                                <input type="radio" name="selectedDiscount" [value]="discounts.discountId" 
+                                       [checked]="discounts.discountId === selectedDiscount" class="me-2" />
+                                       <span *ngIf="discounts.quantityLimit > 0 || discounts.totalMoney > 0">
+                                        {{ discounts.discountName }} - {{ discounts.discountPercent | percentage }}
+                                        <span *ngIf="discounts.totalMoney > 0">(Giảm giá theo tổng hóa đơn thanh toán {{ discounts.totalMoney | currencyFormat }})</span>
+                                        <span *ngIf="discounts.quantityLimit > 0">(Số lượng có hạn {{ discounts.quantityLimit }})</span>                                      
+                                      </span>
+                                      
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+                
+                  
+                  
+                  <!-- applyDiscount() -->
+                  <div class="modal-footer"> 
+                    <button type="button" class="btn btn-primary"  (click)="applyDiscount()">Áp dụng</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearSelectedDiscount()">Đóng</button>
+                  </div>
+                </div>
               </div>
+            </div>
+            
                    <!-- Confirmation Modal -->
 <div #formModal class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -236,6 +294,7 @@
             </div>
           </div>
         </div>
+        
 
         <!-- Modal -->
         <div #formModal class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="formModalLabel" aria-hidden="true">
@@ -264,6 +323,91 @@
             </div>
           </div>
         </div>
+       
+        
+        <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="paymentModalLabel">Thông tin đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <table id="items" class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th scope="col">STT</th>
+                        <th scope="col">Tên món</th>
+                        <th scope="col">SL</th>
+                        <th scope="col">Giá món</th>
+                        <th scope="col">Thành tiền</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of selectedItems; let i = index">
+                        <td>{{ i + 1 }}</td>
+                        <td>
+                          {{ item.itemName }}
+                          <span *ngIf="item.nameCombo">{{ item.nameCombo }}</span>
+                        </td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.discountedPrice || item.price | currencyFormat }}</td>
+                        <td>{{ item.totalPrice | currencyFormat }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="mt-3">
+                  <strong>Tạm tính:</strong> {{ totalAmount | currencyFormat }}
+                </div>
+                <div class="mt-2" *ngIf="selectedDiscount">
+                  <strong>Giảm giá:</strong>
+                  <span>{{ selectedDiscountName }} ({{ selectedDiscountPercent | percentage }})</span>
+                </div>
+                  <div class="mt-2" *ngIf="selectedDiscount">
+                  <strong>Số tiền giảm:</strong> 
+                  <span>{{ totalAmount - totalAmountAfterDiscount | currencyFormat }}</span>
+                </div>
+                <hr>
+                <div class="mt-2">
+                  <strong>Tổng số tiền:</strong> 
+                  <span *ngIf="selectedDiscount === null">
+                    {{ totalAmount | currencyFormat }}
+                  </span>
+                  <span *ngIf="selectedDiscount !== null">
+                    {{ totalAmountAfterDiscount | currencyFormat }}
+                  </span>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal" (click)="createOrderOffline(this.tableId)" >Xác nhận</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+  <!-- Template for cffff -->
+  <div class="modal fade" #formModal id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+                            <!-- Success message -->
+                 <div class="text-center mb-3">
+                              <div class="d-flex justify-content-center align-items-center flex-column">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
+                                      <path d="M8 16a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5.586l-3-3a.5.5 0 0 1 .707-.707L7 9.293l4.646-4.647a.5.5 0 0 1 .708.707l-5 5a.5.5 0 0 1-.708 0z"/>
+                                  </svg>
+                                  <h4 class="mt-2">Tạo đơn hàng thành công</h4>
+                              </div>
+                          </div>
+         
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearCart()">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
       </main>
     </div>
   </div>

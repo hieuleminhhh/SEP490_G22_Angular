@@ -17,12 +17,16 @@ import { InvoiceService } from '../../../../service/invoice.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../common/material/ConfirmDialog/ConfirmDialog.component';
 import { CurrencyFormatPipe } from '../../../common/material/currencyFormat/currencyFormat.component';
+import { DateFormatPipe } from '../../../common/material/dateFormat/dateFormat.component';
+import { PercentagePipe } from '../../../common/material/percentFormat/percentFormat.component';
+import { Discount } from '../../../../models/discount.model';
+import { DiscountService } from '../../../../service/discount.service';
 @Component({
     selector: 'app-create-offline-order',
     templateUrl: './CreateOfflineOrder.component.html',
     styleUrls: ['./CreateOfflineOrder.component.css'],
     standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe]
+    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe]
 })
 export class CreateOfflineOrderComponent implements OnInit {
   tableId: number = 0;
@@ -48,15 +52,21 @@ export class CreateOfflineOrderComponent implements OnInit {
   timeOptions: string[] = [];
   searchTerm: string = '';
   selectedAddress = '';
+  discount: any = {};
   newAddress: AddNewAddress = {
     guestAddress: 'Ăn tại quán',
     consigneeName: '',
     guestPhone: '',
     email:'antaiquan@gmail.com',
   };
+  selectedDiscount: any | null = null;
+  selectedDiscountName: string = '';
+  selectedDiscountPercent: number = 0;
+  totalAmountAfterDiscount: number = 0;
+  totalAmount: number = 0;
   addNew: any = {};
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService,
-   private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService, private dialog: MatDialog ) { }
+   private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService, private dialog: MatDialog,private discountService: DiscountService ) { }
   @ViewChild('formModal') formModal!: ElementRef;
   ngOnInit() {
     this.loadListDishes();
@@ -68,6 +78,10 @@ export class CreateOfflineOrderComponent implements OnInit {
       this.tableId = +params['tableId']; 
       this.loadListOrderByTable(this.tableId);
     });
+    this.LoadActiveDiscounts();
+    this.calculateAndSetTotalAmount();
+    this.selectedDiscount = null;
+
   }
 
   loadListOrderByTable(tableId: number): void {
@@ -101,7 +115,40 @@ export class CreateOfflineOrderComponent implements OnInit {
       }
     );
   }
-  
+  clearCart() {
+    this.selectedItems = [];
+    this.selectedDiscount = null;
+    this.selectedDiscount = null;
+    this.selectedDiscountName = '';
+    this.selectedDiscountPercent = 0;
+    this.selectCategory('Món chính');
+    this.successMessage = "Tất cả các mặt hàng đã được xóa khỏi giỏ hàng.";
+    this.addNew = {
+      consigneeName: '',
+      guestPhone: '',
+      guestAddress: '',
+      email: '',
+      addressId: 0,  // Assuming addressId is of type number
+      orderDate: null,  // Assuming orderDate is of type Date or null
+      status: 0,     // Assuming status is of type number
+      recevingOrder: null,  // Assuming recevingOrder is of type boolean or null
+      orderDetails: [],  // Assuming orderDetails is of type array
+      totalAmount: 0,   // Assuming totalAmount is of type number
+      deposits: 0,     // Assuming deposits is of type array or any other type
+      note: '',  
+      type: 0, 
+      paymentTime: '',
+    paymentAmount: 0,
+    discountId: 0,
+    taxcode: '',
+    paymentStatus: 0,
+    amountReceived: 0,
+    returnAmount: 0,
+    paymentMethods: 0,
+    description: ''      // Assuming note is of type string
+      // Add more properties as required by the AddNewOrder type/interface
+    };
+  }
   
   private parseDateString(dateStr: string): Date | null {
     if (!dateStr) return null; // Handle empty date strings
@@ -136,26 +183,12 @@ export class CreateOfflineOrderComponent implements OnInit {
   //   // Recalculate totalAmount after adding item
   //   this.calculateTotalAmount();
   // }
-  addItem(item: any) {
-    // Find if the item already exists in selectedItems
-    const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-  
-    if (index === -1) {
-      // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
-      const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
-      this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
-      
-      // Recalculate totalAmount after adding item
-      this.calculateTotalAmount();
-    }
-  }
-  
   increaseQuantity(index: number): void {
     if (this.selectedItems[index].quantity < 100) {
       this.selectedItems[index].quantity++;
       this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
       this.validateQuantity(index);
-      this.calculateTotalAmount();
+      this.calculateAndSetTotalAmount();
     }
   }
   
@@ -164,9 +197,28 @@ export class CreateOfflineOrderComponent implements OnInit {
       this.selectedItems[index].quantity--;
       this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
       this.validateQuantity(index);
-      this.calculateTotalAmount();
+      this.calculateAndSetTotalAmount();
     }
   }
+  addItem(item: any) {
+    // Find if the item already exists in selectedItems
+    const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
+    
+    if (index !== -1) {
+      // If the item already exists, increase its quantity and update the total price
+      this.selectedItems[index].quantity++;
+      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
+    } else {
+      // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
+      // Use discountedPrice if available, otherwise fallback to price
+      const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
+      this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
+    }
+  
+    // Recalculate totalAmount and totalAmountAfterDiscount after adding item
+    this.calculateAndSetTotalAmount();
+  }
+  
   validateQuantity(index: number): void {
     const item = this.selectedItems[index];
     if (item.quantity < 1) {
@@ -296,9 +348,6 @@ export class CreateOfflineOrderComponent implements OnInit {
       const vietnamOffset = 7 * 3600000;
       return new Date(now.getTime() + utcOffset + vietnamOffset);
     }
-    calculateTotalAmount(): number {
-     return this.selectedItems.reduce((total, item) => total + item.totalPrice, 0);
-    }
     updateQuantity(index: number, newQuantity: number) {
       if (newQuantity >= 1 && newQuantity <= 100) {
         this.selectedItems[index].quantity = newQuantity;
@@ -408,7 +457,9 @@ export class CreateOfflineOrderComponent implements OnInit {
         comboId: item.comboId,
         unitPrice: item.unitPrice,
         quantity: item.quantity,
-        discountedPrice: item.discountedPrice
+        discountedPrice: item.discountedPrice,
+        orderTime: new Date(),
+        note: item.note
       }));
     
       const guestPhone = this.addNew.guestPhone ? this.addNew.guestPhone : '';
@@ -422,6 +473,7 @@ export class CreateOfflineOrderComponent implements OnInit {
         totalAmount: this.calculateTotalAmount(),
         guestPhone: guestPhone,
         note: "This is a special request note.",
+        discountId: this.selectedDiscount,
         type: 4,
         status: 3,
         orderDetails: orderDetails
@@ -443,6 +495,46 @@ export class CreateOfflineOrderComponent implements OnInit {
         }
       );
     }
+    clearSelectedDiscount() {
+      this.selectedDiscount = null;
+      this.selectedDiscountName = '';
+      this.selectedDiscountPercent = 0;
+  }
+  LoadActiveDiscounts(): void {
+    this.discountService.getActiveDiscounts().subscribe((data) => {
+      this.discount = data;
+    }, (error) => {
+      console.error('Error fetching active discounts:', error);
+    });
+  }
+  onItemClick(discount: Discount) {
+    this.selectedDiscount = discount.discountId;
+    this.selectedDiscountName = discount.discountName;
+    this.selectedDiscountPercent = discount.discountPercent;
+    console.log('Discount selected:', this.selectedDiscount);
+  }  
+ // Method to apply the discount
+ applyDiscount() {
+  if (this.selectedDiscount !== null) {
+    // Find the selected discount
+    const discount = this.discount.find((d: Discount) => d.discountId === this.selectedDiscount);
+    if (discount) {
+      this.selectedDiscountName = discount.discountName;
+      this.selectedDiscountPercent = discount.discountPercent;
+
+      // Recalculate the total amount with the discount applied
+      this.updateTotalAmountWithDiscount();
+
+      // Optionally close the modal programmatically
+      this.closeModal();
+    }
+  } else {
+    // No discount selected, set totalAmountAfterDiscount to totalAmount
+    this.totalAmountAfterDiscount = this.calculateTotalAmount();
+    console.error('No discount selected.');
+  }
+}
+  
     confirmOrder(): void {
       this.createOrderOffline(this.tableId);
     }
@@ -477,7 +569,27 @@ export class CreateOfflineOrderComponent implements OnInit {
     clearAddErrors() {
       this.addErrors = {};
     }
-  
+    calculateTotalAmount(): number {
+      return this.selectedItems.reduce((total, item) => total + item.totalPrice, 0);
+    }
+    calculateAndSetTotalAmount() {
+      this.totalAmount = this.calculateTotalAmount();
+      if (this.selectedDiscount !== null) {
+        this.updateTotalAmountWithDiscount();
+      } else {
+        this.totalAmountAfterDiscount = this.totalAmount; // Khi không có discount
+      }
+    }
+    
+    updateTotalAmountWithDiscount() {
+      const totalAmount = this.calculateTotalAmount();
+      console.log('Total Amount:', totalAmount); // Kiểm tra giá trị totalAmount
+      const discountAmount = totalAmount * (this.selectedDiscountPercent / 100);
+      console.log('Discount Amount:', discountAmount); // Kiểm tra giá trị discountAmount
+      this.totalAmountAfterDiscount = totalAmount - discountAmount;
+      console.log('Total Amount After Discount:', this.totalAmountAfterDiscount); // Kiểm tra giá trị totalAmountAfterDiscount
+    }
+    
     
     
 }
