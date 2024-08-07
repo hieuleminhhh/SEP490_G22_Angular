@@ -91,7 +91,7 @@ export class CookingManagementComponent implements OnInit {
     }
   }
 
-  completeDish(orderDetailId: number, itemNameOrComboName: string): void {
+  completeDish(orderDetailId: number, itemNameOrComboName: string, type: number): void {
     const form = this.forms[orderDetailId];
 
     if (form.invalid) {
@@ -99,11 +99,17 @@ export class CookingManagementComponent implements OnInit {
       return;
     }
     const dishesServed = form.value.dishesServed;
-    this.updateLocal(dishesServed, itemNameOrComboName);
+
+    if (type === 1 || type === 2) {
+      this.updateDishesServed(orderDetailId, dishesServed);
+    } else {
+      this.updateLocal(dishesServed, itemNameOrComboName);
+    }
     this.updateOrderQuantity(orderDetailId, dishesServed);
     this.filterOrders();
     form.reset({ dishesServed: 0 });
   }
+
 
   private updateLocal(dishesServed: number,itemNameOrComboName:string): void {
     let completedDishes = JSON.parse(localStorage.getItem('completedDishes') || '[]');
@@ -115,18 +121,22 @@ export class CookingManagementComponent implements OnInit {
 
   private updateOrderQuantity(orderDetailId: number, dishesServed: number): void {
     const orderIndex = this.order.findIndex((o: { orderDetailId: number }) => o.orderDetailId === orderDetailId);
+
     if (orderIndex !== -1) {
       this.order[orderIndex].quantity -= dishesServed;
       if (this.order[orderIndex].quantity < 0) {
         this.order[orderIndex].quantity = 0;
       }
     }
+    console.log(this.order);
   }
 
   private loadCompletedDishes(): void {
     let completedDishes = JSON.parse(localStorage.getItem('completedDishes') || '[]');
     completedDishes.forEach((dish: { orderDetailId: number; dishesServed: number }) => {
       this.updateOrderQuantity(dish.orderDetailId, dish.dishesServed);
+      console.log('111111');
+
     });
 
     console.log('Loaded Completed Dishes:', completedDishes);
@@ -136,5 +146,19 @@ export class CookingManagementComponent implements OnInit {
 
   private filterOrders(): void {
     this.filteredOrders = this.order.filter((order: { quantity: number; }) => order.quantity > 0);
+  }
+  updateDishesServed(orderDetailId: number, dishesServed:number) {
+    const request = {
+      orderDetailId: orderDetailId,
+      dishesServed: dishesServed
+    };
+    this.cookingService.updateDishesServed(request).subscribe(
+      response => {
+
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
   }
 }

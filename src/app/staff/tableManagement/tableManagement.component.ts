@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import moment from 'moment';
 import { ReservationService } from '../../../service/reservation.service';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { Table, TableReservationResponse } from '../../../models/table.model';
@@ -173,6 +173,8 @@ export class TableManagementComponent implements OnInit {
         }));
         this.dataReservationAccept = [...this.dataReservationToday];
         this.applySelectedTimeFilter();
+        console.log(response);
+
       },
       error => {
         console.error('Error:', error);
@@ -312,6 +314,7 @@ export class TableManagementComponent implements OnInit {
         this.dataReservationPending = response;
         this.totalItems = this.dataReservationPending.length; // Cập nhật lại tổng số bản ghi
         this.paginateData(); // Sau khi cập nhật totalItems, cắt dữ liệu cho trang hiện tại
+
       },
       error => {
         console.error('Error:', error);
@@ -333,7 +336,39 @@ export class TableManagementComponent implements OnInit {
   }
 
 
-  updateReservationById(id: number, status: number): void {
+  updateReservationById(id: number, status: number, orderId: number | null): void {
+    this.reservationService.updateStatusReservation(id, status).pipe(
+      switchMap(response => {
+        // Cập nhật trạng thái của table
+        return this.reservationService.updateStatusTable(id, 1);
+      }),
+      switchMap(response => {
+        if (orderId !== null) {
+          const status = {
+            status: 3
+          }
+          return this,this.tableService.updateOrderStatus(orderId, status);
+        } else {
+          return of(response);
+        }
+      })
+    ).subscribe(
+      response => {
+        // Gọi các hàm để lấy dữ liệu mới
+        this.getTableData();
+        this.getReservation();
+        this.getReservationData();
+      },
+      error => {
+        console.error('Lỗi khi cập nhật trạng thái:', error);
+        if (error.error && error.error.errors) {
+          console.error('Lỗi xác thực:', error.error.errors);
+        }
+      }
+    );
+  }
+
+  updateStatusReservationById(id: number, status: number): void {
     this.reservationService.updateStatusReservation(id, status).pipe(
       switchMap(response => {
         return this.reservationService.updateStatusTable(id, 1);

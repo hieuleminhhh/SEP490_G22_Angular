@@ -143,7 +143,7 @@
                   </div>
                 </div>
                 <div class="col-md-8" style="display: flex;justify-content: center;align-items: center;height: 20px;">
-                  <span class="label-reser" (click)="updateReservationById(reservation.reservationId, 2)"
+                  <span class="label-reser" (click)="updateReservationById(reservation.reservationId, 2, reservation.order.orderId)"
                     [class.disabled]="!reservation.tableOfReservation || reservation.tableOfReservation.length === 0"
                     *ngIf="reservation.tableOfReservation && reservation.tableOfReservation.length > 0">
                     Khách nhận bàn</span>
@@ -292,7 +292,7 @@
                     <td><span [ngClass]="getStatusLabel(reservation.status).class" class="status-label">{{
                         getStatusLabel(reservation.status).label }}</span></td>
                     <td><button type="button" class="btn btn-primary btn-sm" style="background-color: green;"
-                        (click)="updateReservationById(reservation.reservationId, 1)">Nhận đơn</button></td>
+                        (click)="updateStatusReservationById(reservation.reservationId, 1)">Nhận đơn</button></td>
                     <td>
                       <button type="button" class="btn btn-primary btn-sm"
                         (click)="getReservationById(reservation.reservationId)">Chi tiết</button>
