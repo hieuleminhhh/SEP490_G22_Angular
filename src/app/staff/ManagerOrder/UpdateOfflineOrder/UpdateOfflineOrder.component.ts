@@ -175,7 +175,8 @@ export class UpdateOfflineOrderComponent implements OnInit {
         const initialQuantity = currentQuantity; // Assuming currentQuantity is the initial quantity in the database
         this.newlyAddedItems[newlyAddedIndex].quantity = newQuantity - initialQuantity;
         this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * (this.newlyAddedItems[newlyAddedIndex].discountedPrice || this.newlyAddedItems[newlyAddedIndex].price);
-      } else {
+      } 
+      else {
         // Item is new, add to newlyAddedItems
         const newItem = {
           ...item,
@@ -188,7 +189,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
     } catch (error) {
       console.error('Error updating newly added items:', error);
     }
-  }
+}
   addItem(item: any) {
     console.log('Initial item:', item);
   

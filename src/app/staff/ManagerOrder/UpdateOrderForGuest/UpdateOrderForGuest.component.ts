@@ -369,51 +369,43 @@ export class UpdateOrderForGuestComponent implements OnInit {
     
     
    async removeOrUpdateNewlyAddedItem(item: any): Promise<void> {
-  try {
-    // Fetch the current quantities from the database
-    const currentQuantities = await this.orderService.getQuantityOrderDetails(this.orderId).toPromise();
-    console.log("Current Quantities:", currentQuantities);
-
-    // Find the current quantity of the specific item
-    const currentQuantityObj = currentQuantities.find(
-      (qtyObj: any) =>
-        (qtyObj.dishId === item.dishId && item.dishId !== null) ||
-        (qtyObj.comboId === item.comboId && item.comboId !== null)
-    );
-
-    const currentQuantity = currentQuantityObj ? currentQuantityObj.quantity : 0;
-    console.log("Current Quantity for Item:", currentQuantity);
-
-    const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
-    console.log("Index in newlyAddedItems:", newlyAddedIndex);
-
-    if (newlyAddedIndex !== -1) {
-      // Item already exists in newlyAddedItems, update the quantity
-      const newQuantity = item.quantity;
-      const updatedQuantity = newQuantity - currentQuantity;
-      
-      if (updatedQuantity > 0) {
-        // Update quantity and total price for existing item
-        this.newlyAddedItems[newlyAddedIndex].quantity = updatedQuantity;
-        this.newlyAddedItems[newlyAddedIndex].totalPrice = updatedQuantity * (this.newlyAddedItems[newlyAddedIndex].discountedPrice || this.newlyAddedItems[newlyAddedIndex].price);
-      } else if (updatedQuantity === 0) {
-        // Remove item if quantity is 0
-        this.newlyAddedItems.splice(newlyAddedIndex, 1);
+    try {
+      // Fetch the current quantities from the database
+      const currentQuantities = await this.orderService.getQuantityOrderDetails(this.orderId).toPromise();
+      console.log("Current Quantities:", currentQuantities);
+  
+      // Find the current quantity of the specific item
+      const currentQuantityObj = currentQuantities.find(
+        (qtyObj: any) =>
+          (qtyObj.dishId === item.dishId && item.dishId !== null) ||
+          (qtyObj.comboId === item.comboId && item.comboId !== null)
+      );
+  
+      const currentQuantity = currentQuantityObj ? currentQuantityObj.quantity : 0;
+      console.log("Current Quantity for Item:", currentQuantity);
+  
+      const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
+      console.log("Index in newlyAddedItems:", newlyAddedIndex);
+      if (newlyAddedIndex !== -1) {
+        // Item already exists in newlyAddedItems, update the quantity
+        const newQuantity = item.quantity;
+        const initialQuantity = currentQuantity; // Assuming currentQuantity is the initial quantity in the database
+        this.newlyAddedItems[newlyAddedIndex].quantity = newQuantity - initialQuantity;
+        this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * (this.newlyAddedItems[newlyAddedIndex].discountedPrice || this.newlyAddedItems[newlyAddedIndex].price);
+      } 
+      else {
+        // Item is new, add to newlyAddedItems
+        const newItem = {
+          ...item,
+          quantity: item.quantity - currentQuantity, // Only add the new quantity
+          totalPrice: (item.quantity - currentQuantity) * (item.discountedPrice || item.price)
+        };
+        this.newlyAddedItems.push(newItem);
       }
-    } else if (item.quantity > currentQuantity) {
-      // Item is new or its quantity has increased, add to newlyAddedItems
-      const newItem = {
-        ...item,
-        quantity: item.quantity - currentQuantity, // Only add the new quantity
-        totalPrice: (item.quantity - currentQuantity) * (item.discountedPrice || item.price)
-      };
-      this.newlyAddedItems.push(newItem);
+      console.log('Updated Newly Added Items:', this.newlyAddedItems);
+    } catch (error) {
+      console.error('Error updating newly added items:', error);
     }
-
-    console.log('Updated Newly Added Items:', this.newlyAddedItems);
-  } catch (error) {
-    console.error('Error updating newly added items:', error);
-  }
 }
 
     
@@ -444,6 +436,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
         this.calculateTotalAmount();
       }
     }
+  
   
     // Method to calculate total price
     getTotalPrice(item: any): number {
@@ -685,7 +678,6 @@ export class UpdateOrderForGuestComponent implements OnInit {
       response => {
         console.log('Order details updated successfully:', response);
         this.successMessage = 'Order details updated successfully!';
-        window.location.reload();
         // Clear newlyAddedItems after successful update
         this.newlyAddedItems = [];
       },

@@ -284,36 +284,13 @@ createOrder() {
   const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
   const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; // Convert paymentMethod to number
 
-  let amountReceived = totalAmount;
-  let returnAmount = 0;
-  let deposits = 0;
-  // Set amountReceived and returnAmount based on payment method
-  if (paymentMethodValue === 0) { // Cash
-    amountReceived = customerPaidAmount;
-    returnAmount = customerPaidAmount - totalAmount;
-  } 
-  else if (paymentMethodValue === 1) { // COD
-    amountReceived = 0;
-    returnAmount = 0;
-    deposits = 100;
-  }
-  else if (paymentMethodValue === 2) { // COD
-    amountReceived = 0;
-    returnAmount = 0;
-    deposits = 100;
-  }
-
   this.addNew = {
     ...this.addNew, // Spread existing properties if any
     totalAmount,
     orderDetails,
     orderDate: this.getVietnamTime(),
     recevingOrder: currentDate.toISOString(),
-    paymentTime: currentDate.toISOString(),
-    paymentAmount: totalAmount,
-    amountReceived,
-    deposits : deposits,
-    returnAmount,
+    deposits : 0,
     paymentMethods: paymentMethodValue,
     description: 'Order payment description',
     discountId: this.selectedDiscount,
