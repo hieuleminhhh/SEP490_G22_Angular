@@ -461,24 +461,28 @@ export class UpdateOrderForGuestComponent implements OnInit {
     }
     
     
-    
-  
     addItem(item: any) {
+      console.log('Initial item:', item);
+    
       // Ensure that the item has a valid quantity
-      const quantity = item.quantity || 1;
+      let quantity = item.quantity;
+      if (quantity === undefined || quantity === null || isNaN(Number(quantity)) || Number(quantity) <= 0) {
+        quantity = 1; // Default quantity to 1 if it's invalid
+      } else {
+        quantity = Number(quantity);
+      }
+    
       const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
       const totalPrice = quantity * unitPrice; // Calculate total price based on the quantity
     
       // Find if the item already exists in newlyAddedItems
       const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
-
-      
-      // Find if the item already exists in selectedItems
       const selectedIndex = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-   
-      if (newlyAddedIndex == -1) {
-        // Item already exists in newlyAddedItems, update the quantity
-       this.addOrUpdateNewlyAddedItem(item);
+    
+      if (newlyAddedIndex !== -1) {
+        // Item already exists in newlyAddedItems, update the quantity and totalPrice
+        this.newlyAddedItems[newlyAddedIndex].quantity += quantity;
+        this.newlyAddedItems[newlyAddedIndex].totalPrice += totalPrice;
       } else {
         // Item is new, add to newlyAddedItems
         console.log('Item is new, adding to newlyAddedItems');
@@ -491,10 +495,10 @@ export class UpdateOrderForGuestComponent implements OnInit {
       }
     
       if (selectedIndex !== -1) {
-        // Item already exists in selectedItems, update the quantity
+        // Item already exists in selectedItems, update the quantity and totalPrice
         console.log('Item already exists in selectedItems, updating quantity');
-        this.selectedItems[selectedIndex].quantity = quantity;
-        this.selectedItems[selectedIndex].totalPrice = totalPrice;
+        this.selectedItems[selectedIndex].quantity += quantity;
+        this.selectedItems[selectedIndex].totalPrice += totalPrice;
       } else {
         // Item is new, add to selectedItems
         console.log('Item is new, adding to selectedItems');
@@ -509,7 +513,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
     
       console.log('Newly Added Items:', this.newlyAddedItems);
       console.log('Selected Items:', this.selectedItems);
-      
+    
       this.calculateAndSetTotalAmount();
     }
     
@@ -552,7 +556,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
       const unitPrice = removedItem.discountedPrice ? removedItem.discountedPrice : removedItem.price;
       this.newlyAddedItems.push({
           ...removedItem,
-          quantity: 0,
+          quantity: 102,
           unitPrice: unitPrice,
           totalPrice: unitPrice
       });
@@ -681,6 +685,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
       response => {
         console.log('Order details updated successfully:', response);
         this.successMessage = 'Order details updated successfully!';
+        window.location.reload();
         // Clear newlyAddedItems after successful update
         this.newlyAddedItems = [];
       },
@@ -732,6 +737,4 @@ export class UpdateOrderForGuestComponent implements OnInit {
       );
     }
   }
-  
-  
 }
