@@ -18,22 +18,38 @@
   margin-right: 15px;
   margin-left: 15px;
 }
-
+.profile-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
 /* Card header styling */
 .card-body {
   padding: 1.25rem;
 }
-
+.profile-card .card-body{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 /* User profile styling */
 .user-profile {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.user-avatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .user-avatar img {
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
-  border: 2px solid #007bff;
 }
 
 .user-name {
@@ -117,4 +133,49 @@
       width: 100%;
       margin-bottom: 15px;
   }
+}
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.user-profile .button-custom {
+  background-color: #007bff; /* Màu nền */
+  color: white;             /* Màu chữ */
+  border: none;             /* Không viền */
+  padding: 10px 20px;       /* Khoảng đệm bên trong */
+  text-align: center;       /* Căn giữa văn bản */
+  text-decoration: none;    /* Không gạch chân */
+  display: inline-block;    /* Hiển thị inline-block */
+  font-size: 16px;          /* Kích thước chữ */
+  margin: 4px 2px;          /* Khoảng cách bên ngoài */
+  cursor: pointer;          /* Con trỏ chuột */
+  border-radius: 8px;       /* Bo góc */
+  transition: background-color 0.3s; /* Hiệu ứng chuyển đổi màu nền */
+}
+
+.user-profile .button-custom:hover {
+  background-color: #0056b3; /* Màu nền khi hover */
+}
+
+
+.update-icon {
+  margin-left: 10px; /* Điều chỉnh khoảng cách giữa label và icon */
+  padding: 5px;
+  border-radius: 50%;
+  cursor: pointer;
+
+}
+
+.qr-code-container {
+  margin-top: 10px; /* Điều chỉnh khoảng cách giữa icon và QR code */
+}
+
+.d-none {
+  display: none;
+}
+.update-icon.disabled {
+  pointer-events: none; /* Ngăn chặn hành vi nhấp chuột */
+  opacity: 0.5; /* Làm mờ phần tử */
 }
