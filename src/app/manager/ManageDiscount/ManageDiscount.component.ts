@@ -16,6 +16,8 @@ export class ManageDiscountComponent implements OnInit {
   data: any[] = [];
   filteredData: any[] = [];
   dish: any[] = [];
+  filteredDishes: any[] = [];
+  searchTerm: string = '';
   formSubmitted = false;
 
   selectedDishes: { id: number, name: string }[][] = [];
@@ -55,6 +57,10 @@ export class ManageDiscountComponent implements OnInit {
       quantityLimit: null,
       noLimit: false
     }));
+
+    this.conditions.forEach(condition => {
+      condition.originalQuantityLimit = condition.quantityLimit;
+    });
   }
 
   getListDiscount(): void {
@@ -100,11 +106,21 @@ export class ManageDiscountComponent implements OnInit {
     this.discountService.getListDish().subscribe(
       response => {
         this.dish = response;
+        this.filteredDishes = response;
+        console.log(this.filteredDishes);
       },
       error => {
         console.error('Error:', error);
       }
     );
+  }
+
+  filterDishes(): void {
+    const searchTermLower = (document.getElementById('search-dish') as HTMLInputElement)?.value.toLowerCase() || '';
+    this.filteredDishes = this.dish.filter(dish =>
+      dish.itemName.toLowerCase().includes(searchTermLower)
+    );
+
   }
   onPromotionTypeChange(): void {
     if (this.promotion.type === '1') {
@@ -166,6 +182,15 @@ export class ManageDiscountComponent implements OnInit {
     }
   }
 
+  removeDishDetail(conditionIndex: number, dishId: number) {
+    // Kiểm tra nếu detailDiscount và điều kiện cụ thể tồn tại
+    if (this.detailDiscount && this.detailDiscount[conditionIndex] && this.detailDiscount[conditionIndex].dishes) {
+      // Lọc bỏ món ăn có dishId khỏi mảng dishes của điều kiện tương ứng
+      this.detailDiscount[conditionIndex].dishes = this.detailDiscount[conditionIndex].dishes.filter((dish: { dishId: number; }) => dish.dishId !== dishId);
+    }
+  }
+
+
   openPopup(): void {
     const addModal = document.getElementById('addDiscountModal');
     if (addModal) {
@@ -180,12 +205,12 @@ export class ManageDiscountComponent implements OnInit {
       addModal.classList.remove('show');
       addModal.style.display = 'none';
     }
-    window.location.reload();
   }
 
   savePromotion(promotionForm: any): void {
     this.formSubmitted = true;
     if (promotionForm.valid) {
+      let allPromotionsSaved = true;
       for (let i = 0; i < this.promotion.conditions.length; i++) {
         const condition = this.promotion.conditions[i];
         try {
@@ -205,22 +230,32 @@ export class ManageDiscountComponent implements OnInit {
             quantityLimit: this.conditions[i].noLimit ? null : Number(this.conditions[i].quantityLimit) || 0 // Chuyển đổi thành số hoặc null nếu noLimit là true
           };
 
-          this.sendPromotionData(promotionData, i);
+          this.sendPromotionData(promotionData, i, () => {
+            if (i === this.promotion.conditions.length - 1) {
+              this.closePopup();
+              window.location.reload(); // Tải lại trang sau khi lưu xong tất cả các điều kiện
+            }
+          });
         } catch (error) {
           console.error('Error at index:', i, error);
+          allPromotionsSaved = false;
         }
       }
-      // this.closePopup();
+      if (!allPromotionsSaved) {
+        alert('Có lỗi xảy ra khi lưu chương trình khuyến mại. Vui lòng kiểm tra lại.');
+      }
     }
   }
 
-  sendPromotionData(promotionData: any, index: number): void {
+  sendPromotionData(promotionData: any, index: number, callback: () => void): void {
     this.discountService.createDiscount(promotionData).subscribe(
       response => {
         console.log('Promotion saved successfully for condition index:', index, response);
         const discountId = response.discountId;
         if (discountId && this.promotion.type === '2') {
-          this.updateDishDiscountId(discountId, index);
+          this.updateDishDiscountId(discountId, index, callback);
+        } else {
+          callback();
         }
       },
       error => {
@@ -229,7 +264,8 @@ export class ManageDiscountComponent implements OnInit {
       }
     );
   }
-  updateDishDiscountId(discountId: number, index: number): void {
+
+  updateDishDiscountId(discountId: number, index: number, callback: () => void): void {
     const selectedDishes = this.selectedDishes[index];
     const dishIds: number[] = selectedDishes.map(dish => dish.id); // Tạo mảng dishIds từ selectedDishes
 
@@ -238,6 +274,7 @@ export class ManageDiscountComponent implements OnInit {
     this.discountService.updateDishDiscountId(discountId, dishIds).subscribe(
       response => {
         console.log('Dishes updated successfully for discountId:', discountId);
+        callback();
       },
       error => {
         console.error('Error updating dishes for discountId:', discountId, error);
@@ -247,15 +284,23 @@ export class ManageDiscountComponent implements OnInit {
     );
   }
 
-  onDateFromChange(): void {
-    if (this.promotion.endTime < this.promotion.startTime) {
+
+  checkPromotionDates(): void {
+    if (this.promotion && this.promotion.endTime && this.promotion.startTime && this.promotion.endTime < this.promotion.startTime) {
       this.promotion.endTime = this.promotion.startTime;
-    }
-    if (this.detailDiscount[0].endTime < this.detailDiscount[0].startTime) {
-      this.detailDiscount[0].endTime = this.detailDiscount[0].startTime;
     }
   }
 
+  checkDetailDiscountDates(): void {
+    if (this.detailDiscount && this.detailDiscount[0]) {
+      const firstDiscount = this.detailDiscount[0];
+      if (firstDiscount.endTime && firstDiscount.startTime && firstDiscount.endTime < firstDiscount.startTime) {
+        firstDiscount.endTime = firstDiscount.startTime;
+      }
+    } else {
+      console.error('detailDiscount hoặc detailDiscount[0] là undefined');
+    }
+  }
   formatCurrency(event: any, index: number): void {
     let value = event.target.value;
     value = value.replace(/[^0-9]/g, '');
@@ -305,9 +350,12 @@ export class ManageDiscountComponent implements OnInit {
       detailModal.style.display = 'none';
     }
   }
-  convertDateToInputFormat(date: string): string {
-    const dateObj = new Date(date);
-    return dateObj.toISOString().split('T')[0];
+  convertDateToInputFormat(dateString: string): string {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2); // Thêm 1 vì getMonth() trả về tháng từ 0-11
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
   }
   getDetailDiscounts(id: number): void {
     this.discountService.getDetailDiscounts(id).subscribe(
@@ -336,10 +384,11 @@ export class ManageDiscountComponent implements OnInit {
       detailModal.style.display = 'block';
     }
   }
-  toggleAllDishes(event: any): void {
-    const checked = event.target.checked;
-    this.dish.forEach(dish => {
-      dish.selected = checked;
+  toggleAllDishes(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const isChecked = input.checked;
+    this.filteredDishes.forEach(dish => {
+      dish.selected = isChecked;
     });
   }
 
@@ -353,16 +402,18 @@ export class ManageDiscountComponent implements OnInit {
     this.closeDishModal();
   }
 
-
   toggleLimit(index: number, event: Event) {
     const input = event.target as HTMLInputElement;
-    this.conditions[index].noLimit = input.checked;
+    const condition = this.conditions[index];
+    condition.noLimit = input.checked;
 
-    if (this.conditions[index].noLimit) {
-      this.conditions[index].quantityLimit = null; // Xóa giá trị của số lượng giới hạn
+    if (condition.noLimit) {
+      condition.originalQuantityLimit = condition.quantityLimit;
+      condition.quantityLimit = null;
+    } else {
+      condition.quantityLimit = condition.originalQuantityLimit;
     }
-
-    console.log('Checkbox changed for index:', index, 'New noLimit value:', this.conditions[index].noLimit);
+    console.log('Checkbox changed for index:', index, 'New noLimit value:', condition.noLimit);
   }
 
   toggleEditMode() {

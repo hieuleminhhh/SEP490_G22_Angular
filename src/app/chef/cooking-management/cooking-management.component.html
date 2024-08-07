@@ -9,7 +9,7 @@
                 (click)="getOrders('1-4')">Đơn hiện tại</a>
             </li>
             <li><a [class.active]="currentView === 'booking-order'" (click)="setView('booking-order')"
-                (click)="getOrder('2-3')">Đơn đặt hàng</a>
+                (click)="getOrders('2-3')">Đơn đặt hàng</a>
             </li>
           </ul>
         </li>
@@ -55,27 +55,32 @@
                 </tr>
               </thead>
               <tbody>
-                <ng-container *ngFor="let order of order">
+                <ng-container *ngFor="let order of filteredOrders">
                   <tr>
                     <td>{{order.itemName || order.comboName}}</td>
                     <td>{{order.quantity}}</td>
                     <td>{{order.orderTime | date:'dd/MM/yyyy - HH:mm' }}</td>
-                    <td>{{order.note ? null: 'trống'}}</td>
+                    <td>{{order.note ? null: ''}}</td>
                     <td>
-                      <form [formGroup]="forms[order.orderDetailId]" (ngSubmit)="completeDish(order.orderDetailId)" class="form-inline">
+                      <form [formGroup]="forms[order.orderDetailId]"
+                        (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboName)"
+                        class="form-inline">
                         <div class="form-group">
                           <input type="number" formControlName="dishesServed" min="0" [attr.max]="order.quantity"
                             class="form-control form-control-sm input-short" />
                           <button type="submit" class="btn btn-primary btn-sm">Hoàn thành</button>
                         </div>
                       </form>
-                      <div *ngIf="forms[order.orderDetailId].controls['dishesServed'].invalid &&
+                      <div
+                        *ngIf="forms[order.orderDetailId].controls['dishesServed'].invalid &&
                                   (forms[order.orderDetailId].controls['dishesServed'].dirty || forms[order.orderDetailId].controls['dishesServed'].touched)"
-                           class="error-message">
-                        <small class="text-danger" *ngIf="forms[order.orderDetailId].controls['dishesServed'].errors?.['required']">
+                        class="error-message">
+                        <small class="text-danger"
+                          *ngIf="forms[order.orderDetailId].controls['dishesServed'].errors?.['required']">
                           Số lượng là bắt buộc.
                         </small>
-                        <small class="text-danger" *ngIf="forms[order.orderDetailId].controls['dishesServed'].errors?.['max']">
+                        <small class="text-danger"
+                          *ngIf="forms[order.orderDetailId].controls['dishesServed'].errors?.['max']">
                           Số lượng không thể lớn hơn {{order.quantity}}.
                         </small>
                       </div>
@@ -88,7 +93,7 @@
             </table>
           </div>
           <br>
-          <div *ngIf="!order || order.length === 0" style="text-align: center;">
+          <div *ngIf="!filteredOrders || filteredOrders.length < 1" style="text-align: center;">
             <p>Không có dữ liệu </p>
           </div>
           <!-- <div class="pagination" *ngIf="totalPages>0">
@@ -126,22 +131,27 @@
                     <td>{{order.itemName || order.comboDetailsForChef?.[0]?.comboName}}</td>
                     <td>{{order.quantity}}</td>
                     <td>{{order.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</td>
-                    <td>{{order.note ? null: 'trống'}}</td>
+                    <td>{{order.note ? null: ''}}</td>
                     <td>
-                      <form [formGroup]="forms[order.orderDetailId]" (ngSubmit)="completeDish(order.orderDetailId)" class="form-inline">
+                      <form [formGroup]="forms[order.orderDetailId]"
+                        (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboName)"
+                        class="form-inline">
                         <div class="form-group">
                           <input type="number" formControlName="dishesServed" min="0" [attr.max]="order.quantity"
                             class="form-control form-control-sm input-short" />
                           <button type="submit" class="btn btn-primary btn-sm">Hoàn thành</button>
                         </div>
                       </form>
-                      <div *ngIf="forms[order.orderDetailId].controls['dishesServed'].invalid &&
+                      <div
+                        *ngIf="forms[order.orderDetailId].controls['dishesServed'].invalid &&
                                   (forms[order.orderDetailId].controls['dishesServed'].dirty || forms[order.orderDetailId].controls['dishesServed'].touched)"
-                           class="error-message">
-                        <small class="text-danger" *ngIf="forms[order.orderDetailId].controls['dishesServed'].errors?.['required']">
+                        class="error-message">
+                        <small class="text-danger"
+                          *ngIf="forms[order.orderDetailId].controls['dishesServed'].errors?.['required']">
                           Số lượng là bắt buộc.
                         </small>
-                        <small class="text-danger" *ngIf="forms[order.orderDetailId].controls['dishesServed'].errors?.['max']">
+                        <small class="text-danger"
+                          *ngIf="forms[order.orderDetailId].controls['dishesServed'].errors?.['max']">
                           Số lượng không thể lớn hơn {{order.quantity}}.
                         </small>
                       </div>
@@ -154,7 +164,7 @@
             </table>
           </div>
           <br>
-          <div *ngIf="!filteredOrders || filteredOrders.length === 0" style="text-align: center;">
+          <div *ngIf="!filteredOrders || filteredOrders.length < 1" style="text-align: center;">
             <p>Không có dữ liệu </p>
           </div>
           <!-- <div class="pagination" *ngIf="totalPages>0">

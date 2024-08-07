@@ -1,0 +1,75 @@
+<div class="container">
+  <main class="main-content">
+    <div class="container">
+      <div class="card fixed-size">
+        <div class="title">
+          <button (click)="onButtonClick('dineIn')" [class.selected]="isSelected('dineIn')">Phục vụ tại chỗ</button>
+          <button (click)="onButtonClick('takeAway')" [class.selected]="isSelected('takeAway')">Phục vụ mang về</button>
+        </div>
+        <br>
+        <div class="card-body">
+          <!-- Content for dineIn -->
+          <div *ngIf="selectedButton === 'dineIn'">
+            <!-- Upper Section -->
+            <div class="upper-section">
+              <table *ngIf="filteredOrders.length > 0; else noContent">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Tên món</th>
+                    <th>Số lượng hoàn thành</th>
+                  </tr>
+                </thead>
+                <tbody class="scrollable-tbody">
+                  <ng-container *ngFor="let order of filteredOrders">
+                    <tr>
+                      <td>
+                        <input type="checkbox" (change)="onCheckboxChange(order, $event)"
+                          [checked]="order === selectedOrder">
+                      </td>
+                      <td>{{ order.itemNameOrComboName }}</td>
+                      <td>{{ order.dishesServed }}</td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+              <ng-template #noContent>
+                <div>Không có món ăn hoàn thành</div>
+              </ng-template>
+            </div>
+
+            <!-- Lower Section -->
+            <div class="lower-section" *ngIf="orderDish">
+              <hr><br>
+              <h5>Danh sách bàn cần lên món:</h5>
+              <br>
+              <div class="grid-container">
+                <div *ngFor="let dish of orderDish" class="grid-item">
+                  <div class="dish-info">
+                    <p>Bàn {{ dish.tableId }} - {{ getOrderTimeHoursMinutes(dish.orderTime) }}</p>
+                    <p>Số lượng yêu cầu: {{ dish.quantityRequired }}</p>
+                    <div class="quantity-container">
+                      <p>Phục vụ</p>
+                      <input type="number" min="0" [(ngModel)]="number" (keypress)="preventNonNumericalInput($event)"
+                        (input)="validateInput($event)">
+                    </div>
+                    <button (click)="updateDishesServed(dish.orderDetailId, dish.itemName || dish.comboName)">Lên
+                      món</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content for takeAway -->
+          <div *ngIf="selectedButton === 'takeAway'">
+            <!-- Add content specific to take-away here -->
+            <h5>Thông tin mang về:</h5>
+            <p>Đây là nội dung cho phục vụ mang về.</p>
+            <!-- Add additional content or elements as needed -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
