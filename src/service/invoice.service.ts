@@ -32,4 +32,16 @@ export class InvoiceService {
     };
     return this.http.put<any>(url, invoiceData, httpOptions);
   }
+  updateStatusAndCreateInvoice(orderId: number, updateData: any) {
+    const url = `${this.apiUrl}/orders/updateStatusAndCreateInvoice/${orderId}`;
+    return this.http.put(url, updateData);
+  }
+  getInvoiceByOrderId(orderId: number): Observable<any> {
+    const url = `${this.apiUrl}/Invoice/GetInvoiceByOrderID/${orderId}`;
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.get<any>(url, httpOptions);
+  }
+
 }
