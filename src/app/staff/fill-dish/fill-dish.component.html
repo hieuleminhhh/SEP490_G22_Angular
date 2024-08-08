@@ -44,17 +44,16 @@
               <h5>Danh sách bàn cần lên món:</h5>
               <br>
               <div class="grid-container">
-                <div *ngFor="let dish of orderDish" class="grid-item">
+                <div *ngFor="let dish of orderDish; let i = index" class="grid-item">
                   <div class="dish-info">
                     <p>Bàn {{ dish.tableId }} - {{ getOrderTimeHoursMinutes(dish.orderTime) }}</p>
                     <p>Số lượng yêu cầu: {{ dish.quantityRequired }}</p>
                     <div class="quantity-container">
                       <p>Phục vụ</p>
-                      <input type="number" min="0" [(ngModel)]="number" (keypress)="preventNonNumericalInput($event)"
-                        (input)="validateInput($event)">
+                      <input type="number" min="0" [(ngModel)]="quantitiesServed[i]"
+                        (keypress)="preventNonNumericalInput($event)" (input)="validateInput($event)">
                     </div>
-                    <button (click)="updateDishesServed(dish.orderDetailId, dish.itemName || dish.comboName)">Lên
-                      món</button>
+                    <button (click)="updateDishesServed(dish.orderDetailId, dish.itemName || dish.comboName)">Lên món</button>
                   </div>
                 </div>
               </div>
@@ -65,8 +64,20 @@
           <div *ngIf="selectedButton === 'takeAway'">
             <!-- Add content specific to take-away here -->
             <h5>Thông tin mang về:</h5>
-            <p>Đây là nội dung cho phục vụ mang về.</p>
-            <!-- Add additional content or elements as needed -->
+            <div class="lower-section" >
+              <br>
+              <br>
+              <div class="grid-container">
+                <div >
+                  <div class="dish-info">
+                    <p>Đơn 63 - mang về  </p>
+                    <p>Tình trạng: </p>
+
+                    <button >Lên đơn</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

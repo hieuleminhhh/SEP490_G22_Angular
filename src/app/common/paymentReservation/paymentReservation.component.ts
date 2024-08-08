@@ -100,8 +100,9 @@ export class PaymentReservationComponent implements OnInit {
         this.reservationService.clearCart();
         sessionStorage.setItem('data', JSON.stringify(this.data));
         sessionStorage.setItem('cartItem', JSON.stringify(this.cartItem));
-        // window.location.reload();
-        this.checkVnPay(request);
+
+        const requestForVnPay = { ...request, totalAmount: this.getTotalCartPrice() / 2};
+        this.checkVnPay(requestForVnPay);
       },
       error: error => {
         if (error.error instanceof ErrorEvent) {

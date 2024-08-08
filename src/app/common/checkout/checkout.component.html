@@ -158,7 +158,7 @@
               [(ngModel)]="note"></textarea>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" *ngIf="selectedService === 'service1'">
             <span style="margin-right: 10px;">Khuyến mãi</span>
             <i class="fas fa-tags me-2" (click)="openDiscountModal()"></i>
             <div>
@@ -167,7 +167,7 @@
                 percentage }}
               </span>
               <span *ngIf="!selectedDiscountDetails" class="selected-discount" (click)="openDiscountModal()">
-                Chọn khuyến mãi ->
+                Chọn khuyến mãi
               </span>
             </div>
           </div>

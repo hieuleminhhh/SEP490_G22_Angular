@@ -103,7 +103,7 @@ export class CookingManagementComponent implements OnInit {
     if (type === 1 || type === 2) {
       this.updateDishesServed(orderDetailId, dishesServed);
     } else {
-      this.updateLocal(dishesServed, itemNameOrComboName);
+      this.updateLocal(orderDetailId, dishesServed, itemNameOrComboName);
     }
     this.updateOrderQuantity(orderDetailId, dishesServed);
     this.filterOrders();
@@ -111,9 +111,9 @@ export class CookingManagementComponent implements OnInit {
   }
 
 
-  private updateLocal(dishesServed: number,itemNameOrComboName:string): void {
+  private updateLocal(orderDetailId:number,dishesServed: number,itemNameOrComboName:string): void {
     let completedDishes = JSON.parse(localStorage.getItem('completedDishes') || '[]');
-    completedDishes.push({dishesServed, itemNameOrComboName });
+    completedDishes.push({orderDetailId,dishesServed, itemNameOrComboName });
     localStorage.setItem('completedDishes', JSON.stringify(completedDishes));
 
     console.log('Completed Dishes:', localStorage.getItem('completedDishes'));
