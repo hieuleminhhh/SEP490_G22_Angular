@@ -54,7 +54,7 @@ export class CreateOfflineOrderComponent implements OnInit {
   selectedAddress = '';
   discount: any = {};
   newAddress: AddNewAddress = {
-    guestAddress: 'Ăn tại quán',
+    guestAddress: '',
     consigneeName: '',
     guestPhone: '',
     email:'antaiquan@gmail.com',

@@ -66,6 +66,7 @@ export class ManagerOrderComponent implements OnInit {
   paymentAmount: number = 0;
   tables: Table[] = [];
   tableId: number | null = null;
+  dishesServed: number = 0;
 
   constructor(
     private orderService: ManagerOrderService, 
@@ -128,12 +129,26 @@ export class ManagerOrderComponent implements OnInit {
   loadListOrderDetails(orderId: number) {
     console.log('Loading details for Order ID:', orderId);
     this.orderDetailService.getOrderDetail(orderId).subscribe(
-      (orderDetail) => {
+      (orderDetail: ListOrderDetailByOrder) => {
         this.orderDetail = orderDetail;
         this.tables = orderDetail.tables; // Assigning tables to a separate variable
+        
         if (this.tables.length > 0) {
           this.tableId = this.tables[0].tableId; // Extracting tableId from the first table
         }
+
+        // Iterate through orderDetails to access dishesServed
+        let totalDishesServed = 0;
+        orderDetail.orderDetails.forEach((detail) => {
+          console.log('Dishes Served:', detail.dishesServed);
+          totalDishesServed += parseInt(detail.dishesServed, 10);
+        });
+
+        console.log('Total Dishes Served:', totalDishesServed);
+
+        // If needed, you can store totalDishesServed in a variable or use it directly for further logic
+        this.dishesServed = totalDishesServed; // Assuming this.dishesServed is defined
+
         console.log('Fetched order detail:', this.orderDetail);
         console.log('Tables:', this.tables);
         console.log('Table ID:', this.tableId); // Logging the tableId
@@ -143,6 +158,7 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
+
   
   updateOrder(orderId: number) {
     this.router.navigate(['/updateOrder', orderId]);
@@ -170,12 +186,7 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
-  areAllDishesServedEqualToQuantity(): boolean {
-    if (!this.orderDetail || !this.orderDetail.orderDetails) {
-      return false;
-    }
-    return this.orderDetail.orderDetails.every(item => Number(item.dishesServed) > 0);
-  }
+  
   
   
   onStatusChange(event: Event, orderId: number): void {
@@ -259,7 +270,7 @@ export class ManagerOrderComponent implements OnInit {
       console.log('Return Amount:', returnAmount);
   
       const updateData = {
-        status: 4,
+        status: 6,
         paymentTime: new Date().toISOString(),
         paymentAmount: this.DiscountedTotalAmount(),
         taxcode: "HIEU",

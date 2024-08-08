@@ -85,10 +85,10 @@
                     <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">
                       Chi tiết
                     </button>
-                    <!-- Hiển thị nút cập nhật chỉ khi order.status khác 4 -->
-                    <button *ngIf="order.status !== 4"  type="button" class="btn btn-warning btn-sm" (click)="updateOrder(order.orderId)">
+                    <button *ngIf="order.paymentStatus === 0 && order.status !== 5" type="button" class="btn btn-warning btn-sm" (click)="updateOrder(order.orderId)">
                       Cập nhật
-                    </button>
+                    </button>                    
+                    
                   </td>
                 </tr>
               </ng-container>
@@ -155,13 +155,13 @@
           <div class="mb-3">
             <span class="fw-bold">Tên khách hàng:</span> {{ orderDetail.consigneeName || 'Khách lẻ' }}
           </div>
-          <div class="mb-3">
+          <div class="mb-3"  *ngIf="orderDetail.consigneeName">
             <span class="fw-bold">Số điện thoại:</span> {{ orderDetail.guestPhone || '------------------'}}
           </div>
           <div class="mb-3">
             <span class="fw-bold">Thời gian đặt hàng:</span> {{ orderDetail.orderDate | dateFormat }}
           </div>
-          <div class="mb-3">
+          <div class="mb-3" *ngIf="orderDetail.recevingOrder">
             <span class="fw-bold">Thời gian giao hàng:</span> {{ orderDetail.recevingOrder | dateFormat }}
           </div>
           <!-- <div class="mb-3">
@@ -208,6 +208,7 @@
           </table>
           <div class="summary-section mt-4">
             <div class="row">
+              <!-- First Column -->
               <div class="col-md-6">
                 <div class="d-flex justify-content-between">
                   <span class="fw-bold">Tạm tính:</span>
@@ -215,7 +216,7 @@
                 </div>
                 <div *ngIf="orderDetail.discountId > 0" class="d-flex justify-content-between">
                   <span class="fw-bold">Giảm giá:</span>
-                  <span>{{ orderDetail.discountName }} ({{ orderDetail.discountPercent| percentage }})</span>
+                  <span>{{ orderDetail.discountName }} ({{ orderDetail.discountPercent | percentage }})</span>
                 </div>
                 <hr>
                 <div class="d-flex justify-content-between">
@@ -223,11 +224,16 @@
                   <span>{{ DiscountedTotalAmount() | currencyFormat }}</span>
                 </div>
               </div>
+            
+              <!-- Second Column -->
+              <div class="col-md-6 d-flex align-items-start justify-content-end">
+                <div *ngIf="orderDetail.paymentStatus === 1" class="badge bg-success ms-auto badge-circle">Đã thanh toán</div>
+                <div *ngIf="orderDetail.paymentStatus === 0" class="badge bg-danger ms-auto badge-circle">Chưa thanh toán</div>
+              </div>
             </div>
+            
           </div>
-          <br>
-          <div class="badge bg-success ms-auto badge-circle">Đã thanh toán</div>
-
+          
         </div>
         <ng-template #loadingOrError>
           <div *ngIf="!orderDetail">
@@ -247,26 +253,29 @@
           </ng-container>
           <!-- Online staff -->
           <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 2">
-            <button type="button" class="btn btn-success me-2" data-bs-target="#paymentModalPrepay"  data-bs-toggle="modal"
+            <button type="button" class="btn btn-success me-2" data-bs-target="#paymentModalOnline"  data-bs-toggle="modal"
             *ngIf="!orderDetail?.invoiceId" 
-            >Thanh toán</button>
+            (click)="CreateInvoiceOnline(orderDetail?.orderId)">Thanh toán</button>
             <button type="button" class="btn btn-danger me-2" (click)="UpdateStatus(orderDetail?.orderId, 5)">Hủy đơn</button>
           </ng-container>
           <!-- Mang ve -->
           <ng-container *ngIf="orderDetail?.type === 1 && orderDetail?.status === 2">
             <button type="button" class="btn btn-success me-2"
                     *ngIf="!orderDetail?.invoiceId"
-                    data-bs-toggle="modal" data-bs-target="#paymentModalPrepay">
+                    data-bs-toggle="modal" data-bs-target="#paymentModalTakeAway">
               Thanh toán
             </button>
             <button type="button" class="btn btn-danger me-2">Hủy đơn</button>
           </ng-container>
 
            <!-- Tai quan -->
+           <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && dishesServed > 0">
+            <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#paymentModalOffline">Thanh toán</button>
+          </ng-container>
           <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3">
-            <button *ngIf="areAllDishesServedEqualToQuantity()" type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#paymentModal">Thanh toán</button>
             <button type="button" class="btn btn-danger me-2">Hủy đơn</button>
           </ng-container>
+          
         </div>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
       </div>
@@ -297,12 +306,12 @@
       </main>
     </div>
   </div>
-<!-- Thanh toan online -->
-  <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+<!-- Thanh toan mang ve -->
+  <div class="modal fade" id="paymentModalTakeAway" tabindex="-1" aria-labelledby="paymentModalLabelTakeAway" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="paymentModalLabel">Thông tin đơn hàng</h5>
+          <h5 class="modal-title" id="paymentModalTakeAwayLabel">Thông tin đơn hàng</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -343,12 +352,12 @@
       </div>
     </div>
   </div>
-  <!-- Modal for 'Thanh toán takeway' -->
-<div class="modal fade" id="paymentModalPrepay" tabindex="-1" aria-labelledby="paymentModalPrepayLabel" aria-hidden="true" data-bs-backdrop="static">
+  <!-- Modal for 'Thanh toán online' -->
+<div class="modal fade" id="paymentModalOnline" tabindex="-1" aria-labelledby="paymentModalOnlineLabel" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="paymentModalPrepayLabel">Thông tin đơn hàng</h5>
+        <h5 class="modal-title" id="paymentModalOnlineLabel">Thông tin đơn hàng</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -393,6 +402,55 @@
   </div>
 </div>
 
+<!-- Modal for 'Thanh toán offline' -->
+<div class="modal fade" id="paymentModalOffline" tabindex="-1" aria-labelledby="paymentModalOfflineLabel" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="paymentModalOfflineLabel">Thông tin đơn hàng</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Thông tin hóa đơn -->
+        <div class="mb-3">
+          <label for="price" class="form-label">Tổng tiền phải trả:</label>
+          {{ DiscountedTotalAmount() | currencyFormat }}
+        </div>
+
+        <!-- Template for online -->
+        <div class="mb-3">
+          <label class="form-label">Hình thức thanh toán:</label>
+          <div>
+            <input type="radio" id="cashPrepay" name="paymentMethod1" value="0" [(ngModel)]="paymentMethod">
+            <label for="cashPrepay">Tiền mặt</label>
+          </div>
+          <div>
+            <input type="radio" id="bankPrepay" name="paymentMethod2" value="1" [(ngModel)]="paymentMethod">
+            <label for="bankPrepay">Chuyển khoản ngân hàng</label>
+          </div>
+          <div>
+            <input type="radio" id="cashOnDelivery" name="paymentMethod3" value="2" [(ngModel)]="paymentMethod">
+            <label for="cashOnDelivery">Thanh toán khi nhận hàng</label>
+          </div>
+        </div>
+
+        <div class="mb-3" *ngIf="paymentMethod === '0'">
+          <label for="customerPaidPrepay" class="form-label">Tiền khách trả:</label>
+          <input type="number" id="customerPaidPrepay" class="form-control" [(ngModel)]="customerPaid">
+        </div>
+
+        <div class="mb-3" *ngIf="paymentMethod === '1'">
+          <label for="qrCodePrepay" class="form-label"></label>
+          <img id="qrCodePrepay" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" class="img-fluid">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal" (click)="CreateInvoiceOnline(orderDetail?.orderId)">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+</div>
 
   <!-- Template for cffff -->
   <div class="modal fade" id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
@@ -427,6 +485,10 @@
             <div class="mb-3">
               <label for="phoneNumber" class="form-label">Số điện thoại: </label>
               <input id="phoneNumber" class="form-control" [(ngModel)]="invoice.guestPhone" placeholder="N/A" />
+            </div>
+            <div class="mb-3">
+              <label for="address" class="form-label">Địa chỉ: </label>
+              <input id="address" class="form-control" [(ngModel)]="invoice.guestAddress" placeholder="N/A" />
             </div>
           </ng-template>
           <div class="mb-3">
