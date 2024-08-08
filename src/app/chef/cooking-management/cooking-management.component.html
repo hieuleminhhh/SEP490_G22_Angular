@@ -55,7 +55,7 @@
                 </tr>
               </thead>
               <tbody>
-                <ng-container *ngFor="let order of filteredOrders">
+                <ng-container *ngFor="let order of order">
                   <tr>
                     <td>{{order.itemName || order.comboName}}</td>
                     <td>{{order.quantity}}</td>
@@ -63,7 +63,7 @@
                     <td>{{order.note ? null: ''}}</td>
                     <td>
                       <form [formGroup]="forms[order.orderDetailId]"
-                        (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboName)"
+                      (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboName, order.type)"
                         class="form-inline">
                         <div class="form-group">
                           <input type="number" formControlName="dishesServed" min="0" [attr.max]="order.quantity"
@@ -134,7 +134,7 @@
                     <td>{{order.note ? null: ''}}</td>
                     <td>
                       <form [formGroup]="forms[order.orderDetailId]"
-                        (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboName)"
+                      (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboName, order.type)"
                         class="form-inline">
                         <div class="form-group">
                           <input type="number" formControlName="dishesServed" min="0" [attr.max]="order.quantity"
