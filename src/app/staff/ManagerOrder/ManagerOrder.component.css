@@ -90,6 +90,18 @@
   flex: 0 1 auto;
   margin-left: 5px; /* Adjust this value as needed */
 }
+.badge-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 150px; /* Kích thước vòng tròn */
+    height: 80px; /* Kích thước vòng tròn */
+    border-radius: 50%;
+    font-size: 18px; /* Kích thước chữ */
+    background-color: #28a745; /* Màu nền */
+    color: white; /* Màu chữ */
+    padding: 0;
+}
 
   
   

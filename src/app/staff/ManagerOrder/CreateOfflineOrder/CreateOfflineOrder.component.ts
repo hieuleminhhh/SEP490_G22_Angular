@@ -463,14 +463,14 @@ export class CreateOfflineOrderComponent implements OnInit {
       }));
     
       const guestPhone = this.addNew.guestPhone ? this.addNew.guestPhone : '';
-    
+      const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
       const newOrder = {
         tableId: tableId,
         guestAddress: this.addNew.guestAddress,
         consigneeName: this.addNew.consigneeName,
         orderDate: new Date().toISOString(),
         receivingOrder: new Date().toISOString(),
-        totalAmount: this.calculateTotalAmount(),
+        totalAmount,
         guestPhone: guestPhone,
         note: "This is a special request note.",
         discountId: this.selectedDiscount,
