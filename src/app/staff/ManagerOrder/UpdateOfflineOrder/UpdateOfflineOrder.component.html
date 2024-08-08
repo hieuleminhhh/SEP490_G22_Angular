@@ -91,6 +91,12 @@
                     </tr>
                   </tbody>
                 </table>
+                <div *ngIf="selectedItems.length > 0" class="mt-2">
+                  <strong>Tạm tính:</strong>
+                  {{ totalAmount | currencyFormat }}
+                  <br>
+                </div>
+
                 
                 <button class="btn btn-primary btn-sm" *ngIf="selectedItems.length > 0" data-bs-toggle="modal" data-bs-target="#discountModal">
                   <i class="fas fa-tags me-2"></i> <!-- Biểu tượng Font Awesome -->

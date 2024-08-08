@@ -89,7 +89,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
     this.LoadActiveDiscounts();
     this.calculateAndSetTotalAmount();
     this.selectedDiscount = null;
-    this.LoadActiveDiscountByOrderID(this.orderId);
+    
   }
   increaseQuantity(index: number): void {
     const item = this.selectedItems[index];
@@ -347,44 +347,46 @@ export class UpdateOfflineOrderComponent implements OnInit {
     console.log('Updated newlyAddedItems:', this.newlyAddedItems);
 }
 
-updateOrderOffline(tableId: number) {
-    // Chỉ lấy các mục mới thêm vào để cập nhật vào DB
-    const orderDetails = this.newlyAddedItems.map(item => ({
-        dishId: item.dishId || null,
-        comboId: item.comboId || null,
-        quantity: item.quantity,
-        note: item.note || '', // Assuming you have a note property or set it to an empty string
-        orderTime: new Date().toISOString() // Assuming you want the current time
-    }));
+updateOrderOffline(tableId: number): void {
+  // Extract newly added items to update in the DB
+  const orderDetails = this.newlyAddedItems.map(item => ({
+      dishId: item.dishId || null,
+      comboId: item.comboId || null,
+      quantity: item.quantity,
+      note: item.note || '', // Assuming you have a note property or set it to an empty string
+      orderTime: new Date().toISOString() // Assuming you want the current time
+  }));
 
-    // In ra dữ liệu trước khi gửi
-    console.log('Updating offline order with details:', orderDetails);
+  // Log the data before sending
+  console.log('Updating offline order with newly added items:', orderDetails);
 
-    // Construct the order object
-    const updatedOrder = {
-        tableId: tableId,
-        orderDetails: orderDetails
-    };
+  // Construct the order object
+  const updatedOrder = {
+      tableId: tableId,
+      discountId: this.selectedDiscount || 0,
+      orderDetails: orderDetails
+  };
 
-    // Call the service method to update the order
-    this.orderService.updateOrderOffline(updatedOrder).subscribe(
-        response => {
-            console.log('Offline order updated successfully:', response);
-            this.successMessage = 'Offline order updated successfully!';
-            this.closeModal();
-            setTimeout(() => this.successMessage = '', 5000);
-            window.location.reload();
-            // Clear newlyAddedItems after successful update
-            this.newlyAddedItems = [];
-        },
-        error => {
-            console.error('Error updating offline order:', error);
-            if (error.error && error.error.errors) {
-                console.error('Validation errors:', error.error.errors);
-            }
-        }
-    );
+  // Call the service method to update the order
+  this.orderService.updateOrderOffline(tableId, updatedOrder).subscribe(
+      response => {
+          console.log('Offline order updated successfully:', response);
+          this.successMessage = 'Offline order updated successfully!';
+          this.closeModal();
+          setTimeout(() => this.successMessage = '', 5000);
+          window.location.reload();
+          // Clear newlyAddedItems after successful update
+          this.newlyAddedItems = [];
+      },
+      (error: HttpErrorResponse) => {
+          console.error('Error updating offline order:', error);
+          if (error.error && error.error.errors) {
+              console.error('Validation errors:', error.error.errors);
+          }
+      }
+  );
 }
+
 
   loadListOrderByTable(tableId: number): void {
     console.log('Loading orders for table ID:', tableId);
@@ -425,6 +427,8 @@ updateOrderOffline(tableId: number) {
             guestAddress: response.data.guestAddress
           };
           this.orderId = response.data.orderId;
+          this.LoadActiveDiscountByOrderID(this.orderId);
+          console.log(428,this.orderId);
           this.calculateAndSetTotalAmount();
           console.log('Fetched order details:', this.selectedItems);
         } else {
