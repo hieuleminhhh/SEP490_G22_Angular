@@ -15,8 +15,8 @@ export class FillDishComponent implements OnInit {
   filteredOrders: any[] = [];
   selectedOrder: any = null;
   orderDish: any;
-  number: any;
   selectedButton: 'dineIn' | 'takeAway' = 'dineIn';
+  quantitiesServed: number[] = [];
 
   constructor(private cookingService: CookingService) { }
 
@@ -67,11 +67,15 @@ export class FillDishComponent implements OnInit {
     this.cookingService.getOrdersDish(key).subscribe(
       response => {
         this.orderDish = response;
-        this.orderDish.forEach((dish: { quantityRequired: number; number: number; }) => {
+        console.log(this.orderDish);
+
+        this.quantitiesServed = []; // Khởi tạo mảng quantitiesServed mới mỗi khi gọi hàm
+
+        this.orderDish.forEach((dish: { quantityRequired: number; }, index: number) => {
           if (dish.quantityRequired >= dishesServed) {
-            this.number = dishesServed;
+            this.quantitiesServed[index] = dishesServed;
           } else {
-            this.number = dish.quantityRequired;
+            this.quantitiesServed[index] = dish.quantityRequired;
           }
         });
       },
@@ -80,6 +84,7 @@ export class FillDishComponent implements OnInit {
       }
     );
   }
+
 
   getOrderTimeHoursMinutes(orderTime: string): string {
     const date = new Date(orderTime);
@@ -99,26 +104,34 @@ export class FillDishComponent implements OnInit {
     inputElement.value = sanitizedValue;
   }
   updateDishesServed(orderDetailId: number, itemNameOrComboName: string) {
-    const request = {
-      orderDetailId: orderDetailId,
-      dishesServed: this.number
-    };
-    this.cookingService.updateDishesServed(request).subscribe(
-      response => {
-        console.log(response);
-        console.log(itemNameOrComboName);
-        this.deleteLocalStorageItemsByName(itemNameOrComboName);
-        const a = this.getDishesServedByName(itemNameOrComboName) - this.number;
-        if (a > 0) {
-          this.updateLocal(a, itemNameOrComboName);
-        }
+    const index = this.orderDish.findIndex((dish: { orderDetailId: number; }) => dish.orderDetailId === orderDetailId);
 
-        window.location.reload();
-      },
-      error => {
-        console.error('Error:', error);
-      }
-    );
+    if (index !== -1) {
+      const quantityServedForDish = this.quantitiesServed[index]; // Lấy số lượng phục vụ cho món ăn cụ thể
+
+      const request = {
+        orderDetailId: orderDetailId,
+        dishesServed: quantityServedForDish
+      };
+      this.cookingService.updateDishesServed(request).subscribe(
+        response => {
+          console.log(response);
+          console.log(itemNameOrComboName);
+          this.deleteLocalStorageItemsByName(itemNameOrComboName);
+          const a = this.getDishesServedByName(itemNameOrComboName) - quantityServedForDish;
+          if (a > 0) {
+            this.updateLocal(orderDetailId, a, itemNameOrComboName);
+          }
+
+          window.location.reload();
+        },
+        error => {
+          console.error('Error:', error);
+        }
+      );
+    } else {
+      console.error('Error: Order detail ID not found.');
+    }
   }
 
   getDishesServedByName(itemNameOrComboName: string): number {
@@ -155,9 +168,9 @@ export class FillDishComponent implements OnInit {
     console.log('Remaining items in localStorage:', Object.keys(localStorage).map(key => ({ key, value: localStorage.getItem(key) })));
   }
 
-  private updateLocal(dishesServed: number, itemNameOrComboName: string): void {
+  private updateLocal(orderDetailId: number, dishesServed: number, itemNameOrComboName: string): void {
     let completedDishes = JSON.parse(localStorage.getItem('completedDishes') || '[]');
-    completedDishes.push({ dishesServed, itemNameOrComboName });
+    completedDishes.push({ orderDetailId, dishesServed, itemNameOrComboName });
     localStorage.setItem('completedDishes', JSON.stringify(completedDishes));
 
     console.log('Completed Dishes:', localStorage.getItem('completedDishes'));

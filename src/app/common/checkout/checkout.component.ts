@@ -209,7 +209,7 @@ export class CheckoutComponent implements OnInit {
         console.log('Order submitted successfully', response);
         this.cartService.clearCart();
         sessionStorage.removeItem('cartItems');
-        if (this.selectedPaymentMethod === 'banking') {
+        if (this.selectedPaymentMethod === 'banking' || this.selectedService==='service2') {
           this.checkVnPay(this.guestPhone);
         } else {
           this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone } });
