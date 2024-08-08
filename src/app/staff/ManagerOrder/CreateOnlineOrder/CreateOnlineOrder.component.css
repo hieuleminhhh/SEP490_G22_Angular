@@ -133,7 +133,10 @@
     right: 0;
     z-index: 1000; /* Ensure dropdown appears above other elements */
   }
-  
+  .modal-body {
+    max-height: 400px; /* Hoặc bất kỳ chiều cao tối đa nào bạn muốn */
+    overflow-y: auto;
+  }
   .input-group .btn-outline-secondary {
     margin-left: 10px; /* Adjust margin to move the button away from the input */
   }

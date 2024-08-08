@@ -27,6 +27,7 @@ export interface ManagerOrder {
   addressId: number;
   guestAddress: string;
   consigneeName: string;
+  paymentStatus: number;
 }
 export interface ListAllOrder {
   items: ManagerOrder[];
@@ -119,7 +120,7 @@ export interface SelectedItem {
 }
 export interface AddNewOrderResponse {
   message: string;
-  invoiceId: number;
+  orderId: number;
 }
 
 

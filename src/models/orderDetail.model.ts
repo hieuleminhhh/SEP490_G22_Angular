@@ -47,6 +47,9 @@ export interface ListOrderDetailByOrder{
   amountReceived:number;
   returnAmount:number;
   paymentMethods:number;
+  paymentStatus:number;
+  paymentTime:Date;
+  taxcode:string;
   orderDetails:ListOrderDetail[];
   tables: Table[]; 
 }

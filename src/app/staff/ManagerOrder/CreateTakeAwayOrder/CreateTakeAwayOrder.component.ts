@@ -86,7 +86,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     paymentMethods: 0,
     description: ''
   };
-  
+  lastOrderId: number | undefined;
   newAddress: AddNewAddress = {
     guestAddress: 'Ăn tại quán',
     consigneeName: '',
@@ -260,9 +260,11 @@ extractConsigneeName(addressString: string): string {
   return addressString.split(' - ')[0];
 }
 
-extractGuestPhone(addressString: string): string {
-  return addressString.split(' - ')[1];
+extractGuestPhone(addressString: string): string | null {
+  const phone = addressString.split(' - ')[1];
+  return phone && phone.trim() ? phone : null; // Return null if the phone is empty
 }
+
 
 openNoteDialog(item: any): void {
   const dialogRef = this.dialog.open(NoteDialogComponent, {
@@ -282,79 +284,6 @@ openNoteDialog(item: any): void {
 }
 
 
-createOrder() {
-  // Ensure selectedItems is defined
-  if (!this.selectedItems || this.selectedItems.length === 0) {
-    console.error('No items selected for the order.');
-    return;
-  }
-
-  // Map selected items to order details
-  const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
-    itemId: item.id,
-    quantity: item.quantity,
-    price: item.price,
-    unitPrice: item.totalPrice,
-    dishId: item.dishId,
-    comboId: item.comboId,
-    orderTime: new Date(),
-    note: item.note
-  }));
-
-  // Calculate total amount and set various properties
-  const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
-  const currentDate = new Date();
-  const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
-  const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; // Convert paymentMethod to number
-
-  this.addNew = {
-    ...this.addNew, // Spread existing properties if any
-    totalAmount,
-    orderDetails,
-    orderDate: this.getVietnamTime(),
-    recevingOrder: currentDate.toISOString(),
-    paymentTime: currentDate.toISOString(),
-    amountReceived: paymentMethodValue === 0 ? customerPaidAmount : totalAmount,
-    returnAmount: paymentMethodValue === 0 ? customerPaidAmount - totalAmount : 0,
-    paymentMethods: paymentMethodValue,
-    description: 'Order payment description',
-    discountId: this.selectedDiscount,
-    taxcode: '',
-    paymentStatus: 1,
-  };
-
-  // Handle address selection
-  if (this.selectedAddress !== 'Khách lẻ') {
-    const parts = this.selectedAddress.split(' - ');
-    if (parts.length >= 2) {
-      this.addNew.consigneeName = parts[0];
-      this.addNew.guestPhone = parts[1];
-    } else {
-      console.error('Selected address format is incorrect.');
-    }
-    this.addNew.email = 'antaiquan@gmail.com';
-    this.addNew.guestAddress = 'Ăn tại quán';
-  }
-
-  // Log order details for debugging
-  console.log('Order Details:', orderDetails);
-
-  // Call the service to add the new order
-  this.orderService.AddNewOrder(this.addNew).subscribe(
-    response => {
-      console.log('Order created successfully:', response);
-      this.successMessage = 'Đơn hàng đã được tạo thành công!';
-      this.closeModal();
-      setTimeout(() => this.successMessage = '', 5000);
-    },
-    error => {
-      console.error('Error creating order:', error);
-      if (error && error.error && error.error.message) {
-        console.error('Inner exception:', error.error.message);
-      }
-    }
-  );
-}
 
 printInvoice(): void {
   console.log('Invoice data before update:', this.invoice);
@@ -668,5 +597,141 @@ saveAddress() {
     } else {
       this.totalAmountAfterDiscount = this.totalAmount; // Khi không có discount
     }
+  }
+  createOrder() {
+  // Ensure selectedItems is defined
+  if (!this.selectedItems || this.selectedItems.length === 0) {
+    console.error('No items selected for the order.');
+    return;
+  }
+
+  // Map selected items to order details
+  const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
+    itemId: item.id,
+    quantity: item.quantity,
+    price: item.price,
+    unitPrice: item.totalPrice,
+    dishId: item.dishId,
+    comboId: item.comboId,
+    orderTime: new Date(),
+    note: item.note
+  }));
+
+  // Calculate total amount and set various properties
+  const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
+  const currentDate = new Date();
+  const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
+  const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; // Convert paymentMethod to number
+
+  this.addNew = {
+    ...this.addNew, // Spread existing properties if any
+    totalAmount,
+    orderDetails,
+    orderDate: this.getVietnamTime(),
+    recevingOrder: currentDate.toISOString(),
+    paymentTime: currentDate.toISOString(),
+    amountReceived: paymentMethodValue === 0 ? customerPaidAmount : totalAmount,
+    returnAmount: paymentMethodValue === 0 ? customerPaidAmount - totalAmount : 0,
+    paymentMethods: paymentMethodValue,
+    description: 'Order payment description',
+    discountId: this.selectedDiscount,
+    taxcode: '',
+    paymentStatus: 1,
+  };
+
+  // Handle address selection
+  if (this.selectedAddress !== 'Khách lẻ') {
+    const parts = this.selectedAddress.split(' - ');
+    if (parts.length >= 2) {
+      this.addNew.consigneeName = parts[0];
+      this.addNew.guestPhone = parts[1];
+    } else {
+      console.error('Selected address format is incorrect.');
+    }
+    this.addNew.email = 'antaiquan@gmail.com';
+    this.addNew.guestAddress = 'Ăn tại quán';
+  }
+
+  // Log order details for debugging
+  console.log('Order Details:', orderDetails);
+
+  // Call the service to add the new order
+  this.orderService.AddNewOrder(this.addNew).subscribe(
+    response => {
+      console.log('Order created successfully:', response);
+      this.successMessage = 'Đơn hàng đã được tạo thành công!';
+      this.lastOrderId = response.orderId; // Assuming the response contains the orderId
+      console.log(this.lastOrderId);
+
+      this.closeModal();
+      setTimeout(() => this.successMessage = '', 5000);
+
+      // Call CreateInvoiceTakeAway with the new orderId
+      this.CreateInvoiceTakeAway();
+    },
+    error => {
+      console.error('Error creating order:', error);
+      if (error && error.error && error.error.message) {
+        console.error('Inner exception:', error.error.message);
+      }
+    }
+  );
+}
+  
+CreateInvoiceTakeAway(): void {
+  if (this.lastOrderId != null && this.lastOrderId !== undefined) {
+    const paymentMethod = parseInt(this.paymentMethod, 10);
+    const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
+    
+    console.log('Order ID:', this.lastOrderId);
+    console.log('Payment Method:', paymentMethod);
+    console.log('Customer Paid:', this.customerPaid);
+    console.log('Discounted Total Amount:', totalAmount);
+
+    const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : totalAmount;
+    const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - totalAmount : 0;
+
+    console.log('Amount Received:', amountReceived);
+    console.log('Return Amount:', returnAmount);
+
+    const updateData = {
+      status: 6,
+      paymentTime: new Date().toISOString(),
+      paymentAmount: totalAmount,
+      taxcode: "HIEU",
+      accountId: 0,
+      amountReceived: amountReceived,
+      returnAmount: returnAmount,
+      paymentMethods: paymentMethod,
+      description: "strizzzg"
+    };
+
+    console.log('Update Data:', updateData);
+
+    this.invoiceService.updateStatusAndCreateInvoice(this.lastOrderId, updateData).subscribe(
+      (response) => {
+        console.log('Order status updated and invoice created:', response);
+        this.loadInvoice(this.lastOrderId!);
+      },
+      (error) => {
+        console.error('Error updating order status and creating invoice:', error);
+      }
+    );
+  } else {
+    console.warn('Order ID is not valid or is undefined. LastOrderId:', this.lastOrderId);
+  }
+}
+
+
+  
+  loadInvoice(orderId: number): void {
+    this.invoiceService.getInvoiceByOrderId(orderId).subscribe(
+      data => {
+        this.invoice = data;
+      },
+      error => {
+        console.error('Error fetching invoice:', error);
+      }
+    );
   }
 }
