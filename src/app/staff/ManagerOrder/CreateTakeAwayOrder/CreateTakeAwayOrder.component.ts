@@ -101,7 +101,8 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.selectCategory('Món chính');
     this.LoadActiveDiscounts();
     this.calculateAndSetTotalAmount();
-    console.log('ABBABABABA'+this.selectedDiscount);
+    this.selectedDiscount = null;
+
   }
   selectCategory(category: string) {
     this.searchCategory = category;
@@ -255,6 +256,14 @@ addItem(item: any) {
     this.showDropdown = false;
     console.log('Selected Address:', this.addNew);
 }
+extractConsigneeName(addressString: string): string {
+  return addressString.split(' - ')[0];
+}
+
+extractGuestPhone(addressString: string): string {
+  return addressString.split(' - ')[1];
+}
+
 openNoteDialog(item: any): void {
   const dialogRef = this.dialog.open(NoteDialogComponent, {
     width: '300px',

@@ -76,8 +76,10 @@ export class ManagerOrderService {
   }
   updateOrderStatus(orderId: number, status: number): Observable<any> {
     const url = `${this.apiUrl}/Invoice/updateStatus/${orderId}`;
-    return this.http.patch<any>(url, { status }, httpOptions);
+  
+    return this.http.put(url, { status }, { responseType: 'text' });
   }
+  
   
 }
 

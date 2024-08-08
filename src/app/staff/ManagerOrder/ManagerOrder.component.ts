@@ -174,8 +174,10 @@ export class ManagerOrderComponent implements OnInit {
     if (!this.orderDetail || !this.orderDetail.orderDetails) {
       return false;
     }
-    return this.orderDetail.orderDetails.every(item => Number(item.dishesServed) === item.quantity);
+    return this.orderDetail.orderDetails.every(item => Number(item.dishesServed) > 0);
   }
+  
+  
   onStatusChange(event: Event, orderId: number): void {
     const selectElement = event.target as HTMLSelectElement;
     const selectedStatus = parseInt(selectElement.value, 10);
@@ -242,7 +244,7 @@ export class ManagerOrderComponent implements OnInit {
     const day = ('0' + date.getDate()).slice(-2); // Add leading zero if day is < 10
     return `${year}-${month}-${day}`;
   }
-  CreateInvoice(orderId: number | undefined): void {
+  CreateInvoiceOnline(orderId: number | undefined): void {
     if (orderId != null) { // Check if orderId is neither null nor undefined
       const paymentMethod = parseInt(this.paymentMethod, 10);
   
@@ -474,17 +476,23 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Invoice ID is not defined.');
     }
   }
-  UpdateStatus(orderId: number, status: number) {
-    this.orderService.updateOrderStatus(orderId, status).subscribe(
-      response => {
-        console.log('Invoice status updated successfully:', response);
-        // Handle successful response
-      },
-      error => {
-        console.error('Error updating invoice status:', error);
-        // Handle error response
-      }
-    );
+  UpdateStatus(orderId: number | undefined, status: number | undefined) {
+    if (orderId !== undefined && status !== undefined) {
+      this.orderService.updateOrderStatus(orderId, status).subscribe(
+        response => {
+          console.log('Invoice status updated successfully:', response);
+          // Handle the plain text response, e.g., show a success message
+        },
+        error => {
+          console.error('Error updating invoice status:', error);
+          // Handle the error response
+        }
+      );
+    } else {
+      console.error('Order ID or status is undefined');
+    }
   }
+  
+  
   
 }

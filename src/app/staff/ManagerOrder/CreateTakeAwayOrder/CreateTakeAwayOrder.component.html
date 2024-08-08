@@ -304,6 +304,19 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <p><strong>Tên người nhận:</strong> {{ extractConsigneeName(selectedAddress) }}</p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <p><strong>Số điện thoại:</strong> {{ extractGuestPhone(selectedAddress) }}</p>
+                    </div>
+                  </div>
+                </div>
+                <!-- Bảng hiển thị món hàng đã chọn -->
                 <div class="mb-3">
                   <table id="items" class="table table-bordered">
                     <thead>
@@ -329,6 +342,8 @@
                     </tbody>
                   </table>
                 </div>
+        
+                <!-- Hiển thị tổng số tiền và giảm giá -->
                 <div class="mt-3">
                   <strong>Tạm tính:</strong> {{ totalAmount | currencyFormat }}
                 </div>
@@ -336,13 +351,13 @@
                   <strong>Giảm giá:</strong>
                   <span>{{ selectedDiscountName }} ({{ selectedDiscountPercent | percentage }})</span>
                 </div>
-                  <div class="mt-2" *ngIf="selectedDiscount">
-                  <strong>Số tiền giảm:</strong> 
+                <div class="mt-2" *ngIf="selectedDiscount">
+                  <strong>Số tiền giảm:</strong>
                   <span>{{ totalAmount - totalAmountAfterDiscount | currencyFormat }}</span>
                 </div>
                 <hr>
                 <div class="mt-2">
-                  <strong>Tổng số tiền:</strong> 
+                  <strong>Tổng số tiền:</strong>
                   <span *ngIf="selectedDiscount === null">
                     {{ totalAmount | currencyFormat }}
                   </span>
@@ -358,7 +373,6 @@
             </div>
           </div>
         </div>
-
          <!-- Template for cffff -->
     <div class="modal fade" #formModal id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -379,16 +393,9 @@
           </div>
       </div>
   </div>
-
-        
-        
-        
-      
-      </main>
-      
-   
     
-  
+      </main>
+
     </div>
   </div>
 </body>

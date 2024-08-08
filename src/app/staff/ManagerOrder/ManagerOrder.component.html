@@ -225,7 +225,9 @@
               </div>
             </div>
           </div>
-         
+          <br>
+          <div class="badge bg-success ms-auto badge-circle">Đã thanh toán</div>
+
         </div>
         <ng-template #loadingOrError>
           <div *ngIf="!orderDetail">
@@ -240,15 +242,15 @@
         <div>
           <!-- Online guest -->
           <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 1">
-            <button type="button" class="btn btn-primary me-2" (click)="UpdateStatus(this.orderId, 2)">Chấp nhận đơn hàng</button>
-            <button type="button" class="btn btn-danger me-2" (click)="UpdateStatus(this.orderId, 4)">Hủy đơn</button>
+            <button type="button" class="btn btn-primary me-2" (click)="UpdateStatus(orderDetail?.orderId, 2)">Chấp nhận đơn hàng</button>
+            <button type="button" class="btn btn-danger me-2" (click)="UpdateStatus(orderDetail?.orderId, 5)">Hủy đơn</button>
           </ng-container>
           <!-- Online staff -->
           <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 2">
             <button type="button" class="btn btn-success me-2" data-bs-target="#paymentModalPrepay"  data-bs-toggle="modal"
             *ngIf="!orderDetail?.invoiceId" 
             >Thanh toán</button>
-            <button type="button" class="btn btn-danger me-2">Hủy đơn</button>
+            <button type="button" class="btn btn-danger me-2" (click)="UpdateStatus(orderDetail?.orderId, 5)">Hủy đơn</button>
           </ng-container>
           <!-- Mang ve -->
           <ng-container *ngIf="orderDetail?.type === 1 && orderDetail?.status === 2">
@@ -262,7 +264,7 @@
 
            <!-- Tai quan -->
           <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3">
-            <button *ngIf="areAllDishesServedEqualToQuantity()" type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#paymentModal" (click)="CreateInvoice(this.orderId)">Hoàn thành</button>
+            <button *ngIf="areAllDishesServedEqualToQuantity()" type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#paymentModal">Thanh toán</button>
             <button type="button" class="btn btn-danger me-2">Hủy đơn</button>
           </ng-container>
         </div>
@@ -272,12 +274,30 @@
     </div>
   </div>
 </div>
-        
+        <!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Xác nhận</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Bạn có chắc chắn muốn thực hiện hành động này?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" id="confirmActionBtn">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
       </main>
     </div>
   </div>
-<!-- Thanh toan -->
+<!-- Thanh toan online -->
   <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -292,7 +312,7 @@
             {{ DiscountedTotalAmount() |currencyFormat  }}
           </div>
 
-          <!-- Template for CreateTakeAwayOrderComponent -->
+          <!-- Template for online -->
           <div class="mb-3">
             <label class="form-label">Hình thức thanh toán:</label>
             <div>
@@ -303,6 +323,7 @@
               <input type="radio" id="bank" name="paymentMethod" value= "1" [(ngModel)]="paymentMethod">
               <label for="bank">Chuyển khoản ngân hàng</label>
             </div>
+           
           </div>
 
           <div class="mb-3" *ngIf="paymentMethod === '0'">
@@ -317,12 +338,12 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal" (click)="CreateInvoice(orderDetail?.orderId)">Xác nhận</button>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal" (click)="CreateInvoiceOnline(orderDetail?.orderId)">Xác nhận</button>
         </div>
       </div>
     </div>
   </div>
-  <!-- Modal for 'Thanh toán trước' -->
+  <!-- Modal for 'Thanh toán takeway' -->
 <div class="modal fade" id="paymentModalPrepay" tabindex="-1" aria-labelledby="paymentModalPrepayLabel" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -337,7 +358,7 @@
           {{ DiscountedTotalAmount() | currencyFormat }}
         </div>
 
-        <!-- Template for CreateTakeAwayOrderComponent -->
+        <!-- Template for online -->
         <div class="mb-3">
           <label class="form-label">Hình thức thanh toán:</label>
           <div>
@@ -347,6 +368,10 @@
           <div>
             <input type="radio" id="bankPrepay" name="paymentMethodPrepay" value="1" [(ngModel)]="paymentMethod">
             <label for="bankPrepay">Chuyển khoản ngân hàng</label>
+          </div>
+          <div>
+            <input type="radio" id="cashOnDelivery" name="paymentMethod" value="2" [(ngModel)]="paymentMethod">
+            <label for="cashOnDelivery">Thanh toán khi nhận hàng</label>
           </div>
         </div>
 
@@ -362,7 +387,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal" (click)="CreateInvoice(orderDetail?.orderId)">Xác nhận</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal" (click)="CreateInvoiceOnline(orderDetail?.orderId)">Xác nhận</button>
       </div>
     </div>
   </div>
