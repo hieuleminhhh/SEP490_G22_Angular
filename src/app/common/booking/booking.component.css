@@ -255,7 +255,7 @@ tr:hover {
   display: flex;
   justify-content: center; /* Căn giữa theo chiều ngang */
   align-items: center; /* Căn giữa theo chiều dọc */
-  height: 20%;
+  height: 0;
 }
 .modal-content {
   background-color: #fefefe; /* Màu nền của modal */

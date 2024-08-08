@@ -24,4 +24,8 @@ export class CookingService {
     return this.http.get(url);
   }
 
+  getOrdersTakeaway(): Observable<any> {
+    const url = `https://localhost:7188/api/OrderDetailsForChef/stafftype1`;
+    return this.http.get(url);
+  }
 }
