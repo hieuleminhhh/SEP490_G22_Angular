@@ -72,7 +72,7 @@ export class ManagerOrderComponent implements OnInit {
     private orderDetailService: ManagerOrderDetailService, 
     private router: Router,
     private route: ActivatedRoute,
-    private invoiceService : InvoiceService
+    private invoiceService : InvoiceService,
   ) {}
 
   ngOnInit() {
@@ -242,7 +242,7 @@ export class ManagerOrderComponent implements OnInit {
     const day = ('0' + date.getDate()).slice(-2); // Add leading zero if day is < 10
     return `${year}-${month}-${day}`;
   }
-  SuscessfullCreateInvoice(orderId: number | undefined): void {
+  CreateInvoice(orderId: number | undefined): void {
     if (orderId != null) { // Check if orderId is neither null nor undefined
       const paymentMethod = parseInt(this.paymentMethod, 10);
   
@@ -284,7 +284,7 @@ export class ManagerOrderComponent implements OnInit {
     }
   }
   
-  PrePaymentCreateInvoice(orderId: number | undefined): void {
+  CreateInvoiceTakeAway(orderId: number | undefined): void {
     if (orderId != null) { // Check if orderId is neither null nor undefined
       const paymentMethod = parseInt(this.paymentMethod, 10);
   
@@ -299,7 +299,7 @@ export class ManagerOrderComponent implements OnInit {
       console.log('Return Amount:', returnAmount);
   
       const updateData = {
-        status: 2,
+        status: 6,
         paymentTime: new Date().toISOString(),
         paymentAmount: this.DiscountedTotalAmount(),
         taxcode: "HIEU",
@@ -474,8 +474,17 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Invoice ID is not defined.');
     }
   }
+  UpdateStatus(orderId: number, status: number) {
+    this.orderService.updateOrderStatus(orderId, status).subscribe(
+      response => {
+        console.log('Invoice status updated successfully:', response);
+        // Handle successful response
+      },
+      error => {
+        console.error('Error updating invoice status:', error);
+        // Handle error response
+      }
+    );
+  }
   
-  
-  
-
 }
