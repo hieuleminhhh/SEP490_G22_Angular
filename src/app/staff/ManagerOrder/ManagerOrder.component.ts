@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ManagerOrderService } from '../../../service/managerorder.service';
 import { ListAllOrder } from '../../../models/order.model';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ManagerOrderDetailService } from '../../../service/managerorderDetail.service';
 import { ListOrderDetailByOrder } from '../../../models/orderDetail.model';
@@ -348,6 +348,24 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
+  transform(value: string | Date, format: string = 'dd/MM/yyyy HH:mm', locale: string = 'vi-VN'): string {
+    if (!value) return '';
+  
+    let date: Date;
+    if (typeof value === 'string') {
+      date = new Date(value);
+      if (isNaN(date.getTime())) {
+        return value;
+      }
+    } else {
+      date = value;
+    }
+    return formatDate(date, format, locale);
+  }
+  formatDateForPrint(date: Date | string | null): string {
+    if (!date) return 'N/A';
+    return this.transform(date, 'dd/MM/yyyy HH:mm');
+  }
   
   printInvoice(): void {
     console.log('Invoice data before update:', this.invoice);
@@ -425,14 +443,15 @@ export class ManagerOrderComponent implements OnInit {
           <label for="customerName" class="form-label">Tên khách hàng:</label>
           <span id="customerName">${this.invoice.consigneeName || 'Khách lẻ'}</span>
         </div>
+         ${this.invoice.guestPhone ? `
         <div class="mb-3">
           <label for="phoneNumber" class="form-label">Số điện thoại: </label>
           <span id="phoneNumber">${this.invoice.guestPhone || 'N/A'}</span>
-        </div>
+        </div>` : ''}
         <div class="mb-3">
-          <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
-          <span id="orderDate">${this.invoice?.orderDate}</span>
-        </div>
+      <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
+      <span id="orderDate">${this.formatDateForPrint(this.invoice?.orderDate)}</span>
+    </div>
         <div class="mb-3">
           <table class="table">
             <thead>
@@ -463,7 +482,7 @@ export class ManagerOrderComponent implements OnInit {
         </div>
         <div class="mb-3">
           <label for="discount" class="form-label">Khuyến mãi:</label>
-           <span id="discount">${this.invoice?.discountName || '0'} (${this.invoice?.discountPercent || '0' }}%)</span>
+           <span id="discount">${this.invoice?.discountName || '0'} (${this.invoice?.discountPercent || '0'}%)</span>
         </div>
         <hr>
         <div class="mb-3">
@@ -487,6 +506,7 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Invoice ID is not defined.');
     }
   }
+  
   UpdateStatus(orderId: number | undefined, status: number | undefined) {
     if (orderId !== undefined && status !== undefined) {
       this.orderService.updateOrderStatus(orderId, status).subscribe(

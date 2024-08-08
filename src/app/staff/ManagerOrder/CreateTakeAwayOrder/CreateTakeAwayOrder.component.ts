@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Address, AddNewAddress } from '../../../../models/address.model';
 import { ListAllCombo } from '../../../../models/combo.model';
@@ -282,8 +282,24 @@ openNoteDialog(item: any): void {
     }
   });
 }
+transform(value: string | Date, format: string = 'dd/MM/yyyy HH:mm', locale: string = 'vi-VN'): string {
+  if (!value) return '';
 
-
+  let date: Date;
+  if (typeof value === 'string') {
+    date = new Date(value);
+    if (isNaN(date.getTime())) {
+      return value;
+    }
+  } else {
+    date = value;
+  }
+  return formatDate(date, format, locale);
+}
+formatDateForPrint(date: Date | string | null): string {
+  if (!date) return 'N/A';
+  return this.transform(date, 'dd/MM/yyyy HH:mm');
+}
 
 printInvoice(): void {
   console.log('Invoice data before update:', this.invoice);
@@ -361,14 +377,15 @@ printInvoice(): void {
         <label for="customerName" class="form-label">Tên khách hàng:</label>
         <span id="customerName">${this.invoice.consigneeName || 'Khách lẻ'}</span>
       </div>
+       ${this.invoice.guestPhone ? `
       <div class="mb-3">
         <label for="phoneNumber" class="form-label">Số điện thoại: </label>
         <span id="phoneNumber">${this.invoice.guestPhone || 'N/A'}</span>
-      </div>
+      </div>` : ''}
       <div class="mb-3">
-        <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
-        <span id="orderDate">${this.invoice?.orderDate}</span>
-      </div>
+    <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
+    <span id="orderDate">${this.formatDateForPrint(this.invoice?.orderDate)}</span>
+  </div>
       <div class="mb-3">
         <table class="table">
           <thead>
@@ -662,12 +679,7 @@ saveAddress() {
       this.successMessage = 'Đơn hàng đã được tạo thành công!';
       this.lastOrderId = response.orderId; // Assuming the response contains the orderId
       console.log(this.lastOrderId);
-
-      this.closeModal();
       setTimeout(() => this.successMessage = '', 5000);
-
-      // Call CreateInvoiceTakeAway with the new orderId
-      this.CreateInvoiceTakeAway();
     },
     error => {
       console.error('Error creating order:', error);
@@ -721,8 +733,6 @@ CreateInvoiceTakeAway(): void {
     console.warn('Order ID is not valid or is undefined. LastOrderId:', this.lastOrderId);
   }
 }
-
-
   
   loadInvoice(orderId: number): void {
     this.invoiceService.getInvoiceByOrderId(orderId).subscribe(
