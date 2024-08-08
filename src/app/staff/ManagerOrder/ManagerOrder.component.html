@@ -238,34 +238,31 @@
       </div>
       <div class="modal-footer d-flex justify-content-between">
         <div>
+          <!-- Online guest -->
           <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 1">
-            <button type="button" class="btn btn-primary me-2">Chấp nhận đơn hàng</button>
-            <button type="button" class="btn btn-danger me-2">Hủy đơn</button>
+            <button type="button" class="btn btn-primary me-2" (click)="UpdateStatus(this.orderId, 2)">Chấp nhận đơn hàng</button>
+            <button type="button" class="btn btn-danger me-2" (click)="UpdateStatus(this.orderId, 4)">Hủy đơn</button>
           </ng-container>
-
+          <!-- Online staff -->
           <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 2">
             <button type="button" class="btn btn-success me-2" data-bs-target="#paymentModalPrepay"  data-bs-toggle="modal"
             *ngIf="!orderDetail?.invoiceId" 
             >Thanh toán</button>
             <button type="button" class="btn btn-danger me-2">Hủy đơn</button>
           </ng-container>
-
+          <!-- Mang ve -->
           <ng-container *ngIf="orderDetail?.type === 1 && orderDetail?.status === 2">
-
-          
-            <!-- Button for prepayment -->
             <button type="button" class="btn btn-success me-2"
                     *ngIf="!orderDetail?.invoiceId"
                     data-bs-toggle="modal" data-bs-target="#paymentModalPrepay">
               Thanh toán
             </button>
-          
-            <!-- Button for canceling the order -->
             <button type="button" class="btn btn-danger me-2">Hủy đơn</button>
           </ng-container>
-          
+
+           <!-- Tai quan -->
           <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3">
-            <button *ngIf="areAllDishesServedEqualToQuantity()" type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#paymentModal" (click)="SuscessfullCreateInvoice(this.orderId)">Hoàn thành</button>
+            <button *ngIf="areAllDishesServedEqualToQuantity()" type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#paymentModal" (click)="CreateInvoice(this.orderId)">Hoàn thành</button>
             <button type="button" class="btn btn-danger me-2">Hủy đơn</button>
           </ng-container>
         </div>
@@ -320,7 +317,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal" (click)="SuscessfullCreateInvoice(orderDetail?.orderId)">Xác nhận</button>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal" (click)="CreateInvoice(orderDetail?.orderId)">Xác nhận</button>
         </div>
       </div>
     </div>
@@ -365,7 +362,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal" (click)="PrePaymentCreateInvoice(orderDetail?.orderId)">Xác nhận</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal" (click)="CreateInvoice(orderDetail?.orderId)">Xác nhận</button>
       </div>
     </div>
   </div>

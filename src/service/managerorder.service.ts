@@ -54,9 +54,9 @@ export class ManagerOrderService {
     const url = `${this.apiUrl}/orders/createOrderForTable/${orderData.tableId}`;
     return this.http.post<any>(url, orderData, httpOptions);
   }
-  updateOrderOffline(orderData: any): Observable<any> {
-    const url = `${this.apiUrl}/orders/updateOrderDetails/${orderData.tableId}`;
-    return this.http.post<any>(url, orderData, httpOptions);
+  updateOrderOffline(tableId: number, dto: any): Observable<any> {
+    const url = `${this.apiUrl}/orders/updateOrderDetails/${tableId}`;
+    return this.http.post<any>(url, dto, httpOptions);
   }
   getOrderById(orderId: number): Observable<any> {
     const url = `${this.apiUrl}/orders/GetOrderDetails/${orderId}`;
@@ -73,6 +73,10 @@ export class ManagerOrderService {
   updateOrderDetailsByOrderId(orderId: number, dto: any): Observable<any> {
     const url = `${this.apiUrl}/orders/updateOrderDetailsByOrderId/${orderId}`;
     return this.http.post<any>(url, dto, httpOptions); // or .put() if appropriate
+  }
+  updateOrderStatus(orderId: number, status: number): Observable<any> {
+    const url = `${this.apiUrl}/Invoice/updateStatus/${orderId}`;
+    return this.http.patch<any>(url, { status }, httpOptions);
   }
   
 }
