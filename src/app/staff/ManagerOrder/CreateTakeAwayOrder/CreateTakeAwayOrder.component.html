@@ -375,7 +375,7 @@
           </div>
         </div>
          <!-- Template for cffff -->
-    <div class="modal fade" #formModal id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
+    <div class="modal fade" id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -421,13 +421,13 @@
            
               <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearCart()">Đóng</button>
-                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal" (click)="CreateInvoiceTakeAway()">Xác nhận</button>
+                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cffpaymentModal" (click)="CreateInvoiceTakeAway()">Xác nhận</button>
               </div>
           </div>
       </div>
   </div>
-     <!-- Template for cffff -->
-  <div class="modal fade" id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
+  <!-- Template for cffff -->
+  <div class="modal fade" id="cffpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <!-- Success message -->
@@ -439,7 +439,7 @@
             <h4 class="mt-2">Thanh toán thành công</h4>
           </div>
         </div>
-        <div class="modal-body">
+        <div class="modal-body1">
           <div class="modal-header d-flex justify-content-center align-items-center text-center">
             <h5 class="modal-title" id="paymentModalLabel">HÓA ĐƠN THANH TOÁN</h5>
           </div>
@@ -447,24 +447,17 @@
             <label for="orderID" class="form-label">Mã hóa đơn: </label>
             <span id="orderID">{{ invoice?.invoiceId || 'N/A' }}</span>
           </div>
-          <div class="mb-3" *ngIf="invoice.isUpdated; else editTemplate">
-            <label for="customerName" class="form-label">Tên khách hàng:</label>
-            <span id="customerName">{{ invoice.consigneeName || 'Khách lẻ' }}</span>
-          </div>
-          <ng-template #editTemplate>
+
             <div class="mb-3">
               <label for="customerName" class="form-label">Tên khách hàng:</label>
-              <input id="customerName" class="form-control" [(ngModel)]="invoice.consigneeName" placeholder="Khách lẻ" />
+              <span id="customerName">{{ invoice.consigneeName || 'Khách lẻ' }}</span>
             </div>
-            <div class="mb-3">
-              <label for="phoneNumber" class="form-label">Số điện thoại: </label>
-              <input id="phoneNumber" class="form-control" [(ngModel)]="invoice.guestPhone" placeholder="N/A" />
-            </div>
-            <div class="mb-3">
-              <label for="address" class="form-label">Địa chỉ: </label>
-              <input id="address" class="form-control" [(ngModel)]="invoice.guestAddress" placeholder="N/A" />
-            </div>
-          </ng-template>
+          <div class="mb-3" *ngIf="invoice.guestPhone">
+        <label for="phoneNumber" class="form-label">Số điện thoại: </label>
+          <span id="phoneNumber">{{ invoice.guestPhone }}</span>
+         </div>
+
+
           <div class="mb-3">
             <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
             <span id="orderDate">{{ invoice?.orderDate | dateFormat }}</span>
@@ -529,7 +522,8 @@
     </div>
   </div>
       </main>
-
+  
+  
     </div>
   </div>
 </body>
