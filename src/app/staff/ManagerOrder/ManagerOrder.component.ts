@@ -269,6 +269,14 @@ export class ManagerOrderComponent implements OnInit {
       console.log('Amount Received:', amountReceived);
       console.log('Return Amount:', returnAmount);
   
+      // Determine paymentStatus based on paymentMethod
+      let paymentStatus;
+      if (paymentMethod === 0 || paymentMethod === 1) {
+        paymentStatus = 1;
+      } else if (paymentMethod === 2) {
+        paymentStatus = 0;
+      }
+  
       const updateData = {
         status: 6,
         paymentTime: new Date().toISOString(),
@@ -278,6 +286,7 @@ export class ManagerOrderComponent implements OnInit {
         amountReceived: amountReceived,
         returnAmount: returnAmount,
         paymentMethods: paymentMethod,
+        paymentStatus: paymentStatus,  // Set paymentStatus based on condition
         description: "strizzzg"
       };
   
@@ -296,6 +305,7 @@ export class ManagerOrderComponent implements OnInit {
       console.warn('Order ID is not valid or is undefined.');
     }
   }
+  
   
   CreateInvoiceTakeAway(orderId: number | undefined): void {
     if (orderId != null) { // Check if orderId is neither null nor undefined
@@ -320,6 +330,7 @@ export class ManagerOrderComponent implements OnInit {
         amountReceived: amountReceived,
         returnAmount: returnAmount,
         paymentMethods: paymentMethod,
+        paymentStatus: 1,
         description: "strizzzg"
       };
   
@@ -482,7 +493,7 @@ export class ManagerOrderComponent implements OnInit {
         </div>
         <div class="mb-3">
           <label for="discount" class="form-label">Khuyến mãi:</label>
-           <span id="discount">${this.invoice?.discountName || '0'} (${this.invoice?.discountPercent || '0'}%)</span>
+           <span id="discount">${this.getDiscountInvoiceAmount()} (${this.invoice?.discountPercent || '0'}%)</span>
         </div>
         <hr>
         <div class="mb-3">
@@ -523,7 +534,18 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Order ID or status is undefined');
     }
   }
-  
+  getDiscountOrderAmount(): number {
+    if (this.orderDetail?.totalAmount && this.orderDetail?.discountPercent) {
+      return (this.orderDetail.totalAmount * this.orderDetail.discountPercent) / 100;
+    }
+    return 0;
+  }
+  getDiscountInvoiceAmount(): number {
+    if (this.invoice?.totalAmount && this.invoice?.discountPercent) {
+      return (this.invoice.totalAmount * this.invoice.discountPercent) / 100;
+    }
+    return 0;
+  }
   
   
 }

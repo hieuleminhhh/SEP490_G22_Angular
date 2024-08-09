@@ -148,6 +148,7 @@ export class CreateOfflineOrderComponent implements OnInit {
     description: ''      // Assuming note is of type string
       // Add more properties as required by the AddNewOrder type/interface
     };
+    this.router.navigate(['/listTable']); 
   }
   
   private parseDateString(dateStr: string): Date | null {
@@ -483,9 +484,7 @@ export class CreateOfflineOrderComponent implements OnInit {
         response => {
           console.log('Offline order created successfully:', response);
           this.successMessage = 'Offline order created successfully!';
-          this.closeModal();
           setTimeout(() => this.successMessage = '', 5000);
-          this.router.navigate(['/listTable']); 
         },
         error => {
           console.error('Error creating offline order:', error);

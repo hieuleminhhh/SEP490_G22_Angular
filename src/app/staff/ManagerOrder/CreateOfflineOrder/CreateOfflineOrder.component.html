@@ -92,16 +92,6 @@
                         </div>
                       </td>
                       <td>
-                        <div class="d-flex align-items-center">
-                          <input
-                            type="number"
-                            class="form-control text-center small-input"
-                            [(ngModel)]="item.dishesServed"
-                            (ngModelChange)="item.dishesServed = item.dishesServed || 0">
-                        </div>
-
-                      </td>
-                      <td>
                         <div *ngIf="item.discountedPrice" class="d-flex align-items-center">
                           <span>{{ item.discountedPrice | currencyFormat  }}</span>
                         </div>

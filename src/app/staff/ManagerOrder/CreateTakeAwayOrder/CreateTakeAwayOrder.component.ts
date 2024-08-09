@@ -416,7 +416,7 @@ printInvoice(): void {
       </div>
       <div class="mb-3">
         <label for="discount" class="form-label">Khuyến mãi:</label>
-         <span id="discount">${this.invoice?.discountName || '0'} (${this.invoice?.discountPercent || '0'}%)</span>
+         <span id="discount">${this.getDiscountAmount()} (${this.invoice?.discountPercent || '0'}%)</span>
       </div>
       <hr>
       <div class="mb-3">
@@ -744,4 +744,11 @@ CreateInvoiceTakeAway(): void {
       }
     );
   }
+  getDiscountAmount(): number {
+    if (this.invoice?.totalAmount && this.invoice?.discountPercent) {
+      return (this.invoice.totalAmount * this.invoice.discountPercent) / 100;
+    }
+    return 0;
+  }
+  
 }
