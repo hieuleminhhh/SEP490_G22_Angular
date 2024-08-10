@@ -27,7 +27,7 @@ export class CookingManagementComponent implements OnInit {
     this.dateFrom = today;
     this.dateTo = today;
     this.dateNow = today;
-    this.getOrders('1-4');
+    this.getOrders('Current');
   }
 
   setView(view: string) {
@@ -135,7 +135,6 @@ export class CookingManagementComponent implements OnInit {
     let completedDishes = JSON.parse(localStorage.getItem('completedDishes') || '[]');
     completedDishes.forEach((dish: { orderDetailId: number; dishesServed: number }) => {
       this.updateOrderQuantity(dish.orderDetailId, dish.dishesServed);
-      console.log('111111');
 
     });
 
@@ -146,7 +145,9 @@ export class CookingManagementComponent implements OnInit {
 
   private filterOrders(): void {
     this.filteredOrders = this.order.filter((order: { quantity: number; }) => order.quantity > 0);
+
   }
+
   updateDishesServed(orderDetailId: number, dishesServed:number) {
     const request = {
       orderDetailId: orderDetailId,

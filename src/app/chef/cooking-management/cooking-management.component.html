@@ -6,10 +6,10 @@
           <ul>
             <br><br><br>
             <li><a [class.active]="currentView === 'order-layout'" (click)="setView('order-layout')"
-                (click)="getOrders('1-4')">Đơn hiện tại</a>
+                (click)="getOrders('Current')">Đơn hiện tại</a>
             </li>
             <li><a [class.active]="currentView === 'booking-order'" (click)="setView('booking-order')"
-                (click)="getOrders('2-3')">Đơn đặt trước</a>
+                (click)="getOrders('Future')">Đơn đặt trước</a>
             </li>
           </ul>
         </li>
@@ -55,7 +55,7 @@
                 </tr>
               </thead>
               <tbody>
-                <ng-container *ngFor="let order of order">
+                <ng-container *ngFor="let order of filteredOrders">
                   <tr>
                     <td>{{order.itemName || order.comboName}}</td>
                     <td>{{order.quantity}}</td>
