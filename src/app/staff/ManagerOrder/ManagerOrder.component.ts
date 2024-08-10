@@ -595,7 +595,7 @@ export class ManagerOrderComponent implements OnInit {
         paymentTime: new Date().toISOString(), // Automatically sets the current date and time
         paymentAmount: this.DiscountedTotalAmount(),
         taxcode: "string",
-        paymentStatus: 1,
+        paymentStatus: 2,
         accountId: 0,
         amountReceived: amountReceived,
         returnAmount: returnAmount,
@@ -638,19 +638,13 @@ export class ManagerOrderComponent implements OnInit {
     console.log('Customer Paid:', this.customerPaid);
     console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
   
+    const remainingAmountDue = this.getAmountDue();
   
     // Determine the amount received based on payment method and customer payment
-    let amountReceived = paymentMethod === 0 
-  ? (this.customerPaid ?? 0) + (this.orderDetail?.deposits ?? 0)  // Cash payment includes deposit
-  : this.DiscountedTotalAmount();  // Non-cash payment assumes full amount is paid at once
-
-  const remainingAmountDue = this.getAmountDue();  // This should return the total amount due after applying any deposits
-
-  // Calculate the return amount for cash payments
-  const returnAmount = paymentMethod === 0 
-    ? amountReceived - remainingAmountDue 
-    : 0;
-
+    let amountReceived = remainingAmountDue + (this.customerPaid ?? 0);
+  
+    // Calculate the return amount for cash payments
+    const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - remainingAmountDue : 0;
   
     if (orderId !== undefined) {
       const data = {
@@ -681,7 +675,7 @@ export class ManagerOrderComponent implements OnInit {
         }
       );
     } else {
-      console.error('Invoice ID is undefined');
+      console.error('Order ID is undefined');
     }
   }
   
