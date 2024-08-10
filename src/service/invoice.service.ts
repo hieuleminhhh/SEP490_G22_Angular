@@ -43,5 +43,19 @@ export class InvoiceService {
     };
     return this.http.get<any>(url, httpOptions);
   }
+  updateOrderAndInvoice(invoiceId: number, data: any): Observable<any> {
+    const url = `${this.apiUrl}/Invoice/UpdateOrderAndInvoice/${invoiceId}`;
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.put<any>(url, data, httpOptions);
+  }
 
+  updateDepositAndCreateInvoice(invoiceId: number, data: any): Observable<any> {
+    const url = `${this.apiUrl}/Invoice/UpdateDepositAndCreateInvoice/${invoiceId}`;
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.put<any>(url, data, httpOptions);
+  }
 }

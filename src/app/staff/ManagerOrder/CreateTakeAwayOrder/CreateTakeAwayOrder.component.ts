@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Address, AddNewAddress } from '../../../../models/address.model';
 import { ListAllCombo } from '../../../../models/combo.model';
@@ -86,7 +86,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     paymentMethods: 0,
     description: ''
   };
-  
+  lastOrderId: number | undefined;
   newAddress: AddNewAddress = {
     guestAddress: 'Ăn tại quán',
     consigneeName: '',
@@ -260,9 +260,11 @@ extractConsigneeName(addressString: string): string {
   return addressString.split(' - ')[0];
 }
 
-extractGuestPhone(addressString: string): string {
-  return addressString.split(' - ')[1];
+extractGuestPhone(addressString: string): string | null {
+  const phone = addressString.split(' - ')[1];
+  return phone && phone.trim() ? phone : null; // Return null if the phone is empty
 }
+
 
 openNoteDialog(item: any): void {
   const dialogRef = this.dialog.open(NoteDialogComponent, {
@@ -280,80 +282,23 @@ openNoteDialog(item: any): void {
     }
   });
 }
+transform(value: string | Date, format: string = 'dd/MM/yyyy HH:mm', locale: string = 'vi-VN'): string {
+  if (!value) return '';
 
-
-createOrder() {
-  // Ensure selectedItems is defined
-  if (!this.selectedItems || this.selectedItems.length === 0) {
-    console.error('No items selected for the order.');
-    return;
-  }
-
-  // Map selected items to order details
-  const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
-    itemId: item.id,
-    quantity: item.quantity,
-    price: item.price,
-    unitPrice: item.totalPrice,
-    dishId: item.dishId,
-    comboId: item.comboId,
-    orderTime: new Date(),
-    note: item.note
-  }));
-
-  // Calculate total amount and set various properties
-  const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
-  const currentDate = new Date();
-  const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
-  const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; // Convert paymentMethod to number
-
-  this.addNew = {
-    ...this.addNew, // Spread existing properties if any
-    totalAmount,
-    orderDetails,
-    orderDate: this.getVietnamTime(),
-    recevingOrder: currentDate.toISOString(),
-    paymentTime: currentDate.toISOString(),
-    amountReceived: paymentMethodValue === 0 ? customerPaidAmount : totalAmount,
-    returnAmount: paymentMethodValue === 0 ? customerPaidAmount - totalAmount : 0,
-    paymentMethods: paymentMethodValue,
-    description: 'Order payment description',
-    discountId: this.selectedDiscount,
-    taxcode: '',
-    paymentStatus: 1,
-  };
-
-  // Handle address selection
-  if (this.selectedAddress !== 'Khách lẻ') {
-    const parts = this.selectedAddress.split(' - ');
-    if (parts.length >= 2) {
-      this.addNew.consigneeName = parts[0];
-      this.addNew.guestPhone = parts[1];
-    } else {
-      console.error('Selected address format is incorrect.');
+  let date: Date;
+  if (typeof value === 'string') {
+    date = new Date(value);
+    if (isNaN(date.getTime())) {
+      return value;
     }
-    this.addNew.email = 'antaiquan@gmail.com';
-    this.addNew.guestAddress = 'Ăn tại quán';
+  } else {
+    date = value;
   }
-
-  // Log order details for debugging
-  console.log('Order Details:', orderDetails);
-
-  // Call the service to add the new order
-  this.orderService.AddNewOrder(this.addNew).subscribe(
-    response => {
-      console.log('Order created successfully:', response);
-      this.successMessage = 'Đơn hàng đã được tạo thành công!';
-      this.closeModal();
-      setTimeout(() => this.successMessage = '', 5000);
-    },
-    error => {
-      console.error('Error creating order:', error);
-      if (error && error.error && error.error.message) {
-        console.error('Inner exception:', error.error.message);
-      }
-    }
-  );
+  return formatDate(date, format, locale);
+}
+formatDateForPrint(date: Date | string | null): string {
+  if (!date) return 'N/A';
+  return this.transform(date, 'dd/MM/yyyy HH:mm');
 }
 
 printInvoice(): void {
@@ -432,14 +377,15 @@ printInvoice(): void {
         <label for="customerName" class="form-label">Tên khách hàng:</label>
         <span id="customerName">${this.invoice.consigneeName || 'Khách lẻ'}</span>
       </div>
+       ${this.invoice.guestPhone ? `
       <div class="mb-3">
         <label for="phoneNumber" class="form-label">Số điện thoại: </label>
         <span id="phoneNumber">${this.invoice.guestPhone || 'N/A'}</span>
-      </div>
+      </div>` : ''}
       <div class="mb-3">
-        <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
-        <span id="orderDate">${this.invoice?.orderDate}</span>
-      </div>
+    <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
+    <span id="orderDate">${this.formatDateForPrint(this.invoice?.orderDate)}</span>
+  </div>
       <div class="mb-3">
         <table class="table">
           <thead>
@@ -470,7 +416,7 @@ printInvoice(): void {
       </div>
       <div class="mb-3">
         <label for="discount" class="form-label">Khuyến mãi:</label>
-         <span id="discount">${this.invoice?.discountName || '0'} (${this.invoice?.discountPercent || '0'}%)</span>
+         <span id="discount">${this.getDiscountAmount()} (${this.invoice?.discountPercent || '0'}%)</span>
       </div>
       <hr>
       <div class="mb-3">
@@ -669,4 +615,140 @@ saveAddress() {
       this.totalAmountAfterDiscount = this.totalAmount; // Khi không có discount
     }
   }
+  createOrder() {
+  // Ensure selectedItems is defined
+  if (!this.selectedItems || this.selectedItems.length === 0) {
+    console.error('No items selected for the order.');
+    return;
+  }
+
+  // Map selected items to order details
+  const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
+    itemId: item.id,
+    quantity: item.quantity,
+    price: item.price,
+    unitPrice: item.totalPrice,
+    dishId: item.dishId,
+    comboId: item.comboId,
+    orderTime: new Date(),
+    note: item.note
+  }));
+
+  // Calculate total amount and set various properties
+  const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
+  const currentDate = new Date();
+  const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
+  const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; // Convert paymentMethod to number
+
+  this.addNew = {
+    ...this.addNew, // Spread existing properties if any
+    totalAmount,
+    orderDetails,
+    orderDate: this.getVietnamTime(),
+    recevingOrder: null,
+    paymentTime: currentDate.toISOString(),
+    amountReceived: paymentMethodValue === 0 ? customerPaidAmount : totalAmount,
+    returnAmount: paymentMethodValue === 0 ? customerPaidAmount - totalAmount : 0,
+    paymentMethods: paymentMethodValue,
+    description: 'Order payment description',
+    discountId: this.selectedDiscount,
+    taxcode: '',
+    paymentStatus: 1,
+  };
+
+  // Handle address selection
+  if (this.selectedAddress !== 'Khách lẻ') {
+    const parts = this.selectedAddress.split(' - ');
+    if (parts.length >= 2) {
+      this.addNew.consigneeName = parts[0];
+      this.addNew.guestPhone = parts[1];
+    } else {
+      console.error('Selected address format is incorrect.');
+    }
+    this.addNew.email = 'antaiquan@gmail.com';
+    this.addNew.guestAddress = 'Ăn tại quán';
+  }
+
+  // Log order details for debugging
+  console.log('Order Details:', orderDetails);
+
+  // Call the service to add the new order
+  this.orderService.AddNewOrder(this.addNew).subscribe(
+    response => {
+      console.log('Order created successfully:', response);
+      this.successMessage = 'Đơn hàng đã được tạo thành công!';
+      this.lastOrderId = response.orderId; // Assuming the response contains the orderId
+      console.log(this.lastOrderId);
+      setTimeout(() => this.successMessage = '', 5000);
+    },
+    error => {
+      console.error('Error creating order:', error);
+      if (error && error.error && error.error.message) {
+        console.error('Inner exception:', error.error.message);
+      }
+    }
+  );
+}
+  
+CreateInvoiceTakeAway(): void {
+  if (this.lastOrderId != null && this.lastOrderId !== undefined) {
+    const paymentMethod = parseInt(this.paymentMethod, 10);
+    const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
+    
+    console.log('Order ID:', this.lastOrderId);
+    console.log('Payment Method:', paymentMethod);
+    console.log('Customer Paid:', this.customerPaid);
+    console.log('Discounted Total Amount:', totalAmount);
+
+    const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : totalAmount;
+    const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - totalAmount : 0;
+
+    console.log('Amount Received:', amountReceived);
+    console.log('Return Amount:', returnAmount);
+
+    const updateData = {
+      status: 6,
+      paymentTime: new Date().toISOString(),
+      paymentAmount: totalAmount,
+      taxcode: "HIEU",
+      accountId: 0,
+      amountReceived: amountReceived,
+      returnAmount: returnAmount,
+      paymentMethods: paymentMethod,
+      description: "strizzzg"
+    };
+
+    console.log('Update Data:', updateData);
+
+    this.invoiceService.updateStatusAndCreateInvoice(this.lastOrderId, updateData).subscribe(
+      (response) => {
+        console.log('Order status updated and invoice created:', response);
+        this.loadInvoice(this.lastOrderId!);
+      },
+      (error) => {
+        console.error('Error updating order status and creating invoice:', error);
+      }
+    );
+  } else {
+    console.warn('Order ID is not valid or is undefined. LastOrderId:', this.lastOrderId);
+  }
+}
+  
+  loadInvoice(orderId: number): void {
+    this.invoiceService.getInvoiceByOrderId(orderId).subscribe(
+      data => {
+        this.invoice = data;
+      },
+      error => {
+        console.error('Error fetching invoice:', error);
+      }
+    );
+  }
+  getDiscountAmount(): number {
+    if (this.invoice?.totalAmount && this.invoice?.discountPercent) {
+      return (this.invoice.totalAmount * this.invoice.discountPercent) / 100;
+    }
+    return 0;
+  }
+  
 }

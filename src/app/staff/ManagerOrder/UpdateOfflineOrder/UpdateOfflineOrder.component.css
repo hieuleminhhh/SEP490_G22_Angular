@@ -35,3 +35,7 @@ input.rounded-input {
   border-color: #ced4da; /* Màu viền để trông như bị vô hiệu hóa */
   color: #000; /* Màu văn bản là đen */
 }
+.modal-body {
+  max-height: 400px; /* Hoặc bất kỳ chiều cao tối đa nào bạn muốn */
+  overflow-y: auto;
+}

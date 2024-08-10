@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ManagerOrderService } from '../../../service/managerorder.service';
 import { ListAllOrder } from '../../../models/order.model';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ManagerOrderDetailService } from '../../../service/managerorderDetail.service';
 import { ListOrderDetailByOrder } from '../../../models/orderDetail.model';
@@ -66,6 +66,7 @@ export class ManagerOrderComponent implements OnInit {
   paymentAmount: number = 0;
   tables: Table[] = [];
   tableId: number | null = null;
+  dishesServed: number = 0;
 
   constructor(
     private orderService: ManagerOrderService, 
@@ -128,12 +129,26 @@ export class ManagerOrderComponent implements OnInit {
   loadListOrderDetails(orderId: number) {
     console.log('Loading details for Order ID:', orderId);
     this.orderDetailService.getOrderDetail(orderId).subscribe(
-      (orderDetail) => {
+      (orderDetail: ListOrderDetailByOrder) => {
         this.orderDetail = orderDetail;
         this.tables = orderDetail.tables; // Assigning tables to a separate variable
+        
         if (this.tables.length > 0) {
           this.tableId = this.tables[0].tableId; // Extracting tableId from the first table
         }
+
+        // Iterate through orderDetails to access dishesServed
+        let totalDishesServed = 0;
+        orderDetail.orderDetails.forEach((detail) => {
+          console.log('Dishes Served:', detail.dishesServed);
+          totalDishesServed += parseInt(detail.dishesServed, 10);
+        });
+
+        console.log('Total Dishes Served:', totalDishesServed);
+
+        // If needed, you can store totalDishesServed in a variable or use it directly for further logic
+        this.dishesServed = totalDishesServed; // Assuming this.dishesServed is defined
+
         console.log('Fetched order detail:', this.orderDetail);
         console.log('Tables:', this.tables);
         console.log('Table ID:', this.tableId); // Logging the tableId
@@ -143,6 +158,7 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
+
   
   updateOrder(orderId: number) {
     this.router.navigate(['/updateOrder', orderId]);
@@ -170,12 +186,7 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
-  areAllDishesServedEqualToQuantity(): boolean {
-    if (!this.orderDetail || !this.orderDetail.orderDetails) {
-      return false;
-    }
-    return this.orderDetail.orderDetails.every(item => Number(item.dishesServed) > 0);
-  }
+  
   
   
   onStatusChange(event: Event, orderId: number): void {
@@ -244,6 +255,9 @@ export class ManagerOrderComponent implements OnInit {
     const day = ('0' + date.getDate()).slice(-2); // Add leading zero if day is < 10
     return `${year}-${month}-${day}`;
   }
+  
+  
+  
   CreateInvoiceOnline(orderId: number | undefined): void {
     if (orderId != null) { // Check if orderId is neither null nor undefined
       const paymentMethod = parseInt(this.paymentMethod, 10);
@@ -252,14 +266,23 @@ export class ManagerOrderComponent implements OnInit {
       console.log('Customer Paid:', this.customerPaid);
       console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
   
-      const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
+      let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
       const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - this.DiscountedTotalAmount() : 0;
   
       console.log('Amount Received:', amountReceived);
       console.log('Return Amount:', returnAmount);
   
+      // Determine paymentStatus based on paymentMethod
+      let paymentStatus;
+      if (paymentMethod === 0 || paymentMethod === 1) {
+        paymentStatus = 1;
+      } else if (paymentMethod === 2) {
+        paymentStatus = 0;
+        amountReceived = 0;
+      }
+  
       const updateData = {
-        status: 4,
+        status: 6,
         paymentTime: new Date().toISOString(),
         paymentAmount: this.DiscountedTotalAmount(),
         taxcode: "HIEU",
@@ -267,6 +290,7 @@ export class ManagerOrderComponent implements OnInit {
         amountReceived: amountReceived,
         returnAmount: returnAmount,
         paymentMethods: paymentMethod,
+        paymentStatus: paymentStatus,  // Set paymentStatus based on condition
         description: "strizzzg"
       };
   
@@ -285,6 +309,7 @@ export class ManagerOrderComponent implements OnInit {
       console.warn('Order ID is not valid or is undefined.');
     }
   }
+  
   
   CreateInvoiceTakeAway(orderId: number | undefined): void {
     if (orderId != null) { // Check if orderId is neither null nor undefined
@@ -309,6 +334,7 @@ export class ManagerOrderComponent implements OnInit {
         amountReceived: amountReceived,
         returnAmount: returnAmount,
         paymentMethods: paymentMethod,
+        paymentStatus: 1,
         description: "strizzzg"
       };
   
@@ -336,6 +362,24 @@ export class ManagerOrderComponent implements OnInit {
         console.error('Error fetching invoice:', error);
       }
     );
+  }
+  transform(value: string | Date, format: string = 'dd/MM/yyyy HH:mm', locale: string = 'vi-VN'): string {
+    if (!value) return '';
+  
+    let date: Date;
+    if (typeof value === 'string') {
+      date = new Date(value);
+      if (isNaN(date.getTime())) {
+        return value;
+      }
+    } else {
+      date = value;
+    }
+    return formatDate(date, format, locale);
+  }
+  formatDateForPrint(date: Date | string | null): string {
+    if (!date) return 'N/A';
+    return this.transform(date, 'dd/MM/yyyy HH:mm');
   }
   
   printInvoice(): void {
@@ -414,14 +458,15 @@ export class ManagerOrderComponent implements OnInit {
           <label for="customerName" class="form-label">Tên khách hàng:</label>
           <span id="customerName">${this.invoice.consigneeName || 'Khách lẻ'}</span>
         </div>
+         ${this.invoice.guestPhone ? `
         <div class="mb-3">
           <label for="phoneNumber" class="form-label">Số điện thoại: </label>
           <span id="phoneNumber">${this.invoice.guestPhone || 'N/A'}</span>
-        </div>
+        </div>` : ''}
         <div class="mb-3">
-          <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
-          <span id="orderDate">${this.invoice?.orderDate}</span>
-        </div>
+      <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
+      <span id="orderDate">${this.formatDateForPrint(this.invoice?.orderDate)}</span>
+    </div>
         <div class="mb-3">
           <table class="table">
             <thead>
@@ -452,7 +497,7 @@ export class ManagerOrderComponent implements OnInit {
         </div>
         <div class="mb-3">
           <label for="discount" class="form-label">Khuyến mãi:</label>
-           <span id="discount">${this.invoice?.discountName || '0'} (${this.invoice?.discountPercent || '0' }}%)</span>
+           <span id="discount">${this.getDiscountInvoiceAmount()} (${this.invoice?.discountPercent || '0'}%)</span>
         </div>
         <hr>
         <div class="mb-3">
@@ -476,6 +521,7 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Invoice ID is not defined.');
     }
   }
+  
   UpdateStatus(orderId: number | undefined, status: number | undefined) {
     if (orderId !== undefined && status !== undefined) {
       this.orderService.updateOrderStatus(orderId, status).subscribe(
@@ -492,7 +538,152 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Order ID or status is undefined');
     }
   }
+  getDiscountOrderAmount(): number {
+    if (this.orderDetail?.totalAmount && this.orderDetail?.discountPercent) {
+      return (this.orderDetail.totalAmount * this.orderDetail.discountPercent) / 100;
+    }
+    return 0;
+  }
+  getDiscountInvoiceAmount(): number {
+    if (this.invoice?.totalAmount && this.invoice?.discountPercent) {
+      return (this.invoice.totalAmount * this.invoice.discountPercent) / 100;
+    }
+    return 0;
+  }
+  //Online thanh toan khi nhan hang
+  updateAmountReceiving(orderId: number | undefined) {
+    const paymentMethod = parseInt(this.paymentMethod, 10);
+    // Create the data object with the required properties
+    const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
+    const data = {
+      status: 4,
+      amountReceived: amountReceived,
+      description: "Hieu Update"
+    };
   
+    if (orderId !== undefined) {
+      this.orderService.updateAmountReceiving(orderId, data).subscribe(
+        response => {
+          console.log('Amount received and status updated successfully:', response);
+          // Handle the response, e.g., show a success message
+        },
+        error => {
+          console.error('Error updating amount received and status:', error);
+          // Handle the error response
+        }
+      );
+    } else {
+      console.error('Order ID is undefined');
+    }
+  }
+  //Offline thanh toan truoc
+  PrePayment(orderId: number | undefined) {
+    const paymentMethod = parseInt(this.paymentMethod, 10);
+  
+    console.log('Payment Method:', paymentMethod);
+    console.log('Customer Paid:', this.customerPaid);
+    console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
+
+    let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
+    const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - this.DiscountedTotalAmount() : 0;
+
+    console.log('Amount Received:', amountReceived);
+    console.log('Return Amount:', returnAmount);
+    if (orderId !== undefined) {
+      const data = {
+        deposits: this.DiscountedTotalAmount(),
+        paymentTime: new Date().toISOString(), // Automatically sets the current date and time
+        paymentAmount: this.DiscountedTotalAmount(),
+        taxcode: "string",
+        paymentStatus: 1,
+        accountId: 0,
+        amountReceived: amountReceived,
+        returnAmount: returnAmount,
+        paymentMethods: paymentMethod,
+        description: "Hieu Update"
+      };
+      
+      this.invoiceService.updateDepositAndCreateInvoice(orderId, data).subscribe(
+        response => {
+          console.log('Order and invoice updated successfully:', response);
+          this.loadInvoice(orderId);
+        },
+        error => {
+          console.error('Error updating order and invoice:', error);
+        }
+      );
+    } else {
+      console.error('Invoice ID is undefined');
+    }
+  }
+  getAmountDue(): number {
+    if (!this.orderDetail) {
+      return 0; // Or handle it appropriately
+    }
+    const discountedTotal = this.DiscountedTotalAmount();
+    const deposits = this.orderDetail.deposits || 0;
+    return discountedTotal - deposits;
+  }
+  getFinalAmountDue(): number {
+    const totalAmount = this.DiscountedTotalAmount();
+    const deposit = this.orderDetail?.deposits || 0;
+    return totalAmount - deposit;
+  }
+  
+  //Offline hoan thanh goi them mon
+  SuscessfullOrderOffline(orderId: number | undefined) {
+    const paymentMethod = parseInt(this.paymentMethod, 10);
+  
+    console.log('Payment Method:', paymentMethod);
+    console.log('Customer Paid:', this.customerPaid);
+    console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
+  
+  
+    // Determine the amount received based on payment method and customer payment
+    let amountReceived = paymentMethod === 0 
+  ? (this.customerPaid ?? 0) + (this.orderDetail?.deposits ?? 0)  // Cash payment includes deposit
+  : this.DiscountedTotalAmount();  // Non-cash payment assumes full amount is paid at once
+
+  const remainingAmountDue = this.getAmountDue();  // This should return the total amount due after applying any deposits
+
+  // Calculate the return amount for cash payments
+  const returnAmount = paymentMethod === 0 
+    ? amountReceived - remainingAmountDue 
+    : 0;
+
+  
+    if (orderId !== undefined) {
+      const data = {
+        status: 4,
+        paymentTime: new Date().toISOString(), // Automatically sets the current date and time
+        paymentAmount: this.DiscountedTotalAmount(),
+        taxcode: "XYZDEW",
+        paymentStatus: 1,
+        customerName: "string",
+        phone: "string",
+        address: "string",
+        accountId: 0,
+        amountReceived: amountReceived,
+        returnAmount: returnAmount,
+        paymentMethods: paymentMethod,
+        description: "Hieu Update"
+      };
+  
+      this.invoiceService.updateOrderAndInvoice(orderId, data).subscribe(
+        response => {
+          console.log('Deposit updated and invoice created successfully:', response);
+          this.loadInvoice(orderId);
+          // Handle the response, e.g., show a success message
+        },
+        error => {
+          console.error('Error updating deposit and creating invoice:', error);
+          // Handle the error response
+        }
+      );
+    } else {
+      console.error('Invoice ID is undefined');
+    }
+  }
   
   
 }
