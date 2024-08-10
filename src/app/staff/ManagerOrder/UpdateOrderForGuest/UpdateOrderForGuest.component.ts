@@ -233,6 +233,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
       (response: any) => {
         console.log('Address created successfully:', response); // Debug: Check response here
         this.successMessage = 'Địa chỉ đã được thêm thành công!';
+        this.closeModal();
         setTimeout(() => this.successMessage = '', 5000);
   
         // Ensure response contains correct properties in 'data'
