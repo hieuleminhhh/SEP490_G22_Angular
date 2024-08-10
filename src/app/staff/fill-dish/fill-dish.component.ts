@@ -17,11 +17,14 @@ export class FillDishComponent implements OnInit {
   orderDish: any;
   selectedButton: 'dineIn' | 'takeAway' = 'dineIn';
   quantitiesServed: number[] = [];
+  ordersTakeaway: any;
+  selectedItem: any;
 
   constructor(private cookingService: CookingService) { }
 
   ngOnInit(): void {
     this.getCompletedDishesFromLocalStorage();
+    this.getOrdersTakeaway();
   }
 
   getCompletedDishesFromLocalStorage(): void {
@@ -184,4 +187,56 @@ export class FillDishComponent implements OnInit {
     return this.selectedButton === buttonType;
   }
 
+  getOrdersTakeaway() {
+    this.cookingService.getOrdersTakeaway().subscribe(
+      response => {
+        this.ordersTakeaway = response;
+        console.log(this.ordersTakeaway);
+
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
+
+  handleButtonClick(order: any) {
+    // Xử lý sự kiện khi nhấn nút
+    const status = {
+      status: order.type === 1 ? 4 : 7
+    };
+
+    this.cookingService.updateOrderStatus(order.orderId, status).subscribe(
+      response => {
+        console.log('Order status updated:', response);
+        // Load lại trang với selectedButton = 'takeAway'
+        this.selectedButton = 'takeAway';
+        this.refreshContent(); // Tải lại nội dung
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+    console.log('Button clicked for order:', order);
+  }
+
+  refreshContent() {
+    // Logic để tải lại nội dung khi selectedButton là 'takeAway'
+    // Bạn có thể cần phải gọi các phương thức service để lấy lại dữ liệu, nếu cần.
+    if (this.selectedButton === 'takeAway') {
+      this.getOrdersTakeaway(); // Ví dụ về phương thức lấy lại đơn hàng mang về
+    }
+  }
+  closeModal(index: number) {
+
+  }
+
+  showDetails(order: any) {
+    console.log(order);
+    this.selectedItem = order;
+  }
+
+  closePopup() {
+    this.selectedItem = null;
+  }
 }
