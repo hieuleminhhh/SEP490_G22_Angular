@@ -29,7 +29,7 @@ export class TableService {
   }
   updateOrderStatus(Id: number, request:any): Observable<any> {
     const url = `https://localhost:7188/api/Invoice/updateStatus/${Id}`;
-    return this.http.get(url, request);
+    return this.http.put(url, request);
   }
 }
 
