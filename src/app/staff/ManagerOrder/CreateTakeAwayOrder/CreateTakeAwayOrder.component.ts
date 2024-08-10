@@ -645,7 +645,7 @@ saveAddress() {
     totalAmount,
     orderDetails,
     orderDate: this.getVietnamTime(),
-    recevingOrder: currentDate.toISOString(),
+    recevingOrder: null,
     paymentTime: currentDate.toISOString(),
     amountReceived: paymentMethodValue === 0 ? customerPaidAmount : totalAmount,
     returnAmount: paymentMethodValue === 0 ? customerPaidAmount - totalAmount : 0,

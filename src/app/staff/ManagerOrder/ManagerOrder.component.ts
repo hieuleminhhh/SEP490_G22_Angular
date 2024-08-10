@@ -255,6 +255,9 @@ export class ManagerOrderComponent implements OnInit {
     const day = ('0' + date.getDate()).slice(-2); // Add leading zero if day is < 10
     return `${year}-${month}-${day}`;
   }
+  
+  
+  
   CreateInvoiceOnline(orderId: number | undefined): void {
     if (orderId != null) { // Check if orderId is neither null nor undefined
       const paymentMethod = parseInt(this.paymentMethod, 10);
@@ -263,7 +266,7 @@ export class ManagerOrderComponent implements OnInit {
       console.log('Customer Paid:', this.customerPaid);
       console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
   
-      const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
+      let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
       const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - this.DiscountedTotalAmount() : 0;
   
       console.log('Amount Received:', amountReceived);
@@ -275,6 +278,7 @@ export class ManagerOrderComponent implements OnInit {
         paymentStatus = 1;
       } else if (paymentMethod === 2) {
         paymentStatus = 0;
+        amountReceived = 0;
       }
   
       const updateData = {
@@ -545,6 +549,140 @@ export class ManagerOrderComponent implements OnInit {
       return (this.invoice.totalAmount * this.invoice.discountPercent) / 100;
     }
     return 0;
+  }
+  //Online thanh toan khi nhan hang
+  updateAmountReceiving(orderId: number | undefined) {
+    const paymentMethod = parseInt(this.paymentMethod, 10);
+    // Create the data object with the required properties
+    const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
+    const data = {
+      status: 4,
+      amountReceived: amountReceived,
+      description: "Hieu Update"
+    };
+  
+    if (orderId !== undefined) {
+      this.orderService.updateAmountReceiving(orderId, data).subscribe(
+        response => {
+          console.log('Amount received and status updated successfully:', response);
+          // Handle the response, e.g., show a success message
+        },
+        error => {
+          console.error('Error updating amount received and status:', error);
+          // Handle the error response
+        }
+      );
+    } else {
+      console.error('Order ID is undefined');
+    }
+  }
+  //Offline thanh toan truoc
+  PrePayment(orderId: number | undefined) {
+    const paymentMethod = parseInt(this.paymentMethod, 10);
+  
+    console.log('Payment Method:', paymentMethod);
+    console.log('Customer Paid:', this.customerPaid);
+    console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
+
+    let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
+    const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - this.DiscountedTotalAmount() : 0;
+
+    console.log('Amount Received:', amountReceived);
+    console.log('Return Amount:', returnAmount);
+    if (orderId !== undefined) {
+      const data = {
+        deposits: this.DiscountedTotalAmount(),
+        paymentTime: new Date().toISOString(), // Automatically sets the current date and time
+        paymentAmount: this.DiscountedTotalAmount(),
+        taxcode: "string",
+        paymentStatus: 1,
+        accountId: 0,
+        amountReceived: amountReceived,
+        returnAmount: returnAmount,
+        paymentMethods: paymentMethod,
+        description: "Hieu Update"
+      };
+      
+      this.invoiceService.updateDepositAndCreateInvoice(orderId, data).subscribe(
+        response => {
+          console.log('Order and invoice updated successfully:', response);
+          this.loadInvoice(orderId);
+        },
+        error => {
+          console.error('Error updating order and invoice:', error);
+        }
+      );
+    } else {
+      console.error('Invoice ID is undefined');
+    }
+  }
+  getAmountDue(): number {
+    if (!this.orderDetail) {
+      return 0; // Or handle it appropriately
+    }
+    const discountedTotal = this.DiscountedTotalAmount();
+    const deposits = this.orderDetail.deposits || 0;
+    return discountedTotal - deposits;
+  }
+  getFinalAmountDue(): number {
+    const totalAmount = this.DiscountedTotalAmount();
+    const deposit = this.orderDetail?.deposits || 0;
+    return totalAmount - deposit;
+  }
+  
+  //Offline hoan thanh goi them mon
+  SuscessfullOrderOffline(orderId: number | undefined) {
+    const paymentMethod = parseInt(this.paymentMethod, 10);
+  
+    console.log('Payment Method:', paymentMethod);
+    console.log('Customer Paid:', this.customerPaid);
+    console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
+  
+  
+    // Determine the amount received based on payment method and customer payment
+    let amountReceived = paymentMethod === 0 
+  ? (this.customerPaid ?? 0) + (this.orderDetail?.deposits ?? 0)  // Cash payment includes deposit
+  : this.DiscountedTotalAmount();  // Non-cash payment assumes full amount is paid at once
+
+  const remainingAmountDue = this.getAmountDue();  // This should return the total amount due after applying any deposits
+
+  // Calculate the return amount for cash payments
+  const returnAmount = paymentMethod === 0 
+    ? amountReceived - remainingAmountDue 
+    : 0;
+
+  
+    if (orderId !== undefined) {
+      const data = {
+        status: 4,
+        paymentTime: new Date().toISOString(), // Automatically sets the current date and time
+        paymentAmount: this.DiscountedTotalAmount(),
+        taxcode: "XYZDEW",
+        paymentStatus: 1,
+        customerName: "string",
+        phone: "string",
+        address: "string",
+        accountId: 0,
+        amountReceived: amountReceived,
+        returnAmount: returnAmount,
+        paymentMethods: paymentMethod,
+        description: "Hieu Update"
+      };
+  
+      this.invoiceService.updateOrderAndInvoice(orderId, data).subscribe(
+        response => {
+          console.log('Deposit updated and invoice created successfully:', response);
+          this.loadInvoice(orderId);
+          // Handle the response, e.g., show a success message
+        },
+        error => {
+          console.error('Error updating deposit and creating invoice:', error);
+          // Handle the error response
+        }
+      );
+    } else {
+      console.error('Invoice ID is undefined');
+    }
   }
   
   

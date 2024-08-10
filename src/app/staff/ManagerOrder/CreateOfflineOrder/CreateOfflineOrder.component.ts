@@ -470,7 +470,7 @@ export class CreateOfflineOrderComponent implements OnInit {
         guestAddress: this.addNew.guestAddress,
         consigneeName: this.addNew.consigneeName,
         orderDate: new Date().toISOString(),
-        receivingOrder: new Date().toISOString(),
+        receivingOrder: null,
         totalAmount,
         guestPhone: guestPhone,
         note: "This is a special request note.",
