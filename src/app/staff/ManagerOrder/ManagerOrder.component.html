@@ -630,10 +630,11 @@
         <label for="totalAmount" class="form-label">Tổng tiền:</label>
         <span id="totalAmount">{{ invoice?.paymentAmount | currencyFormat }}</span>
     </div>
-    <div class="mb-3">
-      <label for="prepay" *ngIf="paymentMethod === '0'" class="form-label">Thanh toán trước:</label>
-      <span id="prepay">{{ invoice?.returnAmount | currencyFormat }}</span>
+    <div class="mb-3" *ngIf="paymentMethod === '0' && invoice?.deposites > 0">
+      <label for="prepay" class="form-label">Thanh toán trước:</label>
+      <span id="prepay">{{ invoice?.deposits | currencyFormat }}</span>
     </div>
+    
     <hr>
           <div class="mb-3">
             <label for="amountToPay" *ngIf="paymentMethod === '0'" class="form-label">Khách phải trả:</label>
