@@ -248,7 +248,7 @@
       <div class="checkbox-label-container">
         <input type="checkbox" id="earliestCheckbox" [(ngModel)]="isEarliest" class="form-check-input"
           (change)="onEarliestChange()">
-        <label for="earliestCheckbox" class="form-check-label">Sớm nhất</label>
+        <label for="earliestCheckbox" class="form-check-label">giao hàng sớm nhất</label>
       </div>
       <div class="modal-footer">
         <button type="button" style="background-color: red;" class="btn btn-secondary"
@@ -313,17 +313,17 @@
                     (Đơn tối thiểu {{ discounts.totalMoney | currencyFormat }})
                   </span>
                   <span *ngIf="discounts.quantityLimit > 0" class="discount-info">
-                    (Đã dùng {{ discounts.quantityLimit }})
+                    (Còn lại: {{ discounts.quantityLimit - discounts.usedCount}} mã giảm giá)
                   </span>
                   <span *ngIf="discounts.totalMoney > 0" class="discount-info">
-                    (Hạn sử dụng {{ discounts.endTime | date:'dd/MM/yyyy' }})
+                    (Hạn sử dụng: Từ {{ discounts.startTime | date:'dd/MM/yyyy' }} đến {{ discounts.endTime | date:'dd/MM/yyyy' }})
                   </span>
                 </div>
               </div>
             </label>
           </li>
         </ul>
-        <div *ngIf="discount && discount.length < 1">
+        <div *ngIf="discount && discount.length < 1 && discountInvalid.length <1">
           <span>Không có mã khuyến mại</span>
         </div>
       </div>
