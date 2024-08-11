@@ -940,3 +940,36 @@ textarea {
   background-color: #0056b3;
 }
 
+.input-group {
+  display: flex; /* Use flexbox to align label and input */
+  width: 100%;
+}
+
+.input-group-text {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  border-right: none; /* Remove right border to avoid double border with input */
+  border-radius: 4px 0 0 4px;
+  padding: 5px 10px;
+  font-weight: bold;
+  white-space: nowrap;
+  display: flex;
+  align-items: center; /* Center the label vertically */
+  margin-bottom: 0;
+}
+
+.form-control {
+  border: 1px solid #ced4da;
+  border-radius: 0 4px 4px 0;
+  padding: 5px 10px;
+  flex: 1;
+  display: flex;
+  align-items: center; /* Ensure input content is centered */
+}
+
+.form-control:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+

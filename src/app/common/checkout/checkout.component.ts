@@ -209,7 +209,7 @@ export class CheckoutComponent implements OnInit {
         console.log('Order submitted successfully', response);
         this.cartService.clearCart();
         sessionStorage.removeItem('cartItems');
-        if (this.selectedPaymentMethod === 'banking' || this.selectedService==='service2') {
+        if (this.selectedPaymentMethod === 'banking' || this.selectedService === 'service2') {
           this.checkVnPay(this.guestPhone);
         } else {
           this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone } });
@@ -269,14 +269,33 @@ export class CheckoutComponent implements OnInit {
       response => {
         console.log(response);
 
-        this.discount = response.filter((d: { totalMoney: number; }) => d.totalMoney <= this.getTotalCartPrice());
-        this.discountInvalid = response.filter((d: { totalMoney: number; }) => d.totalMoney > this.getTotalCartPrice());
+        const today = new Date(); // Ngày hiện tại
+
+        this.discount = response.filter((d: {
+          totalMoney: number; startTime: string; endTime: string;
+        }) => {
+          const startDate = new Date(d.startTime);
+          const endDate = new Date(d.endTime);
+          return d.totalMoney <= this.getTotalCartPrice() && today >= startDate && today <= endDate;
+        });
+        console.log(today);
+
+        console.log(this.discount);
+
+        this.discountInvalid = response.filter((d: {
+          totalMoney: number; startTime: string; endTime: string;
+        }) => {
+          const startDate = new Date(d.startTime);
+          const endDate = new Date(d.endTime);
+          return d.totalMoney > this.getTotalCartPrice() || today < startDate || today > endDate;
+        });
       },
       error => {
         console.error('Error:', error);
       }
     );
   }
+
   saveDiscount() {
     if (this.selectedDiscount !== null) {
       this.selectedDiscountDetails = this.discount.find((d: { discountId: number | null; }) => d.discountId === this.selectedDiscount);

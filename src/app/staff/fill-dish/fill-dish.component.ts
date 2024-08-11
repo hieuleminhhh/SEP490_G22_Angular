@@ -209,9 +209,8 @@ export class FillDishComponent implements OnInit {
     this.cookingService.updateOrderStatus(order.orderId, status).subscribe(
       response => {
         console.log('Order status updated:', response);
-        // Load lại trang với selectedButton = 'takeAway'
         this.selectedButton = 'takeAway';
-        this.refreshContent(); // Tải lại nội dung
+        this.refreshContent();
       },
       error => {
         console.error('Error:', error);
@@ -221,10 +220,8 @@ export class FillDishComponent implements OnInit {
   }
 
   refreshContent() {
-    // Logic để tải lại nội dung khi selectedButton là 'takeAway'
-    // Bạn có thể cần phải gọi các phương thức service để lấy lại dữ liệu, nếu cần.
     if (this.selectedButton === 'takeAway') {
-      this.getOrdersTakeaway(); // Ví dụ về phương thức lấy lại đơn hàng mang về
+      this.getOrdersTakeaway();
     }
   }
   closeModal(index: number) {
