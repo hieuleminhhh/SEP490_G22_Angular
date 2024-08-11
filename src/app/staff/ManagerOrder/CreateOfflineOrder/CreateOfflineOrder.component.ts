@@ -59,6 +59,9 @@ export class CreateOfflineOrderComponent implements OnInit {
     guestPhone: '',
     email:'antaiquan@gmail.com',
   };
+  paymentMethod: string = '0';
+  customerPaid: number | null = null;
+  paymentAmount: number = 0;
   selectedDiscount: any | null = null;
   selectedDiscountName: string = '';
   selectedDiscountPercent: number = 0;
@@ -462,16 +465,18 @@ export class CreateOfflineOrderComponent implements OnInit {
         orderTime: new Date(),
         note: item.note
       }));
-    
-      const guestPhone = this.addNew.guestPhone ? this.addNew.guestPhone : '';
       const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
+      const currentDate = new Date();
+      const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
+      const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; 
+      const guestPhone = this.addNew.guestPhone ? this.addNew.guestPhone : '';
+
       const newOrder = {
         tableId: tableId,
         guestAddress: this.addNew.guestAddress,
         consigneeName: this.addNew.consigneeName,
         orderDate: new Date().toISOString(),
         receivingOrder: null,
-        totalAmount,
         guestPhone: guestPhone,
         note: "This is a special request note.",
         discountId: this.selectedDiscount,

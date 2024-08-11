@@ -85,7 +85,7 @@
                     <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">
                       Chi tiết
                     </button>
-                    <button *ngIf="order.paymentStatus === 0 && order.status !== 5 && order.status !== 6" 
+                    <button *ngIf="order.paymentStatus === 0 || order.paymentStatus === 2 && order.status !== 5 && order.status !== 6" 
                     type="button" 
                     class="btn btn-warning btn-sm" 
                     (click)="updateOrder(order.orderId)">
@@ -288,10 +288,10 @@
           </ng-container>
 
           <!-- Tai quan -->
-          <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3">
+          <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && orderDetail?.deposits === 0 && orderDetail?.paymentStatus == 0 ">
             <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#prepaymentModalOffline">Thanh toán trước</button>
           </ng-container>
-          <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3">
+          <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && orderDetail?.deposits === 0 && orderDetail?.paymentStatus == 0" >
             <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal" data-bs-toggle="modal" >Hủy đơn</button>
           </ng-container>
           <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3">
@@ -630,23 +630,19 @@
         <label for="totalAmount" class="form-label">Tổng tiền:</label>
         <span id="totalAmount">{{ invoice?.paymentAmount | currencyFormat }}</span>
     </div>
-    <div class="mb-3" *ngIf="paymentMethod === '0' && invoice?.deposites > 0">
+    <div class="mb-3" *ngIf="paymentMethod === '0' && invoice?.deposites!==0">
       <label for="prepay" class="form-label">Thanh toán trước:</label>
       <span id="prepay">{{ invoice?.deposits | currencyFormat }}</span>
     </div>
     
     <hr>
-          <div class="mb-3">
-            <label for="amountToPay" *ngIf="paymentMethod === '0'" class="form-label">Khách phải trả:</label>
-            <span id="amountToPay">{{ invoice?.paymentAmount | currencyFormat }}</span>
-          </div>
-          <div class="mb-3">
-            <label for="customerPaid" *ngIf="paymentMethod === '0'" class="form-label">Tiền khách đưa:</label>
+        <div class="mb-3" *ngIf="paymentMethod === '0'">
+            <label for="customerPaid"  class="form-label">Tiền khách đưa:</label>
             <span id="customerPaid">{{ invoice?.amountReceived | currencyFormat }}</span>
           </div>
           
-          <div class="mb-3">
-            <label for="changeToGive" *ngIf="paymentMethod === '0'" class="form-label">Trả lại:</label>
+          <div class="mb-3" *ngIf="paymentMethod === '0'">
+            <label for="changeToGive"  class="form-label">Trả lại:</label>
             <span id="changeToGive">{{ invoice?.returnAmount | currencyFormat }}</span>
           </div>
           <div class="mb-3" *ngIf="paymentMethod === '1'">

@@ -56,6 +56,23 @@
                   <i class="fas fa-user"></i>
                 </button>
               </div>
+              <input  [(ngModel)]="ischecked" type="checkbox" > Đặt trước
+              <div class="row" *ngIf="ischecked">
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="receivingDate">Ngày nhận hàng</label>
+                    <input type="date" [(ngModel)]="receivingDate" class="form-control" id="receivingDate" name="receivingDate" required>
+                  </div>
+                </div>
+                  <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="receivingTime">Giờ nhận hàng</label>
+                    <select [(ngModel)]="receivingTime" class="form-control" id="receivingTime" name="receivingTime" required>
+                      <option *ngFor="let time of timeOptions" [value]="time">{{ time }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
               <!-- Selected Items Section -->
               <div class="cart-section mt-4">
