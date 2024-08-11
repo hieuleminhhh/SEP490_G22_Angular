@@ -506,7 +506,7 @@
             <label for="totalOrder" class="form-label">Tiền hàng:</label>
             <span id="totalOrder">{{ invoice?.totalAmount | currencyFormat }}</span>
         </div>
-        <div class="mb-3">
+        <div class="mb-3" *ngIf="invoice?.discountPercent && invoice.discountPercent > 0">
           <label for="discount" class="form-label">Khuyến mãi:</label>
           <span id="discount">
             {{ getDiscountAmount() | currencyFormat }} ({{ invoice?.discountPercent}}%)

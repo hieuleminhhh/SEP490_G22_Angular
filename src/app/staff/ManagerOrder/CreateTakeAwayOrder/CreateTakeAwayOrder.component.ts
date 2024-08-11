@@ -762,6 +762,7 @@ CreateInvoiceTakeAway(): void {
       paymentTime: new Date().toISOString(),
       paymentAmount: totalAmount,
       taxcode: "HIEU",
+      paymentStatus: 1,
       accountId: 0,
       amountReceived: amountReceived,
       returnAmount: returnAmount,
