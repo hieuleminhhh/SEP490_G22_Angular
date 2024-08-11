@@ -25,7 +25,7 @@ export interface ListOrderDetail{
   quantity:number;
   note:string;
   imageUrl:string;
-  dishesServed:string;
+  dishesServed:number;
 }
 export interface ListOrderDetailByOrder{
   orderId:number;
