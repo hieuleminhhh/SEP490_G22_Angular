@@ -50,10 +50,17 @@ export class TableManagementComponent implements OnInit {
   itemsPerPage = 9; // Số bản ghi trên mỗi trang
   totalItems = 0; // Tổng số bản ghi
 
+  dateFrom: string = '';
+  dateTo: string = '';
+  dateNow: string = '';
 
   constructor(private tableService: TableService, private reservationService: ReservationService, private router: Router) { }
 
   ngOnInit(): void {
+    const today = new Date().toISOString().split('T')[0];
+    this.dateFrom = today;
+    this.dateTo = today;
+    this.dateNow = today;
     this.getTableData();
     this.searchTermSubject.pipe(debounceTime(300)).subscribe(searchTerm => {
       this.getSearchList();
@@ -172,7 +179,7 @@ export class TableManagementComponent implements OnInit {
           isDropdownOpen: false
         }));
         this.dataReservationAccept = [...this.dataReservationToday];
-        this.applySelectedTimeFilter();
+        this.filterOrdersByDate();
         console.log(response);
 
       },
@@ -181,31 +188,47 @@ export class TableManagementComponent implements OnInit {
       }
     );
   }
-  onSelectTimeframe() {
-    // This method will be called whenever the dropdown selection changes
-    this.applySelectedTimeFilter();
+  onDateFromChange(): void {
+    if (this.dateTo < this.dateFrom) {
+      this.dateTo = this.dateFrom;
+    }
+    this.filterOrdersByDate();
   }
 
-  applySelectedTimeFilter() {
-    if (this.selectedTime === 'today') {
-      this.onSelectToday();
-    } else if (this.selectedTime === 'this_week') {
-      this.onSelectWeek();
+  onDateToChange(): void {
+    this.filterOrdersByDate();
+  }
+
+  filterOrdersByDate(): void {
+    if (this.dateFrom && this.dateTo) {
+      const fromDate = moment(this.dateFrom).startOf('day').toDate();
+      const toDate = moment(this.dateTo).endOf('day').toDate();
+
+      this.dataReservationAccept  = this.dataReservationToday.filter((order: { reservationTime: string | Date }) => {
+        const orderDate = new Date(order.reservationTime);
+        return orderDate >= fromDate && orderDate <= toDate;
+      });
+      console.log(this.dataReservationAccept);
+    } else {
+      this.dataReservationAccept = this.dataReservationToday.filter((order: { quantity: number }) => order.quantity > 0);
     }
-  }
-  onSelectToday() {
-    const today = moment().startOf('day');
-    this.dataReservationAccept = this.dataReservationToday.filter((reservation: any) => {
-      const reservationTime = moment(reservation.reservationTime);
-      return reservationTime.isSame(today, 'day');
-    });
     this.totalItems = this.dataReservationAccept.length;
-    this.paginateData();
   }
-  onSelectWeek() {
-    this.dataReservationAccept = this.dataReservationToday;
-    this.totalItems = this.dataReservationAccept.length;
-    this.paginateData();
+
+  updateStatusReservation(id: number): void {
+    this.reservationService.updateStatusReservation(id, 4).subscribe(
+      response => {
+        this.getTableData();
+        this.getReservation();
+        this.getReservationData();
+      },
+      error => {
+        console.error('Lỗi khi cập nhật trạng thái:', error);
+        if (error.error && error.error.errors) {
+          console.error('Lỗi xác thực:', error.error.errors);
+        }
+      }
+    );
   }
 
   openPopup(reserId: number) {
@@ -276,6 +299,7 @@ export class TableManagementComponent implements OnInit {
       confirmModal.classList.remove('show');
       confirmModal.style.display = 'none';
     }
+    this.selectedTableIds = [];
   }
 
   confirmSave() {
