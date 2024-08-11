@@ -62,6 +62,9 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   selectedDiscountPercent: number = 0;
   totalAmountAfterDiscount: number = 0;
   totalAmount: number = 0;
+  receivingDate: string = '';
+  receivingTime: string = '';
+  timeOptions: string[] = [];
   addNew: AddNewOrder = {
     guestPhone: '',
     email: '',
@@ -86,6 +89,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     paymentMethods: 0,
     description: ''
   };
+  ischecked: boolean = false;
   lastOrderId: number | undefined;
   newAddress: AddNewAddress = {
     guestAddress: 'Ăn tại quán',
@@ -97,11 +101,15 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.loadListDishes();
     this.loadListCombo();
     this.loadAddresses();
+    const today = new Date();
+    this.receivingDate = today.toISOString().split('T')[0];
     this.selectedAddress = "Khách lẻ"
     this.selectCategory('Món chính');
     this.LoadActiveDiscounts();
     this.calculateAndSetTotalAmount();
     this.selectedDiscount = null;
+    this.generateTimeOptions();
+    this.setDefaultReceivingTime();
 
   }
   selectCategory(category: string) {
@@ -525,6 +533,41 @@ saveAddress() {
     }
   );
 }
+generateTimeOptions() {
+  const startHour = 9; // 9 AM
+  const endHour = 21; // 9 PM
+  const interval = 30; // 30 minutes
+
+  this.timeOptions = []; // Clear existing time options before generating new ones
+
+  for (let hour = startHour; hour <= endHour; hour++) {
+    for (let minute = 0; minute < 60; minute += interval) {
+      const hourString = hour < 10 ? '0' + hour : hour.toString();
+      const minuteString = minute < 10 ? '0' + minute : minute.toString();
+      this.timeOptions.push(`${hourString}:${minuteString}`);
+    }
+  }
+
+  // After generating time options, set default receiving time again if needed
+  this.setDefaultReceivingTime();
+}
+
+setDefaultReceivingTime() {
+  const now = new Date();
+  now.setHours(now.getHours() + 1); // Add one hour to the current time
+  now.setMinutes(0); // Round down to the nearest hour
+
+  const defaultHour = now.getHours();
+  const defaultMinute = now.getMinutes();
+
+  const defaultHourString = defaultHour < 10 ? '0' + defaultHour : defaultHour.toString();
+  const defaultMinuteString = defaultMinute < 10 ? '0' + defaultMinute : defaultMinute.toString();
+  const defaultTime = `${defaultHourString}:${defaultMinuteString}`;
+
+  // Find the closest time option and set it as default
+  const closestTimeOption = this.timeOptions.find(time => time >= defaultTime) || this.timeOptions[0];
+  this.receivingTime = closestTimeOption;
+}
   loadAddresses() {
     this.orderService.ListAddress().subscribe(
       (response: Address[]) => {
@@ -615,6 +658,9 @@ saveAddress() {
       this.totalAmountAfterDiscount = this.totalAmount; // Khi không có discount
     }
   }
+  formatDateTime(date: string, time: string): string {
+    return `${date}T${time}:00.000Z`;
+}
   createOrder() {
   // Ensure selectedItems is defined
   if (!this.selectedItems || this.selectedItems.length === 0) {
@@ -630,22 +676,27 @@ saveAddress() {
     unitPrice: item.totalPrice,
     dishId: item.dishId,
     comboId: item.comboId,
-    orderTime: new Date(),
+    orderTime: this.getVietnamTime(),
     note: item.note
   }));
-
+  console.log('682',this.getVietnamTime());
   // Calculate total amount and set various properties
   const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
   const currentDate = new Date();
   const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
   const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; // Convert paymentMethod to number
-
+  let receivingTime: any;
+  if (this.ischecked === true && this.receivingDate && this.receivingTime) {
+    receivingTime = this.formatDateTime(this.receivingDate, this.receivingTime);
+  } else {
+    receivingTime ===null;
+  }
   this.addNew = {
     ...this.addNew, // Spread existing properties if any
     totalAmount,
     orderDetails,
     orderDate: this.getVietnamTime(),
-    recevingOrder: null,
+    recevingOrder: receivingTime,
     paymentTime: currentDate.toISOString(),
     amountReceived: paymentMethodValue === 0 ? customerPaidAmount : totalAmount,
     returnAmount: paymentMethodValue === 0 ? customerPaidAmount - totalAmount : 0,

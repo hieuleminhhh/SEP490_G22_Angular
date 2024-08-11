@@ -497,7 +497,7 @@ export class ManagerOrderComponent implements OnInit {
         </div>
         <div class="mb-3">
           <label for="discount" class="form-label">Khuyến mãi:</label>
-           <span id="discount">${this.getDiscountInvoiceAmount()} (${this.invoice?.discountPercent || '0'}%)</span>
+           <span id="discount">${this.getDiscountInvoiceAmount().toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })} (${this.invoice?.discountPercent || '0'}%)</span>
         </div>
         <hr>
         <div class="mb-3">
@@ -631,53 +631,83 @@ export class ManagerOrderComponent implements OnInit {
   }
   
   //Offline hoan thanh goi them mon
-  SuscessfullOrderOffline(orderId: number | undefined) {
+
+  SuscessfullOrderOffline(orderId: number | undefined, invoiceId?: number) {
     const paymentMethod = parseInt(this.paymentMethod, 10);
   
     console.log('Payment Method:', paymentMethod);
     console.log('Customer Paid:', this.customerPaid);
     console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
   
-    const remainingAmountDue = this.getAmountDue();
+    if (orderId !== undefined) {
+      if (invoiceId === undefined || invoiceId === 0) {
+        let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
+        const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - this.DiscountedTotalAmount() : 0;
+        // Data for creating a new invoice
+        const createData = {
+          orderId: orderId,
+          paymentTime: new Date().toISOString(), // Automatically sets the current date and time
+          paymentAmount: this.DiscountedTotalAmount(),
+          taxcode: "XYZDEW",
+          paymentStatus: 1,
+          customerName: "New Customer",
+          amountReceived: amountReceived,
+          returnAmount: returnAmount,
+          paymentMethods: paymentMethod,
+          description: "Invoice Created"
+        };
+  
+        this.invoiceService.updateDepositAndCreateInvoice(orderId,createData).subscribe(
+          response => {
+            console.log('Invoice created successfully:', response);
+            this.loadInvoice(orderId);
+            // Handle the response, e.g., show a success message
+          },
+          error => {
+            console.error('Error creating invoice:', error);
+            // Handle the error response
+          }
+        );
+      } else {
+        const remainingAmountDue = this.getAmountDue();
   
     // Determine the amount received based on payment method and customer payment
     let amountReceived = remainingAmountDue + (this.customerPaid ?? 0);
   
     // Calculate the return amount for cash payments
     const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - remainingAmountDue : 0;
+
+        
+        // Data for updating an existing invoice
+        const updateData = {
+          status: 4,
+          paymentTime: new Date().toISOString(), // Automatically sets the current date and time
+          paymentAmount: this.DiscountedTotalAmount(),
+          taxcode: "XYZDEW",
+          paymentStatus: 1,
+          amountReceived: amountReceived,
+          returnAmount: returnAmount,
+          paymentMethods: paymentMethod,
+          description: "Invoice Updated"
+        };
   
-    if (orderId !== undefined) {
-      const data = {
-        status: 4,
-        paymentTime: new Date().toISOString(), // Automatically sets the current date and time
-        paymentAmount: this.DiscountedTotalAmount(),
-        taxcode: "XYZDEW",
-        paymentStatus: 1,
-        customerName: "string",
-        phone: "string",
-        address: "string",
-        accountId: 0,
-        amountReceived: amountReceived,
-        returnAmount: returnAmount,
-        paymentMethods: paymentMethod,
-        description: "Hieu Update"
-      };
-  
-      this.invoiceService.updateOrderAndInvoice(orderId, data).subscribe(
-        response => {
-          console.log('Deposit updated and invoice created successfully:', response);
-          this.loadInvoice(orderId);
-          // Handle the response, e.g., show a success message
-        },
-        error => {
-          console.error('Error updating deposit and creating invoice:', error);
-          // Handle the error response
-        }
-      );
+        this.invoiceService.updateOrderAndInvoice(orderId, updateData).subscribe(
+          response => {
+            console.log('Invoice updated successfully:', response);
+            this.loadInvoice(orderId);
+            // Handle the response, e.g., show a success message
+          },
+          error => {
+            console.error('Error updating invoice:', error);
+            // Handle the error response
+          }
+        );
+      }
     } else {
       console.error('Order ID is undefined');
     }
   }
+  
   
   
 }
