@@ -288,13 +288,17 @@
           </ng-container>
 
           <!-- Tai quan -->
-          <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && orderDetail?.deposits === 0 && orderDetail?.paymentStatus == 0 ">
+          <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && orderDetail?.deposits === 0 && orderDetail?.paymentStatus == 0 && 
+          dishesServed !== totalQuantity ">
             <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#prepaymentModalOffline">Thanh toán trước</button>
           </ng-container>
           <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && orderDetail?.deposits === 0 && orderDetail?.paymentStatus == 0" >
             <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal" data-bs-toggle="modal" >Hủy đơn</button>
           </ng-container>
-          <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3">
+          <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2) && 
+          dishesServed === totalQuantity">
+            <!-- && 
+          dishesServed === totalQuantity -->
             <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#paymentModalOffline">Hoàn thành</button>
           </ng-container>
         </div>
@@ -619,12 +623,13 @@
             <label for="totalOrder" class="form-label">Tiền hàng:</label>
             <span id="totalOrder">{{ invoice?.totalAmount | currencyFormat }}</span>
         </div>
-        <div class="mb-3">
+        <div class="mb-3" *ngIf="invoice?.discountPercent && invoice.discountPercent > 0">
           <label for="discount" class="form-label">Khuyến mãi:</label>
           <span id="discount">
-            {{ getDiscountInvoiceAmount() | currencyFormat }} ({{ invoice?.discountPercent}}%)
+              {{ getDiscountInvoiceAmount() | currencyFormat }} ({{ invoice.discountPercent }}%)
           </span>
       </div>
+      
       <hr>
       <div class="mb-3">
         <label for="totalAmount" class="form-label">Tổng tiền:</label>

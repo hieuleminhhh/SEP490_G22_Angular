@@ -67,6 +67,7 @@ export class ManagerOrderComponent implements OnInit {
   tables: Table[] = [];
   tableId: number | null = null;
   dishesServed: number = 0;
+  totalQuantity: number = 0;
 
   constructor(
     private orderService: ManagerOrderService, 
@@ -136,19 +137,25 @@ export class ManagerOrderComponent implements OnInit {
         if (this.tables.length > 0) {
           this.tableId = this.tables[0].tableId; // Extracting tableId from the first table
         }
-
-        // Iterate through orderDetails to access dishesServed
+  
+        // Iterate through orderDetails to access dishesServed and quantity
         let totalDishesServed = 0;
+        let totalQuantity = 0;
+  
         orderDetail.orderDetails.forEach((detail) => {
           console.log('Dishes Served:', detail.dishesServed);
-          totalDishesServed += parseInt(detail.dishesServed, 10);
+          console.log('Quantity:', detail.quantity);
+          totalDishesServed += detail.dishesServed; // No need for parseInt
+          totalQuantity += detail.quantity; // No need for parseInt
         });
-
+  
         console.log('Total Dishes Served:', totalDishesServed);
-
-        // If needed, you can store totalDishesServed in a variable or use it directly for further logic
-        this.dishesServed = totalDishesServed; // Assuming this.dishesServed is defined
-
+        console.log('Total Quantity:', totalQuantity);
+  
+        // Store totalDishesServed and totalQuantity for use in the template
+        this.dishesServed = totalDishesServed;
+        this.totalQuantity = totalQuantity;
+  
         console.log('Fetched order detail:', this.orderDetail);
         console.log('Tables:', this.tables);
         console.log('Table ID:', this.tableId); // Logging the tableId
@@ -158,6 +165,8 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
+  
+  
 
   
   updateOrder(orderId: number) {
@@ -363,6 +372,10 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
+  reloadPage() {
+    window.location.reload(); // Reloads the current page
+  }
+  
   transform(value: string | Date, format: string = 'dd/MM/yyyy HH:mm', locale: string = 'vi-VN'): string {
     if (!value) return '';
   
@@ -526,6 +539,7 @@ export class ManagerOrderComponent implements OnInit {
     if (orderId !== undefined && status !== undefined) {
       this.orderService.updateOrderStatus(orderId, status).subscribe(
         response => {
+          window.location.reload();
           console.log('Invoice status updated successfully:', response);
           // Handle the plain text response, e.g., show a success message
         },
@@ -600,7 +614,7 @@ export class ManagerOrderComponent implements OnInit {
         amountReceived: amountReceived,
         returnAmount: returnAmount,
         paymentMethods: paymentMethod,
-        description: "Hieu Update"
+        description: "Hieu Update",
       };
       
       this.invoiceService.updateDepositAndCreateInvoice(orderId, data).subscribe(
@@ -688,7 +702,8 @@ export class ManagerOrderComponent implements OnInit {
           amountReceived: amountReceived,
           returnAmount: returnAmount,
           paymentMethods: paymentMethod,
-          description: "Invoice Updated"
+          description: "Invoice Updated",
+          tableStatus: 0,
         };
   
         this.invoiceService.updateOrderAndInvoice(orderId, updateData).subscribe(
