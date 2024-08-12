@@ -654,7 +654,7 @@ export class ManagerOrderComponent implements OnInit {
     console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
   
     if (orderId !== undefined) {
-      if (invoiceId === undefined || invoiceId === 0) {
+      if (invoiceId === undefined || invoiceId === 0 || invoiceId === null) {
         let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
         const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - this.DiscountedTotalAmount() : 0;
         // Data for creating a new invoice
@@ -671,7 +671,7 @@ export class ManagerOrderComponent implements OnInit {
           description: "Invoice Created"
         };
   
-        this.invoiceService.updateDepositAndCreateInvoice(orderId,createData).subscribe(
+        this.invoiceService.createInvoiceOffline(orderId, createData).subscribe(
           response => {
             console.log('Invoice created successfully:', response);
             this.loadInvoice(orderId);
@@ -684,12 +684,14 @@ export class ManagerOrderComponent implements OnInit {
         );
       } else {
         const remainingAmountDue = this.getAmountDue();
-  
+        console.log('687',remainingAmountDue);
     // Determine the amount received based on payment method and customer payment
-    let amountReceived = remainingAmountDue + (this.customerPaid ?? 0);
+    let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
+    console.log('690',amountReceived);
   
     // Calculate the return amount for cash payments
     const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - remainingAmountDue : 0;
+    console.log('694',returnAmount);
 
         
         // Data for updating an existing invoice
