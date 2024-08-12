@@ -27,6 +27,7 @@ import { ManageDiscountComponent } from './manager/ManageDiscount/ManageDiscount
 import { FillDishComponent } from './staff/fill-dish/fill-dish.component';
 import { UpdateOrderForGuestComponent } from './staff/ManagerOrder/UpdateOrderForGuest/UpdateOrderForGuest.component';
 import { SettingComponent } from './admin/setting/setting.component';
+import { ManageAccountComponent } from './admin/manageAccount/manageAccount.component';
 
 
 export const routes: Routes = [
@@ -58,5 +59,6 @@ export const routes: Routes = [
     {'path': 'fillDish' , component:FillDishComponent},
     {'path': 'manageDiscount' , component:ManageDiscountComponent},
     {'path': 'updateOrder/:orderId' , component: UpdateOrderForGuestComponent},
-    {'path': 'setting' , component: SettingComponent}
+    {'path': 'setting' , component: SettingComponent},
+    {'path': 'manageAccount', component: ManageAccountComponent},
 ];

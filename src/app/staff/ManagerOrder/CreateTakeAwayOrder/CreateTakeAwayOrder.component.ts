@@ -21,6 +21,7 @@ import { ItemInvoice } from '../../../../models/invoice.model';
 import { PercentagePipe } from '../../../common/material/percentFormat/percentFormat.component';
 import { Discount } from '../../../../models/discount.model';
 import { DiscountService } from '../../../../service/discount.service';
+import { CheckoutService } from '../../../../service/checkout.service';
 
 @Component({
   selector: 'app-CreateTakeAwayOrder',
@@ -33,7 +34,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
 
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService,
      private orderService : ManagerOrderService,  private cd: ChangeDetectorRef, private invoiceService: InvoiceService,
-    private route: ActivatedRoute, private dialog: MatDialog, private discountService: DiscountService) { }
+    private route: ActivatedRoute, private dialog: MatDialog, private discountService: DiscountService, private checkoutService: CheckoutService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   dishes: ListAllDishes[] = [];
   combo: ListAllCombo[] = [];
@@ -91,6 +92,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   };
   ischecked: boolean = false;
   lastOrderId: number | undefined;
+  discountInvalid: any = {};
   newAddress: AddNewAddress = {
     guestAddress: 'Ăn tại quán',
     consigneeName: '',
@@ -607,11 +609,36 @@ setDefaultReceivingTime() {
     }
   }
   LoadActiveDiscounts(): void {
-    this.discountService.getActiveDiscounts().subscribe((data) => {
-      this.discount = data;
-    }, (error) => {
-      console.error('Error fetching active discounts:', error);
-    });
+    this.checkoutService.getListDiscount().subscribe(
+      response => {
+        console.log(response);
+
+        const today = new Date(); // Ngày hiện tại
+
+        this.discount = response.filter((d: {
+          totalMoney: number; startTime: string; endTime: string;
+        }) => {
+          const startDate = new Date(d.startTime);
+          const endDate = new Date(d.endTime);
+          return d.totalMoney <= this.totalAmount && today >= startDate && today <= endDate;
+        });
+        console.log(today);
+
+        console.log(648,this.discount);
+
+        this.discountInvalid = response.filter((d: {
+          totalMoney: number; startTime: string; endTime: string;
+        }) => {
+          const startDate = new Date(d.startTime);
+          const endDate = new Date(d.endTime);
+          return d.totalMoney > this.totalAmount || today < startDate || today > endDate;
+        });
+        console.log(657,this.discountInvalid);
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
   }
   onItemClick(discount: Discount) {
     this.selectedDiscount = discount.discountId;
@@ -656,6 +683,13 @@ setDefaultReceivingTime() {
       this.updateTotalAmountWithDiscount();
     } else {
       this.totalAmountAfterDiscount = this.totalAmount; // Khi không có discount
+    }
+  }
+  onDiscountSelect(discountId: number) {
+    if (this.selectedDiscount === discountId) {
+      this.selectedDiscount = null; // Bỏ chọn nếu đã được chọn trước đó
+    } else {
+      this.selectedDiscount = discountId; // Chọn mã giảm giá mới
     }
   }
   formatDateTime(date: string, time: string): string {
