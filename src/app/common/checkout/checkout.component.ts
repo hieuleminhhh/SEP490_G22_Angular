@@ -19,12 +19,12 @@ import { PercentagePipe } from '../material/percentFormat/percentFormat.componen
 })
 export class CheckoutComponent implements OnInit {
   selectedService: string = 'service1';
-  orderTime: string = 'Sớm nhất';
+  orderTime: string = 'Giao hàng sớm nhất';
   isEditing: boolean = false;
   cartItems: Dish[] = [];
 
-  date: string | undefined;
-  time: string | undefined;
+  date: string='';
+  time: string='';
   isEarliest: boolean = true;
 
   consigneeName: string = '';
@@ -34,7 +34,6 @@ export class CheckoutComponent implements OnInit {
   note: string = '';
   people: number | undefined;
   selectedPaymentMethod: string = 'delivery';
-
   minDate: string; // Ngày nhận tối thiểu là ngày hiện tại
   maxDate: string; // Ngày nhận tối đa là ngày hiện tại + 7 ngày
   availableHours: string[] = [];
@@ -47,6 +46,7 @@ export class CheckoutComponent implements OnInit {
 
   constructor(private cartService: CartService, private http: HttpClient, private router: Router, private route: ActivatedRoute, private checkoutService: CheckoutService) {
     const today = new Date();
+    this.date = new Date().toISOString().split('T')[0];
     this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
     const maxDate = new Date();
     maxDate.setDate(today.getDate() + 7);
@@ -61,6 +61,7 @@ export class CheckoutComponent implements OnInit {
       this.cartItems = JSON.parse(cartItemsString); // Chuyển đổi chuỗi JSON thành mảng đối tượng JavaScript
       console.log(this.cartItems);
     }
+    this.updateTimes();
   }
 
   generateAvailableHours() {
@@ -80,6 +81,28 @@ export class CheckoutComponent implements OnInit {
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
+  updateTimes(): void {
+    const now = new Date();
+    const selectedDate = new Date(this.date);
+    const isToday = now.toDateString() === selectedDate.toDateString();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    this.availableHours = [];
+
+    for (let hour = 9; hour <= 21; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        if (isToday && (hour > currentHour || (hour === currentHour && minute >= currentMinute))) {
+          this.addTimeOption(hour, minute);
+        } else if (!isToday) {
+          this.addTimeOption(hour, minute);
+        }
+      }
+    }
+  }
+  addTimeOption(hour: number, minute: number): void {
+    const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+    this.availableHours.push(time);
+  }
 
   toggleEdit() {
     // Hiển thị modal khi nhấn vào nút "Thay đổi"
@@ -92,6 +115,10 @@ export class CheckoutComponent implements OnInit {
 
   hideModal() {
     // Đóng modal
+    if(!this.date || !this.time){
+      this.isEarliest = true;
+    }
+
     const modal = document.getElementById('updateTimeModal');
     if (modal) {
       modal.classList.remove('show');
@@ -100,8 +127,10 @@ export class CheckoutComponent implements OnInit {
   }
 
   saveTime() {
+    console.log(this.date, this.time);
+
     if (this.isEarliest) {
-      this.orderTime = 'Sớm nhất';
+      this.orderTime = 'Giao hàng sớm nhất';
     } else {
       // Xử lý khi người dùng nhập ngày và giờ
       if (this.date && this.time) {
@@ -128,8 +157,8 @@ export class CheckoutComponent implements OnInit {
   }
   onEarliestChange() {
     if (this.isEarliest) {
-      this.date = undefined;
-      this.time = undefined;
+      this.date = new Date().toISOString().split('T')[0];
+      this.time = '';
     }
   }
 
@@ -189,7 +218,7 @@ export class CheckoutComponent implements OnInit {
       status: 1,
       recevingOrder: receivingTime,
       totalAmount: this.getTotalCartPrice(),
-      deposits: 0,
+      deposits: this.getTotalCartPrice(),
       note: this.note,
       type: 2,
       discountId: this.selectedDiscount,
@@ -271,23 +300,30 @@ export class CheckoutComponent implements OnInit {
 
         const today = new Date(); // Ngày hiện tại
 
+        // Lọc những discount hợp lệ
         this.discount = response.filter((d: {
-          totalMoney: number; startTime: string; endTime: string;
+          totalMoney: number;
+          startTime: string;
+          endTime: string;
+          discountStatus: boolean; // Bổ sung điều kiện status
         }) => {
           const startDate = new Date(d.startTime);
           const endDate = new Date(d.endTime);
-          return d.totalMoney <= this.getTotalCartPrice() && today >= startDate && today <= endDate;
+          return d.discountStatus === true && d.totalMoney <= this.getTotalCartPrice() && today >= startDate && today <= endDate;
         });
         console.log(today);
-
         console.log(this.discount);
 
+        // Lọc những discount không hợp lệ
         this.discountInvalid = response.filter((d: {
-          totalMoney: number; startTime: string; endTime: string;
+          totalMoney: number;
+          startTime: string;
+          endTime: string;
+          discountStatus: boolean; // Bổ sung điều kiện status
         }) => {
           const startDate = new Date(d.startTime);
           const endDate = new Date(d.endTime);
-          return d.totalMoney > this.getTotalCartPrice() || today < startDate || today > endDate;
+          return d.discountStatus !== true || d.totalMoney > this.getTotalCartPrice() || today < startDate || today > endDate;
         });
       },
       error => {
@@ -295,6 +331,7 @@ export class CheckoutComponent implements OnInit {
       }
     );
   }
+
 
   saveDiscount() {
     if (this.selectedDiscount !== null) {

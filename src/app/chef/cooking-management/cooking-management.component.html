@@ -50,7 +50,9 @@
                   <th>Tên món</th>
                   <th>Số lượng</th>
                   <th>Thời gian gọi món</th>
+                  <th>Thời gian nhận món</th>
                   <th>Ghi chú</th>
+                  <th>Loại đơn</th>
                   <th>Số lượng hoàn thành</th>
                 </tr>
               </thead>
@@ -60,7 +62,9 @@
                     <td>{{order.itemName || order.comboName}}</td>
                     <td>{{order.quantity}}</td>
                     <td>{{order.orderTime | date:'dd/MM/yyyy - HH:mm' }}</td>
+                    <td></td>
                     <td>{{order.note ? null: ''}}</td>
+                    <td>{{order.type }}</td>
                     <td>
                       <form [formGroup]="forms[order.orderDetailId]"
                       (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboName, order.type)"
