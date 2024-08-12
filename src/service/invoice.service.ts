@@ -10,8 +10,8 @@ export class InvoiceService {
 
   constructor(private http: HttpClient) { }
 
-  createInvoiceOffline(invoiceData: any): Observable<any> {
-    const url = `${this.apiUrl}/Invoice/create-invoice/${invoiceData.orderId}`;
+  createInvoiceOffline(orderId: number, invoiceData: any): Observable<any> {
+    const url = `${this.apiUrl}/Invoice/create-invoice/${orderId}`;
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };

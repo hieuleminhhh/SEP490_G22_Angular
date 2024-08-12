@@ -552,19 +552,6 @@ export class CreateOfflineOrderComponent implements OnInit {
         modalBackdrop.parentNode.removeChild(modalBackdrop);
       }
     }
-  createInvoiceOffline(orderId: number) {
-    this.invoiceService.createInvoiceOffline(orderId).subscribe(
-      response => {
-        console.log('Invoice created successfully:', response);
-        this.successMessage = 'Invoice created successfully!';
-        setTimeout(() => this.successMessage = '', 5000);
-      },
-      error => {
-        console.error('Error creating invoice:', error);
-        this.errorMessage = 'Failed to create invoice. Please try again later.';
-      }
-    );
-  }
     clearForm() {
       this.newAddress = { consigneeName: '', guestPhone: '', guestAddress: '' , email: '' };
     }
