@@ -231,15 +231,16 @@
             <div class="form-group">
               <label for="date">Ngày nhận</label>
               <input id="date" type="date" name="date" class="form-control form-control-sm" [(ngModel)]="date"
-                (change)="isEarliest = false" [min]="minDate" [max]="maxDate">
+                (change)="isEarliest = false" [min]="minDate" [max]="maxDate" (change)="updateTimes()">
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label for="time">Giờ nhận</label>
               <select id="time" name="time" class="form-control form-control-sm" style="height: 41px;"
-                [(ngModel)]="time">
-                <option *ngFor="let hour of availableHours" [value]="hour">{{ hour }}</option>
+                [(ngModel)]="time" (change)="isEarliest = false">
+                <option value="">Chọn</option>
+                <option *ngFor="let time of availableHours" [value]="time">{{ time }}</option>
               </select>
             </div>
           </div>
@@ -248,7 +249,7 @@
       <div class="checkbox-label-container">
         <input type="checkbox" id="earliestCheckbox" [(ngModel)]="isEarliest" class="form-check-input"
           (change)="onEarliestChange()">
-        <label for="earliestCheckbox" class="form-check-label">giao hàng sớm nhất</label>
+        <label for="earliestCheckbox" class="form-check-label">Giao hàng sớm nhất</label>
       </div>
       <div class="modal-footer">
         <button type="button" style="background-color: red;" class="btn btn-secondary"
@@ -289,7 +290,7 @@
                     (Đơn tối thiểu {{ discounts.totalMoney | currencyFormat }})
                   </span>
                   <span *ngIf="discounts.quantityLimit > 0" class="discount-info">
-                    (Đã dùng {{ discounts.quantityLimit }})
+                    (Còn lại: {{ discounts.quantityLimit - discounts.usedCount}} mã giảm giá)
                   </span>
                   <span *ngIf="discounts.totalMoney > 0" class="discount-info">
                     (Hạn sử dụng {{ discounts.endTime | date:'dd/MM/yyyy' }})
@@ -316,7 +317,8 @@
                     (Còn lại: {{ discounts.quantityLimit - discounts.usedCount}} mã giảm giá)
                   </span>
                   <span *ngIf="discounts.totalMoney > 0" class="discount-info">
-                    (Hạn sử dụng: Từ {{ discounts.startTime | date:'dd/MM/yyyy' }} đến {{ discounts.endTime | date:'dd/MM/yyyy' }})
+                    (Hạn sử dụng: Từ {{ discounts.startTime | date:'dd/MM/yyyy' }} đến {{ discounts.endTime |
+                    date:'dd/MM/yyyy' }})
                   </span>
                 </div>
               </div>
