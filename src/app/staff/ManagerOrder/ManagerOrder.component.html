@@ -85,7 +85,7 @@
                     <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">
                       Chi tiết
                     </button>
-                    <button *ngIf="order.paymentStatus === 0 || order.paymentStatus === 2 && order.status !== 5 && order.status !== 6" 
+                    <button *ngIf="order.paymentStatus === 0 || order.paymentStatus === 2 && order.status !== 5 && order.status !== 6 && order.status !== 7" 
                     type="button" 
                     class="btn btn-warning btn-sm" 
                     (click)="updateOrder(order.orderId)">
@@ -295,8 +295,7 @@
           <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && orderDetail?.deposits === 0 && orderDetail?.paymentStatus == 0" >
             <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal" data-bs-toggle="modal" >Hủy đơn</button>
           </ng-container>
-          <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2) && 
-          dishesServed === totalQuantity">
+          <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2)">
             <!-- && 
           dishesServed === totalQuantity -->
             <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#paymentModalOffline">Hoàn thành</button>
@@ -502,7 +501,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModalOffline" (click)="SuscessfullOrderOffline(orderDetail?.orderId)">Xác nhận</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModalOffline" (click)="SuscessfullOrderOffline(orderDetail?.orderId, orderDetail?.invoiceId)">Xác nhận</button>
       </div>
     </div>
   </div>
@@ -639,7 +638,12 @@
       <label for="prepay" class="form-label">Thanh toán trước:</label>
       <span id="prepay">{{ invoice?.deposits | currencyFormat }}</span>
     </div>
-    
+    <div class="mb-3" *ngIf="paymentMethod === '0' && invoice?.deposits !== 0">
+      <label for="additionalPayment" class="form-label">Tiền khách phải trả thêm:</label>
+      <span id="additionalPayment">
+          {{ (invoice?.paymentAmount - invoice?.deposits) | currencyFormat }}
+      </span>
+  </div>
     <hr>
         <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="customerPaid"  class="form-label">Tiền khách đưa:</label>
@@ -656,7 +660,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="reloadPage()">Đóng</button>
           <button type="button" class="btn btn-primary" (click)="printInvoice()">In hóa đơn</button>
         </div>
       </div>
@@ -776,7 +780,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="reloadPage()">Đóng</button>
           <button type="button" class="btn btn-primary" (click)="printInvoice()">In hóa đơn</button>
         </div>
       </div>
