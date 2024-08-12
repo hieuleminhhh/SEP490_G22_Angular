@@ -21,6 +21,7 @@ import { DateFormatPipe } from '../../../common/material/dateFormat/dateFormat.c
 import { PercentagePipe } from '../../../common/material/percentFormat/percentFormat.component';
 import { Discount } from '../../../../models/discount.model';
 import { DiscountService } from '../../../../service/discount.service';
+import { NoteDialogComponent } from '../../../common/material/NoteDialog/NoteDialog.component';
 @Component({
     selector: 'app-create-offline-order',
     templateUrl: './CreateOfflineOrder.component.html',
@@ -580,7 +581,22 @@ export class CreateOfflineOrderComponent implements OnInit {
       this.totalAmountAfterDiscount = totalAmount - discountAmount;
       console.log('Total Amount After Discount:', this.totalAmountAfterDiscount); // Kiểm tra giá trị totalAmountAfterDiscount
     }
+    openNoteDialog(item: any): void {
+      const dialogRef = this.dialog.open(NoteDialogComponent, {
+        width: '300px',
+        data: { note: item.note },
+        position: {
+          left: '500px', // Adjust the horizontal position
+          top: '-900px' // Adjust the vertical position
+        }
+      });
     
+      dialogRef.afterClosed().subscribe(result => {
+        if (result !== undefined) {
+          item.note = result;
+        }
+      });
+    }
     
     
 }

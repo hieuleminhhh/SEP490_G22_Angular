@@ -85,12 +85,13 @@
                     <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">
                       Chi tiết
                     </button>
-                    <button *ngIf="order.paymentStatus === 0 || order.paymentStatus === 2 && order.status !== 5 && order.status !== 6 && order.status !== 7" 
-                    type="button" 
-                    class="btn btn-warning btn-sm" 
-                    (click)="updateOrder(order.orderId)">
-              Cập nhật
-            </button>
+                    <button *ngIf="(order.paymentStatus === 0 || order.paymentStatus === 2) && order.status !== 5 && order.status !== 6 && order.status !== 7"
+        type="button" 
+        class="btn btn-warning btn-sm" 
+        (click)="updateOrder(order.orderId)">
+  Cập nhật
+</button>
+
                                 
                     
                   </td>
@@ -243,7 +244,9 @@
                 <div *ngIf="orderDetail.paymentStatus === 2" class="badge bg-success ms-auto badge-circle">Thanh toán trước</div>
                 <div *ngIf="orderDetail.paymentStatus === 1" class="badge bg-success ms-auto badge-circle">Đã thanh toán</div>
                 <div *ngIf="orderDetail.paymentStatus === 0" class="badge bg-danger ms-auto badge-circle">Chưa thanh toán</div>
+                <div *ngIf="orderDetail.paymentStatus === null || orderDetail.paymentStatus === undefined" class="badge bg-warning ms-auto badge-circle">Đang chờ</div>
               </div>
+              
             </div>
             
           </div>
@@ -262,8 +265,10 @@
         <div>
           <!-- Online guest -->
           <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 1">
-            <button type="button" class="btn btn-primary me-2" (click)="UpdateStatus(orderDetail?.orderId, 2)">Chấp nhận đơn hàng</button>
-            <button type="button" class="btn btn-danger me-2" (click)="UpdateStatus(orderDetail?.orderId, 5)">Hủy đơn</button>
+            <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#acceptOrderModal">
+              Chấp nhận đơn hàng
+            </button>
+            <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal" data-bs-toggle="modal">Hủy đơn</button>
           </ng-container>
           <!-- Online staff -->
           <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 2">
@@ -295,7 +300,8 @@
           <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && orderDetail?.deposits === 0 && orderDetail?.paymentStatus == 0" >
             <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal" data-bs-toggle="modal" >Hủy đơn</button>
           </ng-container>
-          <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2)">
+          <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2) &&
+          dishesServed === totalQuantity">
             <!-- && 
           dishesServed === totalQuantity -->
             <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#paymentModalOffline">Hoàn thành</button>
@@ -304,6 +310,24 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
       </div>
       
+    </div>
+  </div>
+</div>
+  <!-- Accept Order Confirmation Modal -->
+<div class="modal fade" id="acceptOrderModal" tabindex="-1" aria-labelledby="acceptOrderModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="acceptOrderModalLabel">Xác nhận chấp nhận đơn hàng</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Bạn có chắc chắn muốn chấp nhận đơn hàng này không?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" (click)="acceptOrder(orderDetail?.orderId)">Chấp nhận</button>
+      </div>
     </div>
   </div>
 </div>
@@ -484,7 +508,7 @@
             <label for="cashPrepay">Tiền mặt</label>
           </div>
           <div>
-            <input type="radio" id="bankPrepay" name="paymentMethod" value="1" [(ngModel)]="paymentMethod">
+            <input type="radio" id="bankPrepay" name="paymentMethod2" value="1" [(ngModel)]="paymentMethod">
             <label for="bankPrepay">Chuyển khoản ngân hàng</label>
           </div>
         </div>

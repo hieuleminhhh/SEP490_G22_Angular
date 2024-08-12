@@ -582,15 +582,19 @@ export class UpdateOrderForGuestComponent implements OnInit {
   // Existing methods for context
   calculateTotalAmount(): void {
     this.totalAmount = this.selectedItems.reduce((acc, item) => acc + this.getTotalPrice(item), 0);
+    console.log('585',this.totalAmount)
     this.calculateTotalAmountAfterDiscount();
   }
   
   calculateTotalAmountAfterDiscount(): void {
     if (this.selectedDiscount !== null) {
       const discountPercent = this.selectedDiscountPercent || 0;
+      console.log('592',discountPercent)
       this.totalAmountAfterDiscount = this.totalAmount - (this.totalAmount * (discountPercent / 100));
+      console.log('594',this.totalAmountAfterDiscount)
     } else {
       this.totalAmountAfterDiscount = this.totalAmount;
+      console.log('596',this.totalAmountAfterDiscount)
     }
   }
 
@@ -729,5 +733,18 @@ export class UpdateOrderForGuestComponent implements OnInit {
         }
       );
     }
+  }
+   getDiscountAmount(): number {
+    if (!this.selectedDiscount || this.selectedItems.length === 0) {
+      return 0;
+    }
+
+    // Calculate the total amount of selected items
+    const totalAmount = this.selectedItems.reduce((total, item) => total + item.unitPrice * item.quantity, 0);
+
+    // Calculate the discount amount
+    const discountAmount = totalAmount * (this.selectedDiscountPercent / 100);
+    
+    return discountAmount;
   }
 }
