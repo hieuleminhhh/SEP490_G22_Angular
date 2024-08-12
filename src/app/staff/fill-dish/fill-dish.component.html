@@ -50,15 +50,24 @@
                     <p>Số lượng yêu cầu: {{ dish.quantityRequired }}</p>
                     <div class="quantity-container">
                       <p>Phục vụ</p>
-                      <input type="number" min="0" [(ngModel)]="quantitiesServed[i]"
-                        (keypress)="preventNonNumericalInput($event)" (input)="validateInput($event)">
+                      <input
+                        type="number"
+                        min="1"
+                        [attr.max]="dish.quantityRequired"
+                        [(ngModel)]="quantitiesServed[i]"
+                        (keypress)="preventNonNumericalInput($event)"
+                        (input)="validateInput($event, i, dish.quantityRequired)">
                     </div>
-                    <button (click)="updateDishesServed(dish.orderDetailId, dish.itemName || dish.comboName)">Lên
-                      món</button>
+                    <button
+                      [disabled]="!isInputValid[i]"
+                      (click)="updateDishesServed(dish.orderDetailId, dish.itemName || dish.comboName)">
+                      Lên món
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
+
           </div>
 
           <!-- Content for takeAway -->
@@ -68,10 +77,10 @@
               <div class="grid-container">
                 <div *ngFor="let order of ordersTakeaway; let i = index" class="grid-item">
                   <div class="dish-info" (click)="showDetails(order)">
-                    <p>Đơn {{order.orderId}} - {{ order.type === 1 ? "Mang về" : "Giao hàng" }}</p>
+                    <p>Đơn {{order.orderId}} - {{ order.orderType === 1 ? "Mang về" : "Giao hàng" }}</p>
                     <p>Tình trạng: {{order.status === 1 ? "Hoàn thành" : "Chưa hoàn thành"}}</p>
                     <button *ngIf="order.status === 1" (click)="handleButtonClick(order); $event.stopPropagation()">
-                      {{ order.type === 1 ? "Trả đơn" : "Chuyển qua ship" }}
+                      {{ order.orderType === 1 ? "Trả đơn" : "Chuyển qua ship" }}
                     </button>
                   </div>
                 </div>
@@ -90,7 +99,7 @@
     <span class="close" (click)="closePopup()">&times;</span>
     <div class="details-container">
       <h3>Đơn hàng: {{selectedItem.orderId}}</h3>
-      <p>Loại đơn: {{ selectedItem.type === 1 ? "Mang về" : "Giao hàng" }}</p>
+      <p>Loại đơn: {{ selectedItem.orderType === 1 ? "Mang về" : "Giao hàng" }}</p>
       <p>Tình trạng: {{selectedItem.status === 1 ? "Hoàn thành" : "Chưa hoàn thành"}}</p>
       <p>Thời gian dự kiến nhận hàng: {{ selectedItem.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</p>
       <div *ngFor="let item of selectedItem.itemInOrderDetails" class="info-container">

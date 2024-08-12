@@ -264,6 +264,7 @@ html,
 }
 
 .popup-content {
+  position: relative;
   background-color: #fff;
   padding: 20px;
   border-radius: 5px;
@@ -276,7 +277,23 @@ html,
   position: absolute;
   top: 10px;
   right: 10px;
+  font-size: 24px; /* Kích thước chữ lớn hơn để dễ nhấp */
+  color: #333; /* Màu sắc của biểu tượng đóng */
+  background-color: #fff; /* Nền trắng để làm nổi bật */
+  border: 2px solid #ccc; /* Đường viền mỏng để tạo khung */
+  border-radius: 50%; /* Hình tròn để biểu tượng đóng có hình dạng đồng nhất */
+  width: 30px; /* Chiều rộng của nút đóng */
+  height: 30px; /* Chiều cao của nút đóng */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: background-color 0.3s, color 0.3s; /* Hiệu ứng chuyển màu khi hover */
+}
+
+.close:hover {
+  background-color: #f44336; /* Màu nền khi hover */
+  color: #fff; /* Màu chữ khi hover */
 }
 
 .details-container {

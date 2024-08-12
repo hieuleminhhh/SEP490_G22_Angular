@@ -19,6 +19,7 @@ export class FillDishComponent implements OnInit {
   quantitiesServed: number[] = [];
   ordersTakeaway: any;
   selectedItem: any;
+  isInputValid: boolean[] = [];
 
   constructor(private cookingService: CookingService) { }
 
@@ -95,17 +96,7 @@ export class FillDishComponent implements OnInit {
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
   }
-  preventNonNumericalInput(event: KeyboardEvent) {
-    const charCode = (event.which) ? event.which : event.keyCode;
-    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-      event.preventDefault();
-    }
-  }
-  validateInput(event: Event) {
-    const inputElement = event.target as HTMLInputElement;
-    const sanitizedValue = inputElement.value.replace(/[^0-9]/g, '');
-    inputElement.value = sanitizedValue;
-  }
+
   updateDishesServed(orderDetailId: number, itemNameOrComboName: string) {
     const index = this.orderDish.findIndex((dish: { orderDetailId: number; }) => dish.orderDetailId === orderDetailId);
 
@@ -203,7 +194,7 @@ export class FillDishComponent implements OnInit {
   handleButtonClick(order: any) {
     // Xử lý sự kiện khi nhấn nút
     const status = {
-      status: order.type === 1 ? 4 : 7
+      status: order.orderType === 1 ? 4 : 7
     };
 
     this.cookingService.updateOrderStatus(order.orderId, status).subscribe(
@@ -235,5 +226,34 @@ export class FillDishComponent implements OnInit {
 
   closePopup() {
     this.selectedItem = null;
+  }
+
+  preventNonNumericalInput(event: KeyboardEvent): void {
+    const charCode = event.charCode;
+    if (charCode !== 8 && charCode !== 0 && (charCode < 48 || charCode > 57)) {
+      event.preventDefault();
+    }
+  }
+
+  validateInput(event: Event, index: number, maxQuantity: number): void {
+    const inputElement = event.target as HTMLInputElement;
+    const value = inputElement.value;
+
+    const numericValue = Number(value);
+
+    if (
+      !value ||
+      numericValue < 1 ||
+      numericValue > maxQuantity ||
+      isNaN(numericValue)
+    ) {
+      this.isInputValid[index] = false;
+      inputElement.setCustomValidity('Giá trị không hợp lệ');
+    } else {
+      this.isInputValid[index] = true;
+      inputElement.setCustomValidity('');
+    }
+
+    inputElement.reportValidity();
   }
 }

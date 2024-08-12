@@ -149,24 +149,26 @@ export class MenuComponent {
 
   private loadDishes() {
     if (this.selectedFilter === 'Category') {
+      // Khi filter là Category, gọi API lấy món ăn
       this.dishs$ = this.getDish(this.selectedCategory, this.selectedSortOption);
       this.dishs$.subscribe(
         (data: Dish[]) => {
           this.allData = data;
           this.totalItems = data.length;
-          this.filterList();  // Filtering dishes
+          this.filterList();  // Lọc danh sách món ăn nếu cần
         },
         (error: any) => {
           console.error('Error fetching dishes:', error);
         }
       );
     } else if (this.selectedFilter === 'Combo') {
+      // Khi filter là Combo, gọi API lấy combo
       this.combo$ = this.getCombo(this.selectedSortOption);
       this.combo$.subscribe(
         (data: Combo[]) => {
           this.allData = data;
           this.totalItems = data.length;
-          this.filterList();  // Filtering combos
+          this.filterList();  // Lọc danh sách combo nếu cần
         },
         (error: any) => {
           console.error('Error fetching combos:', error);
@@ -176,8 +178,6 @@ export class MenuComponent {
     console.log('Selected Filter:', this.selectedFilter);
     console.log('Filtered Data Observable:', this.filteredData$);
   }
-
-
 
   private getCombo(sortOption?: string): Observable<Combo[]> {
     let apiUrl = 'https://localhost:7188/api/Combo';
