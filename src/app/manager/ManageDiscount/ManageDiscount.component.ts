@@ -220,7 +220,7 @@ export class ManageDiscountComponent implements OnInit {
           }
           const promotionData = {
             discountPercent: Number(condition.percent) || 0, // Chuyển đổi thành số
-            discountStatus: this.promotion.discountStatus === 'true', // Chuyển đổi chuỗi thành boolean
+            discountStatus: this.promotion.discountStatus === "true", // Chuyển đổi chuỗi thành boolean
             discountName: this.promotion.discountName || '', // Đảm bảo không phải null hoặc undefined
             type: Number(this.promotion.type), // Chuyển đổi thành số
             startTime: new Date(this.promotion.startTime).toISOString(), // Đảm bảo định dạng ISO
@@ -229,11 +229,12 @@ export class ManageDiscountComponent implements OnInit {
             totalMoney: Number(condition.totalAmount) || 0, // Chuyển đổi thành số
             quantityLimit: this.conditions[i].noLimit ? null : Number(this.conditions[i].quantityLimit) || 0 // Chuyển đổi thành số hoặc null nếu noLimit là true
           };
+          console.log(promotionData);
 
           this.sendPromotionData(promotionData, i, () => {
             if (i === this.promotion.conditions.length - 1) {
               this.closePopup();
-              window.location.reload(); // Tải lại trang sau khi lưu xong tất cả các điều kiện
+              //window.location.reload(); // Tải lại trang sau khi lưu xong tất cả các điều kiện
             }
           });
         } catch (error) {
@@ -251,7 +252,10 @@ export class ManageDiscountComponent implements OnInit {
     this.discountService.createDiscount(promotionData).subscribe(
       response => {
         console.log('Promotion saved successfully for condition index:', index, response);
-        const discountId = response.discountId;
+        const discountId = response.discount.discountId;
+        console.log(discountId);
+        console.log(this.promotion.type);
+
         if (discountId && this.promotion.type === '2') {
           this.updateDishDiscountId(discountId, index, callback);
         } else {
