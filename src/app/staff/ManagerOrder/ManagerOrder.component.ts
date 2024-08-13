@@ -732,24 +732,25 @@ export class ManagerOrderComponent implements OnInit {
     }
   
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set time to midnight to ignore time differences
-  
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+    today.setHours(0, 0, 0, 0); // Set time to midnight
   
     // Load the order details
     this.orderDetailService.getOrderDetail(orderId).subscribe(
       (orderDetails) => {
+        // Ensure that the receivingOrder is correctly parsed as a Date object
         const recevingOrder = new Date(orderDetails.recevingOrder);
-        recevingOrder.setHours(0, 0, 0, 0); // Set time to midnight to ignore time differences
-        const deposits = orderDetails.deposits;
+        recevingOrder.setHours(0, 0, 0, 0); // Set time to midnight
+  
         let newStatus: number | null = null;
   
         // Determine the new status based on recevingOrder
         if (recevingOrder.getTime() === today.getTime()) {
+          // Log values for debugging
+          console.log('recevingOrder:', recevingOrder.getTime());
+          console.log('today:', today.getTime());
           newStatus = 6; // If today, set status to 6
-        } else if (recevingOrder.getTime() === tomorrow.getTime()) {
-          newStatus = 2; // If tomorrow, set status to 2
+        } else {
+          newStatus = 2; // If not today, set status to 2
         }
   
         // Update status if applicable and create the invoice
@@ -760,9 +761,9 @@ export class ManagerOrderComponent implements OnInit {
           const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - amountDue : 0;
   
           // Set paymentStatus based on deposits
-          const paymentStatus = deposits === 0 ? 0 : 1;
+          const paymentStatus = orderDetails.deposits === 0 ? 0 : 1;
   
-          this.orderService.UpdateOrderStatus(orderId, newStatus).subscribe(
+          this.orderService.updateOrderStatus(orderId, newStatus).subscribe(
             (statusUpdateResponse) => {
               console.log('Order status updated based on recevingOrder:', statusUpdateResponse);
   
@@ -773,7 +774,7 @@ export class ManagerOrderComponent implements OnInit {
                 paymentAmount: this.DiscountedTotalAmount(),
                 taxcode: "XYZDEW",
                 paymentStatus: paymentStatus,
-                amountReceived: amountReceived,
+                amountReceived: this.paymentAmount,
                 returnAmount: returnAmount,
                 paymentMethods: paymentMethod,
                 description: "Invoice Created"
@@ -803,6 +804,8 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
+  
+  
   
   
   

@@ -36,13 +36,43 @@ export class LoginComponent implements OnInit {
           console.log(this.username);
           console.log(this.password);
           console.log(response.token);
-          this.router.navigate(['/dashboard']);
+          console.log(response.role);
+  
+          // Lưu token và vai trò vào localStorage hoặc một dịch vụ để sử dụng sau này
+          localStorage.setItem('token', response.token);
+          const userRole = response.role; // Vai trò người dùng từ phản hồi
+  
+          // Điều hướng dựa trên vai trò
+          switch (userRole) {
+            case 'Chef':
+              this.router.navigate(['/cooking']);
+              break;
+            case 'Cashier':
+              this.router.navigate(['/dashboard']);
+              break;
+            case 'Admin':
+              this.router.navigate(['/setting']);
+              break;
+            case 'Manager':
+              this.router.navigate(['/manager']);
+              break;
+            case 'StaffOrder':
+              this.router.navigate(['/listTable']);
+              break;
+            case 'Ship':
+              this.router.navigate(['/ship']);
+              break;
+            default:
+              console.error('Unknown role:', userRole);
+              break;
+          }
         },
         error: error => {
           console.error('Login failed', error);
         }
       });
   }
+  
 
   
 
