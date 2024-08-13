@@ -20,7 +20,7 @@
       <p class="tertiary">
 
       </p>
-
+      <br><br><br><br><br><br>
       <a routerLink="/menu" routerLinkActive="äctive" class="btn">Xem thực đơn</a>
     </div>
     <div class="visual">
@@ -28,7 +28,7 @@
     </div>
   </div>
   <!-- End Hero Section -->
-
+  <br><br>
   <!-- How It Works -->
   <div class="section" id="how-it-works">
     <h2 class="secondary">Tiêu Chí</h2>
@@ -62,23 +62,35 @@
 
   <!-- End How It Works -->
 
-
+  <br><br><br>
+  <hr>
 
   <!-- Restaurant Menu -->
-  <div class="section" id="menu">
+  <div class="section-menu" id="menu">
     <div class="container">
 
       <div class="secondary">Món Ăn Đặc Sắc</div>
       <hr>
-      <ul class="category"*ngIf="category$ | async as categories" >
-        <li class="active">All</li>
-        <li *ngFor="let category of categories">{{ category.categoryName }}</li>
+      <ul class="category" *ngIf="category$ | async as categories">
+        <li
+          (click)="filterByCategory(null)"
+          [class.active]="!selectedCategory">
+          All
+        </li>
+        <li
+          *ngFor="let category of categories"
+          (click)="filterByCategory(category.categoryName)"
+          [class.active]="selectedCategory === category.categoryName">
+          {{ category.categoryName }}
+        </li>
       </ul>
+
 
       <div class="container" *ngIf="dishs$ | async as dishs">
         <div class="restaurant-menu">
-          <div class="menu-item"  *ngFor="let item of dishs; let i = index">
-            <img [src]="item.imageUrl" [alt]="item.itemName" width="200" height="200">
+          <div class="menu-item" *ngFor="let item of dishs | slice:0:6; let i = index">
+            <img [src]="item.imageUrl" [alt]="item.itemName" width="200" height="200"
+              (click)="showDetails(item, 'dish')">
 
             <div class="title">{{ item.itemName }}</div>
 
@@ -101,11 +113,13 @@
     </div>
   </div>
   <!-- End Restaurant Menu -->
+  <hr><br>
   <!-- About -->
   <div class="section" id="about">
     <div class="container flex">
       <div class="visual">
-        <img src="https://th.bing.com/th/id/R.dd4e0ef500b38471ba3bfe674e66e7c1?rik=gG6GRr%2fmc1bAgw&pid=ImgRaw&r=0" alt="" />
+        <img src="https://th.bing.com/th/id/R.dd4e0ef500b38471ba3bfe674e66e7c1?rik=gG6GRr%2fmc1bAgw&pid=ImgRaw&r=0"
+          alt="" />
       </div>
       <div class="text">
         <div class="secondary">Về Chúng Tôi</div>
@@ -126,6 +140,33 @@
     </div>
   </div>
   <!-- End About -->
+
+  <!-- Popup for item details -->
+  <div *ngIf="selectedItem" class="popup" (click)="closePopup()">
+    <div class="popup-content" (click)="$event.stopPropagation()">
+      <span class="close" (click)="closePopup()">&times;</span>
+      <div class="details-container">
+        <div class="image-container">
+          <img *ngIf="selectedItem.imageUrl" [src]="selectedItem.imageUrl"
+            alt="{{ selectedItem.nameCombo || selectedItem.itemName }}" width="200" height="200">
+        </div>
+        <div class="info-container">
+          <h2>{{ selectedItem.nameCombo || selectedItem.itemName }}</h2>
+          <p> <span class="price-container">
+              <span *ngIf="selectedItem.discountedPrice" class="discounted-price">{{ selectedItem.discountedPrice |
+                currencyFormat}}</span>
+              <span [class]="selectedItem.discountedPrice ? 'original-price' : 'no-discount'">{{ selectedItem.price |
+                currencyFormat}}</span>
+            </span></p>
+          <p>{{ selectedItem.itemDescription }}</p>
+          <!-- Add more detailed information as needed -->
+          <button (click)="addToCart(selectedItem, 'dish')" class="add-to-cart " style="margin-left: 200px;">Thêm vào
+            giỏ hàng</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
 
 </body>
 
