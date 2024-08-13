@@ -20,6 +20,7 @@ import { PercentagePipe } from '../material/percentFormat/percentFormat.componen
 export class CheckoutComponent implements OnInit {
   selectedService: string = 'service1';
   orderTime: string = 'Giao hàng sớm nhất';
+  reserTime: string = ' ';
   isEditing: boolean = false;
   cartItems: Dish[] = [];
 
@@ -208,6 +209,17 @@ export class CheckoutComponent implements OnInit {
       const currentTimeStr = currentTime.toTimeString().split(' ')[0].substring(0, 5);
       receivingTime = this.formatDateTime(currentDate, currentTimeStr);
     }
+    let deposits = 0;
+    if (this.selectedPaymentMethod === 'banking') {
+      deposits = this.getTotalCartPrice();
+    }
+    if(this.selectedService === 'service2'){
+      deposits = this.getTotalCartPrice()/2;
+    }
+    console.log(this.selectedPaymentMethod);
+    console.log(this.selectedService);
+
+
     const request = {
       guestPhone: this.guestPhone,
       email: this.email,
@@ -218,7 +230,7 @@ export class CheckoutComponent implements OnInit {
       status: 1,
       recevingOrder: receivingTime,
       totalAmount: this.getTotalCartPrice(),
-      deposits: this.getTotalCartPrice(),
+      deposits: deposits,
       note: this.note,
       type: 2,
       discountId: this.selectedDiscount,
