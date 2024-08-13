@@ -55,19 +55,21 @@
                       </td>
                       <td>
                         <div class="d-flex align-items-center">
-                          <button class="btn btn-outline-secondary btn-sm" (click)="decreaseQuantity(i)">-</button>
+                          <button class="btn btn-outline-secondary btn-sm"
+                            (click)="decreaseQuantity(i, orderId)">-</button>
                           <!-- HTML -->
                           <input type="number"
                             class="form-control text-center small-input mx-2 no-spinners rounded-input disabled-input"
-                            [(ngModel)]="item.quantity" (change)="validateQuantity(i)" min="1" max="100">
+                            [(ngModel)]="item.quantity" (change)="validateQuantity(i, orderId)" min="1" max="100">
 
-                          <button class="btn btn-outline-secondary btn-sm" (click)="increaseQuantity(i)">+</button>
+                          <button class="btn btn-outline-secondary btn-sm"
+                            (click)="increaseQuantity(i, orderId)">+</button>
                         </div>
                       </td>
 
                       <td>
                         <div class="d-flex align-items-center">
-                          <input type="number" class="form-control text-center small-input"
+                          <input type="number" class="form-control text-center small-input disabled-input"
                             [(ngModel)]="item.dishesServed">
                         </div>
                       </td>
@@ -90,12 +92,12 @@
                 </table>
                 <div *ngIf="selectedItems.length > 0" class="mt-2">
                   <strong>Tạm tính:</strong>
-                  {{ totalAmountAfterDiscount | currencyFormat }}
+                  {{ totalAmount | currencyFormat }}
                   <br>
                 </div>
 
                 <button class="btn btn-primary btn-sm" *ngIf="selectedItems.length > 0" data-bs-toggle="modal"
-                  data-bs-target="#discountModal">
+                  data-bs-target="#discountModal" (click)="LoadActiveDiscounts()">
                   <i class="fas fa-tags me-2"></i> <!-- Biểu tượng Font Awesome -->
                   Khuyến mãi
                 </button>
@@ -142,7 +144,7 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                       (click)="reloadPage()">Không</button>
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
-                    (click)="updateOrderDetails(orderId)">Có</button>
+                      (click)="updateOrderDetails(orderId)">Có</button>
                   </div>
                 </div>
               </div>
@@ -168,36 +170,85 @@
               </div>
             </div>
             <!-- Giam gia -->
-<!-- Discount Modal -->
-<div class="modal fade" #formModal id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="discountModalLabel">Chọn giảm giá</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <ul class="list-group">
-          <li *ngFor="let discount of discounts" class="list-group-item list-group-item-action">
-            <label class="d-flex align-items-center w-100 m-0" (click)="onItemClick(discount)">
-              <input type="radio" name="selectedDiscount" [value]="discount.discountId"
-                [checked]="discount.discountId === selectedDiscount" class="me-2" />
-              <span *ngIf="discount.quantityLimit > 0 || discount.totalMoney > 0">
-                {{ discount.discountName }} - {{ discount.discountPercent | percentage }}
-                <span *ngIf="discount.totalMoney > 0">(Giảm giá theo tổng hóa đơn thanh toán {{ discount.totalMoney | currencyFormat }})</span>
-                <span *ngIf="discount.quantityLimit > 0">(Số lượng có hạn {{ discount.quantityLimit }})</span>
-              </span>
-            </label>
-          </li>
-        </ul>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="applyDiscount()">Áp dụng</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearSelectedDiscount()">Đóng</button>
-      </div>
-    </div>
-  </div>
-</div>
+            <!-- Discount Modal -->
+            <div class="modal fade" #formModal id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="discountModalLabel">Chọn giảm giá</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body-discount">
+                    <ul class="list-group">
+                      <li *ngFor="let discount of discounts" class="list-group-item list-group-item-action">
+                        <label class="d-flex align-items-center w-100">
+                          <input type="radio" name="selectedDiscount" [value]="discount.discountId"
+                            [checked]="selectedDiscount === discount.discountId"
+                            (click)="onDiscountSelect(discount.discountId)" class="me-2"
+                            style="width: 20px; max-width: 20px;" />
+                          <div class="discount-details">
+                            <div class="discount-left">
+                              {{ discount.discountName }}
+                            </div>
+                            <div class="discount-right">
+                              Giảm {{ discount.discountPercent | percentage }} cho đơn hàng
+                              <span *ngIf="discount.totalMoney > 0" class="discount-info">
+                                (Đơn tối thiểu {{ discount.totalMoney | currencyFormat }})
+                              </span>
+                              <span *ngIf="discount.quantityLimit > 0" class="discount-info">
+                                (Đã dùng {{ discount.quantityLimit }})
+                              </span>
+                              <span *ngIf="discount.totalMoney > 0" class="discount-info">
+                                (Hạn sử dụng {{ discount.endTime | date:'dd/MM/yyyy' }})
+                              </span>
+                            </div>
+                          </div>
+                        </label>
+                      </li>
+                      <li *ngFor="let discounts of discountInvalid"
+                        class="list-group-item list-group-item-action disabled-discount">
+                        <label class="d-flex align-items-center w-100">
+                          <input type="radio" name="selectedDiscount" [value]="discounts.discountId" disabled
+                            class="me-2" style="width: 20px; max-width: 20px;" />
+                          <div class="discount-details">
+                            <div class="discount-left">
+                              {{ discounts.discountName }}
+                            </div>
+                            <div class="discount-right">
+                              Giảm {{ discounts.discountPercent | percentage }} cho đơn hàng
+                              <span *ngIf="discounts.totalMoney > 0" class="discount-info">
+                                (Đơn tối thiểu {{ discounts.totalMoney | currencyFormat }})
+                              </span>
+                              <span *ngIf="discounts.quantityLimit > 0" class="discount-info">
+                                (Còn lại: {{ discounts.quantityLimit - discounts.usedCount}} mã giảm giá)
+                              </span>
+                              <span *ngIf="discounts.totalMoney > 0" class="discount-info">
+                                (Hạn sử dụng: Từ {{ discounts.startTime | date:'dd/MM/yyyy' }} đến {{ discounts.endTime
+                                | date:'dd/MM/yyyy' }})
+                              </span>
+                            </div>
+                          </div>
+                        </label>
+                      </li>
+                    </ul>
+                    <div *ngIf="discounts && discounts.length < 1 && discountInvalid.length <1">
+                      <span>Không có mã khuyến mại</span>
+                    </div>
+                  </div>
+
+
+
+                  <!-- applyDiscount() -->
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                      (click)="applyDiscount(orderId)">Áp dụng</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                      (click)="clearSelectedDiscount()">Đóng</button>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <!-- Right column for dishes and combos -->
             <div class="col-md-6">

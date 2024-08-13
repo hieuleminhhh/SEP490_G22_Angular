@@ -21,6 +21,7 @@ import { ItemInvoice } from '../../../../models/invoice.model';
 import { Discount } from '../../../../models/discount.model';
 import { PercentagePipe } from '../../../common/material/percentFormat/percentFormat.component';
 import { DiscountService } from '../../../../service/discount.service';
+import { CheckoutService } from '../../../../service/checkout.service';
 @Component({
   selector: 'app-UpdateOrderForGuest',
   templateUrl: './UpdateOrderForGuest.component.html',
@@ -31,7 +32,8 @@ import { DiscountService } from '../../../../service/discount.service';
 export class UpdateOrderForGuestComponent implements OnInit {
 
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService,
-    private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService, private discountService: DiscountService ) { }
+    private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService, private discountService: DiscountService,
+    private checkoutService: CheckoutService ) { }
  @ViewChild('formModal') formModal!: ElementRef;
  orderId: number = 0;
  tableId: number = 0;
@@ -43,6 +45,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
  filteredAddresses: any[] = [];
  selectedItems: any[] = []; 
  showingDishes: boolean = true;
+ discountInvalid: any = {};
  showingCombos: boolean = false;
  successMessage: string = '';
  search: string = '';
@@ -87,6 +90,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
       this.orderId = +params['orderId'];
       this.getOrder(this.orderId);
     });
+    this.calculateTotalAmount(this.orderId);
     this.LoadActiveDiscounts();
     this.LoadActiveDiscountByOrderID(this.orderId);
     this.calculateAndSetTotalAmount();
@@ -308,68 +312,73 @@ export class UpdateOrderForGuestComponent implements OnInit {
     reloadPage() {
       window.location.reload();
     }
-    increaseQuantity(index: number): void {
-      const item = this.selectedItems[index];
-      if (item) {
-        item.quantity++;
-        this.updateTotalPrice(index);
-        this.addOrUpdateNewlyAddedItem(item);
+    
+  applyDiscount(orderId: number): void {
+    if (this.selectedDiscount !== null) {
+      // Find the selected discount
+      const discount = this.discounts.find((d: Discount) => d.discountId === this.selectedDiscount);
+      if (discount) {
+        this.selectedDiscount = discount.discountId;
+        this.selectedDiscountName = discount.discountName;
+        this.selectedDiscountPercent = discount.discountPercent;
+  
+        // Recalculate the total amount with the discount applied
+        this.calculateTotalAmountAfterDiscount(orderId);
+  
+        // Optionally close the modal programmatically
+        this.closeModal();
+      } else {
+        console.error('Selected discount not found.');
       }
+    } else {
+      console.error('No discount selected.');
     }
-    
-    // Method to decrease item quantity
-    decreaseQuantity(index: number): void {
-      const item = this.selectedItems[index];
-      if (item && item.quantity > 1) {
-        item.quantity--;
-        this.updateTotalPrice(index);
-        this.removeOrUpdateNewlyAddedItem(item);
-      }
-    }
-    
-    // Method to add or update newly added item
-    async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
-      try {
-        // Fetch the current quantities from the database
-        const currentQuantities = await this.orderService.getQuantityOrderDetails(this.orderId).toPromise();
-        console.log("Current Quantities:", currentQuantities);
-    
-        // Find the current quantity of the specific item
-        const currentQuantityObj = currentQuantities.find(
-          (qtyObj: any) =>
-            (qtyObj.dishId === item.dishId && item.dishId !== null) ||
-            (qtyObj.comboId === item.comboId && item.comboId !== null)
-        );
-    
-        const currentQuantity = currentQuantityObj ? currentQuantityObj.quantity : 0;
-        console.log("Current Quantity for Item:", currentQuantity);
-    
-        const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
-        console.log("Index in newlyAddedItems:", newlyAddedIndex);
-        if (newlyAddedIndex !== -1) {
-          // Item already exists in newlyAddedItems, update the quantity
-          const newQuantity = item.quantity;
-          const initialQuantity = currentQuantity; // Assuming currentQuantity is the initial quantity in the database
-          this.newlyAddedItems[newlyAddedIndex].quantity = newQuantity - initialQuantity;
-          this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * (this.newlyAddedItems[newlyAddedIndex].discountedPrice || this.newlyAddedItems[newlyAddedIndex].price);
-        } 
-        else {
-          // Item is new, add to newlyAddedItems
-          const newItem = {
-            ...item,
-            quantity: item.quantity - currentQuantity, // Only add the new quantity
-            totalPrice: (item.quantity - currentQuantity) * (item.discountedPrice || item.price)
-          };
-          this.newlyAddedItems.push(newItem);
+  }
+  
+  calculateTotalAmountAfterDiscount(orderId: number): void {
+    this.orderDetailService.getOrderDetail(orderId).subscribe((orderDetail) => {
+        // totalAmount hiện tại đã được tính trước khi gọi hàm này
+        // bạn có thể bỏ dòng này nếu không cần cập nhật từ DB
+        this.totalAmount = this.totalAmount || orderDetail.totalAmount;
+
+        if (this.selectedDiscount !== null) {
+            const discountPercent = this.selectedDiscountPercent || 0;
+            console.log('Discount Percent:', discountPercent);
+            this.totalAmountAfterDiscount = this.totalAmount - (this.totalAmount * (discountPercent / 100));
+            console.log('Total Amount After Discount:', this.totalAmountAfterDiscount);
+        } else {
+            this.totalAmountAfterDiscount = this.totalAmount;
+            console.log('Total Amount Without Discount:', this.totalAmountAfterDiscount);
         }
-        console.log('Updated Newly Added Items:', this.newlyAddedItems);
-      } catch (error) {
-        console.error('Error updating newly added items:', error);
-      }
+    }, error => {
+        console.error('Failed to retrieve order details', error);
+        // Handle the error appropriately, e.g., set default values or display an error message
+    });
+}
+
+  increaseQuantity(index: number, orderId: number): void {
+    const item = this.selectedItems[index];
+    if (item) {
+      item.quantity++;
+      this.updateTotalPrice(index, orderId);
+      this.addOrUpdateNewlyAddedItem(item);
     }
-    
-    
-   async removeOrUpdateNewlyAddedItem(item: any): Promise<void> {
+  }
+  
+  
+  // Method to decrease item quantity
+  decreaseQuantity(index: number, orderId: number): void {
+    const item = this.selectedItems[index];
+    if (item && item.quantity > 1) {
+      item.quantity--;
+      this.updateTotalPrice(index, orderId);
+      this.removeOrUpdateNewlyAddedItem(item);
+    }
+  }
+  
+  
+  // Method to add or update newly added item
+  async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
     try {
       // Fetch the current quantities from the database
       const currentQuantities = await this.orderService.getQuantityOrderDetails(this.orderId).toPromise();
@@ -407,209 +416,259 @@ export class UpdateOrderForGuestComponent implements OnInit {
     } catch (error) {
       console.error('Error updating newly added items:', error);
     }
+  }
+  
+  
+ async removeOrUpdateNewlyAddedItem(item: any): Promise<void> {
+  try {
+    // Fetch the current quantities from the database
+    const currentQuantities = await this.orderService.getQuantityOrderDetails(this.orderId).toPromise();
+    console.log("Current Quantities:", currentQuantities);
+
+    // Find the current quantity of the specific item
+    const currentQuantityObj = currentQuantities.find(
+      (qtyObj: any) =>
+        (qtyObj.dishId === item.dishId && item.dishId !== null) ||
+        (qtyObj.comboId === item.comboId && item.comboId !== null)
+    );
+
+    const currentQuantity = currentQuantityObj ? currentQuantityObj.quantity : 0;
+    console.log("Current Quantity for Item:", currentQuantity);
+
+    const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
+    console.log("Index in newlyAddedItems:", newlyAddedIndex);
+    if (newlyAddedIndex !== -1) {
+      // Item already exists in newlyAddedItems, update the quantity
+      const newQuantity = item.quantity;
+      const initialQuantity = currentQuantity; // Assuming currentQuantity is the initial quantity in the database
+      this.newlyAddedItems[newlyAddedIndex].quantity = newQuantity - initialQuantity;
+      this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * (this.newlyAddedItems[newlyAddedIndex].discountedPrice || this.newlyAddedItems[newlyAddedIndex].price);
+    } 
+    else {
+      // Item is new, add to newlyAddedItems
+      const newItem = {
+        ...item,
+        quantity: item.quantity - currentQuantity, // Only add the new quantity
+        totalPrice: (item.quantity - currentQuantity) * (item.discountedPrice || item.price)
+      };
+      this.newlyAddedItems.push(newItem);
+    }
+    console.log('Updated Newly Added Items:', this.newlyAddedItems);
+  } catch (error) {
+    console.error('Error updating newly added items:', error);
+  }
 }
 
-    
-    itemsAreEqual(item1: any, item2: any): boolean {
-      return (item1.dishId === item2.dishId && item1.comboId === item2.comboId);
-    }
+  
+  itemsAreEqual(item1: any, item2: any): boolean {
+    return (item1.dishId === item2.dishId && item1.comboId === item2.comboId);
+  }
 
-    updateNewlyAddedItems(item: any): void {
-      const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
-      if (newlyAddedIndex !== -1) {
-        this.newlyAddedItems[newlyAddedIndex].quantity = item.quantity;
-        this.newlyAddedItems[newlyAddedIndex].totalPrice = item.totalPrice;
-      } else {
-        this.newlyAddedItems.push({
-          ...item,
-          quantity: item.quantity,
-          unitPrice: item.discountedPrice ? item.discountedPrice : item.price,
-          totalPrice: item.totalPrice,
-        });
-      }
-      console.log('Updated Newly Added Items:', this.newlyAddedItems);
+  updateNewlyAddedItems(item: any): void {
+    const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
+    if (newlyAddedIndex !== -1) {
+      this.newlyAddedItems[newlyAddedIndex].quantity = item.quantity;
+      this.newlyAddedItems[newlyAddedIndex].totalPrice = item.totalPrice;
+    } else {
+      this.newlyAddedItems.push({
+        ...item,
+        quantity: item.quantity,
+        unitPrice: item.discountedPrice ? item.discountedPrice : item.price,
+        totalPrice: item.totalPrice,
+      });
     }
-    // Method to update total price for an item
-    updateTotalPrice(index: number): void {
-      const item = this.selectedItems[index];
-      if (item) {
-        item.totalPrice = item.quantity * (item.discountedPrice || item.price);
-        this.calculateTotalAmount();
-      }
+    console.log('Updated Newly Added Items:', this.newlyAddedItems);
+  }
+  // Method to update total price for an item
+  updateTotalPrice(index: number, orderId: number): void {
+    const item = this.selectedItems[index];
+    if (item) {
+      item.totalPrice = item.quantity * (item.discountedPrice || item.price);
+      console.log(`Item ${index} total price updated to: ${item.totalPrice}`);
+      this.calculateTotalAmount(orderId);
     }
+  }
+  
+  calculateTotalAmount(orderId: number): void {
+    this.totalAmount = this.selectedItems.reduce((acc, item) => acc + this.getTotalPrice(item), 0);
+    console.log('Calculated total amount:', this.totalAmount);
+    
+    // Recalculate the total amount after applying any discount
+    this.calculateTotalAmountAfterDiscount(orderId);
+  }
+  
+
+  // Method to calculate total price
+  getTotalPrice(item: any): number {
+    return item.quantity * (item.discountedPrice || item.price);
+  }
+
+  // Method to validate quantity
+  validateQuantity(index: number, orderId: number): void {
+    const item = this.selectedItems[index];
+    if (item) {
+      // Validate quantity within the specified range (1 to 100)
+      item.quantity = Math.max(1, Math.min(item.quantity, 100));
+  
+      // Update the total price and recalculate the total amount
+      this.updateTotalPrice(index, orderId);
+    }
+  }
   
   
-    // Method to calculate total price
-    getTotalPrice(item: any): number {
-      return item.quantity * (item.discountedPrice || item.price);
+  addItem(item: any) {
+    console.log('Initial item:', item);
+  
+    // Ensure that the item has a valid quantity
+    let quantity = item.quantity;
+    if (quantity === undefined || quantity === null || isNaN(Number(quantity)) || Number(quantity) <= 0) {
+      quantity = 1; // Default quantity to 1 if it's invalid
+    } else {
+      quantity = Number(quantity);
     }
   
-    // Method to validate quantity
-    validateQuantity(index: number): void {
-      const item = this.selectedItems[index];
-      if (item) {
-        item.quantity = Math.max(1, Math.min(item.quantity, 100)); // Example: limit between 1 and 100
-        this.updateTotalPrice(index);
-        this.calculateTotalAmount();
-      }
+    const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
+    const totalPrice = quantity * unitPrice; // Calculate total price based on the quantity
+  
+    // Find if the item already exists in newlyAddedItems
+    const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
+    const selectedIndex = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
+  
+    if (newlyAddedIndex !== -1) {
+      // Item already exists in newlyAddedItems, update the quantity and totalPrice
+      this.newlyAddedItems[newlyAddedIndex].quantity += quantity;
+      this.newlyAddedItems[newlyAddedIndex].totalPrice += totalPrice;
+    } else {
+      // Item is new, add to newlyAddedItems
+      console.log('Item is new, adding to newlyAddedItems');
+      this.newlyAddedItems.push({
+        ...item,
+        quantity: quantity,
+        unitPrice: unitPrice,
+        totalPrice: totalPrice,
+      });
     }
-    
-    
-    addItem(item: any) {
-      console.log('Initial item:', item);
-    
-      // Ensure that the item has a valid quantity
-      let quantity = item.quantity;
-      if (quantity === undefined || quantity === null || isNaN(Number(quantity)) || Number(quantity) <= 0) {
-        quantity = 1; // Default quantity to 1 if it's invalid
-      } else {
-        quantity = Number(quantity);
-      }
-    
-      const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
-      const totalPrice = quantity * unitPrice; // Calculate total price based on the quantity
-    
-      // Find if the item already exists in newlyAddedItems
-      const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
-      const selectedIndex = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-    
-      if (newlyAddedIndex !== -1) {
-        // Item already exists in newlyAddedItems, update the quantity and totalPrice
-        this.newlyAddedItems[newlyAddedIndex].quantity += quantity;
-        this.newlyAddedItems[newlyAddedIndex].totalPrice += totalPrice;
-      } else {
-        // Item is new, add to newlyAddedItems
-        console.log('Item is new, adding to newlyAddedItems');
-        this.newlyAddedItems.push({
-          ...item,
-          quantity: quantity,
-          unitPrice: unitPrice,
-          totalPrice: totalPrice,
-        });
-      }
-    
-      if (selectedIndex !== -1) {
-        // Item already exists in selectedItems, update the quantity and totalPrice
-        console.log('Item already exists in selectedItems, updating quantity');
-        this.selectedItems[selectedIndex].quantity += quantity;
-        this.selectedItems[selectedIndex].totalPrice += totalPrice;
-      } else {
-        // Item is new, add to selectedItems
-        console.log('Item is new, adding to selectedItems');
-        this.selectedItems.push({
-          ...item,
-          quantity: quantity,
-          unitPrice: unitPrice,
-          totalPrice: totalPrice,
-          dishesServed: 0
-        });
-      }
-    
-      console.log('Newly Added Items:', this.newlyAddedItems);
-      console.log('Selected Items:', this.selectedItems);
-    
-      this.calculateAndSetTotalAmount();
+  
+    if (selectedIndex !== -1) {
+      // Item already exists in selectedItems, update the quantity and totalPrice
+      console.log('Item already exists in selectedItems, updating quantity');
+      this.selectedItems[selectedIndex].quantity += quantity;
+      this.selectedItems[selectedIndex].totalPrice += totalPrice;
+    } else {
+      // Item is new, add to selectedItems
+      console.log('Item is new, adding to selectedItems');
+      this.selectedItems.push({
+        ...item,
+        quantity: quantity,
+        unitPrice: unitPrice,
+        totalPrice: totalPrice,
+        dishesServed: 0
+      });
     }
-    
-    
- 
-    calculateAndSetTotalAmount(): void {
-      // Ensure selectedItems is not null or undefined
-      if (!this.selectedItems) {
+  
+    console.log('Newly Added Items:', this.newlyAddedItems);
+    console.log('Selected Items:', this.selectedItems);
+  
+    this.calculateAndSetTotalAmount();
+  }
+  
+  
+
+  calculateAndSetTotalAmount(): void {
+    if (!this.selectedItems || this.selectedItems.length === 0) {
         this.totalAmount = 0;
         this.totalAmountAfterDiscount = 0;
         return;
-      }
-    
-      // Calculate the total amount before discount
-      this.totalAmount = this.selectedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    
-      // Ensure selectedDiscountPercent is a valid number
-      if (this.selectedDiscountPercent && !isNaN(this.selectedDiscountPercent)) {
-        this.totalAmountAfterDiscount = this.totalAmount * (1 - this.selectedDiscountPercent / 100);
-      } else {
-        this.totalAmountAfterDiscount = this.totalAmount;
-      }
     }
-    
-    removeItem(index: number) {
-      const removedItem = this.selectedItems[index];
-      console.log('Removing item:', removedItem);
+
+    // Tính tổng số tiền, xem xét cả giá giảm cho từng món
+    this.totalAmount = this.selectedItems.reduce((acc, item) => {
+        const itemPrice = item.discountedPrice ? item.discountedPrice : item.price;
+        return acc + (itemPrice * item.quantity);
+    }, 0);
+    console.log("Total Amount Before Discount:", this.totalAmount);
+
+    // Đảm bảo rằng tỷ lệ giảm giá tổng thể là một số hợp lệ
+    const discountPercent = this.selectedDiscountPercent || 0;
+    this.totalAmountAfterDiscount = this.totalAmount * (1 - discountPercent / 100);
+    console.log("Total Amount After Discount:", this.totalAmountAfterDiscount);
+}
+
+// Call this method after every operation that changes the selected items or discount
+
   
-      this.selectedItems.splice(index, 1);
-      console.log('Updated selectedItems:', this.selectedItems);
-  
-      // Remove the item from newlyAddedItems if it exists
-      const newlyAddedIndex = this.newlyAddedItems.findIndex(item => this.itemsAreEqual(item, removedItem));
-      if (newlyAddedIndex !== -1) {
-          this.newlyAddedItems.splice(newlyAddedIndex, 1);
-          console.log('Removed from newlyAddedItems:', this.newlyAddedItems);
-      }
-  
-      // Add the removed item to newlyAddedItems with quantity 0
-      const unitPrice = removedItem.discountedPrice ? removedItem.discountedPrice : removedItem.price;
-      this.newlyAddedItems.push({
-          ...removedItem,
-          quantity: 102,
-          unitPrice: unitPrice,
-          totalPrice: unitPrice
-      });
-  
-      console.log('Updated newlyAddedItems:', this.newlyAddedItems);
-  }
-  applyDiscount(): void {
-    if (this.selectedDiscount !== null) {
-      // Find the selected discount
-      const discount = this.discounts.find((d: Discount) => d.discountId === this.selectedDiscount);
-      if (discount) {
-        this.selectedDiscount = discount.discountId;
-        this.selectedDiscountName = discount.discountName;
-        this.selectedDiscountPercent = discount.discountPercent;
-  
-        // Recalculate the total amount with the discount applied
-        this.calculateTotalAmountAfterDiscount();
-  
-        // Optionally close the modal programmatically
-        this.closeModal();
-      }
-    } else {
-      // No discount selected, set totalAmountAfterDiscount to totalAmount
-      this.totalAmountAfterDiscount = this.totalAmount;
-      console.error('No discount selected.');
+  removeItem(index: number) {
+    const removedItem = this.selectedItems[index];
+    console.log('Removing item:', removedItem);
+
+    this.selectedItems.splice(index, 1);
+    console.log('Updated selectedItems:', this.selectedItems);
+
+    // Remove the item from newlyAddedItems if it exists
+    const newlyAddedIndex = this.newlyAddedItems.findIndex(item => this.itemsAreEqual(item, removedItem));
+    if (newlyAddedIndex !== -1) {
+        this.newlyAddedItems.splice(newlyAddedIndex, 1);
+        console.log('Removed from newlyAddedItems:', this.newlyAddedItems);
     }
-  }
+
+    // Add the removed item to newlyAddedItems with quantity 0
+    const unitPrice = removedItem.discountedPrice ? removedItem.discountedPrice : removedItem.price;
+    this.newlyAddedItems.push({
+        ...removedItem,
+        quantity: 102,
+        unitPrice: unitPrice,
+        totalPrice: unitPrice
+    });
+
+    console.log('Updated newlyAddedItems:', this.newlyAddedItems);
+}
   
-  // Existing methods for context
-  calculateTotalAmount(): void {
-    this.totalAmount = this.selectedItems.reduce((acc, item) => acc + this.getTotalPrice(item), 0);
-    console.log('585',this.totalAmount)
-    this.calculateTotalAmountAfterDiscount();
-  }
-  
-  calculateTotalAmountAfterDiscount(): void {
-    if (this.selectedDiscount !== null) {
-      const discountPercent = this.selectedDiscountPercent || 0;
-      console.log('592',discountPercent)
-      this.totalAmountAfterDiscount = this.totalAmount - (this.totalAmount * (discountPercent / 100));
-      console.log('594',this.totalAmountAfterDiscount)
-    } else {
-      this.totalAmountAfterDiscount = this.totalAmount;
-      console.log('596',this.totalAmountAfterDiscount)
-    }
-  }
 
     clearSelectedDiscount() {
       this.selectedDiscount = null;
       this.selectedDiscountName = '';
       this.selectedDiscountPercent = 0;
   }
+  // LoadActiveDiscounts(): void {
+  //   this.discountService.getActiveDiscounts().subscribe((data) => {
+  //     this.discounts = data;
+  //     this.applyExistingDiscount();
+  //   }, (error) => {
+  //     console.error('Error fetching active discounts:', error);
+  //   });
+  // }
   LoadActiveDiscounts(): void {
-    this.discountService.getActiveDiscounts().subscribe((data) => {
-      this.discounts = data;
-      this.applyExistingDiscount();
-    }, (error) => {
-      console.error('Error fetching active discounts:', error);
-    });
+    this.checkoutService.getListDiscount().subscribe(
+      response => {
+        this.applyExistingDiscount();
+        console.log(response);
+
+        const today = new Date(); // Ngày hiện tại
+
+        this.discounts = response.filter((d: {
+          totalMoney: number; startTime: string; endTime: string;
+        }) => {
+          const startDate = new Date(d.startTime);
+          const endDate = new Date(d.endTime);
+          return d.totalMoney <= this.totalAmount && today >= startDate && today <= endDate;
+        });
+        console.log(today);
+
+        console.log(648,this.discounts);
+
+        this.discountInvalid = response.filter((d: {
+          totalMoney: number; startTime: string; endTime: string;
+        }) => {
+          const startDate = new Date(d.startTime);
+          const endDate = new Date(d.endTime);
+          return d.totalMoney > this.totalAmount || today < startDate || today > endDate;
+        });
+        console.log(657,this.discountInvalid);
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
   }
  // Method to load active discounts and set selected discount
  LoadActiveDiscountByOrderID(orderDiscountId: number): void {
@@ -674,7 +733,6 @@ export class UpdateOrderForGuestComponent implements OnInit {
     // Construct the dto object
     const dto = {
       discountId: this.selectedDiscount || 0,
-
       orderDetails: orderDetails
     };
   
@@ -683,8 +741,15 @@ export class UpdateOrderForGuestComponent implements OnInit {
       response => {
         console.log('Order details updated successfully:', response);
         this.successMessage = 'Order details updated successfully!';
+        
         // Clear newlyAddedItems after successful update
         this.newlyAddedItems = [];
+
+
+        // Delay một chút để modal đóng hoàn toàn trước khi reload
+        setTimeout(() => {
+          window.location.reload();
+        }, 500); // 500ms có thể điều chỉnh nếu cần
       },
       (error: HttpErrorResponse) => {
         console.error('Error updating order details:', error);
@@ -692,6 +757,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
       }
     );
   }
+  
   onItemClick(discount: Discount) {
     this.selectedDiscount = discount.discountId;
     this.selectedDiscountName = discount.discountName;
@@ -705,7 +771,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
       if (discount) {
         this.selectedDiscountName = discount.discountName;
         this.selectedDiscountPercent = discount.discountPercent;
-        this.calculateTotalAmountAfterDiscount();
+        this.calculateTotalAmountAfterDiscount(this.orderId);
       }
     }
   }
@@ -732,6 +798,13 @@ export class UpdateOrderForGuestComponent implements OnInit {
           this.errorMessage = 'Error updating order status and creating invoice';
         }
       );
+    }
+  }
+  onDiscountSelect(discountId: number) {
+    if (this.selectedDiscount === discountId) {
+      this.selectedDiscount = null; // Bỏ chọn nếu đã được chọn trước đó
+    } else {
+      this.selectedDiscount = discountId; // Chọn mã giảm giá mới
     }
   }
    getDiscountAmount(): number {
