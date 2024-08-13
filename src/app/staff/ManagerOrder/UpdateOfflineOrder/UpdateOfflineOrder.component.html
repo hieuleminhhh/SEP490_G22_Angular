@@ -57,7 +57,7 @@
                       </td>
                       <td>
                         <div class="d-flex align-items-center">
-                          <button class="btn btn-outline-secondary btn-sm" (click)="decreaseQuantity(i)">-</button>
+                          <button class="btn btn-outline-secondary btn-sm" (click)="decreaseQuantity(i, orderId) ">-</button>
                           <!-- HTML -->
                           <input type="number"
                             class="form-control text-center small-input mx-2 no-spinners rounded-input disabled-input"
@@ -70,9 +70,10 @@
 
                       <td>
                         <div class="d-flex align-items-center">
-                          <input type="number" class="form-control text-center small-input disabled-input"
-                            [(ngModel)]="item.dishesServed">
-
+                          <input type="number" 
+                                 class="form-control text-center small-input disabled-input" 
+                                 [(ngModel)]="item.dishesServed" 
+                                 [ngModel]="item.dishesServed || 0">
                         </div>
                       </td>
                       <td>
@@ -125,10 +126,6 @@
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
                   <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#confirmModal">
                     Lưu lại
-                  </button>
-
-                  <button class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#cancelModal">
-                    Hủy
                   </button>
                 </div>
 

@@ -79,6 +79,11 @@ export class ManagerOrderService {
   
     return this.http.put(url, { status }, { responseType: 'text' });
   }
+  updateOrderStatus1(orderId: number, data: any): Observable<any> {
+    const url = `${this.apiUrl}/Invoice/updateStatus/${orderId}`;
+        return this.http.put(url, data, httpOptions); 
+  }
+  
   updateAmountReceiving(orderId: number, data: any): Observable<any> {
     const url = `${this.apiUrl}/orders/UpdateAmountReceiving/${orderId}`;
     return this.http.put<any>(url, data, httpOptions);
