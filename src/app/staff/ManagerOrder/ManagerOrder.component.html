@@ -144,6 +144,15 @@
                       <span *ngSwitchDefault>Khách lẻ</span>
                     </ng-container>
                   </div>
+                  <div *ngIf="orderDetail.paymentMethods !== null && orderDetail.paymentMethods !== undefined" class="mb-3">
+                    <span class="fw-bold">Phương thức thanh toán:</span>
+                    <ng-container [ngSwitch]="orderDetail.paymentMethods">
+                      <span *ngSwitchCase="0">Tiền mặt</span>
+                      <span *ngSwitchCase="1">Chuyển khoản ngân hàng</span>
+                      <span *ngSwitchCase="2">Thanh toán khi nhận hàng</span>
+                    </ng-container>
+                  </div>
+                  
                   <div *ngIf="orderDetail.tables && orderDetail.tables.length > 0" class="mb-3">
                     <span class="fw-bold">Bàn:</span> {{ orderDetail.tables[0].tableId }}
                   </div>
@@ -297,7 +306,7 @@
                   <!-- Mang ve -->
                   <ng-container *ngIf="orderDetail?.type === 1 && orderDetail?.status === 2">
                     <button type="button" class="btn btn-success me-2" *ngIf="!orderDetail?.invoiceId"
-                      data-bs-toggle="modal" data-bs-target="#paymentModalTakeAway">
+                      data-bs-toggle="modal" data-bs-target="#takeawaypaymentModal">
                       Thanh toán
                     </button>
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
@@ -413,56 +422,7 @@
       </main>
     </div>
   </div>
-  <!-- Thanh toan mang ve -->
-  <div class="modal fade" id="paymentModalTakeAway" tabindex="-1" aria-labelledby="paymentModalLabelTakeAway"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="paymentModalTakeAwayLabel">Thông tin đơn hàng</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Thông tin hóa đơn -->
-          <div class="mb-3">
-            <label for="price" class="form-label">Tổng tiền phải trả:</label>
-            {{ DiscountedTotalAmount() |currencyFormat }}
-          </div>
-
-          <!-- Template for online -->
-          <div class="mb-3">
-            <label class="form-label">Hình thức thanh toán:</label>
-            <div>
-              <input type="radio" id="cash" name="paymentMethod" value="0" [(ngModel)]="paymentMethod">
-              <label for="cash">Tiền mặt</label>
-            </div>
-            <div>
-              <input type="radio" id="bank" name="paymentMethod" value="1" [(ngModel)]="paymentMethod">
-              <label for="bank">Chuyển khoản ngân hàng</label>
-            </div>
-
-          </div>
-
-          <div class="mb-3" *ngIf="paymentMethod === '0'">
-            <label for="customerPaid" class="form-label">Tiền khách trả:</label>
-            <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid">
-          </div>
-
-          <div class="mb-3" *ngIf="paymentMethod === '1'">
-            <label for="qrCode" class="form-label"></label>
-            <img id="qrCode"
-              src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7"
-              class="img-fluid">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal"
-            (click)="CreateInvoiceOnline(orderDetail?.orderId)">Xác nhận</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  
   <!-- Modal for 'Thanh toán online' -->
   <div class="modal fade" id="paymentModalOnline" tabindex="-1" aria-labelledby="paymentModalOnlineLabel"
     aria-hidden="true" data-bs-backdrop="static">
@@ -614,6 +574,53 @@
       </div>
     </div>
   </div>
+    <!-- Template for cffff -->
+    <div class="modal fade" id="takeawaypaymentModal" tabindex="-1" aria-labelledby="takeawaypaymentModal" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="paymentModalTakeAwayLabel">Thông tin đơn hàng</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!-- Thông tin hóa đơn -->
+              <div class="mb-3">
+                <label for="price" class="form-label">Tổng tiền phải trả:</label>
+                {{ DiscountedTotalAmount() | currencyFormat }}
+              </div>
+    
+              <!-- Template for online -->
+              <div class="mb-3">
+                <label class="form-label">Hình thức thanh toán:</label>
+                <div>
+                  <input type="radio" id="cash" name="paymentMethod" value= "0" [(ngModel)]="paymentMethod">
+                  <label for="cash">Tiền mặt</label>
+                </div>
+                <div>
+                  <input type="radio" id="bank" name="paymentMethod" value= "1" [(ngModel)]="paymentMethod">
+                  <label for="bank">Chuyển khoản ngân hàng</label>
+                </div>
+               
+              </div>
+    
+              <div class="mb-3" *ngIf="paymentMethod === '0'">
+                <label for="customerPaid" class="form-label">Tiền khách trả:</label>
+                <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid">
+              </div>
+    
+              <div class="mb-3" *ngIf="paymentMethod === '1'">
+                <label for="qrCode" class="form-label"></label>
+                <img id="qrCode" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" class="img-fluid">
+              </div>
+            </div>
+           
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#takepaymentModal" (click)="CreateInvoiceTakeAway(orderDetail?.orderId)">Xác nhận</button>
+              </div>
+          </div>
+      </div>
+  </div>
 
   <!-- Template for offline cffff -->
   <div class="modal fade" id="cfpaymentModalOffline" tabindex="-1" aria-labelledby="cfpaymentModalOfflineLabel"
@@ -735,7 +742,7 @@
       </div>
     </div>
   </div>
-
+  
   <!-- Template for online cffff -->
   <div class="modal fade" id="cfpaymentModalOnline" tabindex="-1" aria-labelledby="cfpaymentModalOnlineLabel"
     aria-hidden="true">
@@ -860,5 +867,105 @@
       </div>
     </div>
   </div>
+  <!-- Template for takaway -->
+  <div class="modal fade" id="takepaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <!-- Success message -->
+        <div class="text-center mb-3">
+          <div class="d-flex justify-content-center align-items-center flex-column">
+            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
+              <path d="M8 16a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5.586l-3-3a.5.5 0 0 1 .707-.707L7 9.293l4.646-4.647a.5.5 0 0 1 .708.707l-5 5a.5.5 0 0 1-.708 0z"/>
+            </svg>
+            <h4 class="mt-2">Thanh toán thành công</h4>
+          </div>
+        </div>
+        <div class="modal-body1">
+          <div class="modal-header d-flex justify-content-center align-items-center text-center">
+            <h5 class="modal-title" id="paymentModalLabel">HÓA ĐƠN THANH TOÁN</h5>
+          </div>
+          <div class="mb-3">
+            <label for="orderID" class="form-label">Mã hóa đơn: </label>
+            <span id="orderID">{{ invoice?.invoiceId || 'N/A' }}</span>
+          </div>
 
+            <div class="mb-3">
+              <label for="customerName" class="form-label">Tên khách hàng:</label>
+              <span id="customerName">{{ invoice.consigneeName || 'Khách lẻ' }}</span>
+            </div>
+          <div class="mb-3" *ngIf="invoice.guestPhone">
+            <label for="phoneNumber" class="form-label">Số điện thoại: </label>
+          <span id="phoneNumber">{{ invoice.guestPhone }}</span>
+         </div>
+
+
+          <div class="mb-3">
+            <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
+            <span id="orderDate">{{ invoice?.orderDate | dateFormat }}</span>
+          </div>
+          <div class="mb-3">
+            <table id="items" class="table">
+              <thead>
+                <tr>
+                  <th scope="col">STT</th>
+                  <th scope="col">Tên món</th>
+                  <th scope="col">SL</th>
+                  <th scope="col">Đơn giá</th>
+                  <th scope="col">Thành tiền</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of invoice?.itemInvoice; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ item.itemName || item.nameCombo }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>{{ item.price | currencyFormat }}</td>
+                  <td>{{ item.unitPrice | currencyFormat }}</td>
+                  
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mb-3">
+            <label for="totalOrder" class="form-label">Tiền hàng:</label>
+            <span id="totalOrder">{{ invoice?.totalAmount | currencyFormat }}</span>
+        </div>
+        <div class="mb-3">
+          <label for="discount" class="form-label">Khuyến mãi:</label>
+          <span id="discount">
+            {{ getDiscountInvoiceAmount() | currencyFormat }} ({{ invoice?.discountPercent}}%)
+          </span>
+        </div>
+      <hr>
+      <div class="mb-3">
+        <label for="totalAmount" class="form-label">Tổng tiền:</label>
+        <span id="totalAmount">{{ invoice?.paymentAmount | currencyFormat }}</span>
+    </div>
+    <hr>
+    <div class="mb-3" *ngIf="paymentMethod === '0'">
+      <label for="amountToPay" class="form-label">Khách phải trả:</label>
+      <span id="amountToPay">{{ invoice?.paymentAmount | currencyFormat }}</span>
+    </div>
+    <div class="mb-3" *ngIf="paymentMethod === '0'">
+      <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
+      <span id="customerPaid">{{ invoice?.amountReceived | currencyFormat }}</span>
+    </div>
+    <div class="mb-3" *ngIf="paymentMethod === '0'">
+      <label for="changeToGive" class="form-label">Trả lại:</label>
+      <span id="changeToGive">{{ invoice?.returnAmount | currencyFormat }}</span>
+    </div>
+
+    <div class="mb-3" *ngIf="paymentMethod === '1'">
+      <label for="qrCode" class="form-label"></label>
+      <img id="qrCode" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" class="img-fluid">
+    </div>
+    
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="reloadPage()">Đóng</button>
+          <button type="button" class="btn btn-primary" (click)="printInvoice()">In hóa đơn</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
