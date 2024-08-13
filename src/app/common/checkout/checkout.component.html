@@ -124,7 +124,7 @@
           <div class="form-group">
             <label for="order-time" *ngIf="selectedService === 'service1'">Thời gian nhận hàng</label>
             <label for="order-time" *ngIf="selectedService === 'service2'">Thời gian đặt bàn</label>
-            <div class="input-group">
+            <div class="input-group" *ngIf="selectedService === 'service1'">
               <input id="order-time" name="orderTime" class="form-control form-control-sm" [(ngModel)]="orderTime"
                 [readonly]="!isEditing">
               <div class="input-group-append">
@@ -132,6 +132,27 @@
                   (click)="toggleEdit()">
                   Thay đổi
                 </button>
+              </div>
+            </div>
+            <div class="input-group" *ngIf="selectedService === 'service2'">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="date">Ngày</label>
+                    <input id="date" type="date" name="date" class="form-control form-control-sm" [(ngModel)]="date"
+                      (change)="isEarliest = false" [min]="minDate" [max]="maxDate" (change)="updateTimes()">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="time">Giờ</label>
+                    <select id="time" name="time" class="form-control form-control-sm" style="height: 41px;"
+                      [(ngModel)]="time" (change)="isEarliest = false">
+                      <option value="">Chọn</option>
+                      <option *ngFor="let time of availableHours" [value]="time">{{ time }}</option>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
