@@ -13,19 +13,21 @@
           <div *ngIf="errorMessage" class="error-message">
             {{ errorMessage }}
           </div>
-          
+
           <div class="row">
             <!-- Left column for address and cart details -->
             <div class="col-md-6">
               <div class="input-group mb-3">
                 <span class="input-group-text">Tên Khách:</span>
-                <input type="text" class="form-control" [value]="selectedOrder?.guestName ? selectedOrder.guestName : 'Khách lẻ'" readonly>
-              
+                <input type="text" class="form-control"
+                  [value]="selectedOrder?.guestName ? selectedOrder.guestName : 'Khách lẻ'" readonly>
+
                 <span class="input-group-text">Điện Thoại:</span>
-                <input type="text" class="form-control" [value]="selectedOrder?.guestPhone ? selectedOrder.guestPhone : '-------------'" readonly>
+                <input type="text" class="form-control"
+                  [value]="selectedOrder?.guestPhone ? selectedOrder.guestPhone : '-------------'" readonly>
               </div>
-              
-              
+
+
 
               <!-- Selected Items Section -->
               <div class="cart-section mt-4">
@@ -48,7 +50,8 @@
                     <tr *ngFor="let item of selectedItems; let i = index">
                       <td>
                         <div class="d-flex align-items-center">
-                          <img [src]="item.imageUrl" alt="Item image" class="img-thumbnail me-2" style="width: 70px; height: 50px;">
+                          <img [src]="item.imageUrl" alt="Item image" class="img-thumbnail me-2"
+                            style="width: 70px; height: 50px;">
                           <p class="mb-0">{{ item.itemName || item.nameCombo }}</p>
                         </div>
                       </td>
@@ -64,24 +67,25 @@
                         </div>
                       </td>
 
-                      
+
                       <td>
                         <div class="d-flex align-items-center">
-                          <input type="number" class="form-control text-center small-input" [(ngModel)]="item.dishesServed">
-                         
+                          <input type="number" class="form-control text-center small-input disabled-input"
+                            [(ngModel)]="item.dishesServed">
+
                         </div>
                       </td>
                       <td>
                         <div *ngIf="item.discountedPrice" class="d-flex align-items-center">
-                          <span>{{ item.discountedPrice | currencyFormat  }}</span>
+                          <span>{{ item.discountedPrice | currencyFormat }}</span>
                         </div>
 
                         <div *ngIf="!item.discountedPrice" class="d-flex align-items-center">
-                          <span>{{ item.price | currencyFormat  }}</span>
+                          <span>{{ item.price | currencyFormat }}</span>
                         </div>
-                        
+
                       </td>
-                      <td>{{ item.totalPrice | currencyFormat  }}</td>
+                      <td>{{ item.totalPrice | currencyFormat }}</td>
                       <td>
                         <button class="btn btn-danger btn-sm" (click)="removeItem(i)">
                           <i class="fas fa-times"></i>
@@ -96,29 +100,30 @@
                   <br>
                 </div>
 
-                
-                <button class="btn btn-primary btn-sm" *ngIf="selectedItems.length > 0" data-bs-toggle="modal" data-bs-target="#discountModal">
+
+                <button class="btn btn-primary btn-sm" *ngIf="selectedItems.length > 0" data-bs-toggle="modal"
+                  data-bs-target="#discountModal" (click)="LoadActiveDiscounts()">
                   <i class="fas fa-tags me-2"></i> <!-- Biểu tượng Font Awesome -->
                   Khuyến mãi
                 </button>
                 <div *ngIf="selectedDiscount" class="mt-2">
                   <strong>Giảm giá:</strong>
                   <span>{{ selectedDiscountName }} ({{ selectedDiscountPercent | percentage }})</span>
-                </div>   
+                </div>
                 <br>
                 <hr>
                 <div *ngIf="selectedItems.length > 0" class="mt-2">
-                <strong>Tổng số tiền:</strong>
-                <span *ngIf="selectedDiscount === null">
-                  {{ totalAmount | currencyFormat }}
-                </span>
-                
-                <span *ngIf="selectedDiscount !== null">
-                  {{ totalAmountAfterDiscount | currencyFormat }}
-                </span>
+                  <strong>Tổng số tiền:</strong>
+                  <span *ngIf="selectedDiscount === null">
+                    {{ totalAmount | currencyFormat }}
+                  </span>
+
+                  <span *ngIf="selectedDiscount !== null">
+                    {{ totalAmountAfterDiscount | currencyFormat }}
+                  </span>
                 </div>
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
-                  <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#confirmModal" >
+                  <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#confirmModal">
                     Lưu lại
                   </button>
 
@@ -126,12 +131,13 @@
                     Hủy
                   </button>
                 </div>
-                
+
               </div>
             </div>
 
             <!-- Xac nhan don -->
-            <div #formModal class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+            <div #formModal class="modal fade" id="confirmModal" tabindex="-1" role="dialog"
+              aria-labelledby="confirmModalLabel" aria-hidden="true">
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -142,14 +148,17 @@
                     <p>Bạn có chắc chắn muốn lưu lại không?</p>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="reloadPage()" >Không</button>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"  (click)="updateOrderOffline(tableId)">Có</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                      (click)="reloadPage()">Không</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                      (click)="updateOrderOffline(tableId)">Có</button>
                   </div>
                 </div>
               </div>
             </div>
-             <!-- Xac nhan huy don -->
-             <div #formModal class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+            <!-- Xac nhan huy don -->
+            <div #formModal class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel"
+              aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -160,79 +169,123 @@
                     Bạn có chắc chắn muốn hủy đơn hàng này không?
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"  data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                      data-bs-dismiss="modal">Đóng</button>
                     <button type="button" class="btn btn-danger" (click)="cancelOrderForTable(tableId)">Hủy</button>
                   </div>
                 </div>
               </div>
             </div>
-                        <!-- Giam gia -->
-                       <!-- Discount Modal -->
-<div class="modal fade" #formModal id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="discountModalLabel">Chọn giảm giá</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <ul class="list-group">
-          <li *ngFor="let discount of discounts" class="list-group-item list-group-item-action">
-            <label class="d-flex align-items-center w-100 m-0" (click)="onItemClick(discount)">
-              <input type="radio" name="selectedDiscount" [value]="discount.discountId"
-                [checked]="discount.discountId === selectedDiscount" class="me-2" />
-              <span *ngIf="discount.quantityLimit > 0 || discount.totalMoney > 0">
-                {{ discount.discountName }} - {{ discount.discountPercent | percentage }}
-                <span *ngIf="discount.totalMoney > 0">(Giảm giá theo tổng hóa đơn thanh toán {{ discount.totalMoney | currencyFormat }})</span>
-                <span *ngIf="discount.quantityLimit > 0">(Số lượng có hạn {{ discount.quantityLimit }})</span>
-              </span>
-            </label>
-          </li>
-        </ul>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="applyDiscount()">Áp dụng</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearSelectedDiscount()">Đóng</button>
-      </div>
-    </div>
-  </div>
-</div>
+            <!-- Giam gia -->
+            <!-- Discount Modal -->
+            <!-- Discount Modal -->
+            <div class="modal fade" #formModal id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="discountModalLabel">Chọn giảm giá</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body-discount">
+                    <ul class="list-group">
+                      <li *ngFor="let discount of discounts" class="list-group-item list-group-item-action">
+                        <label class="d-flex align-items-center w-100">
+                          <input type="radio" name="selectedDiscount" [value]="discount.discountId"
+                            [checked]="selectedDiscount === discount.discountId"
+                            (click)="onDiscountSelect(discount.discountId)" class="me-2"
+                            style="width: 20px; max-width: 20px;" />
+                          <div class="discount-details">
+                            <div class="discount-left">
+                              {{ discount.discountName }}
+                            </div>
+                            <div class="discount-right">
+                              Giảm {{ discount.discountPercent | percentage }} cho đơn hàng
+                              <span *ngIf="discount.totalMoney > 0" class="discount-info">
+                                (Đơn tối thiểu {{ discount.totalMoney | currencyFormat }})
+                              </span>
+                              <span *ngIf="discount.quantityLimit > 0" class="discount-info">
+                                (Đã dùng {{ discount.quantityLimit }})
+                              </span>
+                              <span *ngIf="discount.totalMoney > 0" class="discount-info">
+                                (Hạn sử dụng {{ discount.endTime | date:'dd/MM/yyyy' }})
+                              </span>
+                            </div>
+                          </div>
+                        </label>
+                      </li>
+                      <li *ngFor="let discounts of discountInvalid"
+                        class="list-group-item list-group-item-action disabled-discount">
+                        <label class="d-flex align-items-center w-100">
+                          <input type="radio" name="selectedDiscount" [value]="discounts.discountId" disabled
+                            class="me-2" style="width: 20px; max-width: 20px;" />
+                          <div class="discount-details">
+                            <div class="discount-left">
+                              {{ discounts.discountName }}
+                            </div>
+                            <div class="discount-right">
+                              Giảm {{ discounts.discountPercent | percentage }} cho đơn hàng
+                              <span *ngIf="discounts.totalMoney > 0" class="discount-info">
+                                (Đơn tối thiểu {{ discounts.totalMoney | currencyFormat }})
+                              </span>
+                              <span *ngIf="discounts.quantityLimit > 0" class="discount-info">
+                                (Còn lại: {{ discounts.quantityLimit - discounts.usedCount}} mã giảm giá)
+                              </span>
+                              <span *ngIf="discounts.totalMoney > 0" class="discount-info">
+                                (Hạn sử dụng: Từ {{ discounts.startTime | date:'dd/MM/yyyy' }} đến {{ discounts.endTime
+                                | date:'dd/MM/yyyy' }})
+                              </span>
+                            </div>
+                          </div>
+                        </label>
+                      </li>
+                    </ul>
+                    <div *ngIf="discounts && discounts.length < 1 && discountInvalid.length <1">
+                      <span>Không có mã khuyến mại</span>
+                    </div>
+                  </div>
+
+
+
+                  <!-- applyDiscount() -->
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                      (click)="applyDiscount()">Áp dụng</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                      (click)="clearSelectedDiscount()">Đóng</button>
+                  </div>
+                </div>
+              </div>
+            </div>
             <!-- Xac nhan thanh toan -->
-  
+
             <!-- Right column for dishes and combos -->
             <div class="col-md-6">
               <div class="category-buttons">
-                <button class="btn"
-                        [class.btn-primary]="searchCategory !== 'Món chính'"
-                        [class.btn-secondary]="searchCategory === 'Món chính'"
-                        (click)="selectCategory('Món chính')">Món chính
+                <button class="btn" [class.btn-primary]="searchCategory !== 'Món chính'"
+                  [class.btn-secondary]="searchCategory === 'Món chính'" (click)="selectCategory('Món chính')">Món chính
                 </button>
-                <button class="btn"
-                        [class.btn-primary]="searchCategory !== 'Món khai vị'"
-                        [class.btn-secondary]="searchCategory === 'Món khai vị'"
-                        (click)="selectCategory('Món khai vị')">Món khai vị
+                <button class="btn" [class.btn-primary]="searchCategory !== 'Món khai vị'"
+                  [class.btn-secondary]="searchCategory === 'Món khai vị'" (click)="selectCategory('Món khai vị')">Món
+                  khai vị
                 </button>
-                <button class="btn"
-                        [class.btn-primary]="searchCategory !== 'Món tráng miệng'"
-                        [class.btn-secondary]="searchCategory === 'Món tráng miệng'"
-                        (click)="selectCategory('Món tráng miệng')">Món tráng miệng
+                <button class="btn" [class.btn-primary]="searchCategory !== 'Món tráng miệng'"
+                  [class.btn-secondary]="searchCategory === 'Món tráng miệng'"
+                  (click)="selectCategory('Món tráng miệng')">Món tráng miệng
                 </button>
-                <button class="btn"
-                        [class.btn-primary]="searchCategory !== 'Đồ uống'"
-                        [class.btn-secondary]="searchCategory === 'Đồ uống'"
-                        (click)="selectCategory('Đồ uống')">Đồ uống
+                <button class="btn" [class.btn-primary]="searchCategory !== 'Đồ uống'"
+                  [class.btn-secondary]="searchCategory === 'Đồ uống'" (click)="selectCategory('Đồ uống')">Đồ uống
                 </button>
-                <button class="btn"
-                        [class.btn-primary]="!showingCombos"
-                        [class.btn-secondary]="showingCombos"
-                        (click)="showCombos()">Combo
+                <button class="btn" [class.btn-primary]="!showingCombos" [class.btn-secondary]="showingCombos"
+                  (click)="showCombos()">Combo
                 </button>
               </div>
               <div class="search-bar mt-3">
-                <input type="text" class="form-control" placeholder="Tìm kiếm món ăn..." [(ngModel)]="search" (input)="onSearch()">
+                <input type="text" class="form-control" placeholder="Tìm kiếm món ăn..." [(ngModel)]="search"
+                  (input)="onSearch()">
               </div>
-              
-                <!-- Dishes Section -->
+
+              <!-- Dishes Section -->
               <div class="dishes-section" *ngIf="showingDishes && dishes">
                 <div class="row">
                   <ng-container *ngFor="let list of dishes">
@@ -245,11 +298,12 @@
                           <div class="dish-details">
                             <div class="dish-name">{{ dish.itemName }}</div>
                             <div *ngIf="dish.discountedPrice" class="dish-price">
-                              <span class="text-decoration-line-through">{{ dish.price | currencyFormat  }}</span>
+                              <span class="text-decoration-line-through">{{ dish.price | currencyFormat }}</span>
                               <br>
-                              <span style="color: red">{{ dish.discountedPrice | currencyFormat  }}</span>
+                              <span style="color: red">{{ dish.discountedPrice | currencyFormat }}</span>
                             </div>
-                            <div *ngIf="!dish.discountedPrice" class="dish-price">{{ dish.price | currencyFormat  }}</div>
+                            <div *ngIf="!dish.discountedPrice" class="dish-price">{{ dish.price | currencyFormat }}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -269,7 +323,7 @@
                         <div class="card-body text-center">
                           <div class="combo-details">
                             <div class="combo-name">{{ cb.nameCombo }}</div>
-                            <div class="combo-price">{{ cb.price | currencyFormat  }}</div>
+                            <div class="combo-price">{{ cb.price | currencyFormat }}</div>
                           </div>
                         </div>
                       </div>
@@ -282,7 +336,8 @@
         </div>
 
         <!-- Modal -->
-        <div #formModal class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="formModalLabel" aria-hidden="true">
+        <div #formModal class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="formModalLabel"
+          aria-hidden="true">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
@@ -293,11 +348,13 @@
                 <form #form="ngForm" (ngSubmit)="createAddress()">
                   <div class="form-group">
                     <label for="customerNameForm">Tên khách hàng</label>
-                    <input type="text" [(ngModel)]="newAddress.consigneeName" class="form-control" id="customerNameForm" placeholder="Nhập tên khách hàng" name="consigneeName" required>
+                    <input type="text" [(ngModel)]="newAddress.consigneeName" class="form-control" id="customerNameForm"
+                      placeholder="Nhập tên khách hàng" name="consigneeName" required>
                   </div>
                   <div class="form-group">
                     <label for="guestPhone">Số điện thoại</label>
-                    <input type="tel" [(ngModel)]="newAddress.guestPhone" class="form-control" id="guestPhone" placeholder="Nhập số điện thoại" name="guestPhone" required>
+                    <input type="tel" [(ngModel)]="newAddress.guestPhone" class="form-control" id="guestPhone"
+                      placeholder="Nhập số điện thoại" name="guestPhone" required>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -312,8 +369,8 @@
     </div>
   </div>
 
-  
-  
+
+
   <!-- Template for cffff -->
   <div class="modal fade" id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -321,8 +378,10 @@
         <!-- Success message -->
         <div class="text-center mb-3">
           <div class="d-flex justify-content-center align-items-center flex-column">
-            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
-              <path d="M8 16a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5.586l-3-3a.5.5 0 0 1 .707-.707L7 9.293l4.646-4.647a.5.5 0 0 1 .708.707l-5 5a.5.5 0 0 1-.708 0z"/>
+            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="green" class="bi bi-check-circle"
+              viewBox="0 0 16 16">
+              <path
+                d="M8 16a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5.586l-3-3a.5.5 0 0 1 .707-.707L7 9.293l4.646-4.647a.5.5 0 0 1 .708.707l-5 5a.5.5 0 0 1-.708 0z" />
             </svg>
             <h4 class="mt-2">Tạo đơn hàng thành công</h4>
           </div>
@@ -342,7 +401,8 @@
           <ng-template #editTemplate>
             <div class="mb-3">
               <label for="customerName" class="form-label">Tên khách hàng:</label>
-              <input id="customerName" class="form-control" [(ngModel)]="invoice.consigneeName" placeholder="Khách lẻ" />
+              <input id="customerName" class="form-control" [(ngModel)]="invoice.consigneeName"
+                placeholder="Khách lẻ" />
             </div>
             <div class="mb-3">
               <label for="phoneNumber" class="form-label">Số điện thoại: </label>
@@ -371,7 +431,7 @@
                   <td>{{ item.quantity }}</td>
                   <td>{{ item.price | currencyFormat }}</td>
                   <td>{{ item.unitPrice | currencyFormat }}</td>
-                  
+
                 </tr>
               </tbody>
             </table>
@@ -379,19 +439,19 @@
           <div class="mb-3">
             <label for="totalOrder" class="form-label">Tiền hàng:</label>
             <span id="totalOrder">{{ invoice?.totalAmount | currencyFormat }}</span>
-        </div>
-        <div class="mb-3">
-          <label for="discount" class="form-label">Khuyến mãi:</label>
-          <span id="discount">
-            {{ invoice?.discountName || '0' }} ({{ invoice?.discountPercent || '0' }}%)
-          </span>
-      </div>
-      <hr>
-      <div class="mb-3">
-        <label for="totalAmount" class="form-label">Tổng tiền:</label>
-        <span id="totalAmount">{{ invoice?.paymentAmount | currencyFormat }}</span>
-    </div>
-    <hr>
+          </div>
+          <div class="mb-3">
+            <label for="discount" class="form-label">Khuyến mãi:</label>
+            <span id="discount">
+              {{ invoice?.discountName || '0' }} ({{ invoice?.discountPercent || '0' }}%)
+            </span>
+          </div>
+          <hr>
+          <div class="mb-3">
+            <label for="totalAmount" class="form-label">Tổng tiền:</label>
+            <span id="totalAmount">{{ invoice?.paymentAmount | currencyFormat }}</span>
+          </div>
+          <hr>
           <div class="mb-3">
             <label for="amountToPay" class="form-label">Khách phải trả:</label>
             <span id="amountToPay">{{ invoice?.paymentAmount | currencyFormat }}</span>
@@ -406,11 +466,12 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeAndRedirect()">Đóng</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+            (click)="closeAndRedirect()">Đóng</button>
           <button type="button" class="btn btn-primary" (click)="printInvoice()">In hóa đơn</button>
         </div>
       </div>
     </div>
   </div>
-  
+
 </body>
