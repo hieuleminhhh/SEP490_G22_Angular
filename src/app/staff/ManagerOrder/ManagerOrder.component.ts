@@ -732,20 +732,23 @@ export class ManagerOrderComponent implements OnInit {
     }
   
     const today = new Date();
-    const tomorrow = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to midnight to ignore time differences
+  
+    const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
   
     // Load the order details
     this.orderDetailService.getOrderDetail(orderId).subscribe(
       (orderDetails) => {
         const recevingOrder = new Date(orderDetails.recevingOrder);
+        recevingOrder.setHours(0, 0, 0, 0); // Set time to midnight to ignore time differences
         const deposits = orderDetails.deposits;
         let newStatus: number | null = null;
   
         // Determine the new status based on recevingOrder
-        if (recevingOrder.toDateString() === today.toDateString()) {
+        if (recevingOrder.getTime() === today.getTime()) {
           newStatus = 6; // If today, set status to 6
-        } else if (recevingOrder.toDateString() === tomorrow.toDateString()) {
+        } else if (recevingOrder.getTime() === tomorrow.getTime()) {
           newStatus = 2; // If tomorrow, set status to 2
         }
   
@@ -767,7 +770,7 @@ export class ManagerOrderComponent implements OnInit {
               const invoiceData = {
                 orderId: orderId,
                 paymentTime: new Date().toISOString(),
-                paymentAmount: amountDue,
+                paymentAmount: this.DiscountedTotalAmount(),
                 taxcode: "XYZDEW",
                 paymentStatus: paymentStatus,
                 amountReceived: amountReceived,
@@ -800,6 +803,7 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
+  
   
   
   
