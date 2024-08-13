@@ -1,181 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Food Lover</title>
-  </head>
-  <body>
-    <!-- Hero Section -->
-    <div class="section flex" id="hero-section">
-      <div class="text">
-        <h1 class="primary">
-          It's Not Just Food, <br />
-          It's an <span>Experience</span>
-        </h1>
 
-        <p class="tertiary">
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ipsa,
-          provident dolorum. Voluptatum ducimus minima quasi unde, voluptatibus
-          soluta eligendi. Enim, architecto autem.
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Food Lover</title>
+</head>
+
+<body>
+  <!-- Hero Section -->
+  <div class="sections flex" id="hero-section">
+    <div class="text">
+      <h1 class="primary">
+        Chào Mừng Đến Với Eating House <br />
+        Nơi Tận Hưởng Hương Vị Tuyệt Vời
+      </h1>
+
+      <p class="tertiary">
+
+      </p>
+
+      <a routerLink="/menu" routerLinkActive="äctive" class="btn">Xem thực đơn</a>
+    </div>
+    <div class="visual">
+      <img src="https://raw.githubusercontent.com/programmercloud/foodlover/main/img/home-banner.png" alt="" />
+    </div>
+  </div>
+  <!-- End Hero Section -->
+
+  <!-- How It Works -->
+  <div class="section" id="how-it-works">
+    <h2 class="secondary">Tiêu Chí</h2>
+
+    <div class="container flex">
+      <div class="box">
+        <h3>Đặt hàng dễ dàng</h3>
+        <i class="fas fa-clock"></i>
+        <p>
+          Việc đặt hàng trở nên thuận tiện và đơn giản, giúp bạn tiết kiệm thời gian.
         </p>
-
-        <a href="#menu" class="btn">Explore Menu</a>
       </div>
-      <div class="visual">
-        <img src="https://raw.githubusercontent.com/programmercloud/foodlover/main/img/home-banner.png" alt="" />
+
+      <div class="box active">
+        <h3>Chất lượng tốt nhất</h3>
+        <i class="fas fa-trophy"></i>
+        <p>
+          Chúng tôi cam kết mang đến sản phẩm với chất lượng hàng đầu, đáp ứng mọi yêu cầu khắt khe nhất.
+        </p>
       </div>
-    </div>
-    <!-- End Hero Section -->
 
-    <!-- How It Works -->
-    <div class="section" id="how-it-works">
-      <h2 class="secondary">How It Works</h2>
-
-      <div class="container flex">
-        <div class="box">
-          <h3>Easy Order</h3>
-          <ion-icon name="timer-outline"></ion-icon>
-          <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aperiam,
-            non?
-          </p>
-        </div>
-
-        <div class="box active">
-          <h3>Best Quality</h3>
-          <ion-icon name="trophy-outline"></ion-icon>
-          <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aperiam,
-            non?
-          </p>
-        </div>
-
-        <div class="box">
-          <h3>Fast Delivery</h3>
-          <ion-icon name="checkmark-done-circle-outline"></ion-icon>
-          <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aperiam,
-            non?
-          </p>
-        </div>
+      <div class="box">
+        <h3>Giao hàng nhanh chóng</h3>
+        <i class="fas fa-check-circle"></i>
+        <p>
+          Đảm bảo giao hàng nhanh chóng và an toàn đến tận tay khách hàng.
+        </p>
       </div>
     </div>
-    <!-- End How It Works -->
+  </div>
 
-    <!-- About -->
-    <div class="section" id="about">
-      <div class="container flex">
-        <div class="visual">
-          <img src="https://raw.githubusercontent.com/programmercloud/foodlover/main/img/about.png" alt="" />
-        </div>
-        <div class="text">
-          <div class="secondary">About Our Restaurant</div>
-          <h2 class="primary">150+</h2>
-
-          <h3 class="tertiary">Our Delicious Food</h3>
-
-          <p>
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quia
-            itaque saepe id hic rem doloribus quas esse voluptatibus eius sequi,
-            possimus maxime dolores tempore facilis fugit porro mollitia, est
-            consequuntur.
-          </p>
-
-          <a href="#menu" class="btn">Explore Menu</a>
-        </div>
-      </div>
-    </div>
-    <!-- End About -->
+  <!-- End How It Works -->
 
 
 
-    <!-- Testimonial -->
-    <div class="section" id="testimonial">
-      <div class="container flex">
-        <div class="text">
-          <h2 class="secondary">What people say about FoodLover</h2>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Tempore,
-            eos voluptatem odio, molestias ullam error dolor rem laboriosam illo
-            quae odit aliquam sint a amet, autem natus! Praesentium, ipsam
-            mollitia?
-          </p>
+  <!-- Restaurant Menu -->
+  <div class="section" id="menu">
+    <div class="container">
 
-          <div class="user flex">
-            <img src="https://raw.githubusercontent.com/programmercloud/foodlover/main/img/client.jpg" alt="" />
+      <div class="secondary">Món Ăn Đặc Sắc</div>
+      <hr>
+      <ul class="category"*ngIf="category$ | async as categories" >
+        <li class="active">All</li>
+        <li *ngFor="let category of categories">{{ category.categoryName }}</li>
+      </ul>
 
-            <div class="name">
-              <div class="title">John Smith</div>
-              <div class="location">Lahore, Pakistan</div>
+      <div class="container" *ngIf="dishs$ | async as dishs">
+        <div class="restaurant-menu">
+          <div class="menu-item"  *ngFor="let item of dishs; let i = index">
+            <img [src]="item.imageUrl" [alt]="item.itemName" width="200" height="200">
+
+            <div class="title">{{ item.itemName }}</div>
+
+            <div class="order flex">
+              <div class="price">
+                <span class="price-container">
+                  <span *ngIf="item.discountedPrice" class="discounted-price">{{ item.discountedPrice |
+                    currencyFormat}}</span>
+                  <span [class]="item.discountedPrice ? 'original-price' : 'no-discount'">{{ item.price |
+                    currencyFormat}}</span>
+                </span>
+              </div>
+              <a (click)="addToCart(item, 'dish')" class="btn btn-menu">Thêm vào giỏ hàng</a>
             </div>
           </div>
+
         </div>
-        <div class="visual">
-          <img src="https://raw.githubusercontent.com/programmercloud/foodlover/main/img/testimonial.png" alt="" />
-        </div>
+        <a routerLink="/menu" routerLinkActive="äctive" class="btn">Xem thực đơn</a>
       </div>
     </div>
-    <!-- End Testimonial -->
+  </div>
+  <!-- End Restaurant Menu -->
+  <!-- About -->
+  <div class="section" id="about">
+    <div class="container flex">
+      <div class="visual">
+        <img src="https://th.bing.com/th/id/R.dd4e0ef500b38471ba3bfe674e66e7c1?rik=gG6GRr%2fmc1bAgw&pid=ImgRaw&r=0" alt="" />
+      </div>
+      <div class="text">
+        <div class="secondary">Về Chúng Tôi</div>
 
-    <!-- FAQ -->
-    <div class="section" id="faq">
-      <h2 class="secondary">Frequently Asked Questions</h2>
+        <p>
+          Chúng tôi tự hào mang đến những món ăn đậm đà hương vị từ ba miền Bắc, Trung, Nam của Việt
+          Nam. Từ phở Hà Nội, bún bò Huế đến cơm tấm Sài Gòn, mỗi món ăn tại quán đều được chế biến từ nguyên liệu tươi
+          ngon nhất, kết hợp với bí quyết nấu ăn gia truyền.
+        </p>
+        <br>
+        <p>
+          Sứ mệnh của chúng tôi là mang đến trải nghiệm ẩm thực tuyệt vời với dịch vụ thân thiện và không gian
+          ấm cúng. Chúng tôi mong muốn tạo ra một nơi mà khách hàng có thể thưởng thức những bữa ăn chất lượng trong một
+          không gian gần gũi, thân thiện.
+        </p>
 
-      <div class="faq">
-        <details>
-          <summary>I got wrong food what shoud I do?</summary>
-          <div class="content">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Asperiores amet sunt at?
-            </p>
-          </div>
-        </details>
-
-        <details>
-          <summary>I got wrong food what shoud I do?</summary>
-          <div class="content">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Asperiores amet sunt at?
-            </p>
-          </div>
-        </details>
-
-        <details>
-          <summary>I got wrong food what shoud I do?</summary>
-          <div class="content">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Asperiores amet sunt at?
-            </p>
-          </div>
-        </details>
-
-        <details>
-          <summary>I got wrong food what shoud I do?</summary>
-          <div class="content">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Asperiores amet sunt at?
-            </p>
-          </div>
-        </details>
       </div>
     </div>
-    <!-- End FAQ -->
+  </div>
+  <!-- End About -->
 
+</body>
 
-    <!-- Ion Icons Js -->
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"
-    ></script>
-    <script
-      nomodule
-      src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"
-    ></script>
-  </body>
 </html>
