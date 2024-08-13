@@ -195,7 +195,7 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
-  
+ 
   
   
   onStatusChange(event: Event, orderId: number): void {
@@ -724,6 +724,89 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Order ID is undefined');
     }
   }
+  acceptOrder(orderId: number | undefined): void {
+    // Ensure orderId is defined before proceeding
+    if (orderId === undefined) {
+      console.error('Order ID is undefined');
+      return;
+    }
+  
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to midnight
+  
+    // Load the order details
+    this.orderDetailService.getOrderDetail(orderId).subscribe(
+      (orderDetails) => {
+        // Ensure that the receivingOrder is correctly parsed as a Date object
+        const recevingOrder = new Date(orderDetails.recevingOrder);
+        recevingOrder.setHours(0, 0, 0, 0); // Set time to midnight
+  
+        let newStatus: number | null = null;
+  
+        // Determine the new status based on recevingOrder
+        if (recevingOrder.getTime() === today.getTime()) {
+          // Log values for debugging
+          console.log('recevingOrder:', recevingOrder.getTime());
+          console.log('today:', today.getTime());
+          newStatus = 6; // If today, set status to 6
+        } else {
+          newStatus = 2; // If not today, set status to 2
+        }
+  
+        // Update status if applicable and create the invoice
+        if (newStatus !== null) {
+          const paymentMethod = parseInt(this.paymentMethod, 10);
+          const amountDue = this.DiscountedTotalAmount();
+          const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : amountDue;
+          const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - amountDue : 0;
+  
+          // Set paymentStatus based on deposits
+          const paymentStatus = orderDetails.deposits === 0 ? 0 : 1;
+  
+          this.orderService.updateOrderStatus(orderId, newStatus).subscribe(
+            (statusUpdateResponse) => {
+              console.log('Order status updated based on recevingOrder:', statusUpdateResponse);
+  
+              // Prepare invoice data
+              const invoiceData = {
+                orderId: orderId,
+                paymentTime: new Date().toISOString(),
+                paymentAmount: this.DiscountedTotalAmount(),
+                taxcode: "XYZDEW",
+                paymentStatus: paymentStatus,
+                amountReceived: this.paymentAmount,
+                returnAmount: returnAmount,
+                paymentMethods: paymentMethod,
+                description: "Invoice Created"
+              };
+  
+              // Create the invoice after updating the status
+              this.invoiceService.createInvoiceForOrder(orderId, invoiceData).subscribe(
+                (invoiceResponse) => {
+                  console.log('Invoice created successfully:', invoiceResponse);
+                  this.loadListOrder(); // Reload the order list
+                },
+                (invoiceError) => {
+                  console.error('Error creating invoice:', invoiceError);
+                }
+              );
+            },
+            (statusUpdateError) => {
+              console.error('Error updating order status based on recevingOrder:', statusUpdateError);
+            }
+          );
+        } else {
+          console.log('No status update needed based on recevingOrder.');
+        }
+      },
+      (error) => {
+        console.error('Error loading order details:', error);
+      }
+    );
+  }
+  
+  
+  
   
   
   

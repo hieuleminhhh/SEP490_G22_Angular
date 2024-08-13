@@ -58,4 +58,12 @@ export class InvoiceService {
     };
     return this.http.put<any>(url, data, httpOptions);
   }
+  createInvoiceForOrder(orderId: number, invoiceData: any): Observable<any> {
+    const url = `${this.apiUrl}/Invoice/createInvoiceForOrder/${orderId}`;
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.post<any>(url, invoiceData, httpOptions);
+  }
+  
 }

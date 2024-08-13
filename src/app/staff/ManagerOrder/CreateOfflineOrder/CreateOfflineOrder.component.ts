@@ -21,6 +21,8 @@ import { DateFormatPipe } from '../../../common/material/dateFormat/dateFormat.c
 import { PercentagePipe } from '../../../common/material/percentFormat/percentFormat.component';
 import { Discount } from '../../../../models/discount.model';
 import { DiscountService } from '../../../../service/discount.service';
+import { NoteDialogComponent } from '../../../common/material/NoteDialog/NoteDialog.component';
+import { CheckoutService } from '../../../../service/checkout.service';
 @Component({
     selector: 'app-create-offline-order',
     templateUrl: './CreateOfflineOrder.component.html',
@@ -59,6 +61,7 @@ export class CreateOfflineOrderComponent implements OnInit {
     guestPhone: '',
     email:'antaiquan@gmail.com',
   };
+  discountInvalid: any = {};
   paymentMethod: string = '0';
   customerPaid: number | null = null;
   paymentAmount: number = 0;
@@ -69,7 +72,8 @@ export class CreateOfflineOrderComponent implements OnInit {
   totalAmount: number = 0;
   addNew: any = {};
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService,
-   private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService, private dialog: MatDialog,private discountService: DiscountService ) { }
+   private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService, private dialog: MatDialog,private discountService: DiscountService,
+   private checkoutService: CheckoutService ) { }
   @ViewChild('formModal') formModal!: ElementRef;
   ngOnInit() {
     this.loadListDishes();
@@ -505,11 +509,36 @@ export class CreateOfflineOrderComponent implements OnInit {
       this.selectedDiscountPercent = 0;
   }
   LoadActiveDiscounts(): void {
-    this.discountService.getActiveDiscounts().subscribe((data) => {
-      this.discount = data;
-    }, (error) => {
-      console.error('Error fetching active discounts:', error);
-    });
+    this.checkoutService.getListDiscount().subscribe(
+      response => {
+        console.log(response);
+
+        const today = new Date(); // Ngày hiện tại
+
+        this.discount = response.filter((d: {
+          totalMoney: number; startTime: string; endTime: string;
+        }) => {
+          const startDate = new Date(d.startTime);
+          const endDate = new Date(d.endTime);
+          return d.totalMoney <= this.totalAmount && today >= startDate && today <= endDate;
+        });
+        console.log(today);
+
+        console.log(648,this.discount);
+
+        this.discountInvalid = response.filter((d: {
+          totalMoney: number; startTime: string; endTime: string;
+        }) => {
+          const startDate = new Date(d.startTime);
+          const endDate = new Date(d.endTime);
+          return d.totalMoney > this.totalAmount || today < startDate || today > endDate;
+        });
+        console.log(657,this.discountInvalid);
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
   }
   onItemClick(discount: Discount) {
     this.selectedDiscount = discount.discountId;
@@ -580,7 +609,28 @@ export class CreateOfflineOrderComponent implements OnInit {
       this.totalAmountAfterDiscount = totalAmount - discountAmount;
       console.log('Total Amount After Discount:', this.totalAmountAfterDiscount); // Kiểm tra giá trị totalAmountAfterDiscount
     }
+    openNoteDialog(item: any): void {
+      const dialogRef = this.dialog.open(NoteDialogComponent, {
+        width: '300px',
+        data: { note: item.note },
+        position: {
+          left: '500px', // Adjust the horizontal position
+          top: '-900px' // Adjust the vertical position
+        }
+      });
     
-    
+      dialogRef.afterClosed().subscribe(result => {
+        if (result !== undefined) {
+          item.note = result;
+        }
+      });
+    }
+    onDiscountSelect(discountId: number) {
+      if (this.selectedDiscount === discountId) {
+        this.selectedDiscount = null; // Bỏ chọn nếu đã được chọn trước đó
+      } else {
+        this.selectedDiscount = discountId; // Chọn mã giảm giá mới
+      }
+    }
     
 }

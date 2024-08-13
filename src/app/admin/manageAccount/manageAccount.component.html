@@ -1,0 +1,49 @@
+<div class="container">
+  <h1 class="text-center">Quản lý tài khoản</h1>
+
+  <!-- Search bar -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Tìm kiếm tài khoản..."
+       
+      />
+    </div>
+    <div class="col-md-6 text-right">
+      <button class="btn btn-primary" >Thêm tài khoản mới</button>
+    </div>
+  </div>
+
+  <!-- Account table -->
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th>STT</th>
+          <th>Tên tài khoản</th>
+          <th>Email</th>
+          <th>Quyền</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let account of accounts; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ account.username }}</td>
+          <td>{{ account.email }}</td>
+          <td>{{ account.role }}</td>
+          <td>
+            <button class="btn btn-warning btn-sm" >
+              Sửa
+            </button>
+            <button class="btn btn-danger btn-sm" >
+              Xóa
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
