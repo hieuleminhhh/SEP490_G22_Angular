@@ -2,6 +2,7 @@ export interface Account{
     username: string;
     password:string;
     token:string;
+    role:string;
   }
 
 // account-dto.model.ts
