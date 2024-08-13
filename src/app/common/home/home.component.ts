@@ -21,6 +21,9 @@ export class HomeComponent {
   dishs$: Observable<Dish[]> = this.getDish();
   category$: Observable<Category[]> = this.getCategory();
 
+  selectedItem: any;
+  selectedCategory: string | null = null;
+
   constructor(private cartService: CartService, private cdr: ChangeDetectorRef, private http: HttpClient) {}
 
   addToCart(item: any, itemType: string) {
@@ -45,7 +48,7 @@ export class HomeComponent {
     }, 3000);
   }
 
-  private getDish(categoryName?: string, sortOption?: string): Observable<Dish[]> {
+  private getDish(categoryName?: string): Observable<Dish[]> {
     let apiUrl = 'https://localhost:7188/api/Dish';
 
     if (categoryName) {
@@ -76,7 +79,21 @@ export class HomeComponent {
     return this.http.get<Category[]>('https://localhost:7188/api/Category');
   }
 
+  filterByCategory(categoryName: string | null) {
+    this.selectedCategory = categoryName;
+    this.dishs$ = this.getDish(categoryName ?? undefined); // Lọc món ăn theo danh mục hoặc lấy tất cả nếu categoryName là null
+  }
+
   closeModal(index: number) {
     this.successMessages = [];
+  }
+
+  closePopup() {
+    this.selectedItem = null;
+  }
+
+  showDetails(item: any, type: string) {
+    console.log(item);
+    this.selectedItem = item;
   }
 }

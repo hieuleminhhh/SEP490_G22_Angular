@@ -33,6 +33,16 @@ body {
   justify-content: center; /* Căn giữa theo chiều dọc */
   text-align: center; /* Căn giữa văn bản */
 }
+.section-menu{
+  width: 100%;
+  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Căn giữa theo chiều ngang */
+  justify-content: center; /* Căn giữa theo chiều dọc */
+  text-align: center; /* Căn giữa văn bản */
+  background-color: #fff5f2;
+}
 
 .flex {
   display: flex;
@@ -64,10 +74,10 @@ body {
 
 .btn {
   padding: 14px 20px;
-  background-color: #fbfbfb; /* Màu nền của nút */
+  background-color: green; /* Màu nền của nút */
   border-radius: 40px; /* Bo tròn các góc của nút */
-  border: 1px solid black; /* Đường viền của nút cùng màu với nền */
-  color: black; /* Màu chữ của nút */
+  border: 1px solid white; /* Đường viền của nút cùng màu với nền */
+  color: white; /* Màu chữ của nút */
   text-decoration: none; /* Loại bỏ gạch chân của liên kết */
   font-size: 22px; /* Kích thước chữ */
   display: inline-block; /* Để nút hiển thị theo dòng */
@@ -213,7 +223,18 @@ body {
   margin: 0 auto;
   border-radius: 6px;
   overflow: hidden;
+  border: 1px solid black;
+  padding: 10px; /* Thêm khoảng cách bên trong */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hiệu ứng chuyển đổi */
 }
+
+.menu-item:hover {
+  transform: translateY(-5px); /* Nhẹ nhàng nâng lên khi hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Bóng đổ lớn hơn khi hover */
+  background-color: #f9f9f9; /* Thay đổi màu nền khi hover */
+}
+
 
 .menu-item img {
   width: 100%;
@@ -235,7 +256,7 @@ body {
 
 .title {
   font-size: 18px;
-  font-weight: 300;
+  font-weight: 700;
   margin: 8px 0;
 }
 
@@ -464,4 +485,101 @@ body {
 
 .youtube p {
   font-size: 22px;
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Một lớp phủ mờ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  position: relative;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  width: 70%;
+  max-width: 600px;
+  overflow: hidden;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px; /* Kích thước chữ lớn hơn để dễ nhấp */
+  color: #333; /* Màu sắc của biểu tượng đóng */
+  background-color: #fff; /* Nền trắng để làm nổi bật */
+  border-radius: 50%; /* Hình tròn để biểu tượng đóng có hình dạng đồng nhất */
+  width: 30px; /* Chiều rộng của nút đóng */
+  height: 30px; /* Chiều cao của nút đóng */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s; /* Hiệu ứng chuyển màu khi hover */
+}
+
+.close:hover {
+  background-color: #f44336; /* Màu nền khi hover */
+  color: #fff; /* Màu chữ khi hover */
+}
+
+.details-container {
+  display: flex;
+}
+
+.image-container {
+  flex: 1;
+  padding-right: 20px;
+}
+
+
+.info-container {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Đảm bảo nội dung được giãn đều */
+  flex-grow: 1;
+}
+
+button.add-to-cart {
+  padding: 10px 0px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  align-self: flex-end;
+  width: 150px;
+}
+
+button.add-to-cart:hover {
+  background-color: #45a049;
+}
+.discounted-price {
+  color: red; /* Màu đỏ cho giá đã giảm */
+  font-weight: bold; /* In đậm giá đã giảm */
+}
+
+.original-price {
+  text-decoration: line-through; /* Gạch ngang giá gốc */
+  color: gray; /* Màu xám cho giá gốc */
+}
+
+.no-discount {
+  text-decoration: none; /* Bỏ gạch ngang nếu không có giá giảm */
+  color: black; /* Màu đen cho giá gốc nếu không có giá giảm */
+}
+
+.small-btn {
+  padding: 5px 10px; /* Điều chỉnh padding để làm nhỏ nút */
+  font-size: 12px; /* Điều chỉnh kích thước chữ */
+  line-height: 1.5; /* Điều chỉnh line-height để căn chỉnh chữ */
 }

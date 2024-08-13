@@ -6,7 +6,7 @@ body {
   align-items: center;
   height: 100vh;
   margin: 0;
-  padding-top: 1px;
+
 }
 
 .reservation-form {
@@ -144,6 +144,7 @@ button:hover {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
+  padding-top: 100px;
 }
 
 .empty-cart .center-text {
