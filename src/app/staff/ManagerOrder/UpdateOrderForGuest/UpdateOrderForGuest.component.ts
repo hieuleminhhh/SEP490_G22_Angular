@@ -624,48 +624,62 @@ async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
     console.log("Total Amount After Discount:", this.totalAmountAfterDiscount);
 }
 
-// Call this method after every operation that changes the selected items or discount
-
-removeItem(index: number) {
+removeItem(index: number, orderId: number): void {
   const removedItem = this.selectedItems[index];
   console.log('Attempting to remove/decrease item:', removedItem);
 
-  // Calculate the maximum allowed decrease based on dishesServed
-  const maxAllowedDecrease = removedItem.quantity - removedItem.dishesServed;
+  // Check if the item exists in the cart (newlyAddedItems) but not yet saved
+  const cartIndex = this.newlyAddedItems.findIndex(item => this.itemsAreEqual(item, removedItem));
 
-  if (maxAllowedDecrease <= 0) {
-      console.log('Cannot remove or decrease quantity below the number of dishes served.');
-      return; // Prevent removal if it would violate the dishesServed constraint
-  }
+  // If the item is in the cart (newlyAddedItems) and not saved to the database yet
+  if (cartIndex !== -1) {
+    // Remove the item directly from newlyAddedItems
+    this.newlyAddedItems.splice(cartIndex, 1);
+    console.log('Item removed from newlyAddedItems:', this.newlyAddedItems);
 
-  // Decrease the quantity based on the maxAllowedDecrease
-  removedItem.quantity = removedItem.dishesServed;
-  console.log('Quantity decreased to dishesServed count:', removedItem.quantity);
+    // Remove the item from selectedItems as well
+    this.selectedItems.splice(index, 1);
+    console.log('Item removed from selectedItems:', this.selectedItems);
 
-  // Update total price after decreasing the quantity
-  this.updateTotalPrice(index, removedItem.orderId);
+    // Update total price after removing the item
+    this.updateTotalPrice(index, orderId);
 
-  // Update or remove the item in newlyAddedItems
-  const newlyAddedIndex = this.newlyAddedItems.findIndex(item => this.itemsAreEqual(item, removedItem));
-  if (newlyAddedIndex !== -1) {
-      // Adjust the quantity in newlyAddedItems as well
-      this.newlyAddedItems[newlyAddedIndex].quantity = removedItem.quantity;
-      console.log('Updated quantity in newlyAddedItems:', this.newlyAddedItems);
-  } else {
-      // Add to newlyAddedItems if not already there
-      const unitPrice = removedItem.discountedPrice ? removedItem.discountedPrice : removedItem.price;
-      this.newlyAddedItems.push({
-          ...removedItem,
-          unitPrice: unitPrice,
-          totalPrice: unitPrice * removedItem.quantity
-      });
-      console.log('Added item to newlyAddedItems:', this.newlyAddedItems);
-  }
+    return; // Exit the method after handling the cart removal
+}
+  // If the item is not in the cart (newlyAddedItems), proceed with the regular removal process
+  this.orderDetailService.getOrderDetail(orderId).subscribe((orderDetail) => {
+      // Find the specific detail for the item using either dishId or comboId
+      const detail = orderDetail.orderDetails.find((d: any) => 
+          (removedItem.dishId && d.dishId === removedItem.dishId) || 
+          (removedItem.comboId && d.comboId === removedItem.comboId)
+      );
 
-  if (removedItem.quantity <= 0) {
-      this.selectedItems.splice(index, 1);
-      console.log('Item removed from selectedItems:', this.selectedItems);
-  }
+      if (detail) {
+          // Calculate the maximum allowed decrease based on the difference between quantity and dishesServed
+          const maxAllowedDecrease = removedItem.quantity - detail.dishesServed;
+
+          if (maxAllowedDecrease <= 0) {
+              console.log('Cannot remove or decrease quantity below the number of dishes served.');
+              return; // Prevent removal if it would violate the dishesServed constraint
+          }
+
+          // Decrease the quantity to the dishesServed count
+          removedItem.quantity = detail.dishesServed;
+          console.log('Quantity decreased to dishesServed count:', removedItem.quantity);
+
+          // Update total price after decreasing the quantity
+          this.updateTotalPrice(index, orderId);
+
+          // Update or remove the item in newlyAddedItems
+          this.removeOrUpdateNewlyAddedItem(removedItem);
+
+          // Remove the item from selectedItems if its quantity is 0 or less
+          if (removedItem.quantity <= 0) {
+              this.selectedItems.splice(index, 1);
+              console.log('Item removed from selectedItems:', this.selectedItems);
+          }
+      }
+  });
 }
 
 
@@ -789,6 +803,7 @@ removeItem(index: number) {
         
         // Clear newlyAddedItems after successful update
         this.newlyAddedItems = [];
+        this.selectCategory('Món chính');
 
 
         // Delay một chút để modal đóng hoàn toàn trước khi reload

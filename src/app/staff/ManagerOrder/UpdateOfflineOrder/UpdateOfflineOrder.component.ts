@@ -291,6 +291,7 @@ async addItem(item: any) {
     const item = this.selectedItems[index];
     if (item) {
       item.totalPrice = item.quantity * (item.discountedPrice || item.price);
+      console.log(`Item ${index} total price updated to: ${item.totalPrice}`);
       this.calculateTotalAmount();
     }
   }
@@ -350,31 +351,63 @@ async addItem(item: any) {
       this.selectedDiscountPercent = 0;
   }
   
-  removeItem(index: number) {
+  removeItem(index: number, orderId: number): void {
     const removedItem = this.selectedItems[index];
-    console.log('Removing item:', removedItem);
-
-    this.selectedItems.splice(index, 1);
-    console.log('Updated selectedItems:', this.selectedItems);
-
-    // Remove the item from newlyAddedItems if it exists
-    const newlyAddedIndex = this.newlyAddedItems.findIndex(item => this.itemsAreEqual(item, removedItem));
-    if (newlyAddedIndex !== -1) {
-        this.newlyAddedItems.splice(newlyAddedIndex, 1);
-        console.log('Removed from newlyAddedItems:', this.newlyAddedItems);
-    }
-
-    // Add the removed item to newlyAddedItems with quantity 0
-    const unitPrice = removedItem.discountedPrice ? removedItem.discountedPrice : removedItem.price;
-    this.newlyAddedItems.push({
-        ...removedItem,
-        quantity: 102,
-        unitPrice: unitPrice,
-        totalPrice: unitPrice
+    console.log('Attempting to remove/decrease item:', removedItem);
+  
+    // Check if the item exists in the cart (newlyAddedItems) but not yet saved
+    const cartIndex = this.newlyAddedItems.findIndex(item => this.itemsAreEqual(item, removedItem));
+  
+    // If the item is in the cart (newlyAddedItems) and not saved to the database yet
+    if (cartIndex !== -1) {
+      // Remove the item directly from newlyAddedItems
+      this.newlyAddedItems.splice(cartIndex, 1);
+      console.log('Item removed from newlyAddedItems:', this.newlyAddedItems);
+  
+      // Remove the item from selectedItems as well
+      this.selectedItems.splice(index, 1);
+      console.log('Item removed from selectedItems:', this.selectedItems);
+  
+      // Update total price after removing the item
+      this.updateTotalPrice(index);
+  
+      return; // Exit the method after handling the cart removal
+  }
+    // If the item is not in the cart (newlyAddedItems), proceed with the regular removal process
+    this.orderDetailService.getOrderDetail(orderId).subscribe((orderDetail) => {
+        // Find the specific detail for the item using either dishId or comboId
+        const detail = orderDetail.orderDetails.find((d: any) => 
+            (removedItem.dishId && d.dishId === removedItem.dishId) || 
+            (removedItem.comboId && d.comboId === removedItem.comboId)
+        );
+  
+        if (detail) {
+            // Calculate the maximum allowed decrease based on the difference between quantity and dishesServed
+            const maxAllowedDecrease = removedItem.quantity - detail.dishesServed;
+  
+            if (maxAllowedDecrease <= 0) {
+                console.log('Cannot remove or decrease quantity below the number of dishes served.');
+                return; // Prevent removal if it would violate the dishesServed constraint
+            }
+  
+            // Decrease the quantity to the dishesServed count
+            removedItem.quantity = detail.dishesServed;
+            console.log('Quantity decreased to dishesServed count:', removedItem.quantity);
+  
+            // Update total price after decreasing the quantity
+            this.updateTotalPrice(index);
+  
+            // Update or remove the item in newlyAddedItems
+            this.removeOrUpdateNewlyAddedItem(removedItem);
+  
+            // Remove the item from selectedItems if its quantity is 0 or less
+            if (removedItem.quantity <= 0) {
+                this.selectedItems.splice(index, 1);
+                console.log('Item removed from selectedItems:', this.selectedItems);
+            }
+        }
     });
-
-    console.log('Updated newlyAddedItems:', this.newlyAddedItems);
-}
+  }
 
 updateOrderOffline(tableId: number): void {
   // Extract newly added items to update in the DB

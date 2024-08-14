@@ -84,7 +84,7 @@
                       </td>
                       <td>{{ getTotalPrice(item) | currencyFormat }}</td> <!-- Display updated total -->
                       <td>
-                        <button class="btn btn-danger btn-sm" (click)="removeItem(i)">
+                        <button class="btn btn-danger btn-sm" (click)="removeItem(i, orderId)">
                           <i class="fas fa-times"></i>
                         </button>
                       </td>
