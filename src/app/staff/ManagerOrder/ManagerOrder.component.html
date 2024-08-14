@@ -90,12 +90,10 @@
                       Chi tiết
                     </button>
                     <button
-                      *ngIf="(order.paymentStatus === 0 || order.paymentStatus === 2) && order.status !== 5 && order.status !== 6 && order.status !== 7"
+                      *ngIf="(order.paymentStatus === 0 || order.paymentStatus === 2) && order.status !== 5 && order.status !== 7"
                       type="button" class="btn btn-warning btn-sm" (click)="updateOrder(order.orderId)">
                       Cập nhật
                     </button>
-
-
 
                   </td>
                 </tr>
@@ -292,13 +290,13 @@
                       data-bs-toggle="modal">Hủy đơn</button>
                   </ng-container>
                   <!-- Online staff -->
-                  <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 2">
+                  <ng-container *ngIf="orderDetail?.type === 2 && (orderDetail?.status === 2 || orderDetail?.status === 6)">
                     <button type="button" class="btn btn-success me-2" data-bs-target="#paymentModalOnline"
                       data-bs-toggle="modal" *ngIf="!orderDetail?.invoiceId">Thanh toán</button>
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
                       data-bs-toggle="modal">Hủy đơn</button>
                   </ng-container>
-                  <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 6">
+                  <ng-container *ngIf="orderDetail?.type === 2 && dishesServed === totalQuantity && orderDetail?.paymentMethods ===2">
                     <button type="button" class="btn btn-primary me-2" *ngIf="orderDetail?.paymentStatus === 0"
                       data-bs-target="#completeOrderModal" data-bs-toggle="modal">Hoàn thành</button>
                   </ng-container>
@@ -369,12 +367,17 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                Bạn có chắc chắn muốn hủy đơn này không?
-              </div>
+                <p>Bạn có chắc chắn muốn hủy đơn này không?</p>
+                <div class="form-group">
+                    <label for="cancelationReason">Lý do hủy đơn:</label>
+                    <input type="text" id="cancelationReason" class="form-control" [(ngModel)]="cancelationReason" placeholder="Nhập lý do hủy đơn">
+                </div>
+            </div>
+            
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
-                  (click)="UpdateStatus(orderDetail?.orderId, 5)">Xác nhận</button>
+                  (click)="CancelOrderReason(orderDetail?.orderId)">Xác nhận</button>
               </div>
             </div>
           </div>
@@ -417,8 +420,6 @@
             </div>
           </div>
         </div>
-
-
       </main>
     </div>
   </div>
