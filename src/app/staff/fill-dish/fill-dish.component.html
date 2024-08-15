@@ -60,7 +60,6 @@
                         (input)="validateInput($event, i, dish.quantityRequired)">
                     </div>
                     <button
-                      [disabled]="!isInputValid[i]"
                       (click)="updateDishesServed(dish.orderDetailId, dish.itemName || dish.comboName)">
                       Lên món
                     </button>

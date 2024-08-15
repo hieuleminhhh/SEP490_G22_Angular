@@ -45,17 +45,15 @@
               </div>
               <div class="row">
                 <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="receivingDate">Ngày nhận hàng</label>
-                    <input type="date" [(ngModel)]="receivingDate" class="form-control" id="receivingDate"
-                      name="receivingDate" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="receivingTime">Giờ nhận hàng</label>
-                    <select [(ngModel)]="receivingTime" class="form-control" id="receivingTime" name="receivingTime"
-                      required>
-                      <option *ngFor="let time of timeOptions" [value]="time">{{ time }}</option>
-                    </select>
+                  <label for="order-time">Thời gian nhận hàng</label>
+                  <div class="input-group" >
+                    <input id="order-time" name="orderTime" class="form-control form-control-sm" [(ngModel)]="orderTime" style="height:38px ;">
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary btn-sm" style="background-color: #ddd;" type="button"
+                        (click)="toggleEdit()" style="height:38px ;">
+                        Thay đổi
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -466,17 +464,17 @@
   </div>
 
   <!-- Modal -->
-  <div class="modal fade" id="updateTimeModal" tabindex="-1" role="dialog" aria-labelledby="updateTimeModalLabel"
+  <div class="modal-time fade" id="updateTimeModal" tabindex="-1" role="dialog" aria-labelledby="updateTimeModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
+    <div class="modal-dialog-time" role="document">
+      <div class="modal-content-time">
+        <div class="modal-header-time">
           <h5 class="modal-title" id="updateTimeModalLabel">Chọn thời gian</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideModal()">
+          <button type="button" class="close" data-dismiss="modal-time" aria-label="Close" (click)="hideModal()">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body-time">
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
@@ -503,7 +501,7 @@
             (change)="onEarliestChange()">
           <label for="earliestCheckbox" class="form-check-label">Giao hàng sớm nhất</label>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer-time">
           <button type="button" style="background-color: red;" class="btn btn-secondary"
             (click)="hideModal()">Đóng</button>
           <button type="button" class="btn btn-primary" (click)="saveTime()">Lưu thay đổi</button>
