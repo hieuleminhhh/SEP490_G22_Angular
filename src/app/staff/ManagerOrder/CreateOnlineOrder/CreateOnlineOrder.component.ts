@@ -32,12 +32,19 @@ import { CheckoutService } from '../../../../service/checkout.service';
 export class CreateOnlineOrderComponent implements OnInit {
 
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService : ManagerOrderService,
-     private invoiceService: InvoiceService,private dialog: MatDialog, private discountService: DiscountService, private checkoutService: CheckoutService) { }
+     private invoiceService: InvoiceService,private dialog: MatDialog, private discountService: DiscountService, private checkoutService: CheckoutService) {
+      const today = new Date();
+    this.date = new Date().toISOString().split('T')[0];
+    this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 7);
+    this.maxDate = this.formatDate(maxDate);
+      }
   @ViewChild('formModal') formModal!: ElementRef;
   dishes: ListAllDishes[] = [];
   combo: ListAllCombo[] = [];
-  addresses: Address[] = []; 
-  filteredAddresses: any[] = []; 
+  addresses: Address[] = [];
+  filteredAddresses: any[] = [];
   totalPagesArray: number[] = [];
   selectedItems: any[] = [];
   currentPage: number = 1;
@@ -87,6 +94,14 @@ export class CreateOnlineOrderComponent implements OnInit {
     description: ''
   };
   invoice: any = {};
+  orderTime: string = 'Giao hàng sớm nhất';
+  date: string='';
+  time: string='';
+  isEarliest: boolean = true;
+  minDate: string; // Ngày nhận tối thiểu là ngày hiện tại
+  maxDate: string;
+  availableHours: string[] = [];
+
   ngOnInit() {
     this.loadListDishes();
     this.loadListCombo();
@@ -99,7 +114,7 @@ export class CreateOnlineOrderComponent implements OnInit {
     this.calculateAndSetTotalAmount();
     this.selectedDiscount = null;
     console.log("Select discount "+this.selectedDiscount); // Xem giá trị hiện tại của selectedDiscount
-
+    this.updateTimes();
   }
   selectCategory(searchCategory: string) {
     this.selectedCategory = searchCategory;
@@ -113,7 +128,7 @@ export class CreateOnlineOrderComponent implements OnInit {
     }
   }
   loadListDishes(search: string = '', searchCategory: string =''): void {
-    console.log('Loading dishes with search term:', search); 
+    console.log('Loading dishes with search term:', search);
     this.dishService.ListDishes(this.currentPage,this.pageSize, search, searchCategory ).subscribe(
       (response: ListAllDishes) => {
         if (response && response.items) {
@@ -154,8 +169,8 @@ export class CreateOnlineOrderComponent implements OnInit {
       this.loadListCombo(this.search);
     }
   }
-  
-  
+
+
   showDishes() {
     this.showingDishes = true;
     this.showingCombos = false;
@@ -166,7 +181,7 @@ export class CreateOnlineOrderComponent implements OnInit {
     this.showingCombos = !this.showingCombos;
     this.showingDishes = false;
     this.showingCombos = true;
-    this.selectedCategory = ''; 
+    this.selectedCategory = '';
 }
 increaseQuantity(index: number): void {
   if (this.selectedItems[index].quantity < 100) {
@@ -200,7 +215,7 @@ validateQuantity(index: number): void {
 addItem(item: any) {
   // Find if the item already exists in selectedItems
   const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-  
+
   if (index !== -1) {
     // If the item already exists, increase its quantity and update the total price
     this.selectedItems[index].quantity++;
@@ -216,13 +231,13 @@ addItem(item: any) {
   this.calculateAndSetTotalAmount();
 }
 
-  
-  
+
+
   itemsAreEqual(item1: any, item2: any): boolean {
     if (item1.hasOwnProperty('itemName') && item2.hasOwnProperty('itemName')) {
       return item1.itemName === item2.itemName;
     }
-    
+
     if (item1.hasOwnProperty('nameCombo') && item2.hasOwnProperty('nameCombo')) {
       return item1.nameCombo === item2.nameCombo;
     }
@@ -387,7 +402,7 @@ setDefaultReceivingTime() {
       this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
     }
   }
-  
+
   loadAddresses() {
     this.orderService.ListAddress().subscribe(
       (response: Address[]) => {
@@ -414,8 +429,8 @@ setDefaultReceivingTime() {
       orderDetails: [],  // Assuming orderDetails is of type array
       totalAmount: 0,   // Assuming totalAmount is of type number
       deposits: 0,     // Assuming deposits is of type array or any other type
-      note: '',  
-      type: 0, 
+      note: '',
+      type: 0,
       paymentTime: '',
     paymentAmount: 0,
     discountId: 0,
@@ -427,9 +442,9 @@ setDefaultReceivingTime() {
     description: ''      // Assuming note is of type string
       // Add more properties as required by the AddNewOrder type/interface
     };
-    
+
   }
-  
+
 
   addErrors: any = {};
   addErrorMessage: string = '';
@@ -467,8 +482,8 @@ setDefaultReceivingTime() {
       orderDetails: [],  // Assuming orderDetails is of type array
       totalAmount: 0,   // Assuming totalAmount is of type number
       deposits: 0,     // Assuming deposits is of type array or any other type
-      note: '',  
-      type: 0, 
+      note: '',
+      type: 0,
       paymentTime: '',
     paymentAmount: 0,
     discountId: 0,
@@ -666,7 +681,7 @@ printInvoice(): void {
     this.selectedDiscountName = discount.discountName;
     this.selectedDiscountPercent = discount.discountPercent;
     console.log('Discount selected:', this.selectedDiscount);
-  }  
+  }
  // Method to apply the discount
  applyDiscount() {
   if (this.selectedDiscount !== null) {
@@ -718,6 +733,80 @@ onDiscountSelect(discountId: number) {
     this.selectedDiscount = discountId; // Chọn mã giảm giá mới
   }
 }
+saveTime() {
+  console.log(this.date, this.time);
 
+  if (this.isEarliest) {
+    this.orderTime = 'Giao hàng sớm nhất';
+  } else {
+    // Xử lý khi người dùng nhập ngày và giờ
+    if (this.date && this.time) {
+      this.orderTime = 'Ngày:' + this.date + '  Giờ:' + this.time;
+    } else {
+      console.error('Ngày hoặc giờ chưa được nhập.');
+      // Có thể thực hiện các xử lý khác tại đây, ví dụ hiển thị thông báo lỗi
+    }
+  }
 
+  console.log('Đã lưu thời gian:', this.orderTime);
+  this.hideModal(); // Đóng modal sau khi lưu thành công
+}
+toggleEdit() {
+  // Hiển thị modal khi nhấn vào nút "Thay đổi"
+  const modal = document.getElementById('updateTimeModal');
+  if (modal) {
+    modal.classList.add('show');
+    modal.style.display = 'block';
+  }
+}
+
+hideModal() {
+  // Đóng modal
+  if(!this.date || !this.time){
+    this.isEarliest = true;
+  }
+
+  const modal = document.getElementById('updateTimeModal');
+  if (modal) {
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+  }
+}
+
+formatDate(date: Date): string {
+  // Hàm chuyển đổi định dạng ngày thành chuỗi "YYYY-MM-DD"
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+updateTimes(): void {
+  const now = new Date();
+  const selectedDate = new Date(this.date);
+  const isToday = now.toDateString() === selectedDate.toDateString();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  this.availableHours = [];
+
+  for (let hour = 9; hour <= 21; hour++) {
+    for (let minute = 0; minute < 60; minute += 30) {
+      if (isToday && (hour > currentHour || (hour === currentHour && minute >= currentMinute))) {
+        this.addTimeOption(hour, minute);
+      } else if (!isToday) {
+        this.addTimeOption(hour, minute);
+      }
+    }
+  }
+}
+addTimeOption(hour: number, minute: number): void {
+  const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+  this.availableHours.push(time);
+}
+onEarliestChange() {
+  if (this.isEarliest) {
+    this.date = new Date().toISOString().split('T')[0];
+    this.time = '';
+  }
+}
 }

@@ -1,13 +1,13 @@
 .image-container {
     position: relative;
   }
-  
+
   .card-img-top {
     object-fit: cover;
     height: 150px;
     width: 100%;
   }
-  
+
   .overlay {
     position: absolute;
     top: 0;
@@ -19,7 +19,7 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   .overlay-text {
     color: white;
     font-size: 18px;
@@ -95,12 +95,12 @@
   .dish-details {
     margin-bottom: 10px;
   }
-  
+
   .dish-name {
     font-size: 1.2em;
     font-weight: bold;
   }
-  
+
   .dish-price {
     font-size: 1em;
     color: #888;
@@ -108,12 +108,12 @@
   .combo-details {
     margin-bottom: 10px;
   }
-  
+
   .combo-name {
     font-size: 1.2em;
     font-weight: bold;
   }
-  
+
   .combo-price {
     font-size: 1em;
     color: #888;
@@ -125,7 +125,7 @@
   .input-group {
     position: relative;
   }
-  
+
   .dropdown-menu {
     position: absolute;
     top: 100%;
@@ -148,10 +148,10 @@
     cursor: pointer; /* Change cursor to indicate that this part is clickable */
   }
   /* Hide arrows in input number */
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 input[type=number] {
@@ -334,8 +334,97 @@ input.rounded-input {
   opacity: 0.5;
   pointer-events: none;
 }
+.row{
+  padding-bottom: 10px;
+}
 
-  
-  
-  
-  
+.modal-time {
+  display: none; /* Ẩn modal mặc định */
+  position: fixed; /* Hiển thị modal cố định khi cuộn trang */
+  z-index: 1200; /* Độ sâu của modal */
+  left: 0;
+  top: 0;
+  width: 100%; /* Thay đổi chiều rộng về 100% */
+  height: 100%; /* Thay đổi chiều cao về 100% */
+  overflow: auto; /* Cho phép cuộn khi modal dài hơn trang */
+  background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
+}
+.modal-dialog-time {
+  position: fixed;
+  top: 30%;
+  left: 40%;
+  margin: 0;
+}
+.modal-content-time{
+  width: 420px;
+  height: 300px;
+  background-color: white;
+  padding: 10px;
+}
+.modal-header-time{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-body-time {
+  display: flex;
+  height: 100%;
+  max-height: 150px;
+  flex-direction: column;
+  overflow-y: auto; /* Add vertical scrolling if content overflows */
+  padding: 15px; /* Optional: padding inside */
+}
+.modal.fade.show {
+  display: block;
+}
+
+/* Đảm bảo modal hiển thị lớn hơn nền */
+.modal-backdrop {
+  z-index: 1050;
+}
+.modal-footer-time {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-footer-time .btn-secondary,
+.modal-footer-time .btn-primary {
+  flex: 1;
+  text-align: center; /* Căn giữa văn bản */
+  font-size: 14px; /* Đổi kích thước font chữ */
+  padding: 5px 5px; /* Điều chỉnh khoảng cách nút button */
+}
+
+.modal-footer-time .btn-secondary {
+  margin-right: 100px; /* Để căn sang trái */
+}
+
+.modal-footer-time .btn-primary {
+  margin-left: 50px; /* Để căn sang phải */
+}
+/* Định dạng checkbox và label */
+.checkbox-label-container {
+  display: flex;
+  align-items: center; /* Canh giữa theo chiều dọc */
+}
+
+.checkbox-label-container .form-check-input {
+  margin-right: 10px; /* Khoảng cách giữa checkbox và văn bản */
+  margin-left: 20px;
+  transform: scale(0.4); /* Thu nhỏ checkbox */
+  width: 40px;
+  height: 40px;
+  border: 1px solid black;
+}
+
+.checkbox-label-container .form-check-label {
+  flex: 1; /* Văn bản "Sớm nhất" chiếm toàn bộ không gian còn lại */
+  font-weight: 700;
+}
+.required {
+  color: red;
+  margin-left: 3px; /* Khoảng cách giữa chữ và dấu sao */
+}
+
+
+

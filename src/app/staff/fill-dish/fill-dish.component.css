@@ -34,7 +34,7 @@ body {
   margin: 16px;
   width: 100%;
   max-width: 2500px;
-  height: 600px;
+  height: 700px;
   box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   border-radius: 1rem;
   border: transparent;
@@ -73,8 +73,10 @@ th {
 
 .lower-section {
   margin-top: 20px;
-  /* Add additional styles for the lower section */
+  height: 300px;
+  overflow: auto; /* Thêm thanh cuộn khi cần */
 }
+
 .scrollable-tbody {
   display: block;
   max-height: 180px; /* Set the desired height */
