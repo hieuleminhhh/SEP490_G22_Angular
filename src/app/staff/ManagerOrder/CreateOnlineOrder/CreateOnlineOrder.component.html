@@ -45,15 +45,17 @@
               </div>
               <div class="row">
                 <div class="col-md-6">
-                  <label for="order-time">Thời gian nhận hàng</label>
-                  <div class="input-group" >
-                    <input id="order-time" name="orderTime" class="form-control form-control-sm" [(ngModel)]="orderTime" style="height:38px ;">
-                    <div class="input-group-append">
-                      <button class="btn btn-outline-secondary btn-sm" style="background-color: #ddd;" type="button"
-                        (click)="toggleEdit()" style="height:38px ;">
-                        Thay đổi
-                      </button>
-                    </div>
+                  <div class="form-group">
+                    <label for="receivingDate">Ngày nhận hàng</label>
+                    <input type="date" [(ngModel)]="receivingDate" class="form-control" id="receivingDate"
+                      name="receivingDate" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="receivingTime">Giờ nhận hàng</label>
+                    <select [(ngModel)]="receivingTime" class="form-control" id="receivingTime" name="receivingTime"
+                      required>
+                      <option *ngFor="let time of timeOptions" [value]="time">{{ time }}</option>
+                    </select>
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -130,17 +132,20 @@
                   <br>
                 </div>
                 <!-- <button class="btn btn-primary btn-sm" (click)="openDiscountDialog(item)"> -->
-                  <button class="btn btn-primary btn-sm" *ngIf="selectedItems.length > 0" data-bs-toggle="modal" data-bs-target="#discountModal" (click)="LoadActiveDiscounts()" >
-                    <i class="fas fa-tags me-2"></i> <!-- Biểu tượng Font Awesome -->
-                    Khuyến mãi
-                  </button>
-                  <div *ngIf="selectedDiscount" class="mt-2">
-                    <strong>Giảm giá:</strong>
-                    <span>{{ selectedDiscountName }} ({{ selectedDiscountPercent | percentage }})</span>
-                  </div>
-                  <br>
-                  <hr>
-                  <div *ngIf="selectedItems.length > 0" class="mt-2">
+                <button class="btn btn-primary btn-sm" *ngIf="selectedItems.length > 0" data-bs-toggle="modal"
+                  data-bs-target="#discountModal" (click)="LoadActiveDiscounts()">
+                  <i class="fas fa-tags me-2"></i> <!-- Biểu tượng Font Awesome -->
+                  Khuyến mãi
+                </button>
+                <div *ngIf="selectedDiscount" class="mt-2">
+                  <strong style="margin-right: 5px;">Giảm giá:</strong>
+                  <span>{{ totalAmount - totalAmountAfterDiscount | currencyFormat }}</span>
+                  <span style="margin-left: 10px;">({{ selectedDiscountName }} - {{ selectedDiscountPercent | percentage
+                    }})</span>
+                </div>
+                <br>
+                <hr>
+                <div *ngIf="selectedItems.length > 0" class="mt-2">
                   <strong>Tổng số tiền:</strong>
                   <span *ngIf="selectedDiscount === null">
                     {{ totalAmount | currencyFormat }}
@@ -153,10 +158,11 @@
 
 
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
-                  <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                  <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal"
+                    data-bs-target="#paymentModal">
                     Tạo đơn
                   </button>
-                  <button class="btn btn-danger btn-lg" (click)="clearCart()" >
+                  <button class="btn btn-danger btn-lg" (click)="clearCart()">
                     Hủy
                   </button>
                 </div>
@@ -164,7 +170,8 @@
 
             </div>
             <!-- Discount Modal -->
-            <div class="modal fade" #formModal id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
+            <div class="modal fade" #formModal id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel"
+              aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -176,8 +183,9 @@
                       <li *ngFor="let discounts of discount" class="list-group-item list-group-item-action">
                         <label class="d-flex align-items-center w-100">
                           <input type="radio" name="selectedDiscount" [value]="discounts.discountId"
-                            [checked]="selectedDiscount === discounts.discountId" (click)="onDiscountSelect(discounts.discountId)"
-                            class="me-2" style="width: 20px; max-width: 20px;" />
+                            [checked]="selectedDiscount === discounts.discountId"
+                            (click)="onDiscountSelect(discounts.discountId)" class="me-2"
+                            style="width: 20px; max-width: 20px;" />
                           <div class="discount-details">
                             <div class="discount-left">
                               {{ discounts.discountName }}
@@ -200,8 +208,8 @@
                       <li *ngFor="let discounts of discountInvalid"
                         class="list-group-item list-group-item-action disabled-discount">
                         <label class="d-flex align-items-center w-100">
-                          <input type="radio" name="selectedDiscount" [value]="discounts.discountId" disabled class="me-2"
-                            style="width: 20px; max-width: 20px;" />
+                          <input type="radio" name="selectedDiscount" [value]="discounts.discountId" disabled
+                            class="me-2" style="width: 20px; max-width: 20px;" />
                           <div class="discount-details">
                             <div class="discount-left">
                               {{ discounts.discountName }}
@@ -215,7 +223,8 @@
                                 (Còn lại: {{ discounts.quantityLimit - discounts.usedCount}} mã giảm giá)
                               </span>
                               <span *ngIf="discounts.totalMoney > 0" class="discount-info">
-                                (Hạn sử dụng: Từ {{ discounts.startTime | date:'dd/MM/yyyy' }} đến {{ discounts.endTime | date:'dd/MM/yyyy' }})
+                                (Hạn sử dụng: Từ {{ discounts.startTime | date:'dd/MM/yyyy' }} đến {{ discounts.endTime
+                                | date:'dd/MM/yyyy' }})
                               </span>
                             </div>
                           </div>
@@ -231,8 +240,9 @@
 
                   <!-- applyDiscount() -->
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-primary"  (click)="applyDiscount()">Áp dụng</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearSelectedDiscount()">Đóng</button>
+                    <button type="button" class="btn btn-primary" (click)="applyDiscount()">Áp dụng</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                      (click)="clearSelectedDiscount()">Đóng</button>
                   </div>
                 </div>
               </div>
@@ -241,36 +251,29 @@
             <!-- Right column for dishes and combos -->
             <div class="col-md-6">
               <div class="category-buttons">
-                <button class="btn"
-                        [class.btn-primary]="selectedCategory !== 'Món chính'"
-                        [class.btn-secondary]="selectedCategory === 'Món chính'"
-                        (click)="selectCategory('Món chính')">Món chính
+                <button class="btn" [class.btn-primary]="selectedCategory !== 'Món chính'"
+                  [class.btn-secondary]="selectedCategory === 'Món chính'" (click)="selectCategory('Món chính')">Món
+                  chính
                 </button>
-                <button class="btn"
-                        [class.btn-primary]="selectedCategory !== 'Món khai vị'"
-                        [class.btn-secondary]="selectedCategory === 'Món khai vị'"
-                        (click)="selectCategory('Món khai vị')">Món khai vị
+                <button class="btn" [class.btn-primary]="selectedCategory !== 'Món khai vị'"
+                  [class.btn-secondary]="selectedCategory === 'Món khai vị'" (click)="selectCategory('Món khai vị')">Món
+                  khai vị
                 </button>
-                <button class="btn"
-                        [class.btn-primary]="selectedCategory !== 'Món tráng miệng'"
-                        [class.btn-secondary]="selectedCategory === 'Món tráng miệng'"
-                        (click)="selectCategory('Món tráng miệng')">Món tráng miệng
+                <button class="btn" [class.btn-primary]="selectedCategory !== 'Món tráng miệng'"
+                  [class.btn-secondary]="selectedCategory === 'Món tráng miệng'"
+                  (click)="selectCategory('Món tráng miệng')">Món tráng miệng
                 </button>
-                <button class="btn"
-                        [class.btn-primary]="selectedCategory !== 'Đồ uống'"
-                        [class.btn-secondary]="selectedCategory === 'Đồ uống'"
-                        (click)="selectCategory('Đồ uống')">Đồ uống
+                <button class="btn" [class.btn-primary]="selectedCategory !== 'Đồ uống'"
+                  [class.btn-secondary]="selectedCategory === 'Đồ uống'" (click)="selectCategory('Đồ uống')">Đồ uống
                 </button>
-                <button class="btn"
-                        [class.btn-primary]="!showingCombos"
-                        [class.btn-secondary]="showingCombos"
-                        (click)="showCombos()">Combo
+                <button class="btn" [class.btn-primary]="!showingCombos" [class.btn-secondary]="showingCombos"
+                  (click)="showCombos()">Combo
                 </button>
-            </div>
-            <div class="search-bar mt-3">
-              <input type="text" class="form-control" placeholder="Tìm kiếm món ăn..." [(ngModel)]="search"
-                (input)="onSearch()">
-            </div>
+              </div>
+              <div class="search-bar mt-3">
+                <input type="text" class="form-control" placeholder="Tìm kiếm món ăn..." [(ngModel)]="search"
+                  (input)="onSearch()">
+              </div>
 
 
               <!-- Dishes Section -->
@@ -286,11 +289,12 @@
                           <div class="dish-details">
                             <div class="dish-name">{{ dish.itemName }}</div>
                             <div *ngIf="dish.discountedPrice" class="dish-price">
-                              <span class="text-decoration-line-through">{{ dish.price | currencyFormat  }}</span>
+                              <span class="text-decoration-line-through">{{ dish.price | currencyFormat }}</span>
                               <br>
-                              <span style="color: red">{{ dish.discountedPrice | currencyFormat  }}</span>
+                              <span style="color: red">{{ dish.discountedPrice | currencyFormat }}</span>
                             </div>
-                            <div *ngIf="!dish.discountedPrice" class="dish-price">{{ dish.price | currencyFormat  }}</div>
+                            <div *ngIf="!dish.discountedPrice" class="dish-price">{{ dish.price | currencyFormat }}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -310,7 +314,7 @@
                         <div class="card-body text-center">
                           <div class="combo-details">
                             <div class="combo-name">{{ cb.nameCombo }}</div>
-                            <div class="combo-price">{{ cb.price | currencyFormat  }}</div>
+                            <div class="combo-price">{{ cb.price | currencyFormat }}</div>
                           </div>
                         </div>
                       </div>
@@ -320,7 +324,8 @@
               </div>
 
 
-              <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+              <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                   <div class="modal-content">
                     <div class="modal-header">
@@ -419,7 +424,8 @@
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal" (click)="createOrder()">Xác nhận</button>
+                      <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#cfpaymentModal" (click)="createOrder()">Xác nhận</button>
                     </div>
                   </div>
                 </div>
@@ -429,77 +435,80 @@
             </div>
           </div>
         </div>
-
       </main>
 
-         <!-- Template for cffff -->
-         <div class="modal fade" #formModal id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                                  <!-- Success message -->
-                       <div class="text-center mb-3">
-                                    <div class="d-flex justify-content-center align-items-center flex-column">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="green" class="bi bi-check-circle" viewBox="0 0 16 16">
-                                            <path d="M8 16a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5.586l-3-3a.5.5 0 0 1 .707-.707L7 9.293l4.646-4.647a.5.5 0 0 1 .708.707l-5 5a.5.5 0 0 1-.708 0z"/>
-                                        </svg>
-                                        <h4 class="mt-2">Tạo đơn hàng thành công</h4>
-                                    </div>
-                                </div>
-
-                  <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearCart()">Đóng</button>
-                  </div>
+      <!-- Template for cffff -->
+      <div class="modal fade" #formModal id="cfpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <!-- Success message -->
+            <div class="text-center mb-3">
+              <div class="d-flex justify-content-center align-items-center flex-column">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="green" class="bi bi-check-circle"
+                  viewBox="0 0 16 16">
+                  <path
+                    d="M8 16a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5.586l-3-3a.5.5 0 0 1 .707-.707L7 9.293l4.646-4.647a.5.5 0 0 1 .708.707l-5 5a.5.5 0 0 1-.708 0z" />
+                </svg>
+                <h4 class="mt-2">Tạo đơn hàng thành công</h4>
               </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                (click)="clearCart()">Đóng</button>
+            </div>
           </div>
+        </div>
       </div>
 
     </div>
   </div>
 
   <!-- Modal -->
-<div class="modal fade" id="updateTimeModal" tabindex="-1" role="dialog" aria-labelledby="updateTimeModalLabel"
-aria-hidden="true" >
-<div class="modal-dialog" role="document">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title" id="updateTimeModalLabel">Chọn thời gian</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideModal()">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group">
-            <label for="date">Ngày nhận</label>
-            <input id="date" type="date" name="date" class="form-control form-control-sm" [(ngModel)]="date"
-              (change)="isEarliest = false" [min]="minDate" [max]="maxDate" (change)="updateTimes()"
-              style="height: 41px;">
+  <div class="modal fade" id="updateTimeModal" tabindex="-1" role="dialog" aria-labelledby="updateTimeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="updateTimeModalLabel">Chọn thời gian</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hideModal()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="date">Ngày nhận</label>
+                <input id="date" type="date" name="date" class="form-control form-control-sm" [(ngModel)]="date"
+                  (change)="isEarliest = false" [min]="minDate" [max]="maxDate" (change)="updateTimes()"
+                  style="height: 41px;">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="time">Giờ nhận</label>
+                <select id="time" name="time" class="form-control form-control-sm" style="height: 41px;"
+                  [(ngModel)]="time" (change)="isEarliest = false">
+                  <option value="">Chọn</option>
+                  <option *ngFor="let time of availableHours" [value]="time">{{ time }}</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="form-group">
-            <label for="time">Giờ nhận</label>
-            <select id="time" name="time" class="form-control form-control-sm" style="height: 41px;"
-              [(ngModel)]="time" (change)="isEarliest = false">
-              <option value="">Chọn</option>
-              <option *ngFor="let time of availableHours" [value]="time">{{ time }}</option>
-            </select>
-          </div>
+        <div class="checkbox-label-container">
+          <input type="checkbox" id="earliestCheckbox" [(ngModel)]="isEarliest" class="form-check-input"
+            (change)="onEarliestChange()">
+          <label for="earliestCheckbox" class="form-check-label">Giao hàng sớm nhất</label>
+        </div>
+        <div class="modal-footer">
+          <button type="button" style="background-color: red;" class="btn btn-secondary"
+            (click)="hideModal()">Đóng</button>
+          <button type="button" class="btn btn-primary" (click)="saveTime()">Lưu thay đổi</button>
         </div>
       </div>
     </div>
-    <div class="checkbox-label-container">
-      <input type="checkbox" id="earliestCheckbox" [(ngModel)]="isEarliest" class="form-check-input"
-        (change)="onEarliestChange()">
-      <label for="earliestCheckbox" class="form-check-label">Giao hàng sớm nhất</label>
-    </div>
-    <div class="modal-footer">
-      <button type="button" style="background-color: red;" class="btn btn-secondary"
-        (click)="hideModal()">Đóng</button>
-      <button type="button" class="btn btn-primary" (click)="saveTime()">Lưu thay đổi</button>
-    </div>
   </div>
-</div>
-</div>
 </body>
