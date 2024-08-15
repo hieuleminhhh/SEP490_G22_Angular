@@ -28,6 +28,7 @@ export interface ManagerOrder {
   guestAddress: string;
   consigneeName: string;
   paymentStatus: number;
+  paymentMethods: number;
 }
 export interface ListAllOrder {
   items: ManagerOrder[];
