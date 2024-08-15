@@ -4,7 +4,8 @@
       <div class="card fixed-size">
         <div class="title">
           <button (click)="onButtonClick('dineIn')" [class.selected]="isSelected('dineIn')">Phục vụ tại chỗ</button>
-          <button (click)="onButtonClick('takeAway')" [class.selected]="isSelected('takeAway')">Phục vụ mang về</button>
+          <button (click)="onButtonClick('takeAway')" [class.selected]="isSelected('takeAway')">Đơn mang về</button>
+          <button (click)="onButtonClick('ship')" [class.selected]="isSelected('ship')">Đơn giao hàng</button>
         </div>
         <br>
         <div class="card-body">
@@ -72,15 +73,33 @@
 
           <!-- Content for takeAway -->
           <div *ngIf="selectedButton === 'takeAway'">
-            <h5 *ngIf="!ordersTakeaway">Thông tin đơn mang về và đơn giao hàng:</h5>
-            <div class="lower-section" *ngIf="ordersTakeaway">
+            <h5 *ngIf="takeawayOrders.length>0">Thông tin đơn mang về:</h5>
+            <div class="lower-section" *ngIf="takeawayOrders" style="height: 570px; overflow: auto;">
               <div class="grid-container">
-                <div *ngFor="let order of ordersTakeaway; let i = index" class="grid-item">
+                <div *ngFor="let order of takeawayOrders; let i = index" class="grid-item">
                   <div class="dish-info" (click)="showDetails(order)">
-                    <p>Đơn {{order.orderId}} - {{ order.orderType === 1 ? "Mang về" : "Giao hàng" }}</p>
+                    <p>Đơn {{order.orderId}} </p>
                     <p>Tình trạng: {{order.status === 1 ? "Hoàn thành" : "Chưa hoàn thành"}}</p>
                     <button *ngIf="order.status === 1" (click)="handleButtonClick(order); $event.stopPropagation()">
-                      {{ order.orderType === 1 ? "Trả đơn" : "Chuyển qua ship" }}
+                      Trả đơn
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content for takeAway -->
+          <div *ngIf="selectedButton === 'ship'">
+            <h5 *ngIf="deliveryOrders.length>0">Thông tin đơn giao hàng:</h5>
+            <div class="lower-section" *ngIf="deliveryOrders" style="height: 570px; overflow: auto;">
+              <div class="grid-container">
+                <div *ngFor="let order of deliveryOrders; let i = index" class="grid-item">
+                  <div class="dish-info" (click)="showDetails(order)">
+                    <p>Đơn {{order.orderId}} </p>
+                    <p>Tình trạng: {{order.status === 1 ? "Hoàn thành" : "Chưa hoàn thành"}}</p>
+                    <button *ngIf="order.status === 1" (click)="handleButtonClick(order); $event.stopPropagation()">
+                      Gán đơn ship
                     </button>
                   </div>
                 </div>

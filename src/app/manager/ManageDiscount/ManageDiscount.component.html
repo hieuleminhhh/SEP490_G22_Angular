@@ -43,8 +43,8 @@
         <tbody>
           <tr *ngFor="let program of filteredData; let i = index">
             <td>{{program.discountName}}</td>
-            <td>{{program.startTime}}</td>
-            <td>{{program.endTime}}</td>
+            <td>{{program.startTime | date:'dd/MM/yyyy - HH:mm' }}</td>
+            <td>{{program.endTime | date:'dd/MM/yyyy - HH:mm' }}</td>
             <td>{{ program.type === 1 ? 'Đơn hàng' : (program.type === 2 ? 'Món ăn' : '') }}</td>
             <td>{{ program.discountStatus === true ? 'Kích hoạt' : (program.discountStatus === false ? 'Chưa áp dụng' :
               '') }}</td>

@@ -234,7 +234,7 @@ export class ManageDiscountComponent implements OnInit {
           this.sendPromotionData(promotionData, i, () => {
             if (i === this.promotion.conditions.length - 1) {
               this.closePopup();
-            window.location.reload(); // Tải lại trang sau khi lưu xong tất cả các điều kiện
+              window.location.reload(); // Tải lại trang sau khi lưu xong tất cả các điều kiện
             }
           });
         } catch (error) {
@@ -287,7 +287,6 @@ export class ManageDiscountComponent implements OnInit {
       }
     );
   }
-
 
   checkPromotionDates(): void {
     if (this.promotion && this.promotion.endTime && this.promotion.startTime && this.promotion.endTime < this.promotion.startTime) {
