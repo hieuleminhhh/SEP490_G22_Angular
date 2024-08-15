@@ -15,12 +15,13 @@ export class FillDishComponent implements OnInit {
   filteredOrders: any[] = [];
   selectedOrder: any = null;
   orderDish: any;
-  selectedButton: 'dineIn' | 'takeAway' = 'dineIn';
+  selectedButton: 'dineIn' | 'takeAway'| 'ship' = 'dineIn';
   quantitiesServed: number[] = [];
   ordersTakeaway: any;
   selectedItem: any;
   isInputValid: boolean[] = [];
-
+  deliveryOrders: any[] = [];
+  takeawayOrders: any[] = [];
   constructor(private cookingService: CookingService) { }
 
   ngOnInit(): void {
@@ -170,11 +171,11 @@ export class FillDishComponent implements OnInit {
     console.log('Completed Dishes:', localStorage.getItem('completedDishes'));
   }
 
-  onButtonClick(buttonType: 'dineIn' | 'takeAway'): void {
+  onButtonClick(buttonType: 'dineIn' | 'takeAway' | 'ship'): void {
     this.selectedButton = buttonType;
   }
 
-  isSelected(buttonType: 'dineIn' | 'takeAway'): boolean {
+  isSelected(buttonType: 'dineIn' | 'takeAway' | 'ship'): boolean {
     return this.selectedButton === buttonType;
   }
 
@@ -182,7 +183,11 @@ export class FillDishComponent implements OnInit {
     this.cookingService.getOrdersTakeaway().subscribe(
       response => {
         this.ordersTakeaway = response;
-        console.log(this.ordersTakeaway);
+        this.takeawayOrders = this.ordersTakeaway.filter((order: { orderType: number; }) => order.orderType === 1);
+        this.deliveryOrders = this.ordersTakeaway.filter((order: { orderType: number; }) => order.orderType === 2);
+
+        console.log('Đơn mang về:', this.takeawayOrders);
+        console.log('Đơn giao hàng:', this.deliveryOrders);
 
       },
       error => {

@@ -85,10 +85,10 @@
                     <td class="note-cell" *ngIf="order.note">{{ order.note }}</td>
                     <td *ngIf="!order.note"></td>
                     <td>{{ convertOrderType(order.type) }}</td>
-                    <td>
+                    <td (click)="$event.stopPropagation()">
                       <form [formGroup]="forms[order.orderDetailId]"
-                        (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboName, order.type)"
-                        class="form-inline">
+                        (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboDetailsForChef[0]?.comboName, order.type)"
+                        class="form-inline" >
                         <div class="form-group">
                           <input type="number" formControlName="dishesServed" min="0" [attr.max]="order.quantity"
                             class="form-control form-control-sm input-short" />
@@ -160,7 +160,7 @@
 
                     <td>
                       <form [formGroup]="forms[order.orderDetailId]"
-                        (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboName, order.type)"
+                        (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboDetailsForChef?.[0]?.comboName, order.type)"
                         class="form-inline">
                         <div class="form-group">
                           <input type="number" formControlName="dishesServed" min="0" [attr.max]="order.quantity"
