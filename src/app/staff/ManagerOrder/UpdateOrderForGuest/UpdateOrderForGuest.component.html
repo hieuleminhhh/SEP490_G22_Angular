@@ -55,22 +55,23 @@
                       </td>
                       <td>
                         <div class="d-flex align-items-center">
-                          <button class="btn btn-outline-secondary btn-sm"
-                            (click)="decreaseQuantity(i, orderId)">-</button>
-                          <!-- HTML -->
+                          <button class="btn btn-outline-secondary btn-sm" (click)="decreaseQuantity(i, orderId)">-</button>
                           <input type="number"
-                            class="form-control text-center small-input mx-2 no-spinners rounded-input disabled-input"
-                            [(ngModel)]="item.quantity" (change)="validateQuantity(i, orderId)" min="1" max="100">
-
-                          <button class="btn btn-outline-secondary btn-sm"
-                            (click)="increaseQuantity(i, orderId)">+</button>
+                                 class="form-control text-center small-input mx-2 no-spinners rounded-input"
+                                 [(ngModel)]="item.quantity"
+                                 (change)="validateQuantity(i, orderId)"
+                                 min="0" max="100">
+                          <button class="btn btn-outline-secondary btn-sm" (click)="increaseQuantity(i, orderId)">+</button>
                         </div>
                       </td>
+                      
 
                       <td>
                         <div class="d-flex align-items-center">
-                          <input type="number" class="form-control text-center small-input disabled-input"
-                            [(ngModel)]="item.dishesServed">
+                          <input type="number" 
+                                 class="form-control text-center small-input disabled-input" 
+                                 [(ngModel)]="item.dishesServed" 
+                                 [ngModel]="item.dishesServed || 0">
                         </div>
                       </td>
                       <td>
@@ -83,7 +84,7 @@
                       </td>
                       <td>{{ getTotalPrice(item) | currencyFormat }}</td> <!-- Display updated total -->
                       <td>
-                        <button class="btn btn-danger btn-sm" (click)="removeItem(i)">
+                        <button class="btn btn-danger btn-sm" (click)="removeItem(i, orderId)">
                           <i class="fas fa-times"></i>
                         </button>
                       </td>
@@ -119,9 +120,6 @@
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
                   <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#confirmModal">
                     Lưu lại
-                  </button>
-                  <button class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#cancelModal">
-                    Hủy
                   </button>
                 </div>
 

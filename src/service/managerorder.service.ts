@@ -79,10 +79,23 @@ export class ManagerOrderService {
   
     return this.http.put(url, { status }, { responseType: 'text' });
   }
+  updateOrderStatus1(orderId: number, data: any): Observable<any> {
+    const url = `${this.apiUrl}/Invoice/updateStatus/${orderId}`;
+        return this.http.put(url, data, httpOptions); 
+  }
+  
   updateAmountReceiving(orderId: number, data: any): Observable<any> {
     const url = `${this.apiUrl}/orders/UpdateAmountReceiving/${orderId}`;
     return this.http.put<any>(url, data, httpOptions);
   }
-  
+  CancelOrder(orderId: number, cancelationData: { cancelationReason: string }) {
+    const url = `https://localhost:7188/api/orders/CancelOrderReason/${orderId}`;
+    return this.http.put(url, cancelationData);
+}
+  AcceptOrderWaiting(orderId: number, data: any): Observable<any> {
+  const url = `${this.apiUrl}/orders/AcceptOrder/${orderId}`;
+  return this.http.post<any>(url, data, httpOptions);
+}
+
 }
 

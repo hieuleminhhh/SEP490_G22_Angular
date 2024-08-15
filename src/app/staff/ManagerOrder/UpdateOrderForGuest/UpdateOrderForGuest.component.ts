@@ -366,57 +366,95 @@ export class UpdateOrderForGuestComponent implements OnInit {
   }
   
   
-  // Method to decrease item quantity
   decreaseQuantity(index: number, orderId: number): void {
     const item = this.selectedItems[index];
-    if (item && item.quantity > 1) {
-      item.quantity--;
-      this.updateTotalPrice(index, orderId);
-      this.removeOrUpdateNewlyAddedItem(item);
+    if (item) {
+        // Fetch the order detail within the method
+        this.orderDetailService.getOrderDetail(orderId).subscribe((orderDetail) => {
+            // Find the specific detail for the item in question, using either dishId or comboId
+            const detail = orderDetail.orderDetails.find((d: any) => 
+                (item.dishId && d.dishId === item.dishId) || 
+                (item.comboId && d.comboId === item.comboId)
+            );
+
+            if (detail) {
+                // Check if decreasing the quantity would result in a quantity less than dishesServed
+                const maxAllowedDecrease = item.quantity - detail.dishesServed;
+
+                if (maxAllowedDecrease <= 0) {
+                    console.log('Cannot decrease quantity below the number of dishes served.');
+                    return; // Prevent decreasing the quantity if it would be less than dishesServed
+                }
+
+                // Decrease the quantity if it's valid to do so
+                item.quantity--;
+                this.updateTotalPrice(index, orderId);
+                this.removeOrUpdateNewlyAddedItem(item);
+            }
+        });
     }
-  }
+}
+
   
-  
-  // Method to add or update newly added item
-  async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
-    try {
-      // Fetch the current quantities from the database
-      const currentQuantities = await this.orderService.getQuantityOrderDetails(this.orderId).toPromise();
-      console.log("Current Quantities:", currentQuantities);
-  
-      // Find the current quantity of the specific item
-      const currentQuantityObj = currentQuantities.find(
-        (qtyObj: any) =>
-          (qtyObj.dishId === item.dishId && item.dishId !== null) ||
-          (qtyObj.comboId === item.comboId && item.comboId !== null)
-      );
-  
-      const currentQuantity = currentQuantityObj ? currentQuantityObj.quantity : 0;
-      console.log("Current Quantity for Item:", currentQuantity);
-  
-      const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
-      console.log("Index in newlyAddedItems:", newlyAddedIndex);
-      if (newlyAddedIndex !== -1) {
-        // Item already exists in newlyAddedItems, update the quantity
-        const newQuantity = item.quantity;
-        const initialQuantity = currentQuantity; // Assuming currentQuantity is the initial quantity in the database
-        this.newlyAddedItems[newlyAddedIndex].quantity = newQuantity - initialQuantity;
-        this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * (this.newlyAddedItems[newlyAddedIndex].discountedPrice || this.newlyAddedItems[newlyAddedIndex].price);
-      } 
-      else {
-        // Item is new, add to newlyAddedItems
-        const newItem = {
-          ...item,
-          quantity: item.quantity - currentQuantity, // Only add the new quantity
-          totalPrice: (item.quantity - currentQuantity) * (item.discountedPrice || item.price)
-        };
-        this.newlyAddedItems.push(newItem);
+async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
+  try {
+    // Fetch the current quantities from the database
+    const currentQuantities = await this.orderService.getQuantityOrderDetails(this.orderId).toPromise();
+    console.log("Current Quantities:", currentQuantities);
+
+    // Find the current quantity of the specific item
+    const currentQuantityObj = currentQuantities.find(
+      (qtyObj: any) =>
+        (qtyObj.dishId === item.dishId && item.dishId !== null) ||
+        (qtyObj.comboId === item.comboId && item.comboId !== null)
+    );
+
+    const currentQuantity = currentQuantityObj ? currentQuantityObj.quantity : 0;
+    console.log("Current Quantity for Item:", currentQuantity);
+
+    // Check if the item already exists in newlyAddedItems
+    const selectedItemIndex = this.newlyAddedItems.findIndex(selectedItem => 
+      this.itemsAreEqual(selectedItem, item)
+    );
+    
+    console.log("Index in newlyAddedItems:", selectedItemIndex);
+    console.log("This new:", this.newlyAddedItems);
+
+    const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
+
+    if (selectedItemIndex !== -1) {
+      console.log('selectedItems', this.newlyAddedItems);
+      console.log('currentQuantities:', currentQuantities);
+      
+      // Item already exists in newlyAddedItems, update the quantity
+      const newQuantity = item.quantity;
+      const initialQuantity = currentQuantity; // Quantity in the database
+
+      // Check if the selectedItem exists in the array before updating
+      if (this.newlyAddedItems[selectedItemIndex]) {
+        this.newlyAddedItems[selectedItemIndex].quantity = newQuantity - initialQuantity;
+        this.newlyAddedItems[selectedItemIndex].totalPrice = this.newlyAddedItems[selectedItemIndex].quantity * unitPrice;
+      } else {
+        console.error('Error: selectedItemIndex points to an undefined item in newlyAddedItems.');
       }
-      console.log('Updated Newly Added Items:', this.newlyAddedItems);
-    } catch (error) {
-      console.error('Error updating newly added items:', error);
+    } else {
+      // Item is new, add to newlyAddedItems
+      const newItem = {
+        ...item,
+        quantity: item.quantity - currentQuantity, // Only add the new quantity
+        unitPrice: unitPrice,
+        totalPrice: (item.quantity - currentQuantity) * unitPrice
+      };
+      this.newlyAddedItems.push(newItem);
     }
+
+    console.log('Updated Newly Added Items:', this.newlyAddedItems);
+  } catch (error) {
+    console.error('Error updating newly added items:', error);
   }
+}
+
+  
   
   
  async removeOrUpdateNewlyAddedItem(item: any): Promise<void> {
@@ -516,60 +554,52 @@ export class UpdateOrderForGuestComponent implements OnInit {
   }
   
   
-  addItem(item: any) {
-    console.log('Initial item:', item);
+  async addItem(item: any) {
+    // Find if the item already exists in selectedItems
+    const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
   
-    // Ensure that the item has a valid quantity
-    let quantity = item.quantity;
-    if (quantity === undefined || quantity === null || isNaN(Number(quantity)) || Number(quantity) <= 0) {
-      quantity = 1; // Default quantity to 1 if it's invalid
-    } else {
-      quantity = Number(quantity);
+    let unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
+    if (isNaN(unitPrice)) {
+      console.error('Unit price is not a number:', unitPrice);
+      unitPrice = 0; // Ensure unitPrice has a valid number
     }
   
-    const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
-    const totalPrice = quantity * unitPrice; // Calculate total price based on the quantity
-  
-    // Find if the item already exists in newlyAddedItems
-    const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
-    const selectedIndex = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-  
-    if (newlyAddedIndex !== -1) {
-      // Item already exists in newlyAddedItems, update the quantity and totalPrice
-      this.newlyAddedItems[newlyAddedIndex].quantity += quantity;
-      this.newlyAddedItems[newlyAddedIndex].totalPrice += totalPrice;
+    if (index !== -1) {
+      // If the item already exists, increase its quantity and update the total price
+      this.selectedItems[index].quantity++;
+      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * unitPrice;
     } else {
-      // Item is new, add to newlyAddedItems
-      console.log('Item is new, adding to newlyAddedItems');
-      this.newlyAddedItems.push({
-        ...item,
-        quantity: quantity,
-        unitPrice: unitPrice,
-        totalPrice: totalPrice,
-      });
-    }
-  
-    if (selectedIndex !== -1) {
-      // Item already exists in selectedItems, update the quantity and totalPrice
-      console.log('Item already exists in selectedItems, updating quantity');
-      this.selectedItems[selectedIndex].quantity += quantity;
-      this.selectedItems[selectedIndex].totalPrice += totalPrice;
-    } else {
-      // Item is new, add to selectedItems
-      console.log('Item is new, adding to selectedItems');
+      // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
       this.selectedItems.push({
         ...item,
-        quantity: quantity,
+        quantity: 1,
         unitPrice: unitPrice,
-        totalPrice: totalPrice,
+        totalPrice: unitPrice,
         dishesServed: 0
       });
     }
+    console.log('Updated Selected Items:', this.selectedItems);
   
-    console.log('Newly Added Items:', this.newlyAddedItems);
-    console.log('Selected Items:', this.selectedItems);
-  
+    // Recalculate totalAmount and totalAmountAfterDiscount after adding item
     this.calculateAndSetTotalAmount();
+  
+    // Find the specific item in newlyAddedItems
+    const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
+  
+    if (newlyAddedIndex !== -1) {
+      // If the item already exists in newlyAddedItems, update its quantity
+      this.newlyAddedItems[newlyAddedIndex].quantity += 1;
+      this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * unitPrice;
+    } else {
+      // If the item does not exist in newlyAddedItems, add it with the correct quantity
+      this.newlyAddedItems.push({
+        ...item,
+        quantity: 1,
+        unitPrice: unitPrice,
+        totalPrice: unitPrice,
+      });
+    }
+    console.log('Updated Newly Added Items:', this.newlyAddedItems);
   }
   
   
@@ -594,35 +624,64 @@ export class UpdateOrderForGuestComponent implements OnInit {
     console.log("Total Amount After Discount:", this.totalAmountAfterDiscount);
 }
 
-// Call this method after every operation that changes the selected items or discount
+removeItem(index: number, orderId: number): void {
+  const removedItem = this.selectedItems[index];
+  console.log('Attempting to remove/decrease item:', removedItem);
 
-  
-  removeItem(index: number) {
-    const removedItem = this.selectedItems[index];
-    console.log('Removing item:', removedItem);
+  // Check if the item exists in the cart (newlyAddedItems) but not yet saved
+  const cartIndex = this.newlyAddedItems.findIndex(item => this.itemsAreEqual(item, removedItem));
 
+  // If the item is in the cart (newlyAddedItems) and not saved to the database yet
+  if (cartIndex !== -1) {
+    // Remove the item directly from newlyAddedItems
+    this.newlyAddedItems.splice(cartIndex, 1);
+    console.log('Item removed from newlyAddedItems:', this.newlyAddedItems);
+
+    // Remove the item from selectedItems as well
     this.selectedItems.splice(index, 1);
-    console.log('Updated selectedItems:', this.selectedItems);
+    console.log('Item removed from selectedItems:', this.selectedItems);
 
-    // Remove the item from newlyAddedItems if it exists
-    const newlyAddedIndex = this.newlyAddedItems.findIndex(item => this.itemsAreEqual(item, removedItem));
-    if (newlyAddedIndex !== -1) {
-        this.newlyAddedItems.splice(newlyAddedIndex, 1);
-        console.log('Removed from newlyAddedItems:', this.newlyAddedItems);
-    }
+    // Update total price after removing the item
+    this.updateTotalPrice(index, orderId);
 
-    // Add the removed item to newlyAddedItems with quantity 0
-    const unitPrice = removedItem.discountedPrice ? removedItem.discountedPrice : removedItem.price;
-    this.newlyAddedItems.push({
-        ...removedItem,
-        quantity: 102,
-        unitPrice: unitPrice,
-        totalPrice: unitPrice
-    });
-
-    console.log('Updated newlyAddedItems:', this.newlyAddedItems);
+    return; // Exit the method after handling the cart removal
 }
-  
+  // If the item is not in the cart (newlyAddedItems), proceed with the regular removal process
+  this.orderDetailService.getOrderDetail(orderId).subscribe((orderDetail) => {
+      // Find the specific detail for the item using either dishId or comboId
+      const detail = orderDetail.orderDetails.find((d: any) => 
+          (removedItem.dishId && d.dishId === removedItem.dishId) || 
+          (removedItem.comboId && d.comboId === removedItem.comboId)
+      );
+
+      if (detail) {
+          // Calculate the maximum allowed decrease based on the difference between quantity and dishesServed
+          const maxAllowedDecrease = removedItem.quantity - detail.dishesServed;
+
+          if (maxAllowedDecrease <= 0) {
+              console.log('Cannot remove or decrease quantity below the number of dishes served.');
+              return; // Prevent removal if it would violate the dishesServed constraint
+          }
+
+          // Decrease the quantity to the dishesServed count
+          removedItem.quantity = detail.dishesServed;
+          console.log('Quantity decreased to dishesServed count:', removedItem.quantity);
+
+          // Update total price after decreasing the quantity
+          this.updateTotalPrice(index, orderId);
+
+          // Update or remove the item in newlyAddedItems
+          this.removeOrUpdateNewlyAddedItem(removedItem);
+
+          // Remove the item from selectedItems if its quantity is 0 or less
+          if (removedItem.quantity <= 0) {
+              this.selectedItems.splice(index, 1);
+              console.log('Item removed from selectedItems:', this.selectedItems);
+          }
+      }
+  });
+}
+
 
     clearSelectedDiscount() {
       this.selectedDiscount = null;
@@ -744,6 +803,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
         
         // Clear newlyAddedItems after successful update
         this.newlyAddedItems = [];
+        this.selectCategory('Món chính');
 
 
         // Delay một chút để modal đóng hoàn toàn trước khi reload
