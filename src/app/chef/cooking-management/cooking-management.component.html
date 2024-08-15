@@ -21,6 +21,12 @@
       <h2 *ngIf="currentView === 'order-layout'">Đơn hiện tại</h2>
       <h2 *ngIf="currentView === 'booking-order'">Đơn đặt trước</h2>
 
+      <!-- Chú thích về màu sắc -->
+      <div class="info-note" *ngIf="currentView === 'order-layout'">
+        <p><span class="color-indicator color-yellow"></span> Khách chưa lấy ngay</p>
+        <p><span class="color-indicator color-green"></span> Cần làm ngay</p>
+      </div>
+
       <div class="col-md-3" *ngIf="currentView === 'booking-order'">
         <div class="input-group">
           <label class="input-group-text" for="dateFrom">Từ ngày</label>
@@ -58,16 +64,30 @@
               </thead>
               <tbody>
                 <ng-container *ngFor="let order of filteredOrders">
-                  <tr>
-                    <td>{{order.itemName || order.comboName}}</td>
+                  <tr [ngClass]="{
+                    'green-row': !order.recevingOrder ||
+                                 (order.recevingOrder &&
+                                  (order.recevingOrder.substring(0, 16) === addOneHour(order.orderTime) ||
+                                   isRecevingOrderCloseToCurrentTime(order.recevingOrder))),
+                    'yellow-row': order.recevingOrder &&
+                                  (order.recevingOrder.substring(0, 16) !== addOneHour(order.orderTime) &&
+                                   !isRecevingOrderCloseToCurrentTime(order.recevingOrder))
+                  }" (click)="showDetails(order)">
+                    <td>{{ order.itemName || order.comboDetailsForChef[0]?.comboName }}</td>
                     <td>{{order.quantity}}</td>
                     <td>{{order.orderTime | date:'dd/MM/yyyy - HH:mm' }}</td>
-                    <td></td>
-                    <td>{{order.note ? null: ''}}</td>
-                    <td>{{order.type }}</td>
+                    <td *ngIf="isRecevingOrderMoreThanOneHourLater(order.recevingOrder, order.orderTime)">
+                      {{ order.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}
+                    </td>
+                    <td *ngIf="!isRecevingOrderMoreThanOneHourLater(order.recevingOrder, order.orderTime)">
+
+                    </td>
+                    <td class="note-cell" *ngIf="order.note">{{ order.note }}</td>
+                    <td *ngIf="!order.note"></td>
+                    <td>{{ convertOrderType(order.type) }}</td>
                     <td>
                       <form [formGroup]="forms[order.orderDetailId]"
-                      (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboName, order.type)"
+                        (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboName, order.type)"
                         class="form-inline">
                         <div class="form-group">
                           <input type="number" formControlName="dishesServed" min="0" [attr.max]="order.quantity"
@@ -89,8 +109,6 @@
                         </small>
                       </div>
                     </td>
-
-                    <td></td>
                   </tr>
                 </ng-container>
               </tbody>
@@ -125,6 +143,7 @@
                   <th>Số lượng</th>
                   <th>Thời gian giao hàng</th>
                   <th>Ghi chú</th>
+                  <th>Loại đơn</th>
                   <th>Số lượng hoàn thành</th>
                   <th></th>
                 </tr>
@@ -135,10 +154,13 @@
                     <td>{{order.itemName || order.comboDetailsForChef?.[0]?.comboName}}</td>
                     <td>{{order.quantity}}</td>
                     <td>{{order.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</td>
-                    <td>{{order.note ? null: ''}}</td>
+                    <td class="note-cell" *ngIf="order.note">{{ order.note }}</td>
+                    <td *ngIf="!order.note"></td>
+                    <td>{{ convertOrderType(order.type) }}</td>
+
                     <td>
                       <form [formGroup]="forms[order.orderDetailId]"
-                      (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboName, order.type)"
+                        (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboName, order.type)"
                         class="form-inline">
                         <div class="form-group">
                           <input type="number" formControlName="dishesServed" min="0" [attr.max]="order.quantity"
@@ -185,4 +207,21 @@
       </div>
     </section>
   </main>
+</div>
+
+<!-- Popup for item details -->
+<div *ngIf="selectedItem" class="popup" (click)="closePopup()">
+  <div class="popup-content" (click)="$event.stopPropagation()">
+    <span class="close" (click)="closePopup()">&times;</span>
+    <div class="details-container">
+      <h3>Tên món: {{selectedItem.itemName || selectedItem.comboDetailsForChef[0]?.comboName}} x{{ selectedItem.quantity}}</h3>
+      <div *ngFor="let item of ingredient" class="info-container">
+        <div class="item-details">
+          <h4>{{ item.nameCombo || item.itemName }}</h4>
+          <p>Số lượng: {{ item.quantity }}</p>
+          <p>Đã hoàn thành: {{ item.dishesServed }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

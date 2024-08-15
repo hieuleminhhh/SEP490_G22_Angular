@@ -19,7 +19,8 @@ export class CookingManagementComponent implements OnInit {
   order: any;
   filteredOrders: any[] = [];
   forms: { [key: number]: FormGroup } = {};
-
+  selectedItem: any;
+  ingredient: any;
   constructor(private cookingService: CookingService, private fb: FormBuilder) { }
 
   ngOnInit(): void {
@@ -111,9 +112,9 @@ export class CookingManagementComponent implements OnInit {
   }
 
 
-  private updateLocal(orderDetailId:number,dishesServed: number,itemNameOrComboName:string): void {
+  private updateLocal(orderDetailId: number, dishesServed: number, itemNameOrComboName: string): void {
     let completedDishes = JSON.parse(localStorage.getItem('completedDishes') || '[]');
-    completedDishes.push({orderDetailId,dishesServed, itemNameOrComboName });
+    completedDishes.push({ orderDetailId, dishesServed, itemNameOrComboName });
     localStorage.setItem('completedDishes', JSON.stringify(completedDishes));
 
     console.log('Completed Dishes:', localStorage.getItem('completedDishes'));
@@ -148,7 +149,7 @@ export class CookingManagementComponent implements OnInit {
 
   }
 
-  updateDishesServed(orderDetailId: number, dishesServed:number) {
+  updateDishesServed(orderDetailId: number, dishesServed: number) {
     const request = {
       orderDetailId: orderDetailId,
       dishesServed: dishesServed
@@ -162,4 +163,97 @@ export class CookingManagementComponent implements OnInit {
       }
     );
   }
+  convertOrderType(type: number): string {
+    switch (type) {
+      case 1:
+        return 'Mang về';
+      case 2:
+        return 'Giao hàng';
+      case 3:
+        return 'Đặt bàn';
+      case 4:
+        return 'Tại chỗ';
+      default:
+        return 'Không xác định';
+    }
+  }
+  addOneHour(dateString: string): string {
+    const date = new Date(dateString);
+    date.setHours(date.getHours() + 1);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const updatedDateString = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+    return updatedDateString;
+  }
+
+  isRecevingOrderCloseToCurrentTime(recevingOrder: string): boolean {
+    if (!recevingOrder) return false;
+
+    const currentDate = new Date();
+    const recevingOrderDate = new Date(recevingOrder);
+
+    // Tính toán khoảng cách thời gian giữa recevingOrder và thời gian hiện tại
+    const timeDifference = Math.abs(currentDate.getTime() - recevingOrderDate.getTime());
+    const oneHourInMilliseconds = 60 * 60 * 1000; // 1 giờ = 3600000 milliseconds
+
+    return timeDifference <= oneHourInMilliseconds;
+  }
+
+  isRecevingOrderMoreThanOneHourLater(recevingOrder: string, orderTime: string): boolean {
+    if (!recevingOrder || !orderTime) return false;
+
+    const recevingOrderDate = new Date(recevingOrder);
+    const orderTimeDate = new Date(orderTime);
+    const oneHourInMilliseconds = 60 * 60 * 1000; // 1 giờ = 3600000 milliseconds
+
+    // Kiểm tra xem recevingOrder có lớn hơn orderTime ít nhất 1 giờ không
+    return recevingOrderDate.getTime() >= (orderTimeDate.getTime() + oneHourInMilliseconds);
+  }
+
+  showDetails(order: any) {
+    console.log(order);
+    this.selectedItem = order;
+    this.ingredient = 1;
+  }
+
+  closePopup() {
+    this.selectedItem = null;
+  }
+
+  getIngredient(name: string, quantity:number): void {
+    this.cookingService.getOrders(name).subscribe(
+      response => {
+        this.order = response.data || [];
+        console.log(this.order);
+        this.order.forEach((o: { orderDetailId: number; quantity: number; dishesServed: number }) => {
+          o.dishesServed = o.dishesServed || 0;
+          this.initializeForm(o.orderDetailId, o.quantity);
+        });
+        this.filterOrdersByDate();
+        this.loadCompletedDishes();
+      },
+      error => {
+        console.error('Error:', error);
+        this.order = [];
+        this.filteredOrders = [];
+      }
+    );
+  }
+
+
+
+
+
+
+
+
+
+
+
 }
+
