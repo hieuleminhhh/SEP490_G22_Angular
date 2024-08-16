@@ -87,33 +87,38 @@
               <label for="phone">Số điện thoại<span class="required">*</span></label>
               <input id="phone" name="guestPhone" class="form-control form-control-sm" placeholder="Điền số điện thoại"
                 required [(ngModel)]="guestPhone" required pattern="^0\d{9,10}$" #phone="ngModel">
-                <div *ngIf="phone.invalid && (phone.dirty || phone.touched )">
-                  <small class="text-danger" *ngIf="phone.errors?.['pattern']">
-                    Số điện thoại phải có 10 hoặc 11 chữ số!
-                  </small>
-                  <small class="text-danger" *ngIf="phone.errors?.['required'] && !phone.errors?.['pattern']">
-                    Vui lòng nhập số điện thoại!
-                  </small>
-                </div>
+              <div *ngIf="phone.invalid && (phone.dirty || phone.touched )">
+                <small class="text-danger" *ngIf="phone.errors?.['pattern']">
+                  Số điện thoại phải có 10 hoặc 11 chữ số!
+                </small>
+                <small class="text-danger" *ngIf="phone.errors?.['required'] && !phone.errors?.['pattern']">
+                  Vui lòng nhập số điện thoại!
+                </small>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
-            <div class="form-group">
+            <div class="form-group" *ngIf="selectedService === 'service1'">
               <label *ngIf="selectedService === 'service1'" for="address">Địa chỉ nhận hàng<span
                   class="required">*</span></label>
-              <label *ngIf="selectedService === 'service2'" for="address">Địa chỉ của bạn</label>
-              <input id="address" name="address" class="form-control form-control-sm"
-                placeholder="Điền địa chỉ của bạn" required [(ngModel)]="address" #addressField="ngModel">
+              <input id="address" name="address" class="form-control form-control-sm" placeholder="Điền địa chỉ của bạn"
+                required [(ngModel)]="address" #addressField="ngModel">
               <div
                 *ngIf="addressField.invalid && (addressField.dirty || addressField.touched) && selectedService === 'service1'"
                 class="text-danger">
                 <small class="text-danger">Vui lòng nhập địa chỉ!</small>
               </div>
             </div>
+
+            <div class="form-group" *ngIf="selectedService === 'service2'">
+              <label *ngIf="selectedService === 'service2'" for="address">Địa chỉ của bạn</label>
+              <input id="address" name="address" class="form-control form-control-sm" placeholder="Điền địa chỉ của bạn"
+                [(ngModel)]="address">
+            </div>
             <div class="form-group">
               <label for="email">Email<span class="required"></span></label>
               <input id="email" name="email" class="form-control form-control-sm" placeholder="Điền email của bạn"
-                 [(ngModel)]="email" >
+                [(ngModel)]="email">
             </div>
           </div>
           <div class="form-group">
@@ -128,7 +133,7 @@
           <div class="form-group">
             <label for="order-time" *ngIf="selectedService === 'service1'">Thời gian nhận hàng</label>
             <label for="order-time" *ngIf="selectedService === 'service2'">Thời gian đặt bàn<span
-              class="required">*</span></label>
+                class="required">*</span></label>
             <div class="input-group" *ngIf="selectedService === 'service1'">
               <input id="order-time" name="orderTime" class="form-control form-control-sm" [(ngModel)]="orderTime"
                 [readonly]="!isEditing">
@@ -140,27 +145,28 @@
               </div>
             </div>
             <div class="input-group" *ngIf="selectedService === 'service2'">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <input id="date" type="date" name="date" class="form-control form-control-sm" [(ngModel)]="date"
-                      (change)="isEarliest = false" [min]="minDate" [max]="maxDate" (change)="updateTimes()" style="height: 41px;width: 180px;">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <input id="date" type="date" name="date" class="form-control form-control-sm" [(ngModel)]="date"
+                    (change)="isEarliest = false" [min]="minDate" [max]="maxDate" (change)="updateTimes()"
+                    style="height: 41px;width: 180px;">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <select id="time" name="time" class="form-control form-control-sm"
+                    style="height: 41px;width: 180px;margin-left: 12px;" [(ngModel)]="time" required #times="ngModel">
+                    <option value="" selected>Chọn</option>
+                    <option *ngFor="let time of availableHours" [value]="time">{{ time }}</option>
+                  </select>
+                  <div *ngIf="availableHours.length<1">
+                    <small class="text-danger" style="margin-left: 12px;">Đã hết giờ đặt bàn ngày hôm nay!</small>
+                  </div>
+                  <div *ngIf="times.invalid && (times.dirty || times.touched)">
+                    <small class="text-danger" style="margin-left: 12px;">Vui lòng chọn giờ ăn!</small>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <select id="time" name="time" class="form-control form-control-sm" style="height: 41px;width: 180px;margin-left: 12px;"
-                      [(ngModel)]="time"  required #times="ngModel">
-                      <option value="" selected>Chọn</option>
-                      <option *ngFor="let time of availableHours" [value]="time">{{ time }}</option>
-                    </select>
-                    <div *ngIf="availableHours.length<1">
-                      <small class="text-danger" style="margin-left: 12px;">Đã hết giờ đặt bàn ngày hôm nay!</small>
-                    </div>
-                    <div *ngIf="times.invalid && (times.dirty || times.touched)">
-                      <small class="text-danger" style="margin-left: 12px;">Vui lòng chọn giờ ăn!</small>
-                    </div>
-                  </div>
-                </div>
+              </div>
             </div>
           </div>
 
@@ -244,7 +250,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="updateTimeModal" tabindex="-1" role="dialog" aria-labelledby="updateTimeModalLabel"
-  aria-hidden="true" >
+  aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">

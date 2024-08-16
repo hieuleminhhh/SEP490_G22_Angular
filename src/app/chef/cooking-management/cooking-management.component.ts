@@ -24,10 +24,10 @@ export class CookingManagementComponent implements OnInit {
   constructor(private cookingService: CookingService, private fb: FormBuilder) { }
 
   ngOnInit(): void {
-    const today = new Date().toISOString().split('T')[0];
-    this.dateFrom = today;
-    this.dateTo = today;
-    this.dateNow = today;
+    const today = new Date();
+    this.dateFrom = this.formatDate(today);
+    this.dateTo = this.formatDate(today);
+    this.dateNow = this.formatDate(today);
     this.getOrders('Current');
   }
 
@@ -247,7 +247,13 @@ export class CookingManagementComponent implements OnInit {
 
 
 
-
+  formatDate(date: Date): string {
+    // Hàm chuyển đổi định dạng ngày thành chuỗi "YYYY-MM-DD"
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
 
 
 
