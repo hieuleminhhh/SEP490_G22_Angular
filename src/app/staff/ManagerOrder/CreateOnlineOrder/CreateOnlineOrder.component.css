@@ -2,11 +2,13 @@
     position: relative;
   }
 
+
   .card-img-top {
     object-fit: cover;
     height: 150px;
     width: 100%;
   }
+
 
   .overlay {
     position: absolute;
@@ -19,6 +21,7 @@
     align-items: center;
     justify-content: center;
   }
+
 
   .overlay-text {
     color: white;
@@ -96,10 +99,12 @@
     margin-bottom: 10px;
   }
 
+
   .dish-name {
     font-size: 1.2em;
     font-weight: bold;
   }
+
 
   .dish-price {
     font-size: 1em;
@@ -109,10 +114,12 @@
     margin-bottom: 10px;
   }
 
+
   .combo-name {
     font-size: 1.2em;
     font-weight: bold;
   }
+
 
   .combo-price {
     font-size: 1em;
@@ -125,6 +132,7 @@
   .input-group {
     position: relative;
   }
+
 
   .dropdown-menu {
     position: absolute;
@@ -148,6 +156,10 @@
     cursor: pointer; /* Change cursor to indicate that this part is clickable */
   }
   /* Hide arrows in input number */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
