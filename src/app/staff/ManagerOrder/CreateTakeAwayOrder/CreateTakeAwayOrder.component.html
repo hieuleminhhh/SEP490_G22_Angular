@@ -7,7 +7,7 @@
       
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div class="container mt-5">
-          <h2 class="text-center mb-4">Tạo đơn hàng mang về</h2>
+          <h2 class="order-header text-center mb-4">Tạo đơn hàng mang về</h2>
           <div class="row">
             <!-- Left column for address and cart details -->
             <div class="col-md-6">
@@ -158,12 +158,11 @@
                   </span>
                 </div>
                   
-                  
-                <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
-                  <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                <div *ngIf="selectedItems.length > 0" class="d-grid gap-3">
+                  <button type="button" class="btn custom-btn-success btn-lg rounded-pill" data-bs-toggle="modal" data-bs-target="#paymentModal">
                     Tạo đơn
                   </button>
-                  <button class="btn btn-danger btn-lg" (click)="clearCart()" >
+                  <button class="btn custom-btn-danger btn-lg rounded-pill" (click)="clearCart()">
                     Hủy
                   </button>
                 </div>

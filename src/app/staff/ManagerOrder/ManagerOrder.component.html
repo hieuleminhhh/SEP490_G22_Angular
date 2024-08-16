@@ -176,12 +176,22 @@
                   <div class="mb-3" *ngIf="orderDetail.consigneeName">
                     <span class="fw-bold">Số điện thoại:</span> {{ orderDetail.guestPhone || '------------------'}}
                   </div>
-                  <div class="mb-3">
+                  <div class="mb-3" *ngIf="orderDetail?.type === 2">
+                    <span class="fw-bold">Địa chỉ nhận hàng:</span> {{ orderDetail.guestAddress || 'N/A' }}
+                  </div>
+                  <div class="mb-3" *ngIf="orderDetail?.type === 2 || orderDetail?.type === 1">
                     <span class="fw-bold">Thời gian đặt hàng:</span> {{ orderDetail.orderDate | dateFormat }}
                   </div>
                   <div class="mb-3" *ngIf="orderDetail.recevingOrder">
                     <span class="fw-bold">Thời gian giao hàng:</span> {{ orderDetail.recevingOrder | dateFormat }}
                   </div>
+                  <div class="mb-3" *ngIf="orderDetail?.type === 4">
+                    <span class="fw-bold">Thời gian vào:</span> {{ orderDetail.orderDate | dateFormat }}
+                  </div>
+                  <div class="mb-3" *ngIf="orderDetail.recevingOrder && orderDetail?.type === 4">
+                    <span class="fw-bold">Thời gian ra:</span> {{ orderDetail.recevingOrder | dateFormat }}
+                  </div>
+                  
                   <!-- <div class="mb-3">
             <span class="fw-bold">Thanh toán:</span> {{ orderDetail.recevingOrder | dateFormat }}
           </div> -->
@@ -298,6 +308,8 @@
                       data-bs-toggle="modal" *ngIf="!orderDetail?.invoiceId">Thanh toán</button>
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
                       data-bs-toggle="modal">Hủy đơn</button>
+                    <button type="button" class="btn btn-primary me-2" *ngIf="!orderDetail?.invoiceId">In hóa đơn tạm</button>
+                    <!-- (click)="printTemporaryInvoice()" -->
                   </ng-container>
                   <ng-container
                     *ngIf="orderDetail?.type === 2 && dishesServed === totalQuantity && orderDetail?.paymentMethods ===2">
