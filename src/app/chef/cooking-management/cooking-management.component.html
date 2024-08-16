@@ -27,12 +27,6 @@
         <p><span class="color-indicator color-green"></span> Cần làm ngay</p>
       </div>
 
-      <!-- Chú thích về màu sắc -->
-      <div class="info-note" *ngIf="currentView === 'order-layout'">
-        <p><span class="color-indicator color-yellow"></span> Khách chưa lấy ngay</p>
-        <p><span class="color-indicator color-green"></span> Cần làm ngay</p>
-      </div>
-
       <div class="col-md-3" *ngIf="currentView === 'booking-order'">
         <div class="input-group">
           <label class="input-group-text" for="dateFrom">Từ ngày</label>
@@ -70,16 +64,6 @@
               </thead>
               <tbody>
                 <ng-container *ngFor="let order of filteredOrders">
-                  <tr [ngClass]="{
-                    'green-row': !order.recevingOrder ||
-                                 (order.recevingOrder &&
-                                  (order.recevingOrder.substring(0, 16) === addOneHour(order.orderTime) ||
-                                   isRecevingOrderCloseToCurrentTime(order.recevingOrder))),
-                    'yellow-row': order.recevingOrder &&
-                                  (order.recevingOrder.substring(0, 16) !== addOneHour(order.orderTime) &&
-                                   !isRecevingOrderCloseToCurrentTime(order.recevingOrder))
-                  }" (click)="showDetails(order)">
-                    <td>{{ order.itemName || order.comboDetailsForChef[0]?.comboName }}</td>
                   <tr [ngClass]="{
                     'green-row': !order.recevingOrder ||
                                  (order.recevingOrder &&
@@ -230,22 +214,6 @@
   </main>
 </div>
 
-<!-- Popup for item details -->
-<div *ngIf="selectedItem" class="popup" (click)="closePopup()">
-  <div class="popup-content" (click)="$event.stopPropagation()">
-    <span class="close" (click)="closePopup()">&times;</span>
-    <div class="details-container">
-      <h3>Tên món: {{selectedItem.itemName || selectedItem.comboDetailsForChef[0]?.comboName}} x{{ selectedItem.quantity}}</h3>
-      <div *ngFor="let item of ingredient" class="info-container">
-        <div class="item-details">
-          <h4>{{ item.nameCombo || item.itemName }}</h4>
-          <p>Số lượng: {{ item.quantity }}</p>
-          <p>Đã hoàn thành: {{ item.dishesServed }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Popup for item details -->
 <div *ngIf="selectedItem" class="popup" (click)="closePopup()">

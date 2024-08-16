@@ -34,7 +34,7 @@ export class CreateOnlineOrderComponent implements OnInit {
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService : ManagerOrderService,
      private invoiceService: InvoiceService,private dialog: MatDialog, private discountService: DiscountService, private checkoutService: CheckoutService) {
       const today = new Date();
-    this.date = new Date().toISOString().split('T')[0];
+    this.date = this.formatDate(today);
     this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
     const maxDate = new Date();
     maxDate.setDate(today.getDate() + 7);

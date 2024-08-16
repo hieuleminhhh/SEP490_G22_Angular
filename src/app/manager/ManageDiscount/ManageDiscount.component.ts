@@ -47,10 +47,10 @@ export class ManageDiscountComponent implements OnInit {
 
   ngOnInit(): void {
     this.getListDiscount();
-    const today = new Date().toISOString().split('T')[0];
-    this.dateNow = today;
-    this.promotion.startTime = today;
-    this.promotion.endTime = today;
+    const today = new Date();
+    this.dateNow = this.formatDate(today);
+    this.promotion.startTime = this.formatDate(today);
+    this.promotion.endTime = this.formatDate(today);
 
     // Khởi tạo conditions đồng bộ với promotion.conditions
     this.conditions = this.promotion.conditions.map(() => ({
@@ -426,5 +426,12 @@ export class ManageDiscountComponent implements OnInit {
   saveChanges() {
     // Hàm lưu thay đổi của bạn...
     this.isEditing = false;
+  }
+  formatDate(date: Date): string {
+    // Hàm chuyển đổi định dạng ngày thành chuỗi "YYYY-MM-DD"
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 }
