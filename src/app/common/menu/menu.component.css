@@ -1,18 +1,16 @@
 
 html,
- body {
-   height: 100%;
- }
-
- body {
-   padding-top: 140px;
-   font-family: 'Source Sans Pro',sans-serif;
-   font-weight: 400;
-   font-size: 14px;
-   color: #2e2e2e;
-   background-color: #f2f2f2;
- }
-
+body {
+  padding-top: 80px;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #2e2e2e;
+  background-color: #f2f2f2;
+  min-height: 80vh; /* Chiều cao tối thiểu bằng chiều cao của cửa sổ trình duyệt */
+  margin: 0; /* Loại bỏ margin mặc định để tránh khoảng trắng không cần thiết */
+  box-sizing: border-box; /* Đảm bảo padding và border không làm thay đổi kích thước của phần tử */
+}
 
 
 
@@ -30,6 +28,7 @@ html,
  }
 
  .sticky {
+  flex-grow: 1;
    height: 200px;
  }
 
@@ -348,7 +347,8 @@ button.add-to-cart:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin-top: auto;
+  padding: 10px 0;
 }
 
 .pagination button,

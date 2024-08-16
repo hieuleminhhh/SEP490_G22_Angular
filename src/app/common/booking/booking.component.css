@@ -237,6 +237,10 @@ tr:hover {
   max-width: 1000px !important;
   position: absolute !important;
 }
+::ng-deep html, ::ng-deep body {
+  padding-top: 20px !important;
+}
+
 
 /* Modal styles */
 .modal {

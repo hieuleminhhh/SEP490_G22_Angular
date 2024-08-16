@@ -35,7 +35,7 @@ export class MenuComponent {
   @Input() isReser: boolean = false;
 
   currentPage = 1; // Trang hiện tại
-  itemsPerPage = 4; // Số bản ghi trên mỗi trang
+  itemsPerPage = 8; // Số bản ghi trên mỗi trang
   totalItems = 0; // Tổng số bản ghi
 
   filteredDataSubject = new BehaviorSubject<any[]>([]);
@@ -46,7 +46,6 @@ export class MenuComponent {
   ngOnInit(): void {
     this.loadDishes();
     sessionStorage.removeItem('isReser');
-    console.log(this.isReser);
 
   }
 
@@ -107,14 +106,10 @@ export class MenuComponent {
     }
     return this.http.get<any>(apiUrl).pipe(
       map(response => {
-        // Log dữ liệu nhận được từ API
-        console.log('API response:', response);
 
-        // Kiểm tra nếu response là một mảng
         if (Array.isArray(response)) {
           return response.filter((dish: Dish) => dish.isActive);
         }
-        // Kiểm tra nếu response.data là một mảng
         else if (response && Array.isArray(response.data)) {
           return response.data.filter((dish: Dish) => dish.isActive);
         } else {
@@ -133,6 +128,8 @@ export class MenuComponent {
     const target = event.target as HTMLSelectElement;
     this.selectedCategory = target.value === '*' ? '' : target.value;
     this.selectedFilter = 'Category';
+    console.log(this.selectedFilter);
+
     this.loadDishes();
   }
 
@@ -149,34 +146,28 @@ export class MenuComponent {
 
   private loadDishes() {
     if (this.selectedFilter === 'Category') {
-      // Khi filter là Category, gọi API lấy món ăn
       this.dishs$ = this.getDish(this.selectedCategory, this.selectedSortOption);
       this.dishs$.subscribe(
         (data: Dish[]) => {
           this.allData = data;
-          this.totalItems = data.length;
-          this.filterList();  // Lọc danh sách món ăn nếu cần
+          this.filterList();
         },
         (error: any) => {
           console.error('Error fetching dishes:', error);
         }
       );
     } else if (this.selectedFilter === 'Combo') {
-      // Khi filter là Combo, gọi API lấy combo
       this.combo$ = this.getCombo(this.selectedSortOption);
       this.combo$.subscribe(
         (data: Combo[]) => {
           this.allData = data;
-          this.totalItems = data.length;
-          this.filterList();  // Lọc danh sách combo nếu cần
+          this.filterList();
         },
         (error: any) => {
           console.error('Error fetching combos:', error);
         }
       );
     }
-    console.log('Selected Filter:', this.selectedFilter);
-    console.log('Filtered Data Observable:', this.filteredData$);
   }
 
   private getCombo(sortOption?: string): Observable<Combo[]> {
@@ -276,33 +267,32 @@ export class MenuComponent {
     }
   }
 
-  paginateData(data: any): void {
+  paginateData(data: any[]): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
-    if (data) {
-      data = data.slice(startIndex, endIndex);
-    }
 
+    const paginatedData = data.slice(startIndex, endIndex);
+
+    this.filteredDataSubject.next(paginatedData);
   }
+
   goToDesiredPage(): void {
     if (this.currentPage >= 1 && this.currentPage <= this.totalPages) {
       this.loadDishes();
     } else {
-      // Xử lý thông báo lỗi nếu số trang nhập không hợp lệ
       console.log('Invalid page number');
     }
   }
   filterList(): void {
     const search = (document.getElementById('search') as HTMLInputElement)?.value.toLowerCase() || '';
-    console.log('Search term:', search);
-    console.log('All data:', this.allData);
 
     const filtered = this.allData.filter(item =>
       (item.itemName || item.nameCombo || '').toLowerCase().includes(search)
     );
-    console.log('Filtered data:', filtered);
+    this.totalItems = filtered.length;
 
     this.filteredDataSubject.next(filtered);
+    this.paginateData(filtered);
   }
 
 }
