@@ -279,4 +279,259 @@ input.rounded-input {
   opacity: 0.5;
   pointer-events: none;
 }
+/* Newadd */
+/* Basic adjustments for the container and buttons */
+.category-buttons {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-around;
+}
 
+.category-buttons .btn {
+  min-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.3s ease;
+  z-index: 0;
+}
+
+.category-buttons .btn:hover {
+  transform: scale(1.1);
+  z-index: 1;
+}
+
+.category-buttons .btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #fff; /* Màu chữ để hiển thị rõ ràng */
+}
+
+.category-buttons .btn-outline-primary.btn-primary {
+  color: #fff; /* Màu chữ để hiển thị rõ ràng */
+}
+
+.category-buttons .btn-outline-primary {
+  color: #007bff; /* Màu chữ mặc định khi không được chọn */
+}
+
+.category-buttons .btn-outline-primary:hover {
+  color: #fff; /* Màu chữ khi hover để hiển thị rõ ràng */
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.search-bar {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.search-bar input {
+  border-radius: 4px;
+  padding: 10px;
+}
+
+/* Adjust image container and overlays */
+.image-container {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+  border-bottom: 1px solid #ddd;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.image-container:hover .overlay {
+  opacity: 1;
+}
+
+.overlay-text {
+  color: white;
+  font-size: 16px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.card {
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+/* Dish details adjustments */
+.dish-details, .combo-details {
+  margin-bottom: 10px;
+}
+
+.dish-name, .combo-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dish-price, .combo-price {
+  font-size: 14px;
+  color: #555;
+}
+/* Modal header */
+.modal-header {
+  border-bottom: 1px solid #dee2e6;
+  padding: 1rem;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+/* Modal body */
+.modal-body {
+  padding: 1.5rem;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f9f9f9;
+}
+
+.table-bordered {
+  border: 1px solid #dee2e6;
+}
+
+.table th, .table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table th {
+  background-color: #f1f1f1;
+  font-weight: 600;
+}
+
+.text-muted {
+  color: #6c757d;
+}
+
+/* Modal footer */
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+  padding: 1rem;
+  justify-content: flex-end;
+}
+
+.modal-footer .btn {
+  margin-left: 10px;
+}
+/* Button styles */
+/* Định nghĩa kiểu cho nút thành công */
+.custom-btn-success {
+  background-color: #28a745; /* Màu nền cho nút thành công */
+  border: none; /* Xóa viền mặc định */
+  color: white; /* Màu chữ */
+  font-size: 1rem; /* Điều chỉnh kích thước chữ */
+  font-weight: 600; /* Đậm hơn để dễ đọc hơn */
+  text-transform: uppercase; /* Chữ hoa cho các nút */
+  padding: 0.75rem 1.5rem; /* Padding để tạo khoảng cách bên trong nút */
+  border-radius: 30px; /* Bo góc tròn cho các nút */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ để tạo hiệu ứng nổi bật */
+  transition: all 0.3s ease; /* Hiệu ứng chuyển tiếp khi hover */
+}
+
+.custom-btn-success:hover {
+  background-color: #218838; /* Màu nền khi hover cho nút thành công */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Tăng cường hiệu ứng bóng khi hover */
+  transform: translateY(-2px); /* Nâng nút lên khi hover */
+}
+
+/* Định nghĩa kiểu cho nút hủy */
+.custom-btn-danger {
+  background-color: #dc3545; /* Màu nền cho nút hủy */
+  border: none; /* Xóa viền mặc định */
+  color: white; /* Màu chữ */
+  font-size: 1rem; /* Điều chỉnh kích thước chữ */
+  font-weight: 600; /* Đậm hơn để dễ đọc hơn */
+  text-transform: uppercase; /* Chữ hoa cho các nút */
+  padding: 0.75rem 1.5rem; /* Padding để tạo khoảng cách bên trong nút */
+  border-radius: 30px; /* Bo góc tròn cho các nút */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ để tạo hiệu ứng nổi bật */
+  transition: all 0.3s ease; /* Hiệu ứng chuyển tiếp khi hover */
+}
+
+.custom-btn-danger:hover {
+  background-color: #c82333; /* Màu nền khi hover cho nút hủy */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Tăng cường hiệu ứng bóng khi hover */
+  transform: translateY(-2px); /* Nâng nút lên khi hover */
+}
+/* Newadd */
+.order-header-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.order-header {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-bottom: 10px;
+  position: relative;
+}
+
+.order-header::before,
+.order-header::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 3px;
+  background-color: #007bff;
+}
+
+.order-header::before {
+  left: -30px; /* Điều chỉnh vị trí để gạch gần vào tiêu đề hơn */
+}
+
+.order-header::after {
+  right: -30px; /* Điều chỉnh vị trí để gạch gần vào tiêu đề hơn */
+}
+
+.order-header-container::before,
+.order-header-container::after {
+  content: '';
+  flex: 1;
+  height: 3px;
+  background-color: #007bff;
+  margin: 0 10px;
+}
