@@ -80,7 +80,7 @@ export class PaymentReservationComponent implements OnInit {
       guestNumber: this.data.guestNumber,
       note: this.data.note,
       orderDate: localISOTime,
-      status: 1,
+      status: 0,
       recevingOrder: this.data.reservationTime,
       totalAmount: this.getTotalCartPrice(),
       deposits: this.getTotalCartPrice() / 2,

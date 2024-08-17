@@ -11,7 +11,7 @@
     <div class="filter-grid">
       <div class="inner-wrap">
         <div class="filter-cell">
-          <select class="form-control" (change)="onCategoryChange($event)" *ngIf="category$ | async as categories">
+          <select class="form-control" (click)="onCategoryChange($event)" *ngIf="category$ | async as categories">
             <option value="*">Thực đơn</option>
             <option *ngFor="let category of categories" [value]="category.categoryName">
               {{ category.categoryName }}
@@ -105,12 +105,10 @@
       <button (click)="onNextPage()" [disabled]="currentPage === totalPages">Next</button>
     </div>
 
-    <div class="sticky"></div>
+
   </div>
 
-  <footer class="site-footer">
-    <div class="inner-wrap"></div>
-  </footer>
+
 
   <div *ngFor="let message of successMessages; let i = index" class="modal-dialog">
     <div class="modal-content">

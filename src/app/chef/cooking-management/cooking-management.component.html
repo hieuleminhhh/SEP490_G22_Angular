@@ -144,6 +144,7 @@
                   <th>Thời gian giao hàng</th>
                   <th>Ghi chú</th>
                   <th>Loại đơn</th>
+                  <th>Loại đơn</th>
                   <th>Số lượng hoàn thành</th>
                   <th></th>
                 </tr>
@@ -154,6 +155,10 @@
                     <td>{{order.itemName || order.comboDetailsForChef?.[0]?.comboName}}</td>
                     <td>{{order.quantity}}</td>
                     <td>{{order.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</td>
+                    <td class="note-cell" *ngIf="order.note">{{ order.note }}</td>
+                    <td *ngIf="!order.note"></td>
+                    <td>{{ convertOrderType(order.type) }}</td>
+
                     <td class="note-cell" *ngIf="order.note">{{ order.note }}</td>
                     <td *ngIf="!order.note"></td>
                     <td>{{ convertOrderType(order.type) }}</td>
@@ -208,6 +213,7 @@
     </section>
   </main>
 </div>
+
 
 <!-- Popup for item details -->
 <div *ngIf="selectedItem" class="popup" (click)="closePopup()">

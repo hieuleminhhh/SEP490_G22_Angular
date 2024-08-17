@@ -47,12 +47,16 @@ export class CheckoutComponent implements OnInit {
 
   constructor(private cartService: CartService, private http: HttpClient, private router: Router, private route: ActivatedRoute, private checkoutService: CheckoutService) {
     const today = new Date();
-    this.date = new Date().toISOString().split('T')[0];
-    this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
+    this.date = this.formatDate(today);
+    this.minDate = this.formatDate(today);
     const maxDate = new Date();
     maxDate.setDate(today.getDate() + 7);
-    this.maxDate = this.formatDate(maxDate); // Ngày nhận tối đa là ngày hiện tại + 7 ngày
+    this.maxDate = this.formatDate(maxDate);
     this.generateAvailableHours();
+    console.log(today);
+    console.log(this.date);
+
+
   }
 
   ngOnInit() {
