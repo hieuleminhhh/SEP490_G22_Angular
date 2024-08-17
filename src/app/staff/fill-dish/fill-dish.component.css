@@ -88,16 +88,23 @@ th {
   width: 100%;
   table-layout: fixed;
 }
-
+.scrollable-tbody button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
 thead, tbody tr {
   display: table;
   width: 100%;
   table-layout: fixed;
 }
 
-thead {
-  width: calc( 100% - 1em )
-}
+
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
