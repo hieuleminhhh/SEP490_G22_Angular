@@ -51,16 +51,11 @@
                     <p>Số lượng yêu cầu: {{ dish.quantityRequired }}</p>
                     <div class="quantity-container">
                       <p>Phục vụ</p>
-                      <input
-                        type="number"
-                        min="1"
-                        [attr.max]="dish.quantityRequired"
-                        [(ngModel)]="quantitiesServed[i]"
+                      <input type="number" min="1" [attr.max]="dish.quantityRequired" [(ngModel)]="quantitiesServed[i]"
                         (keypress)="preventNonNumericalInput($event)"
                         (input)="validateInput($event, i, dish.quantityRequired)">
                     </div>
-                    <button
-                      (click)="updateDishesServed(dish.orderDetailId, dish.itemName || dish.comboName)">
+                    <button (click)="updateDishesServed(dish.orderDetailId, dish.itemName || dish.comboName)">
                       Lên món
                     </button>
                   </div>
@@ -90,16 +85,62 @@
 
           <!-- Content for takeAway -->
           <div *ngIf="selectedButton === 'ship'">
-            <h5 *ngIf="deliveryOrders.length>0">Thông tin đơn giao hàng:</h5>
-            <div class="lower-section" *ngIf="deliveryOrders" style="height: 570px; overflow: auto;">
+            <!-- <div class="lower-section" *ngIf="deliveryOrders" style="height: 570px; overflow: auto;">
               <div class="grid-container">
                 <div *ngFor="let order of deliveryOrders; let i = index" class="grid-item">
                   <div class="dish-info" (click)="showDetails(order)">
                     <p>Đơn {{order.orderId}} </p>
                     <p>Tình trạng: {{order.status === 1 ? "Hoàn thành" : "Chưa hoàn thành"}}</p>
-                    <button *ngIf="order.status === 1" (click)="handleButtonClick(order); $event.stopPropagation()">
+                    <button *ngIf="order.status === 1" (click)=" $event.stopPropagation()">
                       Gán đơn ship
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div> -->
+
+            <div class="upper-section">
+              <table *ngIf="filteredOrders.length > 0; else noContent">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Mã đơn hàng</th>
+                    <th>Tình trạng</th>
+                    <th>Thời gian dự kiến nhận hàng</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody class="scrollable-tbody">
+                  <ng-container *ngFor="let order of deliveryOrders">
+                    <tr>
+                      <td *ngIf="order.status===1">
+                        <input type="checkbox" (change)="onCheckBoxChange(order, $event)"
+                          [checked]="order === selectedOrders">
+                      </td>
+                      <td *ngIf="order.status!==1"></td>
+                      <td>{{ order.orderId }}</td>
+                      <td>{{order.status === 1 ? "Sẵn sàng giao" : "Chưa hoàn thành"}}</td>
+                      <td>{{order.recevingOrder  | date:'dd/MM/yyyy - HH:mm'}}</td>
+                      <td><button (click)="showDetails(order)">Chi tiết</button></td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+              <ng-template #noContent>
+                <div>Không có món ăn hoàn thành</div>
+              </ng-template>
+            </div>
+
+            <!-- Lower Section -->
+            <div class="lower-section" *ngIf="orderDish">
+              <hr><br>
+              <h5>Danh sách nhân viên ship:</h5>
+              <br>
+              <div class="grid-container">
+                <div *ngFor="let shiper of dataShipStaff; let i = index" class="grid-item">
+                  <div class="dish-info">
+                    <p>{{shiper.firstName}}{{shiper.lastName}}</p>
+                    <button (click)="updateAccountId(dataShipStaff.accountId)">Chỉ định giao hàng</button>
                   </div>
                 </div>
               </div>
@@ -119,15 +160,52 @@
       <h3>Đơn hàng: {{selectedItem.orderId}}</h3>
       <p>Loại đơn: {{ selectedItem.orderType === 1 ? "Mang về" : "Giao hàng" }}</p>
       <p>Tình trạng: {{selectedItem.status === 1 ? "Hoàn thành" : "Chưa hoàn thành"}}</p>
+      <p>Tên người nhận: {{selectedItem.consigneeName}}</p>
+      <p>Số điện thoại: {{selectedItem.guestPhone}}</p>
+      <p>Địa chỉ: {{selectedItem.guestAddress}}</p>
       <p>Thời gian dự kiến nhận hàng: {{ selectedItem.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</p>
-      <div *ngFor="let item of selectedItem.itemInOrderDetails" class="info-container">
-        <div class="item-details">
-          <h4>{{ item.nameCombo || item.itemName }}</h4>
-          <p>Số lượng: {{ item.quantity }}</p>
-          <p>Đã hoàn thành: {{ item.dishesServed }}</p>
+
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Món ăn</th>
+            <th>Số lượng</th>
+            <th>Hoàn thành</th>
+            <th>Tổng số tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let item of selectedItem.itemInOrderDetails">
+            <tr>
+              <td>{{ item.nameCombo || item.itemName }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.dishesServed }}</td>
+              <td>{{ item.unitPrice | currencyFormat }}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+      <div class="summary-section mt-4">
+        <div class="row">
+          <!-- First Column -->
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between" *ngIf="selectedItem.discountPercent">
+              <span class="fw-bold" >Tạm tính:</span>
+              <span>{{ selectedItem.totalAmount | currencyFormat }}</span>
+            </div>
+            <div *ngIf="selectedItem.discountPercent" class="d-flex justify-content-between">
+              <span class="fw-bold">Giảm giá:</span>
+              <span>{{ selectedItem.totalAmount-selectedItem.discountedPrice | currencyFormat }}</span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between">
+              <span class="fw-bold">Tổng cộng:</span>
+              <span>{{ selectedItem.discountedPrice | currencyFormat }}</span>
+            </div>
+          </div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
-

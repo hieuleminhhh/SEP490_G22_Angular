@@ -24,8 +24,8 @@ export class CheckoutComponent implements OnInit {
   isEditing: boolean = false;
   cartItems: Dish[] = [];
 
-  date: string='';
-  time: string='';
+  date: string = '';
+  time: string = '';
   isEarliest: boolean = true;
 
   consigneeName: string = '';
@@ -79,7 +79,7 @@ export class CheckoutComponent implements OnInit {
     }
   }
 
-  formatDate(date: Date): string {
+  formatDate(date: any): string {
     // Hàm chuyển đổi định dạng ngày thành chuỗi "YYYY-MM-DD"
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -120,7 +120,7 @@ export class CheckoutComponent implements OnInit {
 
   hideModal() {
     // Đóng modal
-    if(!this.date || !this.time){
+    if (!this.date || !this.time) {
       this.isEarliest = true;
     }
 
@@ -205,20 +205,29 @@ export class CheckoutComponent implements OnInit {
   submitForm(): void {
     let receivingTime: string = '';
     if (this.date && this.time) {
-      receivingTime = this.formatDateTime(this.date, this.time);
+      receivingTime = this.formatDate(this.formatDateTime(this.date, this.time));
     } else {
       const currentTime = new Date();
       currentTime.setHours(currentTime.getHours() + 1);
-      const currentDate = currentTime.toISOString().split('T')[0];
+      const year = currentTime.getFullYear();
+      const month = String(currentTime.getMonth() + 1).padStart(2, '0'); // Lưu ý tháng bắt đầu từ 0 nên cần cộng thêm 1
+      const day = String(currentTime.getDate()).padStart(2, '0');
+
+      // Định dạng ngày theo 'YYYY-MM-DD'
+      const currentDate = `${year}-${month}-${day}`;
       const currentTimeStr = currentTime.toTimeString().split(' ')[0].substring(0, 5);
+      console.log(currentDate);
+      console.log(currentTime);
+
+
       receivingTime = this.formatDateTime(currentDate, currentTimeStr);
     }
     let deposits = 0;
     if (this.selectedPaymentMethod === 'banking') {
       deposits = this.getTotalCartPrice();
     }
-    if(this.selectedService === 'service2'){
-      deposits = this.getTotalCartPrice()/2;
+    if (this.selectedService === 'service2') {
+      deposits = this.getTotalCartPrice() / 2;
     }
     console.log(this.selectedPaymentMethod);
     console.log(this.selectedService);

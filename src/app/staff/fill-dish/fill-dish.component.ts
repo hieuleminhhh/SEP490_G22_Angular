@@ -2,31 +2,36 @@ import { CookingService } from './../../../service/cooking.service';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-fill-dish',
   standalone: true,
   templateUrl: './fill-dish.component.html',
   styleUrls: ['./fill-dish.component.css'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, CurrencyFormatPipe]
 })
 export class FillDishComponent implements OnInit {
 
   filteredOrders: any[] = [];
   selectedOrder: any = null;
+  selectedOrders: any[] = [];
   orderDish: any;
-  selectedButton: 'dineIn' | 'takeAway'| 'ship' = 'dineIn';
+  selectedButton: 'dineIn' | 'takeAway' | 'ship' = 'dineIn';
   quantitiesServed: number[] = [];
   ordersTakeaway: any;
   selectedItem: any;
   isInputValid: boolean[] = [];
   deliveryOrders: any[] = [];
   takeawayOrders: any[] = [];
+  dataShipStaff: any;
   constructor(private cookingService: CookingService) { }
 
   ngOnInit(): void {
     this.getCompletedDishesFromLocalStorage();
     this.getOrdersTakeaway();
+    this.getShipStaff();
   }
 
   getCompletedDishesFromLocalStorage(): void {
@@ -197,12 +202,11 @@ export class FillDishComponent implements OnInit {
   }
 
   handleButtonClick(order: any) {
-    // Xử lý sự kiện khi nhấn nút
-    const status = {
-      status: order.orderType === 1 ? 4 : 7
+    const request = {
+      status : 4
     };
 
-    this.cookingService.updateOrderStatus(order.orderId, status).subscribe(
+    this.cookingService.updateOrderStatus(order.orderId, request).subscribe(
       response => {
         console.log('Order status updated:', response);
         this.selectedButton = 'takeAway';
@@ -219,6 +223,10 @@ export class FillDishComponent implements OnInit {
     if (this.selectedButton === 'takeAway') {
       this.getOrdersTakeaway();
     }
+    if (this.selectedButton === 'ship') {
+      this.getOrdersTakeaway();
+    }
+
   }
   closeModal(index: number) {
 
@@ -261,4 +269,85 @@ export class FillDishComponent implements OnInit {
 
     inputElement.reportValidity();
   }
+
+  getShipStaff() {
+    this.cookingService.getShipStaff().subscribe(
+      response => {
+        this.dataShipStaff = response;
+        console.log(this.dataShipStaff);
+
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
+  updateAccountId(aId: any) {
+    const request1 = {
+      status : 7
+    };
+    const request2 ={
+      accountId:aId
+    }
+    this.selectedOrders.forEach(order => {
+      // Gọi API để cập nhật accountId cho đơn hàng
+      this.cookingService.updateAccountForOrder(order.orderId, request2).pipe(
+        // Khi cập nhật accountId thành công, cập nhật trạng thái đơn hàng lên 7
+        switchMap(response => {
+          console.log(`Order ${order.orderId} account updated successfully`, response);
+          return this.cookingService.updateOrderStatus(order.orderId, request1);
+        })
+      ).subscribe(
+        statusResponse => {
+          console.log(`Order ${order.orderId} status updated to 7 successfully`, statusResponse);
+        },
+        error => {
+          console.error(`Error updating account or status for order ${order.orderId}:`, error);
+        }
+      );
+      this.refreshContent();
+    });
+  }
+
+
+
+  assignShipButtonClick(order: any) {
+
+    this.cookingService.updateOrderStatus(order.orderId, status).subscribe(
+      response => {
+        console.log('Order status updated:', response);
+        this.selectedButton = 'takeAway';
+        this.refreshContent();
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+    console.log('Button clicked for order:', order);
+  }
+
+  onCheckBoxChange(selectedOrder: any, event: any): void {
+    if (event.target.checked) {
+      if (!this.selectedOrders.includes(selectedOrder)) {
+        this.selectedOrders.push(selectedOrder);
+      }
+      this.getOrderDish(selectedOrder.itemNameOrComboName, selectedOrder.dishesServed);
+    } else {
+      const index = this.selectedOrders.indexOf(selectedOrder);
+      if (index > -1) {
+        this.selectedOrders.splice(index, 1);
+      }
+      if (this.selectedOrders.length === 0) {
+        this.orderDish = null;
+      }
+    }
+    console.log(this.selectedOrders);
+
+  }
+
+
+
+
+
 }
+
