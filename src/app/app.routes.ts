@@ -38,7 +38,7 @@ export const routes: Routes = [
     {'path': 'news', component:NewsComponent},
     {'path': 'booking', component:BookingComponent},
     {'path': 'cart', component:CartComponent},
-    {'path': 'dashboard', component:DashboardComponent},
+    {'path': 'dashboard/:id', component: DashboardComponent },
     {'path': 'payment', component:PaymentComponent},
     {'path': 'manager', component:DashboardManagerComponent},
     {'path': 'managerdish', component:ManagerDishComponent},

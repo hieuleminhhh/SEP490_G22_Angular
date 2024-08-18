@@ -64,4 +64,13 @@ export class AccountService {
     const url = `${this.apiUrl}/Account/update/${id}`;
     return this.http.put<GetAccountDTO>(url, account, httpOptions);
   }
+  updateAccountStatus(id: number, isActive: boolean): Observable<any> {
+    const url = `${this.apiUrl}/Account/update-status/${id}`;
+    return this.http.put<any>(url, isActive, { ...httpOptions, responseType: 'text' as 'json' });
+  }
+  
+  
+  
+  
+  
 }

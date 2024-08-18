@@ -4,15 +4,10 @@
   <!-- Search bar -->
   <div class="row mb-3">
     <div class="col-md-6">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Tìm kiếm tài khoản..."
-       
-      />
+      <input type="text" class="form-control" placeholder="Tìm kiếm tài khoản..." />
     </div>
     <div class="col-md-6 text-right">
-      <button class="btn btn-primary" >Thêm tài khoản mới</button>
+      <button class="btn btn-primary">Thêm tài khoản mới</button>
     </div>
   </div>
 
@@ -22,24 +17,52 @@
       <thead class="thead-dark">
         <tr>
           <th>STT</th>
-          <th>Tên tài khoản</th>
+          <th>Họ</th>
+          <th>Tên</th>
+          <th>Số điện thoại</th>
+          <th>Địa chỉ</th>
           <th>Email</th>
-          <th>Quyền</th>
-          <th>Hành động</th>
+          <th>Tên tài khoản</th>
+          <th>Mật khẩu</th>
+          <th>Chức năng</th>
+          <th>Hoạt động</th>
+          <th>##</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let account of accounts; let i = index">
           <td>{{ i + 1 }}</td>
-          <td>{{ account.username }}</td>
+          <td>{{ account.firstName }}</td>
+          <td>{{ account.lastName }}</td>
+          <td>{{ account.phone }}</td>
+          <td>{{ account.address }}</td>
           <td>{{ account.email }}</td>
+          <td>{{ account.username }}</td>
+          <td>
+            <span>
+              <input [type]="showPasswordMap[i] ? 'text' : 'password'" [value]="account.password"
+                class="form-control form-control-sm d-inline-block" style="width: 150px;" readonly />
+              <button type="button" class="btn btn-link p-0" (click)="togglePasswordVisibility(i)">
+                <i [class]="showPasswordMap[i] ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+              </button>
+            </span>
+          </td>
           <td>{{ account.role }}</td>
           <td>
-            <button class="btn btn-warning btn-sm" >
-              Sửa
-            </button>
-            <button class="btn btn-danger btn-sm" >
-              Xóa
+            <span [ngClass]="{'active-status': account.isActive, 'inactive-status': !account.isActive}">
+              {{ account.isActive ? 'Đang hoạt động' : 'Không hoạt động' }}
+            </span>
+            <input 
+              type="checkbox" 
+              [checked]="account.isActive" 
+              (change)="toggleActiveStatus(account)"
+              class="ml-2"
+            />
+          </td>
+          
+          <td>
+            <button class="btn btn-warning btn-sm">
+              Cập nhập
             </button>
           </td>
         </tr>
