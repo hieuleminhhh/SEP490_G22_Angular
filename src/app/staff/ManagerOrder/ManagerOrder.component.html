@@ -170,6 +170,9 @@
                     </ng-container>
 
                   </div>
+                  <div class="mb-3" *ngIf="orderDetail.cancelationReason">
+                    <span class="fw-bold">Lý do hủy:</span> {{ orderDetail.cancelationReason}}
+                  </div>
                   <div class="mb-3">
                     <span class="fw-bold">Tên khách hàng:</span> {{ orderDetail.consigneeName || 'Khách lẻ' }}
                   </div>
