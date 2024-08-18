@@ -28,6 +28,7 @@ import { FillDishComponent } from './staff/fill-dish/fill-dish.component';
 import { UpdateOrderForGuestComponent } from './staff/ManagerOrder/UpdateOrderForGuest/UpdateOrderForGuest.component';
 import { SettingComponent } from './admin/setting/setting.component';
 import { ManageAccountComponent } from './admin/manageAccount/manageAccount.component';
+import { OrderShipComponent } from './ship/order-ship/order-ship.component';
 
 
 export const routes: Routes = [
@@ -61,4 +62,5 @@ export const routes: Routes = [
     {'path': 'updateOrder/:orderId' , component: UpdateOrderForGuestComponent},
     {'path': 'setting' , component: SettingComponent},
     {'path': 'manageAccount', component: ManageAccountComponent},
+    {'path': 'shipping', component: OrderShipComponent}
 ];
