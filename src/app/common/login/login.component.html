@@ -1,20 +1,21 @@
 
 <div style="padding-top: 100px;">
   <form class="form-signin" (ngSubmit)="login()">
-    <img class="mb-4" src="https://getbootstrap.com/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72"
-          height="72">
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputUsername" class="sr-only">User Name</label>
+    <img class="mb-4" src="https://localhost:7188/api/Image/getImage/Logo.png" alt="Logo" width="72" height="72">
+
+
+    <h1 class="h3 mb-3 font-weight-normal">Vui lòng đăng nhập</h1>
+    <label for="inputUsername" class="sr-only">Tài khoản</label>
     <input type="text" [(ngModel)]="username" class="form-control" name="username" required>
     <br>
-    <label for="inputPassword" class="sr-only">Password</label>
+    <label for="inputPassword" class="sr-only">Mật khẩu</label>
     <input type="password" [(ngModel)]="password" class="form-control" name="password" required>
     <div class="checkbox mb-3">
       <label>
-        <input type="checkbox" value="remember-me"> Remember me
+        <input type="checkbox" value="remember-me"> Ghi nhớ
       </label>
     </div>
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Đăng nhập</button>
     <p class="mt-5 mb-3 text-muted">&copy; 2020-2024</p>
   </form>
 </div>

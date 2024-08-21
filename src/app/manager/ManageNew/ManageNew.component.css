@@ -1,0 +1,23 @@
+.news-table-container {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .news-table {
+    margin: 0;
+  }
+  
+  .news-table img {
+    max-width: 150px;
+    height: auto;
+  }
+  
+  .news-table th, .news-table td {
+    text-align: center;
+  }
+  
+  .news-table td {
+    vertical-align: middle;
+  }
+  

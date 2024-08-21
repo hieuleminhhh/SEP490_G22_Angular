@@ -29,49 +29,49 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-    this.accountService.login(this.username, this.password)
-      .subscribe({
-        next: response => {
-          console.log('Login successful');
-          console.log(this.username);
-          console.log(this.password);
-          console.log(response.token);
-          console.log(response.role);
-          console.log(response.accountId); // Log the accountId
-  
-          // Lưu token và vai trò vào localStorage hoặc một dịch vụ để sử dụng sau này
-          localStorage.setItem('token', response.token);
-          const userRole = response.role; // Vai trò người dùng từ phản hồi
-          const accountId = response.accountId; // Lấy accountId từ phản hồi
-  
-          switch (userRole) {
-            case 'Chef':
-              this.router.navigate(['/cooking', accountId]);
-              break;
-            case 'Cashier':
-              this.router.navigate(['/dashboard', accountId]);
-              break;
-            case 'Admin':
-              this.router.navigate(['/setting', accountId]);
-              break;
-            case 'Manager':
-              this.router.navigate(['/manager', accountId]);
-              break;
-            case 'StaffOrder':
-              this.router.navigate(['/listTable', accountId]);
-              break;
-            case 'Ship':
-              this.router.navigate(['/ship', accountId]);
-              break;
-            default:
-              console.error('Unknown role:', userRole);
-              break;
-          }
-        },
-        error: error => {
-          console.error('Login failed', error);
+    this.accountService.login(this.username, this.password).subscribe({
+      next: response => {
+        console.log('Login successful');
+        console.log(response.token);
+        console.log(response.role);
+        console.log(response.accountId);
+
+        // Lưu token và vai trò vào localStorage
+        localStorage.setItem('token', response.token);
+
+        // Lưu accountId vào dịch vụ
+        this.accountService.setAccountId(response.accountId);
+
+        const userRole = response.role;
+
+        switch (userRole) {
+          case 'Chef':
+            this.router.navigate(['/cooking']);
+            break;
+          case 'Cashier':
+            this.router.navigate(['/dashboard']);
+            break;
+          case 'Admin':
+            this.router.navigate(['/setting']);
+            break;
+          case 'Manager':
+            this.router.navigate(['/manager']);
+            break;
+          case 'Order Staff':
+            this.router.navigate(['/listTable']);
+            break;
+          case 'Ship':
+            this.router.navigate(['/ship']);
+            break;
+          default:
+            console.error('Unknown role:', userRole);
+            break;
         }
-      });
+      },
+      error: error => {
+        console.error('Login failed', error);
+      }
+    });
   }
   
 

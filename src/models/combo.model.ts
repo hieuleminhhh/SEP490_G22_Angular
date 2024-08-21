@@ -1,5 +1,5 @@
 import { ManagerDish } from "./dish.model";
-
+//guest
 export interface Combo{
   comboId:number;
   nameCombo:string;
@@ -7,6 +7,7 @@ export interface Combo{
   note:string;
   imageUrl:string;
 }
+//manager
 export interface ListAllCombo {
   items: ManagerCombo[];
   totalCount: number;

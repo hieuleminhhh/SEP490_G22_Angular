@@ -2,22 +2,22 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
-import * as $ from 'jquery';
-import { ManagerDishComponent } from './ManagerDish.component';
 
-describe('ManagerDishComponent', () => {
-  let component: ManagerDishComponent;
-  let fixture: ComponentFixture<ManagerDishComponent>;
+import { ManageNewComponent } from './ManageNew.component';
+
+describe('ManageNewComponent', () => {
+  let component: ManageNewComponent;
+  let fixture: ComponentFixture<ManageNewComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ManagerDishComponent ]
+      declarations: [ ManageNewComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ManagerDishComponent);
+    fixture = TestBed.createComponent(ManageNewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
