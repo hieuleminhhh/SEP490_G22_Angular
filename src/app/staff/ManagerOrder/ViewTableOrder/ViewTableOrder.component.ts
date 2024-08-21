@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { TableService } from '../../../../service/table.service';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarOrderComponent } from "../../SidebarOrder/SidebarOrder.component";
+import { AccountService } from '../../../../service/account.service';
 
 @Component({
     selector: 'app-ViewTableOrder',
@@ -19,10 +20,21 @@ export class ViewTableOrderComponent implements OnInit {
   selectedFloor = 1;
   selectedTable: string = 'all';
   dataTable: any;
-  constructor(private tableService: TableService, private router: Router) { }
+  accountId: number = 0;
+  account: any;
+  showSidebar: boolean = true; 
+  constructor(private tableService: TableService, private router: Router,
+    private route: ActivatedRoute, private accountService: AccountService) { }
 
   ngOnInit() {
+    this.accountId = this.accountService.getAccountId() || 0;
+    console.log('31',this.accountId);
+    if (this.accountId) {
+      this.getAccountDetails(this.accountId);
+      this.getTableData();
+    }
     this.getTableData();
+
   }
   getTableData(): void {
     this.tableService.getTables().subscribe(
@@ -69,4 +81,18 @@ export class ViewTableOrderComponent implements OnInit {
       this.router.navigate(['/updateOffline'], { queryParams: { tableId } });
     }
   }
+  getAccountDetails(accountId: number): void {
+    this.accountService.getAccountById(accountId).subscribe(
+      response => {
+        this.account = response;
+        console.log('Account details:', this.account);
+        console.log('Account role:', this.account.role);
+        this.showSidebar = this.account.role !== 'Order Staff';
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
+
 }

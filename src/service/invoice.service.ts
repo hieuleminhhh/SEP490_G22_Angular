@@ -43,8 +43,8 @@ export class InvoiceService {
     };
     return this.http.get<any>(url, httpOptions);
   }
-  updateOrderAndInvoice(invoiceId: number, data: any): Observable<any> {
-    const url = `${this.apiUrl}/Invoice/UpdateOrderAndInvoice/${invoiceId}`;
+  updateOrderAndInvoice(orderId: number, data: any): Observable<any> {
+    const url = `${this.apiUrl}/Invoice/UpdateOrderAndInvoice/${orderId}`;
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };

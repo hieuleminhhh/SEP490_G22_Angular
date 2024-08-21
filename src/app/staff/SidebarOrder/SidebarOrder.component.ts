@@ -13,11 +13,17 @@ import feather from 'feather-icons';
 })
 export class SidebarOrderComponent implements OnInit {
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit() {
   }
   ngAfterViewInit() {
     feather.replace();
+  }
+  isOrderMenuActive(): boolean {
+    const currentUrl = this.router.url;
+    return currentUrl.includes('/listTable') || 
+           currentUrl.includes('/createTakeaway') || 
+           currentUrl.includes('/createOnline');
   }
 }
