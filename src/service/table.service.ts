@@ -51,5 +51,14 @@ export class TableService {
     });
     return this.http.put(url, status, { headers });
   }
+
+  createTableOrder(tableOrder: any): Observable<any> {
+    const url = `https://localhost:7188/api/TableReservation/CreateOrderandTable`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.post(url, tableOrder, { headers });
+  }
 }
 

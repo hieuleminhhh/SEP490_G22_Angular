@@ -156,7 +156,7 @@
                 </div>
                 <div class="col-md-8" style="display: flex;justify-content: center;align-items: center;height: 20px;">
                   <span class="label-reser"
-                    (click)="updateReservationById(reservation.reservationId, 2, reservation.order.orderId)"
+                    (click)="updateReservationById(reservation.reservationId, 2, reservation.order?.orderId)"
                     [class.disabled]="!reservation.tableOfReservation || reservation.tableOfReservation.length === 0"
                     *ngIf="reservation.tableOfReservation && reservation.tableOfReservation.length > 0">
                     Khách nhận bàn</span>

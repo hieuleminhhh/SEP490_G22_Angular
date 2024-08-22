@@ -522,3 +522,41 @@ ul li {
 .dish-list label {
   margin: 0;
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination button,
+.pagination input[type="number"],
+.pagination span {
+  margin: 0 5px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button {
+  background-color: #f0f0f0;
+  width: 81px;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pagination input[type="number"] {
+  width: 50px;
+  text-align: center;
+}
+
+.pagination span {
+  font-weight: bold;
+}
+
