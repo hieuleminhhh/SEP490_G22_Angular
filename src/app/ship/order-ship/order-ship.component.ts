@@ -41,9 +41,29 @@ export class OrderShipComponent implements OnInit {
     );
   }
   completeOrder(order:any){
-
+    const request = {
+      status : 4
+    };
+    this.cookingService.updateOrderStatus(order.orderId,request).subscribe(
+      response => {
+        window.location.reload();
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
   }
   cancelOrder(order:any){
-
+    const request = {
+      status : 5
+    };
+    this.cookingService.updateOrderStatus(order.orderId,request).subscribe(
+      response => {
+        window.location.reload();
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
   }
 }

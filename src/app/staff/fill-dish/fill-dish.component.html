@@ -67,7 +67,7 @@
 
           <!-- Content for takeAway -->
           <div *ngIf="selectedButton === 'takeAway'">
-            <h5 *ngIf="takeawayOrders.length>0">Thông tin đơn mang về:</h5>
+            <h5 *ngIf="takeawayOrders.length>0;else noContent">Thông tin đơn mang về:</h5>
             <div class="lower-section" *ngIf="takeawayOrders" style="height: 570px; overflow: auto;">
               <div class="grid-container">
                 <div *ngFor="let order of takeawayOrders; let i = index" class="grid-item">
@@ -81,26 +81,15 @@
                 </div>
               </div>
             </div>
+            <ng-template #noContent>
+              <div>Không có đơn hàng hoàn thành</div>
+            </ng-template>
           </div>
 
           <!-- Content for takeAway -->
           <div *ngIf="selectedButton === 'ship'">
-            <!-- <div class="lower-section" *ngIf="deliveryOrders" style="height: 570px; overflow: auto;">
-              <div class="grid-container">
-                <div *ngFor="let order of deliveryOrders; let i = index" class="grid-item">
-                  <div class="dish-info" (click)="showDetails(order)">
-                    <p>Đơn {{order.orderId}} </p>
-                    <p>Tình trạng: {{order.status === 1 ? "Hoàn thành" : "Chưa hoàn thành"}}</p>
-                    <button *ngIf="order.status === 1" (click)=" $event.stopPropagation()">
-                      Gán đơn ship
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div> -->
-
             <div class="upper-section">
-              <table *ngIf="filteredOrders.length > 0; else noContent">
+              <table *ngIf="deliveryOrders.length > 0; else noContent">
                 <thead>
                   <tr>
                     <th></th>
@@ -127,12 +116,12 @@
                 </tbody>
               </table>
               <ng-template #noContent>
-                <div>Không có món ăn hoàn thành</div>
+                <div>Không có đơn hàng hoàn thành</div>
               </ng-template>
             </div>
 
             <!-- Lower Section -->
-            <div class="lower-section" *ngIf="orderDish">
+            <div class="lower-section" *ngIf="deliveryOrders.length>1">
               <hr><br>
               <h5>Danh sách nhân viên ship:</h5>
               <br>
