@@ -305,6 +305,7 @@ export class FillDishComponent implements OnInit {
           console.error(`Error updating account or status for order ${order.orderId}:`, error);
         }
       );
+      this.selectedButton = 'ship';
       this.refreshContent();
     });
   }
