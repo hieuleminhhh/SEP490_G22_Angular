@@ -372,21 +372,24 @@ export class TableManagementComponent implements OnInit {
             status: 3
           }
           return this,this.tableService.updateOrderStatus(orderId, status);
-        } else {
-          return of(response);
         }
+        return of(response);
       })
     ).subscribe(
       response => {
+        console.log('Phản hồi từ API:', response); // Thêm dòng này để kiểm tra phản hồi
         // Gọi các hàm để lấy dữ liệu mới
         this.getTableData();
         this.getReservation();
         this.getReservationData();
+        window.location.reload();
       },
       error => {
         console.error('Lỗi khi cập nhật trạng thái:', error);
         if (error.error && error.error.errors) {
           console.error('Lỗi xác thực:', error.error.errors);
+        } else {
+          console.error('Thông tin lỗi:', error.message); // Kiểm tra thêm thông tin lỗi
         }
       }
     );

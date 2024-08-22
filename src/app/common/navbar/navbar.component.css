@@ -12,7 +12,7 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  font-family: "Josefin Sans", sans-serif;
+  font-family: Font Awesome 6 Free;
 }
 
 body {
@@ -59,7 +59,7 @@ nav {
   width: 100%;
   position: fixed;
   top: 0;
-  background: #fff5f2;
+  background: #ffe0d6;
   box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.22);
   z-index: 22;
   display: flex;
@@ -72,7 +72,6 @@ label.logo {
   font-size: 35px;
   font-weight: 700;
 }
-
 .center-menu {
   display: flex;
   justify-content: center;
@@ -102,20 +101,32 @@ nav ul li a {
   color: var(--clr-secondary);
 }
 
-
-.menu a.active,
+.menu a.router-link-active,
 .menu a:hover {
-  border-bottom: 2px solid var(--clr-primary);
+  border-bottom: 2px solid orange; /* Thay đổi màu sắc gạch chân tại đây */
   transition: 0.3s;
 }
+.a.active {
+  color: blue;
+  border-bottom: 2px solid blue;
+}
+.cart-link {
+  position: relative;
+  display: inline-block;
+}
+.cart-icon {
+  font-size: 24px; /* Thay đổi kích thước icon ở đây */
+}
+
 
 .item-count {
-  background-color: red;
-  color: white;
-  border-radius: 50%;
-  padding: 4px;
-  font-size: 12px;
-  margin-left: 5px;
+  position: absolute;
+  top: -10px; /* Điều chỉnh vị trí lên trên */
+  right: -10px; /* Điều chỉnh vị trí sang phải */
+  color: black; /* Màu chữ */
+  border-radius: 50%; /* Tạo hình tròn */
+  padding: 2px 12px; /* Khoảng cách bên trong */
+  font-size: 16px; /* Kích thước chữ */
 }
 .menu {
   display: flex;

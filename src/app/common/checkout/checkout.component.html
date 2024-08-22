@@ -27,7 +27,7 @@
                 <div class="col-2">
                   <img class="img-fluid" [src]="item.imageUrl" alt="Item Image" style="max-width: 100%; height: 56px;">
                 </div>
-                <div class="col">
+                <div class="col" style="font-size: 18px;">
                   <div>{{ item.itemName || item.nameCombo }}</div>
                 </div>
                 <div class="col">
@@ -61,8 +61,10 @@
         </div>
       </div>
       <div class="back-to-shop">
-        <a routerLink="/cart" routerLinkActive="äctive"><i class="fas fa-arrow-left"></i></a>
-        <span class="text-muted">Về giỏ hàng</span>
+        <div style="font-size: 18px;font-weight: bold; cursor: pointer;" routerLink="/menu" routerLinkActive="active">
+          <a><i class="fas fa-arrow-left"></i></a>
+          <span class="text-muted">Về thực đơn</span>
+        </div>
       </div>
     </div>
 
@@ -194,7 +196,7 @@
 
           <div class="form-group" *ngIf="selectedService === 'service1'">
             <span style="margin-right: 10px;">Khuyến mãi</span>
-            <i class="fas fa-tags me-2" (click)="openDiscountModal()"></i>
+            <i class="fas fa-tags me-2" (click)="openDiscountModal()" style="cursor: pointer;"></i>
             <div>
               <span *ngIf="selectedDiscountDetails" class="selected-discount" (click)="openDiscountModal()">
                 {{ selectedDiscountDetails.discountName }} - Giảm {{ selectedDiscountDetails.discountPercent |
@@ -233,10 +235,12 @@
         </div>
         <div class="row">
           <div class="col-md-12">
-            <button type="submit" class="btn btn-primary" [disabled]="myForm.invalid"
-              *ngIf="selectedService === 'service1'">Đặt Hàng</button>
-            <button type="submit" class="btn btn-primary" [disabled]="myForm.invalid"
-              *ngIf="selectedService === 'service2'">Đặt Bàn</button>
+            <button type="submit" class="btn btn-primary" [disabled]="myForm.invalid" style="font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;" *ngIf="selectedService === 'service1'">Đặt Hàng</button>
+            <button type="submit" class="btn btn-primary" [disabled]="myForm.invalid" style="font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;" *ngIf="selectedService === 'service2'">Đặt Bàn</button>
           </div>
           <p class="note" *ngIf="selectedService === 'service2'">
             LƯU Ý: Quý khách cần thanh toán 50% tổng hóa đơn. Bấm đặt bàn để đến trang thanh toán.

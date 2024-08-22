@@ -2,19 +2,20 @@
   <nav>
     <label class="logo">EatingHouse</label>
     <ul class="center-menu">
-      <li><a routerLink="/" class="active">Trang chủ</a></li>
-      <li><a routerLink="/news" routerLinkActive="äctive">Bài viết</a></li>
-      <li><a routerLink="/menu" routerLinkActive="äctive">Thực đơn</a></li>
-      <li><a routerLink="/booking" routerLinkActive="äctive">Đặt bàn</a></li>
-      <li><a routerLink="/purchase" routerLinkActive="äctive">Đơn mua hàng</a></li>
+      <li><a routerLink="/" routerLinkActive="active">Trang chủ</a></li>
+      <li><a routerLink="/news" routerLinkActive="active">Bài viết</a></li>
+      <li><a routerLink="/menu" routerLinkActive="active">Thực đơn</a></li>
+      <li><a routerLink="/booking" routerLinkActive="active">Đặt bàn</a></li>
+      <li><a routerLink="/purchase" routerLinkActive="active">Đơn mua hàng</a></li>
     </ul>
     <ul class="right-menu">
       <li>
-        <a routerLink="/cart" routerLinkActive="active">
-          Giỏ hàng <span class="item-count">{{ itemCount }}</span>
+        <a routerLink="/cart" routerLinkActive="active" class="cart-link">
+          <span class="item-count">{{ itemCount }}</span>
+          <i class="fas fa-shopping-cart cart-icon"></i> <!-- Icon giỏ hàng -->
         </a>
       </li>
-      <li><a routerLink="/login" class="active">Đăng nhập</a></li>
+      <li><a routerLink="/login" routerLinkActive="active">Đăng nhập</a></li>
     </ul>
   </nav>
 </div>

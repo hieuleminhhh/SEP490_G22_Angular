@@ -232,7 +232,7 @@ export class CheckoutComponent implements OnInit {
     console.log(this.selectedPaymentMethod);
     console.log(this.selectedService);
 
-
+    console.log(this.selectedDiscount);
     const request = {
       guestPhone: this.guestPhone,
       email: this.email,
@@ -246,7 +246,7 @@ export class CheckoutComponent implements OnInit {
       deposits: deposits,
       note: this.note,
       type: 2,
-      discountId: this.selectedDiscount,
+      discountId: this.selectedDiscount ,
       orderDetails: this.cartItems.map(item => ({
         unitPrice: this.getTotalPrice(item),
         quantity: item.quantity,

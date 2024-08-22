@@ -168,6 +168,7 @@ export class MenuComponent {
         }
       );
     }
+
   }
 
   private getCombo(sortOption?: string): Observable<Combo[]> {
@@ -292,6 +293,8 @@ export class MenuComponent {
     this.totalItems = filtered.length;
 
     this.filteredDataSubject.next(filtered);
+    console.log(this.filteredDataSubject);
+
     this.paginateData(filtered);
   }
 
