@@ -50,7 +50,7 @@ export const routes: Routes = [
     {'path': 'checkout', component:CheckoutComponent},
     {'path': 'orderDetail', component:OrderDetailComponent},
     {'path': 'tableManagement', component:TableManagementComponent},
-    {'path': 'managerorder', component:ManagerOrderComponent},
+    {'path': 'managerorder', component:ManagerOrderComponent, canActivate: [AuthGuard]},
     {'path': 'paymentReservation', component:PaymentReservationComponent},
     {'path': 'createTakeaway', component:CreateTakeAwayOrderComponent},
     {'path': 'createOnline', component:CreateOnlineOrderComponent},

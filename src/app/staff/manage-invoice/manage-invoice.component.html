@@ -1,81 +1,21 @@
 <div class="app">
-  <header class="app-header">
-    <div class="app-header-logo">
-      <div class="logo">
-
-        <h1 class="logo-title">
-          <span> </span>
-
-        </h1>
-      </div>
+  <app-HeaderOrderStaff></app-HeaderOrderStaff>
+  
+  <div class="app-header-navigation">
+    <div class="tabs">
+      <a href="#" class="tab active">Tổng quát</a>
+      <a href="#" class="tab">Đã thanh toán</a>
+      <a href="#" class="tab">Chưa thanh toán</a>
+      <a href="#" class="tab">Đơn hoàn tiền</a>
+      <a href="#" class="tab">Báo cáo</a>
     </div>
-    <div class="app-header-navigation">
-      <div class="tabs">
-        <a href="#" class="active">
-          Tổng quát
-        </a>
-        <a href="#">
-          Đã thanh toán
-        </a>
-        <a href="#">
-          Chưa thanh toán
-        </a>
-        <a href="#">
-          Đơn hoàn tiền
-        </a>
-        <a href="#">
-          Báo cáo
-        </a>
-      </div>
-    </div>
-    <div class="app-header-actions">
-      <button class="user-profile">
-        <span>Lê Minh Hiếu</span>
-        <span>
-          <img src="https://assets.codepen.io/285131/almeria-avatar.jpeg" />
-        </span>
-      </button>
-      <div class="app-header-actions-buttons">
-        <button class="icon-button large">
-          <i class="ph-magnifying-glass"></i>
-        </button>
-        <button class="icon-button large">
-          <i class="ph-bell"></i>
-        </button>
-      </div>
-    </div>
-    <div class="app-header-mobile">
-      <button class="icon-button large">
-        <i class="ph-list"></i>
-      </button>
-    </div>
-
-  </header>
+  </div>
+  
+    
   <div class="app-body">
-    <div class="app-body-navigation">
-      <nav class="navigation">
-        <a href="#" class="active" style="border-bottom: 2px solid green;">
-          <i class="fas fa-file-invoice"></i> <!-- Hóa đơn -->
-          <span>Hóa đơn</span>
-        </a>
-        <a href="#">
-          <i class="fas fa-box me-2"></i> <!-- Đơn hàng -->
-          <span>Đơn hàng</span>
-        </a>
-        <a href="#">
-          <i class="fas fa-cash-register"></i> <!-- Bán hàng -->
-          <span>Bán hàng</span>
-        </a>
-        <a href="#">
-          <i class="fas fa-calendar-check me-2"></i> <!-- Đặt chỗ -->
-          <span>Đặt chỗ</span>
-        </a>
-        <a href="#">
-          <i class="fas fa-shipping-fast"></i> <!-- Giao hàng -->
-          <span>Giao hàng</span>
-        </a>
-      </nav>
-    </div>
+    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+      <app-SidebarOrder></app-SidebarOrder>
+    </nav>
 
     <div class="app-body-main-content">
       <section class="service-section">

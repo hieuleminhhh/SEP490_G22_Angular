@@ -1,35 +1,42 @@
-.nav {
-  background-color: purple;
-  justify-content: center;
-}
-
-.nav-link {
-  color: white;
-}
-
-.container {
-  padding-top: 5rem;
-}
+/* Add custom CSS to ensure uniformity and enhance styling */
 
 .card {
-  padding: 1rem;
-  box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
-  background-color: rgb(234, 241, 239);
-  text-align: center;
-  border: none;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
 }
 
 .card-body {
-  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .card-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: rgb(13, 10, 10);
+  color: #212529; /* Darker shade of gray for better contrast */
+  font-weight: 700; /* Make text bold */
 }
 
 hr {
-  border-top: 0.1rem solid white;
-  margin: 1rem 0;
+  border-top: 0.2rem solid #ced4da; /* Slightly darker gray color for more visibility */
+}
+
+.card {
+  background-color: #f8f9fa; /* Brighter background color */
+}
+
+.text-primary {
+  color: #0056b3 !important; /* Darker blue for better contrast */
+}
+
+.text-success {
+  color: #218838 !important; /* Darker green for better contrast */
+}
+
+.text-danger {
+  color: #c82333 !important; /* Darker red for better contrast */
 }

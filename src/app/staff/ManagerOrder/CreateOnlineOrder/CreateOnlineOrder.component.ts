@@ -22,12 +22,13 @@ import { DiscountService } from '../../../../service/discount.service';
 import { PercentagePipe } from '../../../common/material/percentFormat/percentFormat.component';
 import { Discount } from '../../../../models/discount.model';
 import { CheckoutService } from '../../../../service/checkout.service';
+import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
 @Component({
   selector: 'app-CreateOnlineOrder',
   templateUrl: './CreateOnlineOrder.component.html',
   styleUrls: ['./CreateOnlineOrder.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, MatDialogModule, CurrencyFormatPipe, DateFormatPipe, PercentagePipe]
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, MatDialogModule, CurrencyFormatPipe, DateFormatPipe, PercentagePipe, HeaderOrderStaffComponent]
 })
 export class CreateOnlineOrderComponent implements OnInit {
 
