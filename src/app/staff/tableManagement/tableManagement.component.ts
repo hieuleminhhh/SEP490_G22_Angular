@@ -205,7 +205,7 @@ export class TableManagementComponent implements OnInit {
       const fromDate = moment(this.dateFrom).startOf('day').toDate();
       const toDate = moment(this.dateTo).endOf('day').toDate();
 
-      this.dataReservationAccept  = this.dataReservationToday.filter((order: { reservationTime: string | Date }) => {
+      this.dataReservationAccept = this.dataReservationToday.filter((order: { reservationTime: string | Date }) => {
         const orderDate = new Date(order.reservationTime);
         return orderDate >= fromDate && orderDate <= toDate;
       });
@@ -364,22 +364,31 @@ export class TableManagementComponent implements OnInit {
   updateReservationById(id: number, status: number, orderId: number | null): void {
     this.reservationService.updateStatusReservation(id, status).pipe(
       switchMap(response => {
-        // Cập nhật trạng thái của table
+        // Update table status
         return this.reservationService.updateStatusTable(id, 1);
       }),
       switchMap(response => {
+        // If orderId is provided, update the order status
         if (orderId !== null) {
-          const status = {
-            status: 3
-          }
-          return this,this.tableService.updateOrderStatus(orderId, status);
+          const status = { status: 3 };
+          return this.tableService.updateOrderStatus(orderId, status).pipe(
+            switchMap(response => {
+              // Create table order if orderId is provided
+              const tableIds = this.findTableIdsByReservationId(id);
+              const request = {
+                orderId: orderId,
+                tableIds: tableIds
+              };
+              return this.tableService.createTableOrder(request);
+            })
+          );
         }
-        return of(response);
+        // If no orderId, just return an observable of null
+        return of(null);
       })
     ).subscribe(
       response => {
-        console.log('Phản hồi từ API:', response); // Thêm dòng này để kiểm tra phản hồi
-        // Gọi các hàm để lấy dữ liệu mới
+        console.log('Phản hồi từ API:', response);
         this.getTableData();
         this.getReservation();
         this.getReservationData();
@@ -390,10 +399,20 @@ export class TableManagementComponent implements OnInit {
         if (error.error && error.error.errors) {
           console.error('Lỗi xác thực:', error.error.errors);
         } else {
-          console.error('Thông tin lỗi:', error.message); // Kiểm tra thêm thông tin lỗi
+          console.error('Thông tin lỗi:', error.message);
         }
       }
     );
+}
+
+
+
+  findTableIdsByReservationId(reservationId: number): number[] {
+    const reservation = this.dataReservationAccept.find((item: { reservationId: number; }) => item.reservationId === reservationId);
+    if (reservation) {
+      return reservation.tableOfReservation.map((table: { tableId: any; }) => table.tableId);
+    }
+    return [];
   }
 
   updateStatusReservationById(id: number, status: number): void {

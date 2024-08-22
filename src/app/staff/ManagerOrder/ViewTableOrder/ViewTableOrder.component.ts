@@ -11,15 +11,15 @@ import { HeaderOrderStaffComponent } from '../HeaderOrderStaff/HeaderOrderStaff.
 import { ManagerOrderService } from '../../../../service/managerorder.service';
 
 @Component({
-    selector: 'app-ViewTableOrder',
-    templateUrl: './ViewTableOrder.component.html',
-    styleUrls: ['./ViewTableOrder.component.css'],
-    standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, HeaderOrderStaffComponent],
-    providers: [
-      { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
-    ]
-  
+  selector: 'app-ViewTableOrder',
+  templateUrl: './ViewTableOrder.component.html',
+  styleUrls: ['./ViewTableOrder.component.css'],
+  standalone: true,
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, HeaderOrderStaffComponent],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+  ]
+
 })
 export class ViewTableOrderComponent implements OnInit {
   tables: any[] = [];
@@ -30,32 +30,29 @@ export class ViewTableOrderComponent implements OnInit {
   dataTable: any;
   accountId: number | null = null;
   account: any;
-  orderId: number | null = null;
-  showSidebar: boolean = true; 
+  orderId: any;
+  showSidebar: boolean = true;
   tableId: number = 0;
-  
+
   constructor(private tableService: TableService, private router: Router,
     private route: ActivatedRoute, private accountService: AccountService,
     private orderService: ManagerOrderService) { }
 
-    ngOnInit() {
-      this.route.queryParams.subscribe(params => {
-        this.tableId = +params['tableId']; 
-        this.loadOrderIdByTable(this.tableId);
-      });
-      // Retrieve accountId from localStorage and convert to number
-      const accountIdString = localStorage.getItem('accountId');
-      this.accountId = accountIdString ? Number(accountIdString) : null;
-    
-      console.log('31', this.accountId);
-    
-      if (this.accountId) {
-        this.getAccountDetails(this.accountId);
-        this.getTableData();
-      } else {
-        console.error('Account ID is not available');
-      }
+  ngOnInit() {
+
+    // Retrieve accountId from localStorage and convert to number
+    const accountIdString = localStorage.getItem('accountId');
+    this.accountId = accountIdString ? Number(accountIdString) : null;
+
+    console.log('31', this.accountId);
+
+    if (this.accountId) {
+      this.getAccountDetails(this.accountId);
+      this.getTableData();
+    } else {
+      console.error('Account ID is not available');
     }
+  }
   getTableData(): void {
     this.tableService.getTables().subscribe(
       response => {
@@ -95,12 +92,8 @@ export class ViewTableOrderComponent implements OnInit {
     }
   }
   navigateToOrder(tableId: number, status: number): void {
-    if (status === 0 || this.orderId === null) {
-      this.router.navigate(['/createOffline'], { queryParams: { tableId } });
-    } else if (status === 1 || this.orderId !== null) {
-      this.router.navigate(['/updateOffline'], { queryParams: { tableId } });
-    }
-  }
+    this.loadOrderIdByTable(tableId ,status);
+}
   getAccountDetails(accountId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
       response => {
@@ -115,25 +108,47 @@ export class ViewTableOrderComponent implements OnInit {
       }
     );
   }
-  loadOrderIdByTable(tableId: number): void {
+  loadOrderIdByTable(tableId: number, status: number): void {
     console.log('Loading orders for table ID:', tableId);
     this.orderService.getOrdersByTableId(tableId).subscribe(
       (response: any) => {
-        if (response && response.data && response.data.orderId) {
+        if (response && response.data) {
           this.orderId = response.data.orderId;
           console.log('Test order ID:', this.orderId);
-          // Optionally, perform other actions with the orderId
         } else {
           console.error('Invalid response:', response);
           this.orderId = null;
+
+          // Điều hướng vào `else` khi response không hợp lệ
+          if (status === 0) {
+            this.router.navigate(['/createOffline'], { queryParams: { tableId } });
+          } else if (status === 1) {
+            this.router.navigate(['/createOffline'], { queryParams: { tableId } });
+          }
+          return; // Dừng thực hiện các khối điều kiện tiếp theo
+        }
+
+        // Điều hướng dựa trên orderId và status
+        if (status === 0) {
+          this.router.navigate(['/createOffline'], { queryParams: { tableId } });
+        } else if (status === 1 && this.orderId !== null) {
+          this.router.navigate(['/updateOffline'], { queryParams: { tableId } });
+        } else if (status === 1 && this.orderId === null) {
+          this.router.navigate(['/createOffline'], { queryParams: { tableId } });
         }
       },
       (error: HttpErrorResponse) => {
         console.error('Error fetching orders:', error);
+
+        // Xử lý lỗi và điều hướng vào else
         this.orderId = null;
+        if (status === 0) {
+          this.router.navigate(['/createOffline'], { queryParams: { tableId } });
+        } else if (status === 1) {
+          this.router.navigate(['/createOffline'], { queryParams: { tableId } });
+        }
       }
     );
   }
-  
 
 }

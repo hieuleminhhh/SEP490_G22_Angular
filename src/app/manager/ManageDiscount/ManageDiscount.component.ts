@@ -45,6 +45,10 @@ export class ManageDiscountComponent implements OnInit {
   detailDiscount: any[] = [];
   isEditing: boolean = false;
 
+  currentPage = 1; // Trang hiện tại
+  itemsPerPage = 10; // Số bản ghi trên mỗi trang
+  totalItems = 0; // Tổng số bản ghi
+
   constructor(private discountService: DiscountService) { }
 
   ngOnInit(): void {
@@ -70,6 +74,7 @@ export class ManageDiscountComponent implements OnInit {
       response => {
         this.data = response;
         this.filterList();
+        this.paginateData();
       },
       error => {
         console.error('Error:', error);
@@ -102,6 +107,9 @@ export class ManageDiscountComponent implements OnInit {
     );
 
     this.filteredData = uniquePrograms;
+    this.totalItems = this.filteredData.length;
+    console.log(this.filteredData);
+
   }
 
   getListDish(): void {
@@ -436,4 +444,39 @@ export class ManageDiscountComponent implements OnInit {
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
+
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.itemsPerPage);
+  }
+  onPreviousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.getListDiscount();
+    }
+  }
+
+  onNextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.getListDiscount();
+    }
+  }
+
+  paginateData(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    if (this.filteredData) {
+      this.filteredData = this.filteredData.slice(startIndex, endIndex);
+    }
+  }
+  goToDesiredPage(): void {
+    if (this.currentPage >= 1 && this.currentPage <= this.totalPages) {
+      this.getListDiscount();
+    } else {
+      // Xử lý thông báo lỗi nếu số trang nhập không hợp lệ
+      console.log('Invalid page number');
+    }
+  }
+
 }
+
