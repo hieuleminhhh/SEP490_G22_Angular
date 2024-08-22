@@ -29,6 +29,7 @@ import { UpdateOrderForGuestComponent } from './staff/ManagerOrder/UpdateOrderFo
 import { SettingComponent } from './admin/setting/setting.component';
 import { ManageAccountComponent } from './admin/manageAccount/manageAccount.component';
 import { OrderShipComponent } from './ship/order-ship/order-ship.component';
+import { ManageInvoiceComponent } from './staff/manage-invoice/manage-invoice.component';
 import { ManageNewComponent } from './manager/ManageNew/ManageNew.component';
 
 
@@ -63,6 +64,8 @@ export const routes: Routes = [
     {'path': 'updateOrder/:orderId' , component: UpdateOrderForGuestComponent},
     {'path': 'setting' , component: SettingComponent},
     {'path': 'manageAccount', component: ManageAccountComponent},
+    {'path': 'shipping', component: OrderShipComponent},
+    {'path': 'invoice', component: ManageInvoiceComponent}
     {'path': 'shipping', component: OrderShipComponent},
     {'path': 'manageNew', component: ManageNewComponent}
 ];

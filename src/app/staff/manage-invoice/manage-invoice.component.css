@@ -1,0 +1,249 @@
+/* Reset some default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.app-header {
+  background-color: #4CAF50;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.app-header-logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-title {
+  font-size: 24px;
+  margin-left: 10px;
+}
+
+.app-header-navigation .tabs {
+  display: flex;
+  gap: 15px;
+}
+
+.tabs a {
+  color: white;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.tabs a.active {
+  background-color: #3e8e41;
+}
+
+.app-header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.user-profile img {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  margin-left: 10px;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 20px;
+  margin-left: 15px;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  height: 700px;
+}
+
+.app-body-navigation {
+  flex: 1;
+  background-color: white; /* Màu nền của sidebar */
+  padding: 20px;
+}
+
+.navigation a {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  color: black;
+  text-decoration: none;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  background-color: white; /* Màu nền mặc định của các thẻ a */
+  transition: background-color 0.3s, border-color 0.3s; /* Thêm hiệu ứng chuyển màu khi hover */
+  width: 130px;
+}
+
+.navigation a:hover {
+  background-color: green; /* Màu nền khi hover */
+  border-color: #1A5276; /* Viền khi hover */
+}
+
+
+
+.app-body-main-content {
+  flex: 6;
+  background-color: #ECF0F1;
+  padding: 20px;
+}
+
+.service-section, .transfer-section {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.tiles {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.tile {
+  flex: 1;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.tile-header i {
+  font-size: 24px;
+  margin-right: 10px;
+}
+.tile-header h3 {
+  display: flex;
+  flex-direction: column; /* Hiển thị các phần tử con theo chiều dọc */
+  align-items: flex-start; /* Canh trái */
+}
+
+.tile-header h3 span {
+  display: block; /* Đảm bảo mỗi thẻ <span> chiếm toàn bộ chiều rộng */
+  margin-bottom: 5px; /* Khoảng cách giữa các dòng */
+}
+
+.tile-header h3 span:last-child {
+  margin-bottom: 0; /* Loại bỏ khoảng cách cho span cuối cùng */
+}
+
+
+.transfer-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Chia đều ba cột */
+  gap: 20px; /* Khoảng cách giữa các cột */
+}
+
+.transfer-details div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.transfer-details dt {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.transfer-details dd {
+  margin-left: 0;
+  margin-bottom: 15px; /* Khoảng cách giữa các mục */
+  font-size: 14px;
+  color: #6c7a89;
+}
+
+.transfer-details div:last-child dd {
+  margin-bottom: 0; /* Loại bỏ khoảng cách cho phần tử cuối */
+}
+
+
+.app-body-sidebar {
+  flex: 3;
+  background-color: #ECF0F1;
+  padding: 20px;
+}
+
+.payment-section {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.payment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.payment-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.payment-details h3 {
+  margin-right: auto;
+}
+
+.payment-section-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.save-button, .settings-button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.save-button:hover, .settings-button:hover {
+  background-color: #45A049;
+}
+
+.settings-button i {
+  font-size: 18px;
+}
