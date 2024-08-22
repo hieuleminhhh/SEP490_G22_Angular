@@ -1,51 +1,50 @@
-<nav class="nav bg-purple justify-content-between">
-  <a class="nav-link text-white mr-auto" href="#"><i class="fa fa-home" aria-hidden="true"></i> Home</a>
-  <a class="nav-link text-white ml-auto" (click)="logout()">Logout <i class="fa fa-sign-out" aria-hidden="true"></i></a>
-</nav>
-
+<app-HeaderOrderStaff></app-HeaderOrderStaff>
 <div class="container py-5">
-  <div class="row justify-content-between">
-    <div class="col-lg-12 p-5">
-      <h1 class="display-6"> <i class="fa fa-chart-bar" aria-hidden="true"></i> Dashboard</h1>
-      <hr />
+  <div class="row mb-4">
+    <div class="col-lg-12">
+      <h1 class="display-4 text-center">
+        <i class="fa fa-chart-bar" aria-hidden="true"></i> Quản lý
+      </h1>
+      <hr class="my-4"/>
     </div>
   </div>
-  <div class="row justify-content-between">
-    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-2 p-2">
-      <a class="text-decoration-none"  routerLink="/tableManagement" routerLinkActive="äctive">
-        <div class="card p-3 shadow bg-purple text-center border-0">
-          <div class="card-body">
-            <i class="fa fa-th-large fa-2x" aria-hidden="true"></i>
-            <hr />
-            <p class="card-title lead">Table</p>
+  <br>
+  <br>
+  <div class="row text-center" style="display: flex; justify-content: space-between; align-items: center;">
+    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+      <a class="text-decoration-none" routerLink="/tableManagement" routerLinkActive="active">
+        <div class="card border-0 shadow-sm bg-light d-flex flex-column h-100">
+          <div class="card-body d-flex flex-column justify-content-center align-items-center">
+            <i class="fa fa-th-large fa-3x text-primary"></i>
+            <hr class="my-3"/>
+            <p class="card-title lead mb-0">Đặt bàn</p>
           </div>
         </div>
       </a>
     </div>
 
-    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-2 p-2">
-      <a class="text-decoration-none"  routerLink="/managerorder" routerLinkActive="äctive">
-        <div class="card p-3 shadow bg-purple text-center border-0">
-          <div class="card-body">
-            <i class="fa fa-cart-plus fa-2x" aria-hidden="true"></i>
-            <hr />
-            <p class="card-title lead">Order's</p>
+    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+      <a class="text-decoration-none" routerLink="/managerorder" routerLinkActive="active">
+        <div class="card border-0 shadow-sm bg-light d-flex flex-column h-100">
+          <div class="card-body d-flex flex-column justify-content-center align-items-center">
+            <i class="fa fa-cart-plus fa-3x text-success"></i>
+            <hr class="my-3"/>
+            <p class="card-title lead mb-0">Đơn hàng</p>
           </div>
         </div>
       </a>
     </div>
 
-    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-2 p-2">
-      <a class="text-decoration-none" href="#" data-toggle="modal" data-target="#modelHELP">
-        <div class="card p-3 shadow bg-purple text-center border-0">
-          <div class="card-body">
-            <i class="fa fa-motorcycle fa-2x" aria-hidden="true"></i>
-            <hr />
-            <p class="card-title lead">Ship</p>
+    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+      <a class="text-decoration-none" routerLink="/fillDish" routerLinkActive="active">
+        <div class="card border-0 shadow-sm bg-light d-flex flex-column h-100">
+          <div class="card-body d-flex flex-column justify-content-center align-items-center">
+            <i class="fa fa-motorcycle fa-3x text-danger"></i>
+            <hr class="my-3"/>
+            <p class="card-title lead mb-0">Giao hàng</p>
           </div>
         </div>
       </a>
     </div>
-
   </div>
 </div>

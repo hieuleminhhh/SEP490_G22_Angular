@@ -611,6 +611,10 @@ body:not(.sidebar-visible) main {
   margin-left: 0; /* Xóa khoảng cách bên trái khi không có sidebar */
   width: 100%; /* Đảm bảo chiều rộng 100% khi không có sidebar */
 }
+
+body.sidebar-visible main {
+  margin-left: 250px; 
+}
 /* Đảm bảo rằng back-link không có gạch chân và có khoảng cách */
 .back-link {
   text-decoration: none; /* Loại bỏ gạch chân của liên kết */

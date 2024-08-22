@@ -1,13 +1,10 @@
 <body>
+  <app-HeaderOrderStaff></app-HeaderOrderStaff>
   <div class="container-fluid">
     <div class="row">
       <!-- Sidebar -->
       
       <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-        <br>
-        <br>
-        <br>
-        <br>
         <app-SidebarOrder></app-SidebarOrder>
       </nav>
 
@@ -15,10 +12,12 @@
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <!-- Page Header -->
         <div class="container mt-5">
-          <h1 class="text-center mb-4">Quản lý đơn hàng</h1>
-
+          <a href="javascript:history.back()" class="back-link">
+            <i class="fas fa-arrow-left back-icon"></i>
+          </a>
+          <h1 class="text-center mb-4 heading-styled">Quản lý đơn hàng</h1>
           <!-- Buttons and search bar -->
-          <div class="mb-3 d-flex justify-content-center">
+          <div class="mb-3">
             <div class="input-group" style="max-width: 400px;">
               <input type="text" class="form-control" placeholder="Tìm kiếm..." aria-label="Search"
                 aria-describedby="button-addon2" [(ngModel)]="search">

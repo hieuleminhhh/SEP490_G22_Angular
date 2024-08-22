@@ -2,13 +2,15 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { DiscountService } from '../../../service/discount.service';
+import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
+import { SideBarComponent } from "../SideBar/SideBar.component";
 
 @Component({
   selector: 'app-manage-discount',
   standalone: true,
   templateUrl: './ManageDiscount.component.html',
   styleUrls: ['./ManageDiscount.component.css'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, HeaderOrderStaffComponent, SideBarComponent]
 })
 export class ManageDiscountComponent implements OnInit {
   dateNow: string = '';

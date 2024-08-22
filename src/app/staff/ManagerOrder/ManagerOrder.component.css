@@ -102,6 +102,31 @@
     color: white; /* Màu chữ */
     padding: 0;
 }
-
+.back-link {
+    text-decoration: none; /* Loại bỏ gạch chân của liên kết */
+  }
+  
+  /* Tạo kiểu cho biểu tượng */
+  .back-icon {
+    cursor: pointer;
+    margin-right: 15px; /* Khoảng cách giữa biểu tượng và tiêu đề */
+    font-size: 1.8em; /* Kích thước biểu tượng */
+    color: rgb(83, 82, 82); /* Màu sắc biểu tượng */
+    transition: color 0.3s ease; /* Hiệu ứng chuyển màu khi hover */
+  }
+  /* Thay đổi màu sắc biểu tượng khi hover */
+  .back-icon:hover {
+    color: black; /* Màu sắc mới khi hover */
+  }
+  .heading-styled {
+    font-size: 2.5rem; /* Larger font size for better visibility */
+    font-weight: 700; /* Bold text for emphasis */
+    color: #343a40; /* Dark gray color for a modern look */
+    text-transform: uppercase; /* Uppercase text for a strong visual impact */
+    letter-spacing: 0.05em; /* Slight letter spacing for readability */
+    border-bottom: 2px solid #abccef; /* Bottom border for added emphasis */
+    padding-bottom: 10px; /* Space between text and border */
+    margin-bottom: 2rem; /* Adjust bottom margin to suit the design */
+  }
   
   

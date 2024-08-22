@@ -99,6 +99,7 @@ export class ViewTableOrderComponent implements OnInit {
         console.log('Account details:', this.account);
         console.log('Account role:', this.account.role);
         this.showSidebar = this.account.role !== 'OrderStaff';
+
       },
       error => {
         console.error('Error fetching account details:', error);

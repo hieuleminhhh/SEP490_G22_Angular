@@ -23,12 +23,13 @@ import { PercentagePipe } from '../../../common/material/percentFormat/percentFo
 import { DiscountService } from '../../../../service/discount.service';
 import { CheckoutService } from '../../../../service/checkout.service';
 import { AccountService } from '../../../../service/account.service';
+import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
 @Component({
   selector: 'app-UpdateOfflineOrder',
   templateUrl: './UpdateOfflineOrder.component.html',
   styleUrls: ['./UpdateOfflineOrder.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe]
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe, HeaderOrderStaffComponent]
 })
 export class UpdateOfflineOrderComponent implements OnInit {
   orderId: number = 0;

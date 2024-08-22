@@ -53,22 +53,22 @@ export class LoginComponent implements OnInit {
   handleUserRole(role: string) {
     switch (role) {
       case 'Chef':
-        this.router.navigate(['/cooking']);
+        window.location.href = '/cooking';
         break;
       case 'Cashier':
-        this.router.navigate(['/dashboard']);
+        window.location.href = '/dashboard';
         break;
       case 'Admin':
-        this.router.navigate(['/setting']);
+        window.location.href = '/setting';
         break;
       case 'Manager':
-        this.router.navigate(['/manager']);
+        window.location.href = '/managerdish';
         break;
       case 'OrderStaff':
         window.location.href = '/listTable';
         break;
       case 'Ship':
-        this.router.navigate(['/ship']);
+        window.location.href = '/ship';
         break;
       default:
         console.error('Unknown role:', role);

@@ -14,13 +14,15 @@ import { PercentagePipe } from '../../common/material/percentFormat/percentForma
 import { InvoiceService } from '../../../service/invoice.service';
 import { ItemInvoice } from '../../../models/invoice.model';
 import { Table } from '../../../models/table.model';
+import { AccountService } from '../../../service/account.service';
+import { HeaderOrderStaffComponent } from "./HeaderOrderStaff/HeaderOrderStaff.component";
 
 @Component({
     selector: 'app-ManagerOrder',
     templateUrl: './ManagerOrder.component.html',
     styleUrls: ['./ManagerOrder.component.css'],
     standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe]
+    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe, HeaderOrderStaffComponent]
 })
 export class ManagerOrderComponent implements OnInit {
   orders: ListAllOrder[] = [];
@@ -35,7 +37,8 @@ export class ManagerOrderComponent implements OnInit {
   totalPagesArray: number[] = [];
   weeks: { start: string, end: string }[] = [];
   years: number[] = [];
-
+  accountId: number | null = null;
+  account: any;
   statuses = [
     { value: 1, text: 'Đang chờ' },
     { value: 2, text: 'Đã chấp nhận' },
@@ -77,6 +80,7 @@ export class ManagerOrderComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private invoiceService : InvoiceService,
+    private accountService: AccountService
   ) {}
 
   ngOnInit() {
@@ -784,7 +788,19 @@ export class ManagerOrderComponent implements OnInit {
     }
   }
   
-  
+  getAccountDetails(accountId: number): void {
+    this.accountService.getAccountById(accountId).subscribe(
+      response => {
+        this.account = response;
+        console.log('Account details:', this.account);
+        console.log('Account role:', this.account.role);
+
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
   
   
   
