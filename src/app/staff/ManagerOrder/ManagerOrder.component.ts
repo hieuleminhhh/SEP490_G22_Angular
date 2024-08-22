@@ -28,7 +28,7 @@ export class ManagerOrderComponent implements OnInit {
   orders: ListAllOrder[] = [];
   dateFrom: string = '';
   dateTo: string = '';
-  search: string = '';  
+  search: string = '';
   currentPage: number = 1;
   pageSize: number = 10;
   totalCount: number = 0;
@@ -48,10 +48,10 @@ export class ManagerOrderComponent implements OnInit {
     { value: 6, text: 'Đang chuẩn bị' },  // Thanh toan Takeaway vs online
     { value: 7, text: 'Đang giao hàng' }   // online
   ];
-  
+
   types = [
     { value: '1', text: 'Mang về' },//thanh toan trc
-    { value: '2', text: 'Online' },// thanh toan trc 
+    { value: '2', text: 'Online' },// thanh toan trc
     { value: '3', text: 'Đặt bàn' },
     { value: '4', text: 'Tại chỗ' }
   ];
@@ -75,8 +75,8 @@ export class ManagerOrderComponent implements OnInit {
 
 
   constructor(
-    private orderService: ManagerOrderService, 
-    private orderDetailService: ManagerOrderDetailService, 
+    private orderService: ManagerOrderService,
+    private orderDetailService: ManagerOrderDetailService,
     private router: Router,
     private route: ActivatedRoute,
     private invoiceService : InvoiceService,
@@ -105,16 +105,16 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
-  
+
   loadListOrder(): void {
     this.orderService.ListOrders(
-      this.currentPage, 
-      this.pageSize, 
-      this.search, 
-      this.dateFrom, 
-      this.dateTo, 
-      this.selectedStatus, 
-      this.selectedFilter, 
+      this.currentPage,
+      this.pageSize,
+      this.search,
+      this.dateFrom,
+      this.dateTo,
+      this.selectedStatus,
+      this.selectedFilter,
       this.selectedType,
     ).subscribe(
       (response: ListAllOrder) => {
@@ -132,36 +132,36 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
-  
+
   loadListOrderDetails(orderId: number) {
     console.log('Loading details for Order ID:', orderId);
     this.orderDetailService.getOrderDetail(orderId).subscribe(
       (orderDetail: ListOrderDetailByOrder) => {
         this.orderDetail = orderDetail;
         this.tables = orderDetail.tables; // Assigning tables to a separate variable
-        
+
         if (this.tables.length > 0) {
           this.tableId = this.tables[0].tableId; // Extracting tableId from the first table
         }
-  
+
         // Iterate through orderDetails to access dishesServed and quantity
         let totalDishesServed = 0;
         let totalQuantity = 0;
-  
+
         orderDetail.orderDetails.forEach((detail) => {
           console.log('Dishes Served:', detail.dishesServed);
           console.log('Quantity:', detail.quantity);
           totalDishesServed += detail.dishesServed; // No need for parseInt
           totalQuantity += detail.quantity; // No need for parseInt
         });
-  
+
         console.log('Total Dishes Served:', totalDishesServed);
         console.log('Total Quantity:', totalQuantity);
-  
+
         // Store totalDishesServed and totalQuantity for use in the template
         this.dishesServed = totalDishesServed;
         this.totalQuantity = totalQuantity;
-  
+
         console.log('Fetched order detail:', this.orderDetail);
         console.log('Tables:', this.tables);
         console.log('Table ID:', this.tableId); // Logging the tableId
@@ -171,10 +171,10 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
-  
-  
 
-  
+
+
+
   updateOrder(orderId: number) {
     this.router.navigate(['/updateOrder', orderId]);
   }
@@ -188,8 +188,8 @@ export class ManagerOrderComponent implements OnInit {
     }
     return this.orderDetail?.totalAmount ?? 0; // Sử dụng giá trị mặc định nếu orderDetail là null
   }
-  
-  
+
+
   updateOrderStatus(orderId: number, status: number): void {
     this.orderService.UpdateOrderStatus(orderId, status).subscribe(
       (response) => {
@@ -201,9 +201,9 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
- 
-  
-  
+
+
+
   onStatusChange(event: Event, orderId: number): void {
     const selectElement = event.target as HTMLSelectElement;
     const selectedStatus = parseInt(selectElement.value, 10);
@@ -244,7 +244,7 @@ export class ManagerOrderComponent implements OnInit {
         return 'black';
     }
   }
-  
+
 
   onPageChange(page: number): void {
     this.currentPage = page;
@@ -270,23 +270,23 @@ export class ManagerOrderComponent implements OnInit {
     const day = ('0' + date.getDate()).slice(-2); // Add leading zero if day is < 10
     return `${year}-${month}-${day}`;
   }
-  
-  
-  
+
+
+
   CreateInvoiceOnline(orderId: number | undefined): void {
     if (orderId != null) { // Check if orderId is neither null nor undefined
       const paymentMethod = parseInt(this.paymentMethod, 10);
-  
+
       console.log('Payment Method:', paymentMethod);
       console.log('Customer Paid:', this.customerPaid);
       console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
-  
+
       let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
       const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - this.DiscountedTotalAmount() : 0;
-  
+
       console.log('Amount Received:', amountReceived);
       console.log('Return Amount:', returnAmount);
-  
+
       // Determine paymentStatus based on paymentMethod
       let paymentStatus;
       if (paymentMethod === 0 || paymentMethod === 1) {
@@ -295,7 +295,7 @@ export class ManagerOrderComponent implements OnInit {
         paymentStatus = 0;
         amountReceived = 0;
       }
-  
+
       const updateData = {
         status: 6,
         paymentTime: new Date().toISOString(),
@@ -308,9 +308,9 @@ export class ManagerOrderComponent implements OnInit {
         paymentStatus: paymentStatus,  // Set paymentStatus based on condition
         description: "strizzzg"
       };
-  
+
       console.log('Update Data:', updateData);
-  
+
       this.invoiceService.updateStatusAndCreateInvoice(orderId, updateData).subscribe(
         (response) => {
           console.log('Order status updated and invoice created:', response);
@@ -324,22 +324,22 @@ export class ManagerOrderComponent implements OnInit {
       console.warn('Order ID is not valid or is undefined.');
     }
   }
-  
-  
+
+
   CreateInvoiceTakeAway(orderId: number | undefined): void {
     if (orderId != null) { // Check if orderId is neither null nor undefined
       const paymentMethod = parseInt(this.paymentMethod, 10);
-  
+
       console.log('Payment Method:', paymentMethod);
       console.log('Customer Paid:', this.customerPaid);
       console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
-  
+
       const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
       const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - this.DiscountedTotalAmount() : 0;
-  
+
       console.log('Amount Received:', amountReceived);
       console.log('Return Amount:', returnAmount);
-  
+
       const updateData = {
         status: 6,
         paymentTime: new Date().toISOString(),
@@ -352,9 +352,9 @@ export class ManagerOrderComponent implements OnInit {
         paymentStatus: 1,
         description: "strizzzg"
       };
-  
+
       console.log('Update Data:', updateData);
-  
+
       this.invoiceService.updateStatusAndCreateInvoice(orderId, updateData).subscribe(
         (response) => {
           console.log('Order status updated and invoice created:', response);
@@ -381,10 +381,10 @@ export class ManagerOrderComponent implements OnInit {
   reloadPage() {
     window.location.reload(); // Reloads the current page
   }
-  
+
   transform(value: string | Date, format: string = 'dd/MM/yyyy HH:mm', locale: string = 'vi-VN'): string {
     if (!value) return '';
-  
+
     let date: Date;
     if (typeof value === 'string') {
       date = new Date(value);
@@ -400,12 +400,12 @@ export class ManagerOrderComponent implements OnInit {
     if (!date) return 'N/A';
     return this.transform(date, 'dd/MM/yyyy HH:mm');
   }
-  
+
   printInvoice(): void {
     console.log('Invoice data before update:', this.invoice);
     if (this.invoice.invoiceId) {
       const printWindow = window.open('', '', 'height=600,width=800');
-  
+
       // Write the content to the new window
       printWindow?.document.write('<html><head><title>Invoice</title>');
       printWindow?.document.write(`
@@ -455,7 +455,7 @@ export class ManagerOrderComponent implements OnInit {
         </style>
       `);
       printWindow?.document.write('</head><body>');
-  
+
       // Add restaurant information
       printWindow?.document.write(`
         <div class="header">
@@ -466,7 +466,7 @@ export class ManagerOrderComponent implements OnInit {
           <hr>
         </div>
       `);
-  
+
       // Add invoice information
       printWindow?.document.write(`
         <div class="mb-3">
@@ -524,14 +524,14 @@ export class ManagerOrderComponent implements OnInit {
           <span id="totalAmount">${this.invoice?.paymentAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
         </div>
       `);
-  
+
       // Add footer
       printWindow?.document.write(`
         <div class="footer">
           Cảm ơn quý khách và hẹn gặp lại!
         </div>
       `);
-  
+
       // Close the document and trigger print
       printWindow?.document.write('</body></html>');
       printWindow?.document.close();
@@ -540,7 +540,7 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Invoice ID is not defined.');
     }
   }
-  
+
   // UpdateStatus(orderId: number | undefined, status: number | undefined) {
   //   if (orderId !== undefined && status !== undefined) {
   //     this.orderService.updateOrderStatus(orderId, status).subscribe(
@@ -608,7 +608,7 @@ export class ManagerOrderComponent implements OnInit {
       amountReceived: amountReceived,
       description: "Hieu Update"
     };
-  
+
     if (orderId !== undefined) {
       this.orderService.updateAmountReceiving(orderId, data).subscribe(
         response => {
@@ -628,7 +628,7 @@ export class ManagerOrderComponent implements OnInit {
   //Offline thanh toan truoc
   PrePayment(orderId: number | undefined) {
     const paymentMethod = parseInt(this.paymentMethod, 10);
-  
+
     console.log('Payment Method:', paymentMethod);
     console.log('Customer Paid:', this.customerPaid);
     console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
@@ -651,7 +651,7 @@ export class ManagerOrderComponent implements OnInit {
         paymentMethods: paymentMethod,
         description: "Hieu Update",
       };
-      
+
       this.invoiceService.updateDepositAndCreateInvoice(orderId, data).subscribe(
         response => {
           console.log('Order and invoice updated successfully:', response);
@@ -678,16 +678,16 @@ export class ManagerOrderComponent implements OnInit {
     const deposit = this.orderDetail?.deposits || 0;
     return totalAmount - deposit;
   }
-  
+
   //Offline hoan thanh goi them mon
 
   SuscessfullOrderOffline(orderId: number | undefined, invoiceId?: number) {
     const paymentMethod = parseInt(this.paymentMethod, 10);
-  
+
     console.log('Payment Method:', paymentMethod);
     console.log('Customer Paid:', this.customerPaid);
     console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
-  
+
     if (orderId !== undefined) {
       if (invoiceId === undefined || invoiceId === 0 || invoiceId === null) {
         let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
@@ -705,7 +705,7 @@ export class ManagerOrderComponent implements OnInit {
           paymentMethods: paymentMethod,
           description: "Invoice Created"
         };
-  
+
         this.invoiceService.createInvoiceOffline(orderId, createData).subscribe(
           response => {
             console.log('Invoice created successfully:', response);
@@ -723,12 +723,12 @@ export class ManagerOrderComponent implements OnInit {
     // Determine the amount received based on payment method and customer payment
     let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
     console.log('690',amountReceived);
-  
+
     // Calculate the return amount for cash payments
     const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - remainingAmountDue : 0;
     console.log('694',returnAmount);
 
-        
+
         // Data for updating an existing invoice
         const updateData = {
           status: 4,
@@ -742,7 +742,7 @@ export class ManagerOrderComponent implements OnInit {
           description: "Invoice Updated",
           tableStatus: 0,
         };
-  
+
         this.invoiceService.updateOrderAndInvoice(orderId, updateData).subscribe(
           response => {
             console.log('Invoice updated successfully:', response);
@@ -762,20 +762,20 @@ export class ManagerOrderComponent implements OnInit {
   acceptOrder(orderId: number | undefined): void {
     if (orderId !== undefined) {
       const data = {
-        paymentAmount: 0,        
-        taxcode: "string",       
-        accountId: 0,          
-        amountReceived: 0,       
-        returnAmount: 0,       
-        paymentMethods: 2,       
-        description: "string"   
+        paymentAmount: 0,
+        taxcode: "string",
+        accountId: 0,
+        amountReceived: 0,
+        returnAmount: 0,
+        paymentMethods: 2,
+        description: "string"
       };
-  
+
       this.orderService.AcceptOrderWaiting(orderId, data).subscribe(
         response => {
           window.location.reload();
           console.log('Order accepted successfully:', response);
-        
+
         },
         error => {
           console.error('Error accepting order:', error);
@@ -787,7 +787,7 @@ export class ManagerOrderComponent implements OnInit {
       // Xử lý khi `orderId` không xác định
     }
   }
-  
+
   getAccountDetails(accountId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
       response => {
@@ -801,8 +801,8 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
-  
-  
-  
-  
+
+
+
+
 }

@@ -24,7 +24,7 @@ body{
   }
 }
 .cart{
-  background-color: #fff;
+  background-color: beige;
   padding: 4vh 5vh;
   border-bottom-left-radius: 1rem;
   border-top-left-radius: 1rem;
@@ -118,6 +118,9 @@ input:focus::-webkit-input-placeholder
   font-size: 1rem;
   padding: 1vh;
   border-radius: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
 }
 .btn:focus{
   box-shadow: none;
@@ -269,7 +272,7 @@ input[type="radio"] {
 .cart-header {
   position: sticky;
   top: 0;
-  background-color: white; /* Ensure background matches the container */
+  background-color: beige; /* Ensure background matches the container */
   z-index: 10; /* Keep the header above the scrollable content */
   padding: 10px 0; /* Optional: add padding for better spacing */
 }
@@ -309,4 +312,7 @@ input[type="radio"] {
 .close {
   cursor: pointer;
   color: red; /* Optional: change the color of the close icon */
+}
+.dive{
+  font-size: 20px;
 }
