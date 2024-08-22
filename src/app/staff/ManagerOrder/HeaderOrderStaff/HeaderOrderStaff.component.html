@@ -1,0 +1,23 @@
+<header class="header-order-staff navbar navbar-expand-lg navbar-dark bg-custom">
+  <div class="container-fluid">
+    <a class="navbar-brand logo" href="#">
+      <img src="https://localhost:7188/api/Image/getImage/logoEat.png" alt="Logo" />
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" (click)="logout()">
+            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+          </a>
+        </li>
+      </ul>
+      <div class="user-info d-flex align-items-center ms-3">
+        <i class="fas fa-user-circle user-avatar"></i>
+        <span class="user-name ms-2">{{account.username}}</span>
+      </div>
+    </div>
+  </div>
+</header>

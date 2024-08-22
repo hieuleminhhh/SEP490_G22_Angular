@@ -19,8 +19,10 @@ export class DashboardComponent implements OnInit {
       console.log('Account ID:', this.accountId);
     }
     
-  logout() {
-    this.accountService.logout();
-    this.router.navigate(['/']);
-  }
+    logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('accountId');
+      this.accountService.logout();
+      window.location.href = '/';
+    }
 }

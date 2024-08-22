@@ -1,11 +1,11 @@
-<div *ngIf="loggedIn$ | async; else notLoggedIn">
+<div *ngIf="showHeader === false; else notLoggedIn">
+  <router-outlet></router-outlet>
+</div>
+
+<ng-template #notLoggedIn>
+  <app-navbar></app-navbar>
+  <div class="main-content">
     <router-outlet></router-outlet>
   </div>
-
-  <ng-template #notLoggedIn>
-    <app-navbar></app-navbar>
-    <div class="main-content">
-      <router-outlet></router-outlet>
-    </div>
-    <app-footer></app-footer>
-  </ng-template>
+  <app-footer></app-footer>
+</ng-template>

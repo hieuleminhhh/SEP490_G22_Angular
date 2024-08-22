@@ -22,6 +22,7 @@ import { Discount } from '../../../../models/discount.model';
 import { PercentagePipe } from '../../../common/material/percentFormat/percentFormat.component';
 import { DiscountService } from '../../../../service/discount.service';
 import { CheckoutService } from '../../../../service/checkout.service';
+import { AccountService } from '../../../../service/account.service';
 @Component({
   selector: 'app-UpdateOfflineOrder',
   templateUrl: './UpdateOfflineOrder.component.html',
@@ -76,9 +77,12 @@ export class UpdateOfflineOrderComponent implements OnInit {
   newlyAddedItems: any[] = [];
   invoice: any = {};
   initialTotalAmount: number = 0;
+  accountId: number | null = null;
+  account: any;
+  showSidebar: boolean = true; 
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService,
      private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService, private discountService: DiscountService,
-     private checkoutService: CheckoutService ) { }
+     private checkoutService: CheckoutService,private accountService: AccountService ) { }
   @ViewChild('formModal') formModal!: ElementRef;
   ngOnInit() {
     this.loadListDishes();
@@ -92,7 +96,13 @@ export class UpdateOfflineOrderComponent implements OnInit {
     this.LoadActiveDiscounts();
     this.calculateAndSetTotalAmount();
     this.selectedDiscount = null;
-    
+    const accountIdString = localStorage.getItem('accountId');
+      this.accountId = accountIdString ? Number(accountIdString) : null;
+      if (this.accountId) {
+        this.getAccountDetails(this.accountId);
+      } else {
+        console.error('Account ID is not available');
+      }
   }
   increaseQuantity(index: number): void {
     const item = this.selectedItems[index];
@@ -1036,7 +1046,19 @@ updateOrderOffline(tableId: number): void {
       this.selectedDiscount = discountId; // Chọn mã giảm giá mới
     }
   }
-    
+  getAccountDetails(accountId: number): void {
+    this.accountService.getAccountById(accountId).subscribe(
+      response => {
+        this.account = response;
+        console.log('Account details:', this.account);
+        console.log('Account role:', this.account.role);
+        this.showSidebar = this.account.role !== 'OrderStaff';
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
     
   }
   

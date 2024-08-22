@@ -23,6 +23,7 @@ import { Discount } from '../../../../models/discount.model';
 import { DiscountService } from '../../../../service/discount.service';
 import { NoteDialogComponent } from '../../../common/material/NoteDialog/NoteDialog.component';
 import { CheckoutService } from '../../../../service/checkout.service';
+import { AccountService } from '../../../../service/account.service';
 @Component({
     selector: 'app-create-offline-order',
     templateUrl: './CreateOfflineOrder.component.html',
@@ -71,9 +72,13 @@ export class CreateOfflineOrderComponent implements OnInit {
   totalAmountAfterDiscount: number = 0;
   totalAmount: number = 0;
   addNew: any = {};
+  accountId: number | null = null;
+  account: any;
+  showSidebar: boolean = true; 
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService,
-   private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService, private dialog: MatDialog,private discountService: DiscountService,
-   private checkoutService: CheckoutService ) { }
+   private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService, private dialog: MatDialog
+   ,private discountService: DiscountService,
+   private checkoutService: CheckoutService, private accountService: AccountService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   ngOnInit() {
     this.loadListDishes();
@@ -88,7 +93,16 @@ export class CreateOfflineOrderComponent implements OnInit {
     this.LoadActiveDiscounts();
     this.calculateAndSetTotalAmount();
     this.selectedDiscount = null;
-
+    const accountIdString = localStorage.getItem('accountId');
+    this.accountId = accountIdString ? Number(accountIdString) : null;
+  
+    console.log('31', this.accountId);
+  
+    if (this.accountId) {
+      this.getAccountDetails(this.accountId);
+    } else {
+      console.error('Account ID is not available');
+    }
   }
 
   loadListOrderByTable(tableId: number): void {
@@ -284,6 +298,19 @@ export class CreateOfflineOrderComponent implements OnInit {
       },
       (error) => {
         console.error('Error fetching combos:', error);
+      }
+    );
+  }
+  getAccountDetails(accountId: number): void {
+    this.accountService.getAccountById(accountId).subscribe(
+      response => {
+        this.account = response;
+        console.log('Account details:', this.account);
+        console.log('Account role:', this.account.role);
+        this.showSidebar = this.account.role !== 'OrderStaff';
+      },
+      error => {
+        console.error('Error fetching account details:', error);
       }
     );
   }
