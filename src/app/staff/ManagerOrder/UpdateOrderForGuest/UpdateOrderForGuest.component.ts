@@ -22,12 +22,13 @@ import { Discount } from '../../../../models/discount.model';
 import { PercentagePipe } from '../../../common/material/percentFormat/percentFormat.component';
 import { DiscountService } from '../../../../service/discount.service';
 import { CheckoutService } from '../../../../service/checkout.service';
+import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
 @Component({
   selector: 'app-UpdateOrderForGuest',
   templateUrl: './UpdateOrderForGuest.component.html',
   styleUrls: ['./UpdateOrderForGuest.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe]
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe, HeaderOrderStaffComponent]
 })
 export class UpdateOrderForGuestComponent implements OnInit {
 
@@ -74,6 +75,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
    guestPhone: '',
    email:'antaiquan@gmail.com',
  };
+ showSidebar: boolean = true; 
  customerPaid: number | null = null;
  addressId: number | null = null;
  addNew: any = {};

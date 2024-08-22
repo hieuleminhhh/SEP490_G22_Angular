@@ -8,13 +8,14 @@ import { ManagerComboService } from '../../../service/managercombo.service';
 import { AddNewCombo, ListAllCombo, UpdateCombo } from '../../../models/combo.model';
 import { AddNewDish, Dish, ManagerDish } from '../../../models/dish.model';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
+import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 
 @Component({
   selector: 'app-ManagerCombo',
   templateUrl: './ManagerCombo.component.html',
   styleUrls: ['./ManagerCombo.component.css'],
   standalone: true,
-  imports: [SideBarComponent, RouterModule, CommonModule, FormsModule, HeaderComponent, CurrencyFormatPipe]
+  imports: [SideBarComponent, RouterModule, CommonModule, FormsModule, HeaderComponent, CurrencyFormatPipe, HeaderOrderStaffComponent]
 })
 export class ManagerComboComponent implements OnInit {
   @ViewChild('addComboModal') addComboModal!: ElementRef;
@@ -166,9 +167,20 @@ export class ManagerComboComponent implements OnInit {
   onImageSelect(event: Event): void {
     const fileInput = event.target as HTMLInputElement;
     if (fileInput.files && fileInput.files.length > 0) {
-      this.selectedFile = fileInput.files[0];
-      const imageUrl = URL.createObjectURL(this.selectedFile);
-      this.addNew.imageUrl = imageUrl;
+      const file = fileInput.files[0];
+      
+      // Optional: Validate file size (e.g., 2MB max)
+      if (file.size > 2 * 1024 * 1024) {
+        this.addErrors.imageError = 'File size exceeds 2MB';
+  
+        return;
+      }
+      // Create a URL for the selected file
+      this.selectedFile = file;
+      this.imageUrl = URL.createObjectURL(file);
+    } else {
+  
+      this.addErrors.imageError = 'No file selected';
     }
   }
   uploadImage(): void {
