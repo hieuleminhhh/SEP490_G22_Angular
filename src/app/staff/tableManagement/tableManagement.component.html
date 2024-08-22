@@ -166,16 +166,20 @@
           <div *ngIf="!dataReservationAccept || dataReservationAccept.length === 0" style="text-align: center;">
             <p>Không có đơn đặt bàn cho ngày hôm nay</p>
           </div>
-          <div class="pagination" *ngIf="totalPages>0">
-            <button (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+          <div class="pagination" *ngIf="totalPages > 0">
+            <button (click)="onPreviousPage()" [disabled]="currentPage === 1">
+              <i class="fas fa-arrow-left"></i> <!-- Icon mũi tên trái -->
+            </button>
 
-            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"
-              max="{{ totalPages }}">
+            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1" max="{{ totalPages }}">
 
             <span>of {{ totalPages }}</span>
 
-            <button (click)="onNextPage()" [disabled]="currentPage === totalPages">Next</button>
+            <button (click)="onNextPage()" [disabled]="currentPage === totalPages">
+              <i class="fas fa-arrow-right"></i> <!-- Icon mũi tên phải -->
+            </button>
           </div>
+
         </div>
       </div>
 
@@ -318,16 +322,20 @@
           <div *ngIf="!dataReservationPending || dataReservationPending.length === 0" style="text-align: center;">
             <p>Không có yêu cầu đặt bàn </p>
           </div>
-          <div class="pagination" *ngIf="totalPages>0">
-            <button (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+          <div class="pagination" *ngIf="totalPages > 0">
+            <button (click)="onPreviousPage()" [disabled]="currentPage === 1">
+              <i class="fas fa-arrow-left"></i> <!-- Icon mũi tên trái -->
+            </button>
 
-            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"
-              max="{{ totalPages }}">
+            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1" max="{{ totalPages }}">
 
             <span>of {{ totalPages }}</span>
 
-            <button (click)="onNextPage()" [disabled]="currentPage === totalPages">Next</button>
+            <button (click)="onNextPage()" [disabled]="currentPage === totalPages">
+              <i class="fas fa-arrow-right"></i> <!-- Icon mũi tên phải -->
+            </button>
           </div>
+
         </div>
       </div>
     </section>
@@ -500,9 +508,6 @@
             <input type="text" placeholder="Nhập từ khóa tìm kiếm..." [(ngModel)]="searchTerm"
               (input)="onSearchChange($event)">
           </div>
-
-
-
           <br>
           <div>
             <table>
@@ -550,16 +555,20 @@
           <div *ngIf="!dataReservation || dataReservation.length === 0" style="text-align: center;">
             <p>Không có dữ liệu </p>
           </div>
-          <div class="pagination" *ngIf="totalPages>0">
-            <button (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+          <div class="pagination" *ngIf="totalPages > 0">
+            <button (click)="onPreviousPage()" [disabled]="currentPage === 1">
+              <i class="fas fa-arrow-left"></i> <!-- Icon mũi tên trái -->
+            </button>
 
-            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"
-              max="{{ totalPages }}">
+            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1" max="{{ totalPages }}">
 
             <span>of {{ totalPages }}</span>
 
-            <button (click)="onNextPage()" [disabled]="currentPage === totalPages">Next</button>
+            <button (click)="onNextPage()" [disabled]="currentPage === totalPages">
+              <i class="fas fa-arrow-right"></i> <!-- Icon mũi tên phải -->
+            </button>
           </div>
+
         </div>
       </div>
     </section>

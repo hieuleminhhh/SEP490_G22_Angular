@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Dish } from '../models/dish.model';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Address } from '../models/address.model';
 import { TableReservationResponse } from '../models/table.model';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class ReservationService {
   private itemCountSubject = new BehaviorSubject<number>(0);
   isReser: boolean = false;
 
-  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) {
+  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router, private authService: AuthService) {
 
   }
 
@@ -70,39 +71,67 @@ export class ReservationService {
 
   getReservation(reservationId: number): Observable<any> {
     const url = `https://localhost:7188/api/Reservations/${reservationId}`;
-    return this.http.get(url);
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get(url, { headers });
   }
   getReservationList(status?: number): Observable<any> {
     const baseUrl = 'https://localhost:7188/api/Reservations';
     const url = status !== undefined ? `${baseUrl}?status=${status}` : baseUrl;
-    return this.http.get(url);
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get(url, { headers });
   }
   createResevetion(reservation: any): Observable<any> {
     const url = `https://localhost:7188/api/Reservations/create`;
-    return this.http.post(url, reservation);
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.post(url, reservation, { headers });
   }
 
   updateStatusReservation(reservationId: number, status: any): Observable<any> {
     const url = `https://localhost:7188/api/Reservations/${reservationId}/update-status`;
     const payload = { status: status };
-    return this.http.put(url, payload);
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.put(url, payload, { headers });
   }
 
   updateStatusTable(reservationId: number, status: any): Observable<any> {
     const url = `https://localhost:7188/api/Reservations/${reservationId}/tables/status`;
     const payload = { tableStatus: status };  // Cập nhật tên trường
-    return this.http.put(url, payload);
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.put(url, payload, { headers });
   }
 
 
   searchReservation(searchTerm: string): Observable<any[]> {
     const url = `https://localhost:7188/api/Reservations/searchNameOrPhone?guestNameOrguestPhone=${searchTerm}`;
-    return this.http.get<any[]>(url);
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get<any[]>(url, { headers });
   }
 
   getTableReservation(reserId: number): Observable<TableReservationResponse> {
     const url = `https://localhost:7188/api/Reservations/check-time/${reserId}`;
-    return this.http.get<TableReservationResponse>(url);
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get<TableReservationResponse>(url, { headers });
   }
 
 }

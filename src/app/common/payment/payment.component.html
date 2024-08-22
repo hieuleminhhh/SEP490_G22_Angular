@@ -1,3 +1,5 @@
+<br><br>
+
 <div>
   <div class="order-info">
     <div class="row">
@@ -9,42 +11,26 @@
           <hr>
           <div class="order-details" *ngIf="data">
             <div class="row">
-              <div class="form-group">
-                <label for="name">Họ tên :</label>
+              <div class="form-group" style="margin-bottom: 15px;">
+                <label for="name">Họ tên: <span style=" font-weight: bold;">{{data?.consigneeName}}</span></label>
               </div>
-              <div class="form-group">
-                <span style="float: left; font-weight: bold;">{{data?.consigneeName}}</span>
+              <div class="form-group" style="margin-bottom: 15px;">
+                <label for="email">Email: <span style=" font-weight: bold;">{{data?.email}}</span></label>
               </div>
-              <div class="form-group">
-                <label for="email">Email :</label>
+              <div class="form-group" style="margin-bottom: 15px;">
+                <label for="phone">Điện thoại: <span style=" font-weight: bold;">{{data?.guestPhone}}</span></label>
               </div>
-              <div class="form-group">
-                <span style="float: left; font-weight: bold;">{{data?.email}}</span>
+              <div class="form-group" style="margin-bottom: 15px;">
+                <label for="time">Thời gian nhận hàng: <span style="font-weight: bold;">{{data?.receivingTime |
+                    date:'dd/MM/yyyy'}} -
+                    {{data?.receivingTime | date:'shortTime'}}</span></label>
               </div>
-              <div class="form-group">
-                <label for="phone">Điện thoại:</label>
+              <div class="form-group" style="margin-bottom: 15px;">
+                <label for="address">Địa chỉ nhận hàng: <span
+                    style="font-weight: bold;">{{data?.guestAddress}}</span></label>
               </div>
-              <div class="form-group">
-                <span style="float: left; font-weight: bold;">{{data?.guestPhone}}</span>
-              </div>
-              <div class="form-group">
-                <label for="time">Thời gian nhận hàng:</label>
-              </div>
-              <div class="form-group">
-                <span style="float: left; font-weight: bold;">{{data?.receivingTime | date:'dd/MM/yyyy'}} -
-                  {{data?.receivingTime | date:'shortTime'}}</span>
-              </div>
-              <div class="form-group">
-                <label for="address">Địa chỉ nhận hàng:</label>
-              </div>
-              <div class="form-group">
-                <span style="font-weight: bold;">{{data?.guestAddress}}</span>
-              </div>
-              <div class="form-group">
-                <label for="address">Ghi chú:</label>
-              </div>
-              <div class="form-group">
-                <span style="font-weight: bold;">{{data.note}}</span>
+              <div class="form-group" style="margin-bottom: 15px;">
+                <label for="address">Ghi chú: <span style="font-weight: bold;">{{data.note}}</span></label>
               </div>
             </div>
           </div>
@@ -108,15 +94,16 @@
                 </div>
               </div>
             </div>
-            <hr>
+            <br>
             <div class="col-12 panel-footer basket-footer">
               <div class="row">
                 <div class="col-12 text-right">
-                  <div class="dive">Khuyến mãi: <span class="very emphasized">{{data?.discountPriceOrder | currencyFormat}}</span></div>
+                  <div class="dive">Khuyến mãi: <span class="very emphasized">{{data?.discountPriceOrder |
+                      currencyFormat}}</span></div>
                 </div>
                 <hr>
                 <div class="row">
-                  <div class="col-12 text-right">
+                  <div class="col-12 text-right" style="padding-left: 0;">
                     <div class="dive">Tổng hóa đơn: <span class="very emphasized">{{data?.totalAmount |
                         currencyFormat}}</span></div>
                   </div>
@@ -125,10 +112,69 @@
             </div>
             <div class="back-to-shop">
               <a routerLink="/menu" routerLinkActive="active"><i class="fas fa-arrow-left"></i>Thực đơn</a>
-              <button *ngIf="!orderCancelled" class="btn btn-danger" (click)="cancelOrder()">Hủy đơn hàng</button>
+              <button *ngIf="!orderCancelled" class="btn btn-danger" data-bs-target="#cancelOrderModal"
+                data-bs-toggle="modal">Hủy đơn hàng</button>
               <button *ngIf="orderCancelled" class="btn btn-primary" (click)="reorder()">Mua lại</button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Cancel Order Confirmation Modal -->
+  <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="cancelOrderModalLabel">Xác nhận hủy đơn</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+          <p>Bạn có chắc chắn muốn hủy đơn này không?</p>
+          <div class="form-group">
+            <label for="cancelationReason">Lý do hủy đơn:</label>
+            <br><br>
+            <div class="form-check">
+              <input type="radio" id="reason1" name="cancelationReason" class="form-check-input"
+                [(ngModel)]="cancelationReason" value="Không còn nhu cầu" />
+              <label class="form-check-label" for="reason1"> Không còn nhu cầu</label>
+            </div>
+            <div class="form-check">
+              <input type="radio" id="reason2" name="cancelationReason" class="form-check-input"
+                [(ngModel)]="cancelationReason" value="Đơn hàng sai" />
+              <label class="form-check-label" for="reason2"> Đơn hàng sai</label>
+            </div>
+            <div class="form-check">
+              <input type="radio" id="reason3" name="cancelationReason" class="form-check-input"
+                [(ngModel)]="cancelationReason" value="Thời gian giao hàng quá lâu" />
+              <label class="form-check-label" for="reason3"> Thời gian giao hàng quá lâu</label>
+            </div>
+            <div class="form-check">
+              <input type="radio" id="reason4" name="cancelationReason" class="form-check-input"
+                [(ngModel)]="cancelationReason" value="Chất lượng sản phẩm không đạt yêu cầu" />
+              <label class="form-check-label" for="reason4"> Chất lượng sản phẩm không đạt yêu cầu</label>
+            </div>
+            <div class="form-check">
+              <input type="radio" id="reason5" name="cancelationReason" class="form-check-input"
+                [(ngModel)]="cancelationReason" value="Lý do khác" />
+              <label class="form-check-label" for="reason5">Lý do khác</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+            Đóng
+          </button>
+          <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal" (click)="cancelOrder()">
+            Xác nhận
+          </button>
         </div>
       </div>
     </div>

@@ -37,7 +37,7 @@
                     <img class="img-fluid" [src]="item.imageUrl" alt="Item Image"
                       style="max-width: 100%; height: 56px;">
                   </div>
-                  <div class="col">
+                  <div class="col" style="font-size: 18px;">
                     <div>{{ item.itemName||item.nameCombo }}</div>
                   </div>
                   <div class="col">
@@ -71,10 +71,10 @@
             </div>
           </div>
         </div>
-
+        <br>
         <div class="back-to-shop d-flex justify-content-between align-items-center">
-          <div>
-            <a routerLink="/menu" routerLinkActive="active"><i class="fas fa-arrow-left"></i></a>
+          <div style="font-size: 18px;font-weight: bold; cursor: pointer;" routerLink="/menu" routerLinkActive="active">
+            <a><i class="fas fa-arrow-left"></i></a>
             <span class="text-muted">Về thực đơn</span>
           </div>
           <button class="btn btn-primary btn-sm" *ngIf="cartItems && cartItems.length > 0;" (click)="checkout()">Thanh

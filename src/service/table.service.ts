@@ -17,25 +17,39 @@ export class TableService {
     });
     return this.http.get(url, { headers });
   }
-  
-
 
   updateStatusTable(tableId: number): Observable<any> {
     const url = `https://localhost:7188/api/Table/${tableId}`;
-    return this.http.get(url);
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get(url, { headers });
   }
 
   createTableReservation(tableReser: any): Observable<any> {
     const url = `https://localhost:7188/api/Reservations/register-tables`;
-    return this.http.post(url, tableReser);
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.post(url, tableReser, { headers });
   }
   getOrdersByTableId(tableId: number): Observable<any> {
     const url = `https://localhost:7188/api/orders/GetOrderByTableId/${tableId}`;
-    return this.http.get(url);
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get(url, { headers });
   }
-  updateOrderStatus(Id: number, request:any): Observable<any> {
-    const url = `https://localhost:7188/api/Invoice/updateStatus/${Id}`;
-    return this.http.put(url, request);
+  updateOrderStatus(orderId: number, status: any): Observable<any> {
+    const url = `https://localhost:7188/api/orders/${orderId}/Updatestatus`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.put(url, status, { headers });
   }
 }
 

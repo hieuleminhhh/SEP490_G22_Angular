@@ -558,8 +558,12 @@ input[type="radio"] {
   border-radius: 4px;     /* Góc bo tròn */
   display: inline-block;  /* Hiển thị theo dạng khối nội dòng */
   background-color: white;
+  cursor: pointer;
 }
 .disabled-discount {
   opacity: 0.5;
   pointer-events: none;
+}
+.dive{
+  font-size: 18px;
 }

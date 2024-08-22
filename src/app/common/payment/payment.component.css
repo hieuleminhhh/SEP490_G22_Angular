@@ -86,12 +86,22 @@ img{
 }
 
 .back-to-shop button {
-  background-color: red;
-  flex-grow: 0; /* Không cho phép nút mở rộng */
-  width: auto; /* Đảm bảo kích thước tự động phù hợp với nội dung */
-  margin-right: 10px;
-  margin-bottom: 30px;
-  font-size: 15px
+  background-color: red;         /* Màu nền của nút */
+  flex-grow: 0;                  /* Không cho phép nút mở rộng */
+  width: auto;                   /* Kích thước nút tự động phù hợp với nội dung */
+  margin-right: 10px;            /* Khoảng cách phải của nút */
+  margin-bottom: 30px;           /* Khoảng cách dưới của nút */
+  font-size: 15px;               /* Kích thước chữ của nút */
+  padding: 10px 20px;            /* Khoảng cách bên trong nút, thêm padding cho dễ nhìn */
+  color: white;                  /* Màu chữ của nút */
+  border: none;                  /* Bỏ viền mặc định của nút */
+  border-radius: 4px;            /* Bo tròn các góc của nút */
+  cursor: pointer;               /* Con trỏ chuột thay đổi khi di chuột qua nút */
+  transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu nền mượt mà khi di chuột vào nút */
+}
+
+.back-to-shop button:hover {
+  background-color: darkred; /* Thay đổi màu nền khi di chuột qua nút */
 }
 .back-to-shop a  {
   font-size: 20px; /* Kích thước chữ mong muốn */
@@ -132,7 +142,6 @@ input:focus::-webkit-input-placeholder
   color: white;
   width: 100%;
   font-size: 0.7rem;
-  margin-top: 4vh;
   padding: 1vh;
   border-radius: 0;
 }
@@ -251,4 +260,109 @@ span {
 .success-message h3 {
   margin-top: 20px; /* Khoảng cách từ h4 lớn nhất đến h3 */
   color: #555; /* Màu chữ */
+}
+.dive{
+  font-size: 18px;
+}
+/* Modal Customization */
+.modal-content {
+  border-radius: 8px; /* Bo tròn các góc của modal */
+  border: none; /* Bỏ viền mặc định của modal */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Đổ bóng cho modal */
+}
+
+.modal-header {
+  background-color: #f8f9fa; /* Màu nền cho phần đầu của modal */
+  border-bottom: 1px solid #dee2e6; /* Đường viền dưới của phần đầu modal */
+  border-top-left-radius: 8px; /* Bo tròn góc trên bên trái */
+  border-top-right-radius: 8px; /* Bo tròn góc trên bên phải */
+  padding: 15px 20px; /* Khoảng cách bên trong phần đầu modal */
+}
+
+.modal-title {
+  font-size: 18px; /* Kích thước chữ cho tiêu đề */
+  font-weight: 600; /* Độ đậm chữ cho tiêu đề */
+  color: #333; /* Màu chữ của tiêu đề */
+}
+
+.btn-close {
+  background-color: transparent; /* Nền trong suốt cho nút đóng */
+  border: none; /* Bỏ viền cho nút đóng */
+  font-size: 20px; /* Kích thước chữ cho nút đóng */
+  color: #000; /* Màu chữ của nút đóng */
+}
+
+.modal-body {
+  padding: 20px; /* Khoảng cách bên trong phần thân modal */
+  font-size: 16px; /* Kích thước chữ cho nội dung */
+  color: #555; /* Màu chữ cho nội dung trong modal */
+}
+
+.modal-body p {
+  margin-bottom: 15px; /* Khoảng cách dưới đoạn văn */
+}
+
+.form-group {
+  margin-top: 10px; /* Khoảng cách phía trên nhóm lý do hủy đơn */
+}
+
+.form-group label {
+  font-size: 14px; /* Kích thước chữ của nhãn */
+  font-weight: 500; /* Độ đậm của nhãn */
+  color: #444; /* Màu chữ của nhãn */
+}
+
+.form-check {
+  display: flex; /* Sử dụng flexbox để căn chỉnh radio button và nhãn */
+  height: 30px;
+}
+
+.form-check-input {
+  margin-right: 10px; /* Khoảng cách giữa radio button và nhãn */
+}
+
+.form-check-label {
+  font-size: 14px; /* Kích thước chữ của nhãn */
+  color: #333; /* Màu chữ cho nhãn */
+}
+.form-check-input{
+  font-size: 10px;
+  width: 10px;
+    height: 10px;
+}
+.form-check-input:checked {
+  background-color: gray;
+  border-color: gray;
+}
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.modal-footer .btn {
+  padding: 5px 10px;
+  font-size: 14px;
+  min-width: 80px;
+}
+
+
+.modal-footer .btn-secondary {
+  background-color: #6c757d; /* Màu nền cho nút Đóng */
+  color: white; /* Màu chữ của nút Đóng */
+  border: none; /* Bỏ viền nút Đóng */
+}
+
+.modal-footer .btn-secondary:hover {
+  background-color: #5a6268; /* Màu nền khi hover nút Đóng */
+}
+
+.modal-footer .btn-danger {
+  background-color: #dc3545; /* Màu nền cho nút Xác nhận */
+  color: white; /* Màu chữ của nút Xác nhận */
+  border: none; /* Bỏ viền nút Xác nhận */
+}
+
+.modal-footer .btn-danger:hover {
+  background-color: #c82333; /* Màu nền khi hover nút Xác nhận */
 }

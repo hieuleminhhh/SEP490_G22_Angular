@@ -67,6 +67,5 @@ export const routes: Routes = [
     {'path': 'manageAccount', component: ManageAccountComponent},
     {'path': 'shipping', component: OrderShipComponent},
     {'path': 'invoice', component: ManageInvoiceComponent},
-    {'path': 'shipping', component: OrderShipComponent},
     {'path': 'manageNew', component: ManageNewComponent}
 ];
