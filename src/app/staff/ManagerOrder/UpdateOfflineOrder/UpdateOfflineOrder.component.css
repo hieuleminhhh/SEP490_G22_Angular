@@ -492,3 +492,7 @@ input.rounded-input {
 .back-icon:hover {
   color: black; /* Màu sắc mới khi hover */
 }
+.highlight {
+  color: #ff5733; /* Màu sắc nổi bật cho phần trong dấu ngoặc */
+  font-style: italic; /* In nghiêng để tạo sự khác biệt */
+}
