@@ -24,12 +24,13 @@ import { DiscountService } from '../../../../service/discount.service';
 import { NoteDialogComponent } from '../../../common/material/NoteDialog/NoteDialog.component';
 import { CheckoutService } from '../../../../service/checkout.service';
 import { AccountService } from '../../../../service/account.service';
+import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
 @Component({
     selector: 'app-create-offline-order',
     templateUrl: './CreateOfflineOrder.component.html',
     styleUrls: ['./CreateOfflineOrder.component.css'],
     standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe]
+    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe, HeaderOrderStaffComponent]
 })
 export class CreateOfflineOrderComponent implements OnInit {
   tableId: number = 0;

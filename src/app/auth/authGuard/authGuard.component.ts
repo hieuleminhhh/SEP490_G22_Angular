@@ -1,21 +1,31 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';// Đảm bảo bạn có một dịch vụ auth để lấy thông tin người dùng
+import { CanActivate, ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from '../../../service/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-
+  
   constructor(private authService: AuthService, private router: Router) {}
 
-  canActivate(): boolean {
-    const user = this.authService.getUser(); // Lấy thông tin người dùng từ dịch vụ auth
-    if (user && user.role === 'OrderStaff') { // Kiểm tra vai trò của người dùng
-      return true; 
-    } else {
-      this.router.navigate(['/login']); // Điều hướng đến trang đăng nhập nếu không có quyền
-      return false; // Không cho phép truy cập
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    const user = this.authService.getUser(); 
+    const url = route.url[0].path; 
+
+    if (user) {
+      if (url === 'listTable' && (user.role === 'Cashier' || user.role === 'OrderStaff')) {
+        return true;
     }
+      if (url === 'manageNew' && user.role === 'Cashier') {
+        return true; 
+      }
+      if (url === 'managerorder' && user.role === 'Cashier') {
+        return true; 
+      }
+    }
+
+    this.router.navigate(['/login']); 
+    return false;
   }
 }

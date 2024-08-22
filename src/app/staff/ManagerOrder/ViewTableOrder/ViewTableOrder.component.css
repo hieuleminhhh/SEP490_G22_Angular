@@ -1,94 +1,95 @@
 /* Căn chỉnh lại các phần tử và bố cục */
 .container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .card {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .short-card {
-    margin-bottom: 10px;
-  }
-  
-  .table-layout-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
-  
-  .floor-button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .floor-button.active {
-    background-color: #007bff;
-    color: #fff;
-  }
-  
-  .table-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 20px;
-  }
-  
-  .table {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px;
-    text-align: center;
-    position: relative;
-  }
-  
-  .table.in-use {
-    background-color: #ffe6e6;
-  }
-  
-  .table-id {
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  
-  .table-status {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 10px;
-  }
-  
-  .table-capacity {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    font-size: 14px;
-  }
-  
-  .table-check {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 20px;
-    color: green;
-  }
-  
-  .floor-select {
-    width: 20%;
-    padding: 5px;
-    margin-bottom: 20px;
-  }
-    /* CSS cho tiêu đề */
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.short-card {
+  margin-bottom: 10px;
+}
+
+.table-layout-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.floor-button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.floor-button.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.table-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.table {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  position: relative;
+}
+
+.table.in-use {
+  background-color: #ffe6e6;
+}
+
+.table-id {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.table-status {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.table-capacity {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+.table-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  color: green;
+}
+
+.floor-select {
+  width: 20%;
+  padding: 5px;
+  margin-bottom: 20px;
+}
+
+/* CSS cho tiêu đề */
 .title-header {
   font-size: 2rem; /* Kích thước chữ lớn hơn */
   font-weight: bold; /* Đậm chữ */
@@ -99,10 +100,48 @@
   text-transform: uppercase; /* Chữ in hoa để tạo sự nổi bật */
   font-family: 'Arial', sans-serif; /* Sử dụng font chữ đẹp và dễ đọc */
 }
+
 main {
   padding-top: 2rem; /* Thêm khoảng cách phía trên nội dung chính nếu cần thiết */
+  margin-left: 0; /* Đặt mặc định khoảng cách bên trái là 0 */
 }
+
+/* Khi sidebar không hiển thị */
 body:not(.sidebar-visible) main {
   margin-left: 0; /* Xóa khoảng cách bên trái khi không có sidebar */
   width: 100%; /* Đảm bảo chiều rộng 100% khi không có sidebar */
 }
+
+body.sidebar-visible main {
+  margin-left: 250px; 
+}
+/* Custom CSS */
+/* Custom CSS */
+.custom-select {
+  font-family: 'Arial', sans-serif; /* Use a clean, modern font */
+  font-size: 1rem; /* Adjust font size for readability */
+  font-weight: 500; /* Slightly bold for emphasis */
+  padding: 0.75rem 1.25rem; /* Add padding for better spacing */
+  border-radius: 0.375rem; /* Rounded corners for a modern look */
+  border: 1px solid #ced4da; /* Light gray border */
+  background-color: #f8f9fa; /* Light background color */
+  color: #495057; /* Dark gray text color for contrast */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Smooth transition for focus and hover effects */
+  max-width: 250px; /* Set maximum width to shorten the select box */
+  width: 100%; /* Ensure it takes full width of its container if needed */
+}
+
+.custom-select:focus {
+  border-color: #007bff; /* Blue border on focus */
+  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25); /* Blue shadow on focus */
+  outline: none; /* Remove default outline */
+}
+
+.custom-select option {
+  background-color: #ffffff; /* White background for options */
+  font-family: 'Arial', sans-serif; /* Ensure options use the same font */
+  font-size: 1rem; /* Ensure options have consistent font size */
+}
+
+
+

@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService } from '../../../service/account.service';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { SidebarOrderComponent } from "../SidebarOrder/SidebarOrder.component";
+import { HeaderOrderStaffComponent } from "../ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, SidebarOrderComponent, HeaderOrderStaffComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })

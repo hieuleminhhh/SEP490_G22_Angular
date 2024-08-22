@@ -22,13 +22,14 @@ import { PercentagePipe } from '../../../common/material/percentFormat/percentFo
 import { Discount } from '../../../../models/discount.model';
 import { DiscountService } from '../../../../service/discount.service';
 import { CheckoutService } from '../../../../service/checkout.service';
+import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
 
 @Component({
   selector: 'app-CreateTakeAwayOrder',
   templateUrl: './CreateTakeAwayOrder.component.html',
   styleUrls: ['./CreateTakeAwayOrder.component.css'],
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe]
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe, HeaderOrderStaffComponent]
 })
 export class CreateTakeAwayOrderComponent implements OnInit {
 

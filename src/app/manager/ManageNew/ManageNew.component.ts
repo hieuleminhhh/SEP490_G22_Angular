@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Import CommonModule
+import { CommonModule } from '@angular/common';
+import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
+import { SideBarComponent } from "../SideBar/SideBar.component"; // Import CommonModule
 @Component({
   selector: 'app-manage-new',
   templateUrl: './ManageNew.component.html',
   styleUrls: ['./ManageNew.component.css'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule, HeaderOrderStaffComponent, SideBarComponent]
 })
 export class ManageNewComponent implements OnInit {
 
