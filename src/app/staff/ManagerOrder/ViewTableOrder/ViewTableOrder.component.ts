@@ -6,8 +6,9 @@ import { FormsModule } from '@angular/forms';
 import { SidebarOrderComponent } from "../../SidebarOrder/SidebarOrder.component";
 import { AccountService } from '../../../../service/account.service';
 import { JwtInterceptor } from '../../../../jwt.interceptor';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpErrorResponse } from '@angular/common/http';
 import { HeaderOrderStaffComponent } from '../HeaderOrderStaff/HeaderOrderStaff.component';
+import { ManagerOrderService } from '../../../../service/managerorder.service';
 
 @Component({
     selector: 'app-ViewTableOrder',
@@ -29,11 +30,19 @@ export class ViewTableOrderComponent implements OnInit {
   dataTable: any;
   accountId: number | null = null;
   account: any;
+  orderId: number | null = null;
   showSidebar: boolean = true; 
+  tableId: number = 0;
+  
   constructor(private tableService: TableService, private router: Router,
-    private route: ActivatedRoute, private accountService: AccountService) { }
+    private route: ActivatedRoute, private accountService: AccountService,
+    private orderService: ManagerOrderService) { }
 
     ngOnInit() {
+      this.route.queryParams.subscribe(params => {
+        this.tableId = +params['tableId']; 
+        this.loadOrderIdByTable(this.tableId);
+      });
       // Retrieve accountId from localStorage and convert to number
       const accountIdString = localStorage.getItem('accountId');
       this.accountId = accountIdString ? Number(accountIdString) : null;
@@ -86,9 +95,9 @@ export class ViewTableOrderComponent implements OnInit {
     }
   }
   navigateToOrder(tableId: number, status: number): void {
-    if (status === 0) {
+    if (status === 0 || this.orderId === null) {
       this.router.navigate(['/createOffline'], { queryParams: { tableId } });
-    } else if (status === 1) {
+    } else if (status === 1 || this.orderId !== null) {
       this.router.navigate(['/updateOffline'], { queryParams: { tableId } });
     }
   }
@@ -106,5 +115,25 @@ export class ViewTableOrderComponent implements OnInit {
       }
     );
   }
+  loadOrderIdByTable(tableId: number): void {
+    console.log('Loading orders for table ID:', tableId);
+    this.orderService.getOrdersByTableId(tableId).subscribe(
+      (response: any) => {
+        if (response && response.data && response.data.orderId) {
+          this.orderId = response.data.orderId;
+          console.log('Test order ID:', this.orderId);
+          // Optionally, perform other actions with the orderId
+        } else {
+          console.error('Invalid response:', response);
+          this.orderId = null;
+        }
+      },
+      (error: HttpErrorResponse) => {
+        console.error('Error fetching orders:', error);
+        this.orderId = null;
+      }
+    );
+  }
+  
 
 }
