@@ -3,6 +3,7 @@ export interface Account{
     password:string;
     token:string;
     role:string;
+    accountId: number;
   }
 
 // account-dto.model.ts
@@ -29,7 +30,7 @@ export interface UpdateAccountDTO {
 }
 
 export interface GetAccountDTO {
-  id: number;
+  accountId: number;
   firstName: string;
   lastName: string;
   email: string;
@@ -37,4 +38,6 @@ export interface GetAccountDTO {
   role: string;
   address: string;
   phone: string;
+  isActive: boolean;
+  password: string;
 }

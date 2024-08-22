@@ -763,7 +763,7 @@ export class ManagerOrderComponent implements OnInit {
         accountId: 0,          
         amountReceived: 0,       
         returnAmount: 0,       
-        paymentMethods: 0,       
+        paymentMethods: 2,       
         description: "string"   
       };
   

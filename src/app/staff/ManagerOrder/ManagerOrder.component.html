@@ -2,7 +2,12 @@
   <div class="container-fluid">
     <div class="row">
       <!-- Sidebar -->
+      
       <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+        <br>
+        <br>
+        <br>
+        <br>
         <app-SidebarOrder></app-SidebarOrder>
       </nav>
 
@@ -169,6 +174,9 @@
                       <span *ngSwitchDefault>Chưa xác định</span>
                     </ng-container>
 
+                  </div>
+                  <div class="mb-3" *ngIf="orderDetail.cancelationReason">
+                    <span class="fw-bold">Lý do hủy:</span> {{ orderDetail.cancelationReason}}
                   </div>
                   <div class="mb-3">
                     <span class="fw-bold">Tên khách hàng:</span> {{ orderDetail.consigneeName || 'Khách lẻ' }}

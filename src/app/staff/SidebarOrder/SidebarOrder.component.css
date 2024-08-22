@@ -1,54 +1,9 @@
-/* Adjust sidebar links */
-#sidebarMenu .nav-link {
-    display: flex;
-    align-items: center;
-    white-space: nowrap; /* Prevent line breaks */
-    overflow: hidden;
-    text-overflow: ellipsis; /* Add ellipsis if the text overflows */
-    font-family: 'Arial', sans-serif; /* Font family */
-    font-size: 16px; /* Font size */
-    color: #333; /* Text color */
-    padding: 10px 15px; /* Padding */
-    transition: background-color 0.3s ease; /* Smooth background color transition */
-  }
-  
-  /* Hover effect */
-  #sidebarMenu .nav-link:hover {
-    background-color: #f8f9fa; /* Background color on hover */
-    color: #007bff; /* Text color on hover */
-  }
-  
-  /* Active link */
-  #sidebarMenu .nav-link.active {
-    background-color: #007bff; /* Background color for active link */
-    color: #fff; /* Text color for active link */
-  }
-  
-  /* Adjust inner menu */
-  #orderMenu .nav-link {
-    display: flex;
-    align-items: center;
-    white-space: nowrap; /* Prevent line breaks */
-    overflow: hidden;
-    text-overflow: ellipsis; /* Add ellipsis if the text overflows */
-    padding-left: 30px; /* Adjust padding for sub-menu items */
-    font-size: 14px; /* Font size for sub-menu items */
-    color: #555; /* Text color for sub-menu items */
-  }
-  
-  /* Hover effect for inner menu */
-  #orderMenu .nav-link:hover {
-    background-color: #f1f1f1; /* Background color on hover */
-    color: #0056b3; /* Text color on hover */
-  }
-  
-  /* Optional: Increase the sidebar width if needed */
-  #sidebarMenu {
-    width: 250px;
-  }
-  
-  /* Optional: Add some spacing between the icon and the text */
-  #sidebarMenu .nav-link span {
-    margin-right: 10px;
-  }
-  
+.nav-item {
+  list-style: none; /* Remove bullet points */
+  padding: 0; /* Remove default padding */
+  margin: 0; /* Remove default margin */
+}
+.li{
+  width: 130px;
+  background-color: white;
+}

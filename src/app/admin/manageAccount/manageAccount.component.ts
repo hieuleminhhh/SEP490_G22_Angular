@@ -19,7 +19,7 @@ export class ManageAccountComponent implements OnInit {
   selectedAccount: GetAccountDTO | null = null;
   isEditing: boolean = false;
   errorMessage: string = '';
-
+  showPasswordMap: { [key: number]: boolean } = {};
   ngOnInit() {
     this.loadAccounts();
   }
@@ -64,4 +64,43 @@ export class ManageAccountComponent implements OnInit {
     this.selectedAccount = account;
     this.isEditing = true;
   }
+
+  togglePasswordVisibility(index: number): void {
+    this.showPasswordMap[index] = !this.showPasswordMap[index];
+  }
+  toggleActiveStatus(account: GetAccountDTO): void {
+    // Toggle the account's active status
+    const newStatus = !account.isActive;
+    account.isActive = newStatus;
+  
+    // Update the status on the server
+    this.updateAccountStatus(account.accountId, newStatus);
+  }
+  
+  updateAccountStatus(id: number, isActive: boolean): void {
+    if (!id) {
+      console.error('Account ID is missing');
+      return;
+    }
+  
+    this.accountService.updateAccountStatus(id, isActive).subscribe(
+      response => {
+        console.log('Response:', response);
+        alert(`Account status updated to: ${isActive ? 'Đang hoạt động' : 'Không hoạt động'}`);
+      },
+      error => {
+        this.errorMessage = 'Error updating account status.';
+        console.error('Error updating account status:', error);
+  
+        // Optionally revert the change if the update fails
+        const account = this.accounts.find(acc => acc.accountId === id);
+        if (account) {
+          account.isActive = !isActive; // Revert to original status
+        }
+      }
+    );
+  }
+  
+  
+  
 }

@@ -50,6 +50,7 @@ export interface ListOrderDetailByOrder{
   paymentStatus:number;
   paymentTime:Date;
   taxcode:string;
+  cancelationReason:string;
   orderDetails:ListOrderDetail[];
   tables: Table[]; 
 }
