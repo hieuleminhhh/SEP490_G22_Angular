@@ -21,6 +21,10 @@ export class ManageAccountComponent implements OnInit {
   errorMessage: string = '';
   showPasswordMap: { [key: number]: boolean } = {};
 
+  currentPage = 1; // Trang hiện tại
+  itemsPerPage = 5; // Số bản ghi trên mỗi trang
+  totalItems = 0; // Tổng số bản ghi
+
   ngOnInit() {
     this.loadAccounts();
   }
@@ -30,10 +34,16 @@ export class ManageAccountComponent implements OnInit {
       accounts => {
         this.accounts = accounts;
         console.log('25', this.accounts); // Log here after accounts are populated
+        this.totalItems = this.accounts.length;
+        this.paginateData();
       },
       error => this.errorMessage = 'Error fetching accounts.'
     );
+
+
+    console.log(this.totalItems);
   }
+
 
   getAccountById(id: number) {
     this.accountService.getAccountById(id).subscribe(
@@ -76,6 +86,8 @@ export class ManageAccountComponent implements OnInit {
   toggleActiveStatus(account: GetAccountDTO): void {
     const newStatus = !account.isActive;
     account.isActive = newStatus;
+
+    // Update the status on the server
     this.updateAccountStatus(account.accountId, newStatus);
   }
 
@@ -94,6 +106,7 @@ export class ManageAccountComponent implements OnInit {
         this.errorMessage = 'Error updating account status.';
         console.error('Error updating account status:', error);
 
+        // Optionally revert the change if the update fails
         const account = this.accounts.find(acc => acc.accountId === id);
         if (account) {
           account.isActive = !isActive;
@@ -101,4 +114,38 @@ export class ManageAccountComponent implements OnInit {
       }
     );
   }
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.itemsPerPage);
+  }
+  onPreviousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadAccounts();
+    }
+  }
+
+  onNextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadAccounts();
+    }
+  }
+
+  paginateData(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    if (this.accounts) {
+      this.accounts = this.accounts.slice(startIndex, endIndex);
+    }
+  }
+  goToDesiredPage(): void {
+    if (this.currentPage >= 1 && this.currentPage <= this.totalPages) {
+      this.loadAccounts();
+    } else {
+      // Xử lý thông báo lỗi nếu số trang nhập không hợp lệ
+      console.log('Invalid page number');
+    }
+  }
+
+
 }

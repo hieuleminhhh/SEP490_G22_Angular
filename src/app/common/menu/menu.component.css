@@ -6,7 +6,7 @@ body {
   font-weight: 400;
   font-size: 14px;
   color: #2e2e2e;
-  background-color: wheat;
+  background-color: rgb(244, 244, 244);
   min-height: 80vh; /* Chiều cao tối thiểu bằng chiều cao của cửa sổ trình duyệt */
   margin: 0; /* Loại bỏ margin mặc định để tránh khoảng trắng không cần thiết */
   box-sizing: border-box; /* Đảm bảo padding và border không làm thay đổi kích thước của phần tử */
