@@ -32,46 +32,48 @@ export class LoginComponent implements OnInit {
     this.accountService.login(this.username, this.password).subscribe({
       next: response => {
         console.log('Login successful');
-        console.log(response.token);
-        console.log(response.role);
-        console.log(response.accountId);
-
-        // Lưu token và vai trò vào localStorage
+        console.log('Token:', response.token);
+        console.log('Role:', response.role);
+        console.log('Account ID:', response.accountId);
+  
+        // Store token and role in localStorage
         localStorage.setItem('token', response.token);
-
-        // Lưu accountId vào dịch vụ
-        this.accountService.setAccountId(response.accountId);
-
-        const userRole = response.role;
-
-        switch (userRole) {
-          case 'Chef':
-            this.router.navigate(['/cooking']);
-            break;
-          case 'Cashier':
-            this.router.navigate(['/dashboard']);
-            break;
-          case 'Admin':
-            this.router.navigate(['/setting']);
-            break;
-          case 'Manager':
-            this.router.navigate(['/manager']);
-            break;
-          case 'Order Staff':
-            this.router.navigate(['/listTable']);
-            break;
-          case 'Ship':
-            this.router.navigate(['/ship']);
-            break;
-          default:
-            console.error('Unknown role:', userRole);
-            break;
-        }
+  
+        localStorage.setItem('accountId', response.accountId.toString());
+  
+        // Handle user roles and navigate accordingly
+        this.handleUserRole(response.role);
       },
       error: error => {
         console.error('Login failed', error);
       }
     });
+  }
+  
+  handleUserRole(role: string) {
+    switch (role) {
+      case 'Chef':
+        this.router.navigate(['/cooking']);
+        break;
+      case 'Cashier':
+        this.router.navigate(['/dashboard']);
+        break;
+      case 'Admin':
+        this.router.navigate(['/setting']);
+        break;
+      case 'Manager':
+        this.router.navigate(['/manager']);
+        break;
+      case 'OrderStaff':
+        window.location.href = '/listTable';
+        break;
+      case 'Ship':
+        this.router.navigate(['/ship']);
+        break;
+      default:
+        console.error('Unknown role:', role);
+        break;
+    }
   }
   
 

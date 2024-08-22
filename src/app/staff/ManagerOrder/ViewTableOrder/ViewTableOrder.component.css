@@ -88,4 +88,21 @@
     padding: 5px;
     margin-bottom: 20px;
   }
-  
+    /* CSS cho tiêu đề */
+.title-header {
+  font-size: 2rem; /* Kích thước chữ lớn hơn */
+  font-weight: bold; /* Đậm chữ */
+  color: #004d99; /* Màu xanh đậm để nổi bật */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); /* Tạo hiệu ứng bóng mờ */
+  margin-bottom: 2rem; /* Tăng khoảng cách dưới tiêu đề */
+  letter-spacing: 1px; /* Tăng khoảng cách giữa các chữ cái */
+  text-transform: uppercase; /* Chữ in hoa để tạo sự nổi bật */
+  font-family: 'Arial', sans-serif; /* Sử dụng font chữ đẹp và dễ đọc */
+}
+main {
+  padding-top: 2rem; /* Thêm khoảng cách phía trên nội dung chính nếu cần thiết */
+}
+body:not(.sidebar-visible) main {
+  margin-left: 0; /* Xóa khoảng cách bên trái khi không có sidebar */
+  width: 100%; /* Đảm bảo chiều rộng 100% khi không có sidebar */
+}

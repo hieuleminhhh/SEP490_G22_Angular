@@ -1,4 +1,5 @@
 <body>
+  <app-HeaderOrderStaff *ngIf="!showSidebar"></app-HeaderOrderStaff>
   <div class="container-fluid">
     <div class="row">
       <!-- Sidebar -->
@@ -9,9 +10,8 @@
 
       <!-- Main Content -->
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        
         <section>
-          <h2 class="text-center mb-4">Danh sách bàn tại quán</h2>
+          <h2 class="text-center mb-4 title-header">Danh sách bàn tại quán</h2>
 
           <!-- Move the select dropdown here -->
           <div class="mb-3 text-center"> <!-- Added a wrapper div to center the dropdown -->

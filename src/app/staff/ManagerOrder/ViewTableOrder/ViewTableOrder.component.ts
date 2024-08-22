@@ -5,13 +5,20 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarOrderComponent } from "../../SidebarOrder/SidebarOrder.component";
 import { AccountService } from '../../../../service/account.service';
+import { JwtInterceptor } from '../../../../jwt.interceptor';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HeaderOrderStaffComponent } from '../HeaderOrderStaff/HeaderOrderStaff.component';
 
 @Component({
     selector: 'app-ViewTableOrder',
     templateUrl: './ViewTableOrder.component.html',
     styleUrls: ['./ViewTableOrder.component.css'],
     standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent]
+    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, HeaderOrderStaffComponent],
+    providers: [
+      { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+    ]
+  
 })
 export class ViewTableOrderComponent implements OnInit {
   tables: any[] = [];
@@ -20,22 +27,26 @@ export class ViewTableOrderComponent implements OnInit {
   selectedFloor = 1;
   selectedTable: string = 'all';
   dataTable: any;
-  accountId: number = 0;
+  accountId: number | null = null;
   account: any;
   showSidebar: boolean = true; 
   constructor(private tableService: TableService, private router: Router,
     private route: ActivatedRoute, private accountService: AccountService) { }
 
-  ngOnInit() {
-    this.accountId = this.accountService.getAccountId() || 0;
-    console.log('31',this.accountId);
-    if (this.accountId) {
-      this.getAccountDetails(this.accountId);
-      this.getTableData();
+    ngOnInit() {
+      // Retrieve accountId from localStorage and convert to number
+      const accountIdString = localStorage.getItem('accountId');
+      this.accountId = accountIdString ? Number(accountIdString) : null;
+    
+      console.log('31', this.accountId);
+    
+      if (this.accountId) {
+        this.getAccountDetails(this.accountId);
+        this.getTableData();
+      } else {
+        console.error('Account ID is not available');
+      }
     }
-    this.getTableData();
-
-  }
   getTableData(): void {
     this.tableService.getTables().subscribe(
       response => {
@@ -87,7 +98,7 @@ export class ViewTableOrderComponent implements OnInit {
         this.account = response;
         console.log('Account details:', this.account);
         console.log('Account role:', this.account.role);
-        this.showSidebar = this.account.role !== 'Order Staff';
+        this.showSidebar = this.account.role !== 'OrderStaff';
       },
       error => {
         console.error('Error fetching account details:', error);

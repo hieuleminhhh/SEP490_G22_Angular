@@ -1,0 +1,47 @@
+.header-order-staff {
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .bg-custom {
+    background-color: #5ab3ff; /* Màu xanh nhạt hơn */
+}
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+  }
+  
+  .navbar-brand img {
+    height: 40px;
+    margin-right: 10px;
+  }
+  
+  .navbar-brand span {
+    font-size: 1.5rem;
+    color: white;
+  }
+  
+  .nav-link {
+    color: white;
+  }
+  
+  .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+  
+  .user-info {
+    margin-left: 20px;
+  }
+  
+  .user-avatar {
+    height: 40px;
+    border-radius: 50%;
+    font-size: 2rem;
+    margin-top: 12px;
+  }
+  
+  .user-name {
+    color: white;
+    font-weight: 500;
+  }
+  
