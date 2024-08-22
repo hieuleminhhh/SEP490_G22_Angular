@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { Table, TableReservationResponse } from '../../../models/table.model';
 import { DatePipe } from '@angular/common';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
+import { HeaderOrderStaffComponent } from '../ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component';
 
 
 @Component({
@@ -18,7 +19,7 @@ import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currenc
   standalone: true,
   templateUrl: './tableManagement.component.html',
   styleUrls: ['./tableManagement.component.css'],
-  imports: [CommonModule, FormsModule, NgxPaginationModule, CurrencyFormatPipe],
+  imports: [CommonModule, FormsModule, NgxPaginationModule, CurrencyFormatPipe, HeaderOrderStaffComponent],
   providers: [DatePipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
