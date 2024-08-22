@@ -31,6 +31,7 @@ import { ManageAccountComponent } from './admin/manageAccount/manageAccount.comp
 import { OrderShipComponent } from './ship/order-ship/order-ship.component';
 import { ManageInvoiceComponent } from './staff/manage-invoice/manage-invoice.component';
 import { ManageNewComponent } from './manager/ManageNew/ManageNew.component';
+import { AuthGuard } from './auth/authGuard/authGuard.component';
 
 
 export const routes: Routes = [
@@ -54,7 +55,7 @@ export const routes: Routes = [
     {'path': 'createTakeaway', component:CreateTakeAwayOrderComponent},
     {'path': 'createOnline', component:CreateOnlineOrderComponent},
     {'path': 'cooking', component:CookingManagementComponent},
-    {'path': 'listTable', component:ViewTableOrderComponent},
+    {'path': 'listTable', component:ViewTableOrderComponent, canActivate: [AuthGuard]},
     {'path': 'createOffline', component:CreateOfflineOrderComponent},
     {'path': 'updateOffline' , component:UpdateOfflineOrderComponent},
     {'path': 'paymentSuccess' , component:PaymentSuccessComponent},
@@ -65,7 +66,7 @@ export const routes: Routes = [
     {'path': 'setting' , component: SettingComponent},
     {'path': 'manageAccount', component: ManageAccountComponent},
     {'path': 'shipping', component: OrderShipComponent},
-    {'path': 'invoice', component: ManageInvoiceComponent}
+    {'path': 'invoice', component: ManageInvoiceComponent},
     {'path': 'shipping', component: OrderShipComponent},
     {'path': 'manageNew', component: ManageNewComponent}
 ];

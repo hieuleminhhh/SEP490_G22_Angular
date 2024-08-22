@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { AddNewOrder, AddNewOrderResponse, ListAllOrder, ManagerOrderByTableId } from '../models/order.model';
 import { AddNewAddress, Address } from '../models/address.model';
+import { AuthService } from './auth.service';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -14,7 +15,7 @@ const httpOptions = {
 export class ManagerOrderService {
     private apiUrl = 'https://localhost:7188/api';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { }
   ListOrders(page: number = 1, pageSize: number = 10, search: string = '', dateFrom: string = '', dateTo: string = '', status: number = 0, filterByDate: string = '', type: number = 0): Observable<ListAllOrder> {
     let params = new HttpParams()
         .set('page', page.toString())
@@ -52,7 +53,11 @@ export class ManagerOrderService {
   }
   createOrderOffline(orderData: any): Observable<any> {
     const url = `${this.apiUrl}/orders/createOrderForTable/${orderData.tableId}`;
-    return this.http.post<any>(url, orderData, httpOptions);
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.post<any>(url, orderData, { headers });
   }
   updateOrderOffline(tableId: number, dto: any): Observable<any> {
     const url = `${this.apiUrl}/orders/updateOrderDetails/${tableId}`;
