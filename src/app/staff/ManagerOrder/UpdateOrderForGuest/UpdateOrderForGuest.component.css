@@ -463,6 +463,14 @@ input.rounded-input {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Tăng cường hiệu ứng bóng khi hover */
   transform: translateY(-2px); /* Nâng nút lên khi hover */
   }
+  body:not(.sidebar-visible) main {
+    margin-left: 0; /* Xóa khoảng cách bên trái khi không có sidebar */
+    width: 100%; /* Đảm bảo chiều rộng 100% khi không có sidebar */
+  }
+  
+  body.sidebar-visible main {
+    margin-left: 250px; 
+  }
   
 
   
