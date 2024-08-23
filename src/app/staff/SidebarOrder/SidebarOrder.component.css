@@ -2,8 +2,31 @@
   list-style: none; /* Remove bullet points */
   padding: 0; /* Remove default padding */
   margin: 0; /* Remove default margin */
+  width: 130px; /* Set width for each item */
+  background-color: white; /* Background color */
 }
-.li{
-  width: 130px;
-  background-color: white;
+
+.nav-item a.nav-link {
+  padding: 10px; /* Add padding to links */
+  border-radius: 5px; /* Rounded corners */
+  transition: background-color 0.3s; /* Smooth transition */
+  border: 1px solid black;
+}
+
+.nav-item a.nav-link:hover {
+  background-color: #f0f0f0; /* Background color on hover */
+}
+
+.nav-item a.nav-link.active {
+  color: #fff; /* Active link color */
+  background-color:  cornflowerblue; /* Background color for active link */
+  border-bottom: 2px solid #fff; /* Bottom border for active link */
+}
+
+.nav-item ul.nav {
+  padding-left: 15px; /* Indentation for nested items */
+}
+
+.collapse.show {
+  background-color: #f8f9fa; /* Background color for collapsed menu */
 }

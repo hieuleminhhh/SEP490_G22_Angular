@@ -17,8 +17,12 @@ export class OrderShipComponent implements OnInit {
   constructor(private cookingService:CookingService) { }
   deliveryOrders: any[] = [];
   selectedItem: any;
+  accountId: any;
   ngOnInit() {
-    this.getListShip(1);
+    const accountIdString = localStorage.getItem('accountId');
+    this.accountId = accountIdString ? Number(accountIdString) : null;
+
+    this.getListShip(this.accountId);
   }
   showDetails(order: any) {
     console.log(order);

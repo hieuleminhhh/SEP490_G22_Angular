@@ -26,14 +26,14 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 export class ManagerDishComponent implements OnInit {
   @ViewChild('addDishModal') addDishModal!: ElementRef;
   @ViewChild('updateDishModal') updateDishModal!: ElementRef;
-  
+
   dishes: ListAllDishes[] = [];
   categories: Category[] = [];
   totalPagesArray: number[] = [];
   updatedDish: UpdateDish = {
     dishId: 0,
-    itemName: '', 
-    itemDescription: '', 
+    itemName: '',
+    itemDescription: '',
     price: null as number | null,
     imageUrl: '',
     categoryId: 0,
@@ -49,15 +49,16 @@ export class ManagerDishComponent implements OnInit {
     message: '',
   };
   imageUrl: string = '';
-  search: string = '';  
+  search: string = '';
   currentPage: number = 1;
   pageSize: number = 5;
   totalCount: number = 0;
   selectedFile: File | null = null;
   selectedUpdateFile: File | null = null;
-  addErrorMessage: string = ''; 
+  addErrorMessage: string = '';
   updateErrorMessage: string = '';
   successMessage: string = '';
+  searchCategory: string = '';
   addErrors = {
     itemNameError: '',
     descriptionError: '',
@@ -80,8 +81,8 @@ export class ManagerDishComponent implements OnInit {
   }
 
   loadListDishes(search: string = ''): void {
-    console.log('Loading dishes with search term:', search); 
-    this.dishService.ListDishes(this.currentPage, this.pageSize, search).subscribe(
+    console.log('Loading dishes with search term:', search);
+    this.dishService.ListDishes(this.currentPage, this.pageSize, this.searchCategory, search).subscribe(
       (response: ListAllDishes) => {
         if (response && response.items) {
           this.dishes = [response];
@@ -100,7 +101,7 @@ export class ManagerDishComponent implements OnInit {
 
   onSearch(): void {
     this.currentPage = 1;
-    console.log('Search term:', this.search);  
+    console.log('Search term:', this.search);
     this.loadListDishes(this.search);
   }
 
@@ -168,7 +169,7 @@ onImageSelect(event: Event): void {
   const fileInput = event.target as HTMLInputElement;
   if (fileInput.files && fileInput.files.length > 0) {
     const file = fileInput.files[0];
-    
+
     // Optional: Validate file size (e.g., 2MB max)
     if (file.size > 2 * 1024 * 1024) {
       this.addErrors.imageError = 'File size exceeds 2MB';
@@ -238,7 +239,7 @@ onUpdateImageSelect(event: Event): void {
   if (fileInput.files && fileInput.files.length > 0) {
     this.selectedUpdateFile = fileInput.files[0];
     const imageUrl = URL.createObjectURL(this.selectedUpdateFile);
-    this.updatedDish.imageUrl = imageUrl;  
+    this.updatedDish.imageUrl = imageUrl;
   }
 }
 
@@ -350,11 +351,11 @@ resetForm(): void {
 }
 
 resetUpdateForm(): void {
-  this.updatedDish = { 
+  this.updatedDish = {
     dishId: 0,
-    itemName: '', 
-    itemDescription: '', 
-    price: 0, 
+    itemName: '',
+    itemDescription: '',
+    price: 0,
     imageUrl: '',
     categoryId: 0,
     message: '',
@@ -376,7 +377,7 @@ updateDishStatus(dishId: number, isActive: boolean): void {
   this.dishService.UpdateDishStatus(dishId, isActive).subscribe(
     (response) => {
       console.log('Dish status updated successfully:', response);
-      this.loadListDishes(); 
+      this.loadListDishes();
     },
     (error) => {
       console.error('Error updating dish status:', error);

@@ -4,13 +4,14 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 import { switchMap } from 'rxjs';
+import { HeaderOrderStaffComponent } from "../ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 
 @Component({
   selector: 'app-fill-dish',
   standalone: true,
   templateUrl: './fill-dish.component.html',
   styleUrls: ['./fill-dish.component.css'],
-  imports: [CommonModule, FormsModule, CurrencyFormatPipe]
+  imports: [CommonModule, FormsModule, CurrencyFormatPipe, HeaderOrderStaffComponent]
 })
 export class FillDishComponent implements OnInit {
 
@@ -26,6 +27,7 @@ export class FillDishComponent implements OnInit {
   deliveryOrders: any[] = [];
   takeawayOrders: any[] = [];
   dataShipStaff: any;
+  isAnyOrderSelected: boolean = false;
   constructor(private cookingService: CookingService) { }
 
   ngOnInit(): void {
@@ -140,32 +142,25 @@ export class FillDishComponent implements OnInit {
   }
 
   deleteLocalStorageItemsByName(name: string): void {
-    const allKeys = Object.keys(localStorage);
-    let isDeleted = false;
+    const value = localStorage.getItem('completedDishes');
 
-    for (const key of allKeys) {
-      const value = localStorage.getItem(key);
-
-      if (value) {
-        const items = JSON.parse(value);
-        if (Array.isArray(items)) {
-          const updatedItems = items.filter((item: any) => !item.itemNameOrComboName.includes(name));
-          if (updatedItems.length !== items.length) {
-            isDeleted = true;
-            localStorage.setItem(key, JSON.stringify(updatedItems));
-          }
+    if (value) {
+      const items = JSON.parse(value);
+      if (Array.isArray(items)) {
+        const updatedItems = items.filter((item: any) => !item.itemNameOrComboName.includes(name));
+        if (updatedItems.length !== items.length) {
+          localStorage.setItem('completedDishes', JSON.stringify(updatedItems));
+          console.log(`Deleted items with name containing '${name}'`);
+        } else {
+          console.log(`No items found with name containing '${name}'`);
         }
       }
-    }
-
-    if (isDeleted) {
-      console.log(`Deleted items with name containing '${name}'`);
     } else {
-      console.log(`No items found with name containing '${name}'`);
+      console.log('No completedDishes found in localStorage');
     }
 
-    // In lại các mục sau khi xóa
-    console.log('Remaining items in localStorage:', Object.keys(localStorage).map(key => ({ key, value: localStorage.getItem(key) })));
+    // In lại các mục trong completedDishes sau khi xóa
+    console.log('Remaining completedDishes:', localStorage.getItem('completedDishes'));
   }
 
   private updateLocal(orderDetailId: number, dishesServed: number, itemNameOrComboName: string): void {
@@ -175,6 +170,7 @@ export class FillDishComponent implements OnInit {
 
     console.log('Completed Dishes:', localStorage.getItem('completedDishes'));
   }
+
 
   onButtonClick(buttonType: 'dineIn' | 'takeAway' | 'ship'): void {
     this.selectedButton = buttonType;
@@ -203,7 +199,7 @@ export class FillDishComponent implements OnInit {
 
   handleButtonClick(order: any) {
     const request = {
-      status : 4
+      status: 4
     };
 
     this.cookingService.updateOrderStatus(order.orderId, request).subscribe(
@@ -284,11 +280,13 @@ export class FillDishComponent implements OnInit {
   }
   updateAccountId(aId: any) {
     const request1 = {
-      status : 7
+      status: 7
     };
-    const request2 ={
-      accountId:aId
+    const request2 = {
+      accountId: aId
     }
+    console.log(aId);
+
     this.selectedOrders.forEach(order => {
       // Gọi API để cập nhật accountId cho đơn hàng
       this.cookingService.updateAccountForOrder(order.orderId, request2).pipe(
@@ -300,13 +298,13 @@ export class FillDishComponent implements OnInit {
       ).subscribe(
         statusResponse => {
           console.log(`Order ${order.orderId} status updated to 7 successfully`, statusResponse);
+          window.location.reload();
         },
         error => {
           console.error(`Error updating account or status for order ${order.orderId}:`, error);
         }
       );
-      this.selectedButton = 'ship';
-      this.refreshContent();
+
     });
   }
 
