@@ -23,8 +23,11 @@
     </nav>
   </aside>
   <main class="main-content">
-    <header>
 
+    <header>
+      <a href="javascript:history.back()" class="back-link">
+        <i class="fas fa-arrow-left back-icon"></i>
+      </a>
       <h2 *ngIf="currentView === 'table-layout'">Sơ đồ bàn</h2>
       <h2 *ngIf="currentView === 'booking-request'">Yêu cầu đặt bàn</h2>
       <h2 *ngIf="currentView === 'booking-schedule'">Lịch đặt bàn</h2>

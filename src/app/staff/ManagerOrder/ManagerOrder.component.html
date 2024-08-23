@@ -3,7 +3,7 @@
   <div class="container-fluid">
     <div class="row">
       <!-- Sidebar -->
-      
+
       <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
         <app-SidebarOrder></app-SidebarOrder>
       </nav>
@@ -93,8 +93,8 @@
                       data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">
                       Chi tiết
                     </button>
-                    <button *ngIf="(order.paymentStatus === 0 && order.status !== 5 && order.status !== 7) && 
-         !((order.status === 6 || order.status === 2) && order.paymentStatus === 0 && order.paymentMethods === 2)"
+                    <button *ngIf="(order.paymentStatus === 0 && order.status !== 5 && order.status !== 7) &&
+         !((order.status === 6 || order.status === 2|| order.status === 4) && order.paymentStatus === 0 && order.paymentMethods === 2)"
                       type="button" class="btn btn-warning btn-sm" (click)="updateOrder(order.orderId)">
                       Cập nhật
                     </button>
@@ -198,7 +198,7 @@
                   <div class="mb-3" *ngIf="orderDetail.recevingOrder && orderDetail?.type === 4">
                     <span class="fw-bold">Thời gian ra:</span> {{ orderDetail.recevingOrder | dateFormat }}
                   </div>
-                  
+
                   <!-- <div class="mb-3">
             <span class="fw-bold">Thanh toán:</span> {{ orderDetail.recevingOrder | dateFormat }}
           </div> -->
@@ -318,11 +318,6 @@
                     <button type="button" class="btn btn-primary me-2" *ngIf="!orderDetail?.invoiceId">In hóa đơn tạm</button>
                     <!-- (click)="printTemporaryInvoice()" -->
                   </ng-container>
-                  <ng-container
-                    *ngIf="orderDetail?.type === 2 && dishesServed === totalQuantity && orderDetail?.paymentMethods ===2">
-                    <button type="button" class="btn btn-primary me-2" *ngIf="orderDetail?.paymentStatus === 0"
-                      data-bs-target="#completeOrderModal" data-bs-toggle="modal">Hoàn thành</button>
-                  </ng-container>
 
                   <!-- Mang ve -->
                   <ng-container *ngIf="orderDetail?.type === 1 && orderDetail?.status === 2">
@@ -335,7 +330,7 @@
                   </ng-container>
 
                   <!-- Tai quan -->
-                  <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && orderDetail?.deposits === 0 && orderDetail?.paymentStatus == 0 && 
+                  <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && orderDetail?.deposits === 0 && orderDetail?.paymentStatus == 0 &&
           dishesServed !== totalQuantity ">
                     <button type="button" class="btn btn-success me-2" data-bs-toggle="modal"
                       data-bs-target="#prepaymentModalOffline">Thanh toán trước</button>
@@ -348,7 +343,7 @@
 
                   <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2) &&
           dishesServed === totalQuantity">
-                    <!-- && 
+                    <!-- &&
           dishesServed === totalQuantity -->
                     <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
                       data-bs-target="#paymentModalOffline">Hoàn thành</button>
