@@ -1,73 +1,106 @@
-<div class="container">
-  <h1 class="text-center">Quản lý tài khoản</h1>
-<br><br>
-  <!-- Search bar -->
-  <div class="row mb-3">
-    <div class="col-md-6">
-      <input type="text" class="form-control" placeholder="Tìm kiếm tài khoản..." style="width: 400px;" />
-    </div>
-    <div class="col-md-6 d-flex justify-content-end">
-      <button class="btn btn-primary">Thêm tài khoản mới</button>
-    </div>
+<app-HeaderOrderStaff></app-HeaderOrderStaff>
+
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+      <app-SidebarAdmin></app-SidebarAdmin>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <h1 class="text-center mb-4">Quản lý tài khoản</h1>
+
+      <!-- Search bar -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <input type="text" class="form-control" placeholder="Tìm kiếm tài khoản..." />
+        </div>
+        <div class="col-md-6 text-md-right">
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAccountModal">Thêm tài khoản mới</button>
+        </div>
+      </div>
+
+      <!-- Account table -->
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead class="thead-dark">
+            <tr>
+              <th>STT</th>
+              <th>Họ</th>
+              <th>Tên</th>
+              <th>Số điện thoại</th>
+              <th>Địa chỉ</th>
+              <th>Email</th>
+              <th>Tên tài khoản</th>
+              <th>Mật khẩu</th>
+              <th>Chức năng</th>
+              <th>Hoạt động</th>
+              <th>##</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let account of accounts; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ account.firstName }}</td>
+              <td>{{ account.lastName }}</td>
+              <td>{{ account.phone }}</td>
+              <td>{{ account.address }}</td>
+              <td>{{ account.email }}</td>
+              <td>{{ account.username }}</td>
+              <td>
+                <span class="d-flex align-items-center">
+                  <input [type]="showPasswordMap[i] ? 'text' : 'password'"
+                    [value]="account.password"
+                    class="form-control form-control-sm me-2"
+                    style="width: 150px;"
+                    readonly />
+                  <button type="button" class="btn btn-link p-0" (click)="togglePasswordVisibility(i)">
+                    <i [class]="showPasswordMap[i] ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+                  </button>
+                </span>
+              </td>
+              <td>{{ account.role }}</td>
+              <td>
+                <span [ngClass]="{'text-success': account.isActive, 'text-danger': !account.isActive}">
+                  {{ account.isActive ? 'Đang hoạt động' : 'Không hoạt động' }}
+                </span>
+                <input
+                  type="checkbox"
+                  [checked]="account.isActive"
+                  (change)="toggleActiveStatus(account)"
+                  class="ms-2"
+                />
+              </td>
+              <td>
+                <button class="btn btn-warning btn-sm">
+                  Cập nhập
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
   </div>
+</div>
 
-  <!-- Account table -->
-  <div class="table-responsive">
-    <table class="table table-bordered table-striped">
-      <thead class="thead-dark">
-        <tr>
-          <th>STT</th>
-          <th>Họ</th>
-          <th>Tên</th>
-          <th>Số điện thoại</th>
-          <th>Địa chỉ</th>
-          <th>Email</th>
-          <th>Tên tài khoản</th>
-          <th>Mật khẩu</th>
-          <th>Chức năng</th>
-          <th>Hoạt động</th>
-          <th>##</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let account of accounts; let i = index">
-          <td>{{ i + 1 }}</td>
-          <td>{{ account.firstName }}</td>
-          <td>{{ account.lastName }}</td>
-          <td>{{ account.phone }}</td>
-          <td>{{ account.address }}</td>
-          <td>{{ account.email }}</td>
-          <td>{{ account.username }}</td>
-          <td style="width: 200px;">
-            <span>
-              <input [type]="showPasswordMap[i] ? 'text' : 'password'" [value]="account.password"
-                class="form-control form-control-sm d-inline-block" style="width: 150px;" readonly />
-              <button type="button" class="btn btn-link p-0" (click)="togglePasswordVisibility(i)">
-                <i [class]="showPasswordMap[i] ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
-              </button>
-            </span>
-          </td>
-          <td>{{ account.role }}</td>
-          <td>
-            <span [ngClass]="{'active-status': account.isActive, 'inactive-status': !account.isActive}">
-              {{ account.isActive ? 'Đang hoạt động' : 'Không hoạt động' }}
-            </span>
-            <input
-              type="checkbox"
-              [checked]="account.isActive"
-              (change)="toggleActiveStatus(account)"
-              class="ml-2"
-            />
-          </td>
-
-          <td>
-            <button class="btn btn-warning btn-sm">
-              Cập nhập
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+<!-- Add Account Modal -->
+<div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addAccountModalLabel">Thêm tài khoản mới</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Your form for adding a new account here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary">Lưu thay đổi</button>
+      </div>
+    </div>
   </div>
   <div class="pagination" *ngIf="totalPages > 0">
     <button (click)="onPreviousPage()" [disabled]="currentPage === 1">

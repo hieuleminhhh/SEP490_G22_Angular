@@ -4,13 +4,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../../service/account.service';
 import { Observable } from 'rxjs';
+import { SidebarAdminComponent } from "../SidebarAdmin/SidebarAdmin.component";
+import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 
 @Component({
   selector: 'app-manageAccount',
   templateUrl: './manageAccount.component.html',
   styleUrls: ['./manageAccount.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, SidebarAdminComponent, HeaderOrderStaffComponent]
 })
 export class ManageAccountComponent implements OnInit {
 

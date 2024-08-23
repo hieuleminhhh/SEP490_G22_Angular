@@ -9,13 +9,14 @@ import { AddNewDish, ListAllDishes, ManagerDish, UpdateDish } from '../../../mod
 import { HeaderComponent } from "../Header/Header.component";
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
+import { SidebarAdminComponent } from "../../admin/SidebarAdmin/SidebarAdmin.component";
 
 @Component({
     selector: 'app-ManagerDish',
     templateUrl: './ManagerDish.component.html',
     styleUrls: ['./ManagerDish.component.css'],
     standalone: true,
-    imports: [SideBarComponent, RouterModule, CommonModule, FormsModule, HeaderComponent, CurrencyFormatPipe, HeaderOrderStaffComponent]
+    imports: [SideBarComponent, RouterModule, CommonModule, FormsModule, HeaderComponent, CurrencyFormatPipe, HeaderOrderStaffComponent, SidebarAdminComponent]
 })
 export class ManagerDishComponent implements OnInit {
   @ViewChild('addDishModal') addDishModal!: ElementRef;

@@ -1,0 +1,49 @@
+/* Adjust sidebar width and styling */
+#sidebarMenu {
+    width: 250px; /* Set a fixed width */
+    background-color: #f8f9fa; /* Light background color */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+  }
+  
+  /* Style for the navigation links */
+  #sidebarMenu .nav-link {
+    display: flex;
+    align-items: center; /* Center items vertically */
+    padding: 10px 15px; /* Add padding */
+    color: #333; /* Text color */
+    font-weight: 500; /* Medium font weight */
+    border-radius: 4px; /* Rounded corners */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+  }
+  
+  /* Hover effect */
+  #sidebarMenu .nav-link:hover {
+    background-color: #e9ecef; /* Light hover background */
+    color: #62a6ee; /* Primary color on hover */
+  }
+  
+  /* Active link styling */
+  #sidebarMenu .nav-link.active {
+    background-color: #62a6ee; /* Highlight color for active link */
+    color: #fff; /* White text color for active link */
+  }
+  
+  /* Adjust icon size and alignment */
+  /* Đảm bảo biểu tượng không bị che bởi thuộc tính CSS khác */
+  #sidebarMenu .nav-link i {
+    font-size: 18px; /* Kích thước biểu tượng */
+    margin-right: 10px; /* Khoảng cách giữa biểu tượng và văn bản */
+    line-height: 1.5; /* Căn chỉnh biểu tượng với văn bản */
+    vertical-align: middle; /* Căn chỉnh theo chiều dọc */
+  }
+  
+  /* Prevent text wrapping and handle overflow */
+  #sidebarMenu .nav-item {
+    white-space: nowrap;
+  }
+  
+  #sidebarMenu .nav-link {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
