@@ -39,12 +39,20 @@
   flex-direction: column;
   align-items: center;
 }
+.logo-image {
+  width: 150px; /* Adjust size as needed */
+  height: auto; 
+  max-width: 100%;
+  border-radius: 50%; /* Optional: make the logo circular */
+  object-fit: cover; /* Ensure the logo fits well within the specified width/height */
+}
 
 .user-avatar {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 
 .user-avatar img {
   width: 200px;
@@ -178,4 +186,14 @@
 .update-icon.disabled {
   pointer-events: none; /* Ngăn chặn hành vi nhấp chuột */
   opacity: 0.5; /* Làm mờ phần tử */
+}
+.small-input {
+  width: 50%; /* Adjust width as needed */
+  padding: 5px; /* Adjust padding as needed */
+  font-size: 0.875rem; /* Smaller font size */
+  border-radius: 5px;
+}
+
+.small-input:hover {
+  border-color: #007bff;
 }

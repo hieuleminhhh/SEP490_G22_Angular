@@ -28,4 +28,14 @@ export class SettingService {
     const url = `https://localhost:7188/api/Setting/1`;
     return this.http.put(url, request, this.getHttpOptions());
   }
+  UploadImage(image: File): Observable<{ imageUrl: string }> {
+    const formData = new FormData();
+    formData.append('image', image);
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.post<{ imageUrl: string }>(`https://localhost:7188/api/Image/upload`, formData, { headers });
+  }
+
 }

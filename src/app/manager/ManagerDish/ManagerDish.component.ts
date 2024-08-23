@@ -59,6 +59,7 @@ export class ManagerDishComponent implements OnInit {
   updateErrorMessage: string = '';
   successMessage: string = '';
   searchCategory: string = '';
+  searchCategory: string = '';
   addErrors = {
     itemNameError: '',
     descriptionError: '',
