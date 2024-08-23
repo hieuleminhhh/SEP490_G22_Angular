@@ -2,12 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CookingService } from '../../../service/cooking.service';
+import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 
 @Component({
   selector: 'app-cooking-management',
   standalone: true,
   templateUrl: './cooking-management.component.html',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, HeaderOrderStaffComponent],
   styleUrls: ['./cooking-management.component.css']
 })
 export class CookingManagementComponent implements OnInit {

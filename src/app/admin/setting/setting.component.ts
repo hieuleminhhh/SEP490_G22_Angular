@@ -3,13 +3,15 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SettingService } from '../../../service/setting.service';
 import { ManagerDishService } from '../../../service/managerdish.service';
+import { SidebarAdminComponent } from "../SidebarAdmin/SidebarAdmin.component";
+import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 
 @Component({
   selector: 'app-setting',
   standalone: true,
   templateUrl: './setting.component.html',
   styleUrls: ['./setting.component.css'],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule]
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, SidebarAdminComponent, HeaderOrderStaffComponent]
 })
 export class SettingComponent implements OnInit {
 

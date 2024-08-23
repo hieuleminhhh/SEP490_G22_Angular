@@ -16,7 +16,8 @@ export class LoginComponent implements OnInit {
   username: string = '';
   password: string = '';
   token: string = '';
-
+  errorMessage: string | null = null; 
+  successMessage: string | null = null;
   constructor(private accountService: AccountService,  private router: Router) { 
     this.accountService.isLoggedIn().subscribe({
       next: loggedIn => {
@@ -35,17 +36,23 @@ export class LoginComponent implements OnInit {
         console.log('Token:', response.token);
         console.log('Role:', response.role);
         console.log('Account ID:', response.accountId);
-  
+
         // Store token and role in localStorage
         localStorage.setItem('token', response.token);
-  
         localStorage.setItem('accountId', response.accountId.toString());
-  
+
         // Handle user roles and navigate accordingly
         this.handleUserRole(response.role);
+        this.successMessage = 'Đăng nhập thành công!';
+    
+        this.errorMessage = null;
+        setTimeout(() => {
+          //
+        }, 2000); 
       },
       error: error => {
         console.error('Login failed', error);
+        this.errorMessage = 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.';
       }
     });
   }
@@ -68,7 +75,7 @@ export class LoginComponent implements OnInit {
         window.location.href = '/listTable';
         break;
       case 'Ship':
-        window.location.href = '/ship';
+        window.location.href ='/shipping';
         break;
       default:
         console.error('Unknown role:', role);

@@ -5,7 +5,7 @@
   .bg-custom {
     background-color: #5ab3ff; /* Màu xanh nhạt hơn */
 }
-  .navbar-brand {
+  .avbar-brand {
     display: flex;
     align-items: center;
   }
@@ -43,5 +43,49 @@
   .user-name {
     color: white;
     font-weight: 500;
+    font-size: 1rem; /* Adjust the font size as needed */
+    margin-left: 8px; /* Adjust spacing between avatar and name */
+  }
+  .header-order-staff .nav-link {
+    cursor: pointer;
+  }
+  .dropdown-menu-container {
+    position: relative;
+    margin-left: 20px;
+    margin-bottom: -80px;
+  }
+  
+  .dropdown-menu {
+    display: none; /* Initially hidden */
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 200px; /* Adjust the width of the dropdown menu */
+  }
+  
+  
+  .dropdown-menu.show {
+    display: block;
+  }
+  .dropdown-item {
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    display: block;
+  }
+  .dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #007bff; /* Change color on hover if desired */
+    border-radius: 4px;
+  }
+  #utk{
+    cursor: pointer;
   }
   
