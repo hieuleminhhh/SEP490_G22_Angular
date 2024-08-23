@@ -1,6 +1,6 @@
 <header class="header-order-staff navbar navbar-expand-lg navbar-dark bg-custom">
   <div class="container-fluid">
-    <a class="navbar-brand logo" href="#">
+    <a class="navbar-brand logo">
       <img src="https://localhost:7188/api/Image/getImage/logoEat.png" alt="Logo" />
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -14,10 +14,85 @@
           </a>
         </li>
       </ul>
-      <div class="user-info d-flex align-items-center ms-3">
-        <i class="fas fa-user-circle user-avatar"></i>
-        <span class="user-name ms-2">{{account?.username}}</span>
+      <div class="user-info d-flex align-items-center ms-3" id="utk">
+        <i class="fas fa-user-circle user-avatar" (click)="toggleDropdown()"></i>
+        <span class="user-name ms-2" (click)="toggleDropdown()">{{account?.username}}</span>
+        <div class="dropdown-menu-container">
+          <ul class="dropdown-menu" [class.show]="dropdownOpen">
+            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">Xem thông tin</a></li>
+            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Đổi mật khẩu</a></li>
+          </ul>
+        </div>
       </div>
+      
+      
     </div>
   </div>
 </header>
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="profileModalLabel">Thông tin cá nhân</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Profile details here -->
+        <div class="mb-3">
+          <label for="firstName" class="form-label">Họ</label>
+          <input type="text" class="form-control" id="firstName" [(ngModel)]="account.firstName">
+        </div>
+        <div class="mb-3">
+          <label for="lastName" class="form-label">Tên</label>
+          <input type="text" class="form-control" id="lastName" [(ngModel)]="account.lastName">
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" [(ngModel)]="account.email">
+        </div>
+        <div class="mb-3">
+          <label for="address" class="form-label">Địa chỉ</label>
+          <input type="text" class="form-control" id="address" [(ngModel)]="account.address">
+        </div>
+        <div class="mb-3">
+          <label for="phone" class="form-label">Số điện thoại</label>
+          <input type="tel" class="form-control" id="phone" [(ngModel)]="account.phone">
+        </div>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" (click)="saveProfile()">Lưu</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- change pass -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changePasswordModalLabel">Đổi mật khẩu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="currentPassword">Mật khẩu hiện tại:</label>
+          <input type="password" id="currentPassword" class="form-control" placeholder="Nhập mật khẩu hiện tại">
+        </div>
+        <div class="form-group">
+          <label for="newPassword">Mật khẩu mới:</label>
+          <input type="password" id="newPassword" class="form-control" placeholder="Nhập mật khẩu mới">
+        </div>
+        <div class="form-group">
+          <label for="confirmNewPassword">Xác nhận mật khẩu mới:</label>
+          <input type="password" id="confirmNewPassword" class="form-control"  placeholder="Xác nhận mật khẩu mới">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" (click)="changePassword()">Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,113 +1,124 @@
-<div class="container">
-  <div class="row gutters" *ngIf="info">
-    <div class="title">
-      Quản lý thông tin quán ăn
-    </div>
-    <br>
-    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12">
-      <div class="card h-100 profile-card">
-        <div class="card-body">
-          <div class="account-settings">
-            <div class="user-profile">
-              <div class="user-avatar">
-                <img [src]="info[0].logo" alt="Logo" class="logo-image">
+<app-HeaderOrderStaff></app-HeaderOrderStaff>
+
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+      <app-SidebarAdmin></app-SidebarAdmin>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <h1 class="text-center mb-4">Thông tin quán ăn</h1>
+
+      <div class="row gutters" *ngIf="info">
+        <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12 mb-4">
+          <div class="card h-100 profile-card">
+            <div class="card-body">
+              <div class="account-settings">
+                <div class="user-profile text-center">
+                  <div class="user-avatar">
+                    <img [src]="info[0].logo" alt="Logo" class="logo-image">
+                  </div>
+                  <button class="btn btn-primary mt-3" (click)="fileInputLogo.click()">
+                    Đổi logo
+                    <input type="file" #fileInputLogo (change)="onUpdateLogoSelect($event)" style="display: none;">
+                  </button>
+                </div>
               </div>
-              <br>
-              <button class="button-custom" (click)="fileInputLogo.click()">Đổi logo
-                <input type="file" #fileInputLogo (change)="onUpdateLogoSelect($event)" style="display: none;">
-              </button>
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12">
-      <div class="card h-100 details-card">
-        <div class="card-body">
-          <div class="row gutters">
-            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-              <div class="form-group">
-                <label for="fullName">Tên quán ăn</label>
-                <input type="text" class="form-control" id="fullName" [(ngModel)]="info[0].eateryName"
-                  [readonly]="!isEditing">
-              </div>
-            </div>
-            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-              <div class="form-group">
-                <label for="eMail">Địa chỉ</label>
-                <input type="text" class="form-control" id="eMail" [(ngModel)]="info[0].address"
-                  [readonly]="!isEditing">
-              </div>
-            </div>
-            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-              <div class="form-group">
-                <label for="phone">Số điện thoại</label>
-                <input type="text" class="form-control" id="phone" [(ngModel)]="info[0].phone" [readonly]="!isEditing">
-              </div>
-            </div>
-            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-              <div class="form-group">
-                <label for="website">Email</label>
-                <input type="email" class="form-control" id="website" [(ngModel)]="info[0].email"
-                  [readonly]="!isEditing">
-              </div>
-            </div>
-          </div>
-          <div class="row gutters">
-            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-              <div class="form-group">
-                <label for="Street">Giờ mở cửa</label>
-                <input type="text" class="form-control" id="Street" [(ngModel)]="info[0].openTime"
-                  [readonly]="!isEditing">
-              </div>
-            </div>
-            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-              <div class="form-group">
-                <label for="ciTy">Giờ đóng cửa</label>
-                <input type="text" class="form-control" id="ciTy" [(ngModel)]="info[0].closeTime"
-                  [readonly]="!isEditing">
-              </div>
-            </div>
-            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-              <div class="form-group">
-                <label for="sTate">Mã QR ngân hàng
-                  <span class="update-icon"
-                        (click)="fileInputQRCode.click()"
-                        [ngClass]="{'disabled': !isEditing}">
-                    <i class="fas fa-upload"></i>
-                  </span>
-                  <input type="file" #fileInputQRCode (change)="onUpdateImageSelect($event)" style="display: none;">
-                </label>
-                <div class="qr-code-container">
-                  <img [src]="info.qrcode" alt="QR Code">
+        <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12">
+          <div class="card h-100 details-card">
+            <div class="card-body">
+              <div class="row gutters">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-3">
+                  <div class="form-group">
+                    <label for="eateryName">Tên quán ăn</label>
+                    <input type="text" class="form-control" id="eateryName" [(ngModel)]="info[0].eateryName"
+                      [readonly]="!isEditing">
+                  </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-3">
+                  <div class="form-group">
+                    <label for="address">Địa chỉ</label>
+                    <input type="text" class="form-control" id="address" [(ngModel)]="info[0].address"
+                      [readonly]="!isEditing">
+                  </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-3">
+                  <div class="form-group">
+                    <label for="phone">Số điện thoại</label>
+                    <input type="text" class="form-control" id="phone" [(ngModel)]="info[0].phone" [readonly]="!isEditing">
+                  </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-3">
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" [(ngModel)]="info[0].email"
+                      [readonly]="!isEditing">
+                  </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-3">
+                  <div class="form-group">
+                    <label for="openTime">Giờ mở cửa</label>
+                    <input type="text" class="form-control" id="openTime" [(ngModel)]="info[0].openTime"
+                      [readonly]="!isEditing">
+                  </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-3">
+                  <div class="form-group">
+                    <label for="closeTime">Giờ đóng cửa</label>
+                    <input type="text" class="form-control" id="closeTime" [(ngModel)]="info[0].closeTime"
+                      [readonly]="!isEditing">
+                  </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-3">
+                  <div class="form-group">
+                    <label for="qrcode">
+                      Mã QR ngân hàng
+                      <span class="update-icon" (click)="fileInputQRCode.click()" [ngClass]="{'disabled': !isEditing}">
+                        <i class="fas fa-upload"></i>
+                      </span>
+                      <input type="file" #fileInputQRCode (change)="onUpdateImageSelect($event)" style="display: none;">
+                    </label>
+                    <div class="qr-code-container mt-2">
+                      <img [src]="info.qrcode" alt="QR Code" class="img-fluid">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12 mb-3">
+                  <div class="form-group">
+                    <label for="linkContact">Website URL</label>
+                    <input type="text" class="form-control" id="linkContact" [(ngModel)]="info[0].linkContact"
+                      [readonly]="!isEditing">
+                  </div>
                 </div>
               </div>
 
-            </div>
-            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-              <div class="form-group">
-                <label for="zIp">Website URL</label>
-                <input type="text" class="form-control" id="zIp" [(ngModel)]="info[0].linkContact"
-                  [readonly]="!isEditing">
-              </div>
-            </div>
-          </div>
-          <div class="row gutters">
-            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-              <div class="text-right">
-                <button *ngIf="!isEditing" type="button" id="update" name="update" class="btn btn-primary"
-                  (click)="enableEditing()">Cập nhật</button>
-                <button *ngIf="isEditing" type="button" id="save" name="save" class="btn btn-success"
-                  (click)="saveChanges()">Lưu</button>
-                <button *ngIf="isEditing" type="button" id="cancel" name="cancel" class="btn btn-danger"
-                  (click)="cancelEditing()">Hủy</button>
+              <div class="row gutters">
+                <div class="col-12 text-end">
+                  <button *ngIf="!isEditing" type="button" id="update" name="update" class="btn btn-primary"
+                    (click)="enableEditing()">Cập nhật</button>
+                  <button *ngIf="isEditing" type="button" id="save" name="save" class="btn btn-success"
+                    (click)="saveChanges()">Lưu</button>
+                  <button *ngIf="isEditing" type="button" id="cancel" name="cancel" class="btn btn-danger"
+                    (click)="cancelEditing()">Hủy</button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-
+    </main>
   </div>
 </div>

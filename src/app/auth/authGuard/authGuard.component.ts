@@ -23,8 +23,34 @@ export class AuthGuard implements CanActivate {
       if (url === 'managerorder' && user.role === 'Cashier') {
         return true; 
       }
+      if (url === 'managerorder' && user.role === 'Cashier') {
+        return true; 
+      }
+      if (url === 'createOffline' && user.role === 'Cashier' || user.role === 'OrderStaff') {
+        return true; 
+      }
+      if (url === 'updateOffline' && user.role === 'Cashier' || user.role === 'OrderStaff') {
+        return true; 
+      }
+      if (url === 'updateOffline' && user.role === 'Cashier' || user.role === 'OrderStaff') {
+        return true; 
+      }
+      if (url === 'createTakeaway' && user.role === 'Cashier') {
+        return true; 
+      }
+      if (url === 'createOnline' && user.role === 'Cashier') {
+        return true; 
+      }
+      if (url === 'manageDiscount' && user.role === 'Manager') {
+        return true; 
+      } 
+      if (url === 'managerdish' && user.role === 'Manager') {
+        return true; 
+      } 
+      if (url === 'managercombo' && user.role === 'Manager') {
+        return true; 
+      } 
     }
-
     this.router.navigate(['/login']); 
     return false;
   }

@@ -17,6 +17,7 @@ export class HeaderOrderStaffComponent implements OnInit {
   constructor(  private router: Router,
     private route: ActivatedRoute,private accountService: AccountService ) { }
     account: any;
+    dropdownOpen = false;
   ngOnInit() {
     const accountIdString = localStorage.getItem('accountId');
       this.accountId = accountIdString ? Number(accountIdString) : null;
@@ -43,5 +44,25 @@ export class HeaderOrderStaffComponent implements OnInit {
         console.error('Error fetching account details:', error);
       }
     );
+  }
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+  changePassword() {
+    this.dropdownOpen = false;  // Đóng menu sau khi chọn
+  }
+  saveProfile() {
+    if (this.accountId) {
+      this.accountService.updateAccount(this.accountId, this.account).subscribe({
+        next: (updatedAccount) => {
+          console.log('Profile updated successfully:', updatedAccount);
+        },
+        error: (error) => {
+          console.error('Error updating profile:', error);
+        }
+      });
+    } else {
+      console.error('No account ID provided');
+    }
   }
 }

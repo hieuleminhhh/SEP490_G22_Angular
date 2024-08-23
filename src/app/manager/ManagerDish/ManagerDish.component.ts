@@ -9,17 +9,24 @@ import { AddNewDish, ListAllDishes, ManagerDish, UpdateDish } from '../../../mod
 import { HeaderComponent } from "../Header/Header.component";
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
+import { SidebarAdminComponent } from "../../admin/SidebarAdmin/SidebarAdmin.component";
+import { JwtInterceptor } from '../../../jwt.interceptor';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 @Component({
     selector: 'app-ManagerDish',
     templateUrl: './ManagerDish.component.html',
     styleUrls: ['./ManagerDish.component.css'],
     standalone: true,
-    imports: [SideBarComponent, RouterModule, CommonModule, FormsModule, HeaderComponent, CurrencyFormatPipe, HeaderOrderStaffComponent]
+    imports: [SideBarComponent, RouterModule, CommonModule, FormsModule, HeaderComponent, CurrencyFormatPipe, HeaderOrderStaffComponent, SidebarAdminComponent],
+    providers: [
+      { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+    ]
 })
 export class ManagerDishComponent implements OnInit {
   @ViewChild('addDishModal') addDishModal!: ElementRef;
   @ViewChild('updateDishModal') updateDishModal!: ElementRef;
+  
   dishes: ListAllDishes[] = [];
   categories: Category[] = [];
   totalPagesArray: number[] = [];

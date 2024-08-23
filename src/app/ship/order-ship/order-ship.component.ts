@@ -3,13 +3,14 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 import { CookingService } from '../../../service/cooking.service';
+import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 
 @Component({
   selector: 'app-order-ship',
   standalone: true,
   templateUrl: './order-ship.component.html',
   styleUrls: ['./order-ship.component.css'],
-  imports: [CommonModule, FormsModule, CurrencyFormatPipe]
+  imports: [CommonModule, FormsModule, CurrencyFormatPipe, HeaderOrderStaffComponent]
 })
 export class OrderShipComponent implements OnInit {
 
