@@ -972,4 +972,19 @@ textarea {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
+.back-link {
+  text-decoration: none; /* Loại bỏ gạch chân của liên kết */
+}
 
+/* Tạo kiểu cho biểu tượng */
+.back-icon {
+  cursor: pointer;
+  margin-right: 15px; /* Khoảng cách giữa biểu tượng và tiêu đề */
+  font-size: 1.8em; /* Kích thước biểu tượng */
+  color: rgb(83, 82, 82); /* Màu sắc biểu tượng */
+  transition: color 0.3s ease; /* Hiệu ứng chuyển màu khi hover */
+}
+/* Thay đổi màu sắc biểu tượng khi hover */
+.back-icon:hover {
+  color: black; /* Màu sắc mới khi hover */
+}

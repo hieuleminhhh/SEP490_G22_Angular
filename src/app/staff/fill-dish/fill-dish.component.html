@@ -1,6 +1,11 @@
+
+<app-HeaderOrderStaff></app-HeaderOrderStaff>
 <div class="container">
   <main class="main-content">
     <div class="container">
+      <a href="javascript:history.back()" class="back-link">
+        <i class="fas fa-arrow-left back-icon"></i>
+      </a>
       <div class="card fixed-size">
         <div class="title">
           <button (click)="onButtonClick('dineIn')" [class.selected]="isSelected('dineIn')">Phục vụ tại chỗ</button>
@@ -121,7 +126,7 @@
             </div>
 
             <!-- Lower Section -->
-            <div class="lower-section" *ngIf="deliveryOrders.length>1">
+            <div class="lower-section" *ngIf="selectedOrders.length > 0">
               <hr><br>
               <h5>Danh sách nhân viên ship:</h5>
               <br>
@@ -129,7 +134,7 @@
                 <div *ngFor="let shiper of dataShipStaff; let i = index" class="grid-item">
                   <div class="dish-info">
                     <p>{{shiper.firstName}}{{shiper.lastName}}</p>
-                    <button (click)="updateAccountId(dataShipStaff.accountId)">Chỉ định giao hàng</button>
+                    <button (click)="updateAccountId(shiper.accountId)">Chỉ định giao hàng</button>
                   </div>
                 </div>
               </div>

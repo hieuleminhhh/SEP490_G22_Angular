@@ -205,7 +205,7 @@ export class CheckoutComponent implements OnInit {
   submitForm(): void {
     let receivingTime: string = '';
     if (this.date && this.time) {
-      receivingTime = this.formatDate(this.formatDateTime(this.date, this.time));
+      receivingTime = this.formatDateTime(this.date, this.time);
     } else {
       const currentTime = new Date();
       currentTime.setHours(currentTime.getHours() + 1);

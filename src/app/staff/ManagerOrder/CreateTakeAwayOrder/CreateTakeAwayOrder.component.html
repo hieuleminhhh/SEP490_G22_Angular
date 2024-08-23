@@ -5,7 +5,7 @@
       <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
         <app-SidebarOrder></app-SidebarOrder>
       </nav>
-      
+
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div class="container mt-5">
           <h2 class="order-header text-center mb-4">Tạo đơn hàng mang về</h2>
@@ -105,7 +105,7 @@
                             </span>
                           </p>
                         </div>
-                      </td>                      
+                      </td>
                       <td>
                         <div class="d-flex align-items-center">
                           <button class="btn btn-outline-secondary btn-sm" (click)="decreaseQuantity(i)">-</button>
@@ -131,7 +131,7 @@
                   </tbody>
                 </table>
                 <div *ngIf="selectedItems.length > 0" class="mt-2">
-                  <strong>Tạm tính:</strong>             
+                  <strong>Tạm tính:</strong>
                   {{ totalAmount | currencyFormat }}
                   <br>
                 </div>
@@ -145,7 +145,7 @@
                     <span>{{ totalAmount - totalAmountAfterDiscount | currencyFormat }}</span>
                     <span style="margin-left: 10px;">({{ selectedDiscountName }} - {{ selectedDiscountPercent | percentage }})</span>
                   </div>
-                  
+
                   <br>
                   <hr>
                   <div *ngIf="selectedItems.length > 0" class="mt-2">
@@ -153,12 +153,12 @@
                   <span *ngIf="selectedDiscount === null">
                     {{ totalAmount | currencyFormat }}
                   </span>
-                  
+
                   <span *ngIf="selectedDiscount !== null">
                     {{ totalAmountAfterDiscount | currencyFormat }}
                   </span>
                 </div>
-                  
+
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-3">
                   <button type="button" class="btn custom-btn-success btn-lg rounded-pill" data-bs-toggle="modal" data-bs-target="#paymentModal">
                     Tạo đơn
@@ -233,18 +233,18 @@
                     <span>Không có mã khuyến mại</span>
                   </div>
                 </div>
-              
-                
-                
+
+
+
                 <!-- applyDiscount() -->
-                <div class="modal-footer"> 
+                <div class="modal-footer">
                   <button type="button" class="btn btn-primary"  (click)="applyDiscount()">Áp dụng</button>
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearSelectedDiscount()">Đóng</button>
                 </div>
               </div>
             </div>
           </div>
-             
+
             <!-- Right column for dishes and combos -->
             <div class="col-md-6">
               <div class="category-buttons">
@@ -277,7 +277,7 @@
               <div class="search-bar mt-3">
                 <input type="text" class="form-control" placeholder="Tìm kiếm món ăn..." [(ngModel)]="search" (input)="onSearch()">
               </div>
-              
+
                <!-- Dishes Section -->
                <div class="dishes-section" *ngIf="showingDishes && dishes">
                 <div class="row">
@@ -325,7 +325,7 @@
               </div>
             </div>
 
-            
+
           </div>
         </div>
 
@@ -378,7 +378,7 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Bảng hiển thị món hàng đã chọn -->
                 <div class="mb-3">
                   <table id="items" class="table table-bordered">
@@ -405,7 +405,7 @@
                     </tbody>
                   </table>
                 </div>
-        
+
                 <!-- Hiển thị tổng số tiền và giảm giá -->
                 <div class="mt-3">
                   <strong>Tạm tính:</strong> {{ totalAmount | currencyFormat }}
@@ -455,7 +455,7 @@
                   {{ totalAmountAfterDiscount | currencyFormat }}
                 </span>
               </div>
-    
+
               <!-- Template for online -->
               <div class="mb-3">
                 <label class="form-label">Hình thức thanh toán:</label>
@@ -467,22 +467,22 @@
                   <input type="radio" id="bank" name="paymentMethod" value= "1" [(ngModel)]="paymentMethod">
                   <label for="bank">Chuyển khoản ngân hàng</label>
                 </div>
-               
+
               </div>
-    
+
               <div class="mb-3" *ngIf="paymentMethod === '0'">
                 <label for="customerPaid" class="form-label">Tiền khách trả:</label>
                 <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid">
               </div>
-    
+
               <div class="mb-3" *ngIf="paymentMethod === '1'">
                 <label for="qrCode" class="form-label"></label>
                 <img id="qrCode" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" class="img-fluid">
               </div>
             </div>
-           
+
               <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearCart()">Đóng</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Đóng</button>
                   <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cffpaymentModal" (click)="CreateInvoiceTakeAway()">Xác nhận</button>
               </div>
           </div>
@@ -491,7 +491,7 @@
   <!-- Template for cffff -->
   <div class="modal fade" id="cffpaymentModal" tabindex="-1" aria-labelledby="cfpaymentModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-      <div class="modal-content">
+      <div class="modal-content" style="padding: 15px;">
         <!-- Success message -->
         <div class="text-center mb-3">
           <div class="d-flex justify-content-center align-items-center flex-column">
@@ -542,7 +542,7 @@
                   <td>{{ item.quantity }}</td>
                   <td>{{ item.price | currencyFormat }}</td>
                   <td>{{ item.unitPrice | currencyFormat }}</td>
-                  
+
                 </tr>
               </tbody>
             </table>
@@ -580,18 +580,18 @@
       <label for="qrCode" class="form-label"></label>
       <img id="qrCode" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" class="img-fluid">
     </div>
-    
+
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="clearCart()">Đóng</button>
           <button type="button" class="btn btn-primary" (click)="printInvoice()">In hóa đơn</button>
         </div>
       </div>
     </div>
   </div>
       </main>
-  
-  
+
+
     </div>
   </div>
 </body>
