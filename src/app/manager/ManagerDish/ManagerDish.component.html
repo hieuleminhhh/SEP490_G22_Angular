@@ -1,89 +1,201 @@
 <app-HeaderOrderStaff></app-HeaderOrderStaff>
 <div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar -->
-    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-      <app-SidebarAdmin></app-SidebarAdmin>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-      <div
-        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Quản lý tài khoản</h1>
-        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11; right: 20px;">
-          <div *ngIf="successMessage" class="alert alert-success" style="max-width: 300px;">{{ successMessage }}</div>
-        </div>
-        <div class="btn-toolbar mb-2 mb-md-0">
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Tìm kiếm tài khoản..." aria-label="Search"
-              aria-describedby="button-addon2">
-            <button class="btn btn-outline-secondary" type="button" id="button-addon2">Tìm kiếm</button>
-          </div>
-          <div class="btn-group ms-2">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAccountModal">Thêm
-              tài khoản mới</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Account table -->
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Tên món ăn</th>
-              <th>Mô tả</th>
-              <th>Giá</th>
-              <th>Hình ảnh</th>
-              <th>Tên thể loại</th>
-              <th>Trạng thái</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngFor="let list of dishes">
-              <tr *ngFor="let dish of list.items">
-                <td>{{ dish.itemName }}</td>
-                <td>{{ dish.itemDescription }}</td>
-                <td>{{ dish.price | currencyFormat }}</td>
-                <td><img [src]="dish.imageUrl" [alt]="dish.itemName" *ngIf="dish.imageUrl" style="width: 200px; height: 200px; object-fit: cover;"></td>
-                <td>{{ dish.categoryName }}</td>
-                <td>
-                  <input type="checkbox" (change)="onCheckboxChange($event, dish.dishId)" [checked]="dish.isActive">
-                  <span [ngStyle]="{'color': dish.isActive ? 'green' : 'red'}">
-                      {{ dish.isActive ? 'Đang hoạt động' : 'Không hoạt động' }}
-                  </span>
-              </td>                    
-                <td>
-                  <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateDishModal" (click)="getDishById(dish.dishId)">Cập nhật</button>
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-          
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <app-SideBar></app-SideBar>
+        </nav>
         
-        </table>
-      </div>
-    </main>
-  </div>
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+              <app-Header></app-Header>
+                <h2 class="h2">Quản lý món ăn</h2>
+                <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11; right: 20px;">
+                  <div *ngIf="successMessage" class="alert alert-success" style="max-width: 300px;">{{ successMessage }}</div>
+              </div>             
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="input-group">
+                      <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Tìm kiếm..." aria-label="Search" aria-describedby="button-addon2" [(ngModel)]="search">
+                        <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="onSearch()">Tìm kiếm</button>
+                    </div>
+                    
+                    </div>
+                </div>
+                <div class="btn-group">
+                  <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addDishModal">Thêm món ăn mới<i class="bi bi-plus"></i></button>
+              </div>
+              
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Tên món ăn</th>
+                    <th>Mô tả</th>
+                    <th>Giá</th>
+                    <th>Hình ảnh</th>
+                    <th>Tên thể loại</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let list of dishes">
+                    <tr *ngFor="let dish of list.items">
+                      <td>{{ dish.itemName }}</td>
+                      <td>{{ dish.itemDescription }}</td>
+                      <td>{{ dish.price | currencyFormat }}</td>
+                      <td><img [src]="dish.imageUrl" [alt]="dish.itemName" *ngIf="dish.imageUrl" style="width: 200px; height: 200px; object-fit: cover;"></td>
+                      <td>{{ dish.categoryName }}</td>
+                      <td>
+                        <input type="checkbox" (change)="onCheckboxChange($event, dish.dishId)" [checked]="dish.isActive">
+                        <span [ngStyle]="{'color': dish.isActive ? 'green' : 'red'}">
+                            {{ dish.isActive ? 'Đang hoạt động' : 'Không hoạt động' }}
+                        </span>
+                    </td>                    
+                      <td>
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateDishModal" (click)="getDishById(dish.dishId)">Cập nhật</button>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+                
+              
+              </table>
+              <nav aria-label="Page navigation">
+                <ul class="pagination">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <a class="page-link" (click)="onPageChange(currentPage - 1)">Trước</a>
+                  </li>
+                  <li class="page-item" *ngFor="let page of totalPagesArray" [class.active]="page === currentPage">
+                    <a class="page-link" (click)="onPageChange(page)">{{ page }}</a>
+                  </li>
+                  <li class="page-item" [class.disabled]="currentPage === totalPagesArray.length">
+                    <a class="page-link" (click)="onPageChange(currentPage + 1)">Sau</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+            
+        </main>
+    </div>
 </div>
 
-<!-- Add Account Modal -->
-<div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true">
+<!-- Add Dish Modal -->
+<div class="modal fade" #addDishModal id="addDishModal" tabindex="-1" aria-labelledby="addDishModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addAccountModalLabel">Thêm tài khoản mới</h5>
+        <h5 class="modal-title" id="addDishModalLabel">Thêm món ăn mới</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <!-- Your form for adding a new account here -->
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        <button type="button" class="btn btn-primary">Lưu thay đổi</button>
+      <div class="modal-body">       
+        <form (ngSubmit)="createDish()">
+          <div class="mb-3">
+            <label for="itemName" class="form-label">Tên Món ăn</label>
+            <input type="text" class="form-control" id="itemName" placeholder="Nhập tên món ăn" [(ngModel)]="addNew.itemName" name="itemName">
+            <div *ngIf="addErrors.itemNameError" class="alert alert-danger">{{ addErrors.itemNameError }}</div>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Mô tả</label>
+            <textarea class="form-control" id="description" rows="3" placeholder="Nhập mô tả" [(ngModel)]="addNew.itemDescription" name="itemDescription"></textarea>
+            <div *ngIf="addErrors.descriptionError" class="alert alert-danger">{{ addErrors.descriptionError }}</div>
+          </div>
+          <div class="mb-3">
+            <label for="price" class="form-label">Giá</label>
+            <input type="number" class="form-control" id="price" placeholder="Nhập giá" [(ngModel)]="addNew.price" name="price">
+            <div *ngIf="addErrors.priceError" class="alert alert-danger">{{ addErrors.priceError }}</div>
+          </div>
+          <div class="mb-3">
+            <label for="image" class="form-label">Hình ảnh</label>
+            <input type="file" class="form-control" id="image" (change)="onImageSelect($event)" aria-describedby="imageHelp">
+            <div *ngIf="addErrors.imageError" class="alert alert-danger">{{ addErrors.imageError }}</div>
+            <div *ngIf="imageUrl" class="mt-3">
+              <img [src]="imageUrl" alt="Hình ảnh đã chọn" class="img-fluid" style="max-width: 100px; height: auto;">
+            </div>
+          </div>
+          
+          
+          <div class="mb-3 custom-select">
+            <label for="category" class="form-label">Tên thể loại</label>
+            <div class="select-wrapper">
+              <select class="form-control" id="category" [(ngModel)]="addNew.categoryId" name="categoryId">
+                <option disabled [selected]="addNew.categoryId === null" value="">-- Chọn thể loại --</option>
+                <option *ngFor="let category of categories" [value]="category.categoryId">{{ category.categoryName }}</option>
+              </select>
+            </div>
+            <div *ngIf="addErrors.categoryError" class="alert alert-danger">{{ addErrors.categoryError }}</div>
+          </div>
+          <div class="mb-3">
+            <label for="isActive" class="form-label">Trạng thái</label>
+            <input type="checkbox" id="isActive" [(ngModel)]="addNew.isActive" name="isActive">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Đóng</button>
+            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </div>
+
+
+  
+  
+  <!-- Update Dish Modal -->
+  <div class="modal fade" #updateDishModal id="updateDishModal" tabindex="-1" aria-labelledby="updateDishModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateDishModalLabel">Cập nhật món ăn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Tên món ăn</label>
+                        <input type="text" class="form-control" id="itemName" placeholder="Enter item name" [(ngModel)]="updatedDish.itemName" name="itemName">
+                        <div *ngIf="updateErrors.itemNameError" class="alert alert-danger">{{ updateErrors.itemNameError }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="description" rows="3" placeholder="Enter description" [(ngModel)]="updatedDish.itemDescription" name="itemDescription"></textarea>
+                        <div *ngIf="updateErrors.descriptionError" class="alert alert-danger">{{ updateErrors.descriptionError }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label"> Giá</label>
+                        <input type="number" class="form-control" id="price" placeholder="Enter price" [(ngModel)]="updatedDish.price" name="price">
+                        <div *ngIf="updateErrors.priceError" class="alert alert-danger">{{ updateErrors.priceError }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Hình ảnh</label>
+                        <input type="file" class="form-control" id="image" (change)="onUpdateImageSelect($event)">
+                        <img *ngIf="updatedDish.imageUrl" [src]="updatedDish.imageUrl" class="img-thumbnail small-img-thumbnail" alt="Ảnh">
+                    </div>
+                    <div class="mb-3 custom-select">
+                        <label for="category" class="form-label">Tên thể loại</label>
+                        <div class="select-wrapper">
+                            <select class="form-control" id="category" [(ngModel)]="updatedDish.categoryId" name="categoryId">
+                                <option disabled [ngValue]="null" [selected]="!updatedDish.categoryId">-- Chọn thể loại --</option>
+                                <option *ngFor="let category of categories" [ngValue]="category.categoryId">{{ category.categoryName }}</option>
+                            </select>
+                            <div class="select-arrow"></div>
+                        </div>
+                        <div *ngIf="updateErrors.categoryError" class="alert alert-danger">{{ updateErrors.categoryError }}</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Đóng</button>
+                <button type="button" class="btn btn-primary" (click)="updateDish()">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+  
+  
