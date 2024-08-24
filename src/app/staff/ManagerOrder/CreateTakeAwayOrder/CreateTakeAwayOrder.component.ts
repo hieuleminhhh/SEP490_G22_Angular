@@ -89,11 +89,13 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     amountReceived: 0,
     returnAmount: 0,
     paymentMethods: 0,
-    description: ''
+    description: '',
+    accountId: 0
   };
   ischecked: boolean = false;
   lastOrderId: number | undefined;
   discountInvalid: any = {};
+  accountId: number | null = null;
   newAddress: AddNewAddress = {
     guestAddress: 'Ăn tại quán',
     consigneeName: '',
@@ -114,6 +116,8 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.generateTimeOptions();
     this.setDefaultReceivingTime();
     this.paymentMethod = '0';
+    const accountIdString = localStorage.getItem('accountId');
+    this.accountId = accountIdString ? Number(accountIdString) : null;
   }
   selectCategory(category: string) {
     this.searchCategory = category;
@@ -755,6 +759,7 @@ setDefaultReceivingTime() {
     paymentMethods: paymentMethodValue,
     description: 'Order payment description',
     discountId: this.selectedDiscount,
+    accountId: this.accountId,
     taxcode: '',
     paymentStatus: 1,
   };
@@ -815,7 +820,7 @@ CreateInvoiceTakeAway(): void {
       paymentAmount: totalAmount,
       taxcode: "HIEU",
       paymentStatus: 1,
-      accountId: 0,
+      accountId: this.accountId,
       amountReceived: amountReceived,
       returnAmount: returnAmount,
       paymentMethods: paymentMethod,

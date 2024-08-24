@@ -87,6 +87,10 @@ export class ManagerOrderComponent implements OnInit {
     this.setDefaultDates();
     this.loadListOrder();
     this.paymentMethod = '0';
+    const accountIdString = localStorage.getItem('accountId');
+    this.accountId = accountIdString ? Number(accountIdString) : null;
+
+    console.log('31', this.accountId);
   }
 
   setDefaultDates() {
@@ -99,7 +103,6 @@ export class ManagerOrderComponent implements OnInit {
       (response: ListOrderDetailByOrder) => {
         this.selectedOrder = response;
         console.log('Order details:', this.selectedOrder);
-        // Thực hiện logic bổ sung nếu cần
       },
       (error: HttpErrorResponse) => {
         console.error('Error fetching order details:', error);
@@ -303,7 +306,7 @@ export class ManagerOrderComponent implements OnInit {
         paymentTime: new Date().toISOString(),
         paymentAmount: this.DiscountedTotalAmount(),
         taxcode: "HIEU",
-        accountId: 0,
+        accountId: this.accountId,
         amountReceived: amountReceived,
         returnAmount: returnAmount,
         paymentMethods: paymentMethod,
@@ -347,7 +350,7 @@ export class ManagerOrderComponent implements OnInit {
         paymentTime: new Date().toISOString(),
         paymentAmount: this.DiscountedTotalAmount(),
         taxcode: "HIEU",
-        accountId: 0,
+        accountId: this.accountId,
         amountReceived: amountReceived,
         returnAmount: returnAmount,
         paymentMethods: paymentMethod,
@@ -668,7 +671,7 @@ export class ManagerOrderComponent implements OnInit {
         paymentAmount: this.DiscountedTotalAmount(),
         taxcode: "string",
         paymentStatus: 2,
-        accountId: 0,
+        accountId: this.accountId,
         amountReceived: amountReceived,
         returnAmount: returnAmount,
         paymentMethods: paymentMethod,
@@ -726,6 +729,7 @@ export class ManagerOrderComponent implements OnInit {
           amountReceived: amountReceived,
           returnAmount: returnAmount,
           paymentMethods: paymentMethod,
+          accountId: this.accountId,
           description: "Invoice Created"
         };
 
