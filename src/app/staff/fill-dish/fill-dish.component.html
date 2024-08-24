@@ -189,22 +189,33 @@
         <div class="row">
           <!-- First Column -->
           <div class="col-md-6">
-            <div class="d-flex justify-content-between" *ngIf="selectedItem.discountPercent">
+            <div class="d-flex justify-content-between mb-2" *ngIf="selectedItem.discountPercent">
               <span class="fw-bold">Tạm tính:</span>
               <span>{{ selectedItem.totalAmount | currencyFormat }}</span>
             </div>
-            <div *ngIf="selectedItem.discountPercent" class="d-flex justify-content-between">
+            <div *ngIf="selectedItem.discountPercent" class="d-flex justify-content-between mb-2">
               <span class="fw-bold">Giảm giá:</span>
-              <span>{{ selectedItem.totalAmount-selectedItem.discountedPrice | currencyFormat }}</span>
+              <span>{{ selectedItem.totalAmount - selectedItem.discountedPrice | currencyFormat }}</span>
             </div>
             <hr>
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between mb-2">
               <span class="fw-bold">Tổng cộng:</span>
               <span>{{ selectedItem.discountedPrice | currencyFormat }}</span>
             </div>
           </div>
+      
+          <!-- Payment Status Badges -->
+          <div class="col-md-6 d-flex align-items-center justify-content-end">
+            <div *ngIf="selectedItem.deposits > 0" class="badge bg-success ms-auto badge-circle">
+              Đã thanh toán
+            </div>
+            <div *ngIf="selectedItem.deposits === 0" class="badge bg-danger ms-auto badge-circle">
+              Chưa thanh toán
+            </div>
+          </div>
         </div>
       </div>
+      
 
     </div>
   </div>
@@ -229,9 +240,10 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" (click)="updateAccountId(shiper.accountId)" data-bs-target="#invoiceModal" >Xác
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal"  data-bs-target="#invoiceModal" >Xác
           nhận</button>
       </div>
+      <!-- (click)="updateAccountId(shiper.accountId)" -->
     </div>
   </div>
 </div>
@@ -297,9 +309,25 @@
                 <p><strong>Tổng tiền hàng:</strong> {{ order.totalAmount | currencyFormat }}</p>
                 <p><strong>Giảm giá:</strong> {{ (order.totalAmount * (order.discountPercent / 100)) | currencyFormat }} ({{ order.discountPercent }}%)</p>
                 <hr>
-                <p><strong>Tổng tiền phải trả:</strong> {{ (order.totalAmount - (order.totalAmount * (order.discountPercent / 100))) | currencyFormat }}</p>
+                <p><strong>Khách phải trả:</strong> 
+                  {{ (order.deposits > 0 ? 0 : order.totalAmount - (order.totalAmount * (order.discountPercent / 100))) | currencyFormat }}
+                </p>
+              </div>
+              
+              <!-- Row for the payment status badge -->
+              <div class="row">
+                <div class="col-md-6 offset-md-6 d-flex align-items-center justify-content-end">
+                  <div *ngIf="order.deposits > 0" class="badge bg-success">
+                    Đã thanh toán
+                  </div>
+                  <div *ngIf="order.deposits === 0" class="badge bg-danger">
+                    Chưa thanh toán
+                  </div>
+                </div>
               </div>
             </div>
+            
+
           </div>
         </div>
       </div>
