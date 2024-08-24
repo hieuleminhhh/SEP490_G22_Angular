@@ -1,9 +1,11 @@
 <body [class.sidebar-visible]="showSidebar">
   <app-HeaderOrderStaff></app-HeaderOrderStaff>
-  <div class="container-fluid" style="display: flex; align-items: center;">
-    <div class="row" >
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+
       <!-- Main Content -->
-      <main class="col-md-12 ms-sm-auto col-lg-10 px-md-4">
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div class="container mt-5">
           <a href="javascript:history.back()" class="back-link">
             <i class="fas fa-arrow-left back-icon"></i>
@@ -11,7 +13,7 @@
           <h2 class="order-header text-center mb-4">
             Đơn hàng tại quán <span class="highlight">(bàn {{ tableId }})</span>
           </h2>
-
+          
           <div class="row">
             <!-- Left column for address and cart details -->
             <div class="col-md-6">
@@ -37,7 +39,7 @@
                   <i class="fas fa-user"></i>
                 </button>
               </div>
-
+              
 
               <!-- Selected Items Section -->
               <div class="cart-section mt-4">
@@ -136,7 +138,7 @@
                     Hủy
                   </button>
                 </div>
-
+                
               </div>
               <!-- Discount Modal -->
               <div class="modal fade" #formModal id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel"

@@ -269,7 +269,7 @@
 
                       <!-- Second Column -->
                       <div class="col-md-6 d-flex align-items-start justify-content-end">
-                        <div *ngIf="orderDetail.paymentStatus === 2" class="badge bg-success ms-auto badge-circle">Thanh
+                        <div *ngIf="orderDetail.paymentStatus === 2 || orderDetail.paymentStatus === 0 && !(orderDetail.deposits > 0 && orderDetail.status === 1)" class="badge bg-success ms-auto badge-circle">Thanh
                           toán trước</div>
                         <div *ngIf="orderDetail.paymentStatus === 1" class="badge bg-success ms-auto badge-circle">Đã
                           thanh toán</div>
