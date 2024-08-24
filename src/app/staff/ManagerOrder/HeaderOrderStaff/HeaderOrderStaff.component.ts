@@ -34,6 +34,7 @@ export class HeaderOrderStaffComponent implements OnInit {
     } else {
       console.error('Account ID is not available');
     }
+    this.getInfo();
   }
   logout() {
     localStorage.removeItem('token');

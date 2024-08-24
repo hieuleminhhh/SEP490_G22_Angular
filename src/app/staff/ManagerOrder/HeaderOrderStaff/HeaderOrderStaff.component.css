@@ -88,4 +88,10 @@
   #utk{
     cursor: pointer;
   }
+  .logo-circle {
+    width: 100px; /* Đặt kích thước theo ý muốn, ví dụ 100px */
+    height: 250px;
+    border-radius: 70%; /* Làm cho hình ảnh thành hình tròn */
+    object-fit: cover; /* Đảm bảo hình ảnh không bị méo */
+  }
   
