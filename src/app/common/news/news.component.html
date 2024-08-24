@@ -1,54 +1,40 @@
-<section class="text-gray-600 body-font overflow-hidden">
-  <div class="container px-5 py-24 mx-auto">
-    <div class="-my-8 divide-y-2 divide-gray-100">
-      <div class="py-8 flex flex-wrap md:flex-nowrap">
-        <div class="md:w-64 md:mb-0 mb-6 flex-shrink-0 flex flex-col">
-          <span class="font-semibold title-font text-gray-700">CATEGORY</span>
-          <span class="mt-1 text-gray-500 text-sm">12 Jun 2019</span>
-        </div>
-        <div class="md:flex-grow">
-          <h2 class="text-2xl font-medium text-gray-900 title-font mb-2">Bitters hashtag waistcoat fashion axe chia unicorn</h2>
-          <p class="leading-relaxed">Glossier echo park pug, church-key sartorial biodiesel vexillologist pop-up snackwave ramps cornhole. Marfa 3 wolf moon party messenger bag selfies, poke vaporware kombucha lumbersexual pork belly polaroid hoodie portland craft beer.</p>
-          <a class="text-indigo-500 inline-flex items-center mt-4">Learn More
-            <svg class="w-4 h-4 ml-2" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 12h14"></path>
-              <path d="M12 5l7 7-7 7"></path>
-            </svg>
-          </a>
-        </div>
+<div class="container" style="margin-top: 40px;">
+  <div class="container" *ngIf="!selectedArticle">
+    <div class="card" *ngFor="let article of articles" (click)="onSelectArticle(article)">
+      <div class="card-header">
+        <img [src]="article.newsImage" alt="rover" />
       </div>
-      <div class="py-8 flex flex-wrap md:flex-nowrap">
-        <div class="md:w-64 md:mb-0 mb-6 flex-shrink-0 flex flex-col">
-          <span class="font-semibold title-font text-gray-700">CATEGORY</span>
-          <span class="mt-1 text-gray-500 text-sm">12 Jun 2019</span>
-        </div>
-        <div class="md:flex-grow">
-          <h2 class="text-2xl font-medium text-gray-900 title-font mb-2">Meditation bushwick direct trade taxidermy shaman</h2>
-          <p class="leading-relaxed">Glossier echo park pug, church-key sartorial biodiesel vexillologist pop-up snackwave ramps cornhole. Marfa 3 wolf moon party messenger bag selfies, poke vaporware kombucha lumbersexual pork belly polaroid hoodie portland craft beer.</p>
-          <a class="text-indigo-500 inline-flex items-center mt-4">Learn More
-            <svg class="w-4 h-4 ml-2" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 12h14"></path>
-              <path d="M12 5l7 7-7 7"></path>
-            </svg>
-          </a>
-        </div>
-      </div>
-      <div class="py-8 flex flex-wrap md:flex-nowrap">
-        <div class="md:w-64 md:mb-0 mb-6 flex-shrink-0 flex flex-col">
-          <span class="font-semibold title-font text-gray-700">CATEGORY</span>
-          <span class="text-sm text-gray-500">12 Jun 2019</span>
-        </div>
-        <div class="md:flex-grow">
-          <h2 class="text-2xl font-medium text-gray-900 title-font mb-2">Woke master cleanse drinking vinegar salvia</h2>
-          <p class="leading-relaxed">Glossier echo park pug, church-key sartorial biodiesel vexillologist pop-up snackwave ramps cornhole. Marfa 3 wolf moon party messenger bag selfies, poke vaporware kombucha lumbersexual pork belly polaroid hoodie portland craft beer.</p>
-          <a class="text-indigo-500 inline-flex items-center mt-4">Learn More
-            <svg class="w-4 h-4 ml-2" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 12h14"></path>
-              <path d="M12 5l7 7-7 7"></path>
-            </svg>
-          </a>
+      <div class="card-body">
+        <!-- <span class="tag tag-teal">{{ article.category }}</span> -->
+        <h4>{{ article.newsTitle }}</h4>
+        <p>{{ article.newsContent.length > 100 ? (article.newsContent | slice:0:100) + '...' : article.newsContent }}
+        </p>
+        <div class="user">
+          <div class="user-info">
+            <h5>Thời gian: {{ article.newsDate | date:'dd/MM/yyyy' }}</h5>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</section>
+
+  <!-- Chi tiết bài viết -->
+  <div *ngIf="selectedArticle" style="display: flex; margin-top: 20px; border: 1px solid #ddd; padding: 20px;">
+    <div style="flex: 1; margin-right: 20px;">
+      <img [src]="selectedArticle.newsImage" alt="Hình ảnh bài viết" style="max-width: 100%; height: auto;" />
+    </div>
+    <div style="flex: 2;">
+      <h2 style="margin-bottom: 15px;">{{ selectedArticle.newsTitle }}</h2>
+      <div style="margin-bottom: 20px; white-space: pre-line;">
+        {{ selectedArticle.newsContent }}
+      </div>
+
+      <div style="display: flex; align-items: center;">
+        <div>
+          <small>{{ selectedArticle.newsDate | date:'dd/MM/yyyy' }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
