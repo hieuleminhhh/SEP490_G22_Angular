@@ -1051,6 +1051,7 @@ updateOrderOffline(tableId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
       response => {
         this.account = response;
+        this.showSidebar = this.account.role !== 'OrderStaff' && this.account.role !== 'Cashier';
         console.log('Account details:', this.account);
         console.log('Account role:', this.account.role);
       },
