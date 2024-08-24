@@ -1,13 +1,13 @@
 .image-container {
     position: relative;
   }
-  
+
   .card-img-top {
     object-fit: cover;
     height: 150px;
     width: 100%;
   }
-  
+
   .overlay {
     position: absolute;
     top: 0;
@@ -19,7 +19,7 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   .overlay-text {
     color: white;
     font-size: 18px;
@@ -95,12 +95,12 @@
   .dish-details {
     margin-bottom: 10px;
   }
-  
+
   .dish-name {
     font-size: 1.2em;
     font-weight: bold;
   }
-  
+
   .dish-price {
     font-size: 1em;
     color: #888;
@@ -108,12 +108,12 @@
   .combo-details {
     margin-bottom: 10px;
   }
-  
+
   .combo-name {
     font-size: 1.2em;
     font-weight: bold;
   }
-  
+
   .combo-price {
     font-size: 1em;
     color: #888;
@@ -127,18 +127,18 @@
     align-items: center;
     position: relative;
   }
-  
+
   .form-control {
     border-radius: 4px;
     box-shadow: none;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
   }
-  
+
   .form-control:focus {
     border-color: #007bff;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
   }
-  
+
   .dropdown-menu {
     width: 100%;
     border-radius: 0 0 4px 4px;
@@ -146,18 +146,18 @@
     overflow-y: auto;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
-  
+
   .dropdown-menu .dropdown-item {
     padding: 8px 15px;
     font-size: 14px;
     transition: background-color 0.2s ease, color 0.2s ease;
   }
-  
+
   .dropdown-menu .dropdown-item:hover {
     background-color: #f8f9fa;
     color: #333;
   }
-  
+
   .search-container {
     border-bottom: 1px solid #ddd;
   }
@@ -168,7 +168,7 @@
     justify-content: center;
     margin-bottom: 20px;
   }
-  
+
   .order-header {
     font-size: 24px;
     font-weight: bold;
@@ -178,7 +178,7 @@
     padding-bottom: 10px;
     position: relative;
   }
-  
+
   .order-header::before,
   .order-header::after {
     content: '';
@@ -187,17 +187,16 @@
     transform: translateY(-50%);
     width: 50px;
     height: 3px;
-    background-color: #007bff;
   }
-  
+
   .order-header::before {
     left: -30px; /* Điều chỉnh vị trí để gạch gần vào tiêu đề hơn */
   }
-  
+
   .order-header::after {
     right: -30px; /* Điều chỉnh vị trí để gạch gần vào tiêu đề hơn */
   }
-  
+
   .order-header-container::before,
   .order-header-container::after {
     content: '';
@@ -206,7 +205,7 @@
     background-color: #007bff;
     margin: 0 10px;
   }
-  
+
   .highlight {
     color: #ff5733; /* Màu sắc nổi bật cho phần trong dấu ngoặc */
     font-style: italic; /* In nghiêng để tạo sự khác biệt */
@@ -217,25 +216,25 @@
     padding: 8px 10px;
     box-shadow: none;
   }
-  
+
   .search-input:focus {
     outline: none;
   }
-  
+
   .btn-outline-secondary {
     border-radius: 50%;
     padding: 6px 12px;
     margin-left: 5px;
   }
-  
+
   .btn-outline-secondary i {
     font-size: 18px;
   }
-  
+
   .ml-2 {
     margin-left: 8px;
   }
-  
+
   .dropdown-menu {
     position: absolute;
     top: 100%;
@@ -243,7 +242,7 @@
     right: 0;
     z-index: 1000; /* Ensure dropdown appears above other elements */
   }
-  
+
   .input-group .btn-outline-secondary {
     margin-left: 10px; /* Adjust margin to move the button away from the input */
   }
@@ -263,21 +262,21 @@
     margin: 0 !important;
   }
  /* Hide arrows in input number */
- input[type=number]::-webkit-inner-spin-button, 
- input[type=number]::-webkit-outer-spin-button { 
-   -webkit-appearance: none; 
-   margin: 0; 
+ input[type=number]::-webkit-inner-spin-button,
+ input[type=number]::-webkit-outer-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
  }
- 
+
  input[type=number] {
    -moz-appearance: textfield; /* Hide the spinners in Firefox */
  }
- 
+
  input.no-spinners {
    -webkit-appearance: none; /* Chrome, Safari, Edge, Opera */
    -moz-appearance: textfield; /* Firefox */
  }
- 
+
  /* Make the input field circular */
  input.rounded-input {
    border-radius: 50%;
@@ -613,7 +612,7 @@ body:not(.sidebar-visible) main {
 }
 
 body.sidebar-visible main {
-  margin-left: 250px; 
+  margin-left: 250px;
 }
 /* Đảm bảo rằng back-link không có gạch chân và có khoảng cách */
 .back-link {

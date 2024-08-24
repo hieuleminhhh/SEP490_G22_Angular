@@ -1,32 +1,77 @@
+/* Áp dụng cho toàn bộ danh sách điều hướng */
+.nav {
+  padding: 10px;
+  width: 250px; /* Chiều rộng cố định */
+  background-color: #f8f9fa; /* Màu nền */
+  border-radius: 8px; /* Bo góc */
+  overflow: hidden;
+}
+
+/* Áp dụng cho từng mục trong danh sách điều hướng */
 .nav-item {
-  list-style: none; /* Remove bullet points */
-  padding: 0; /* Remove default padding */
-  margin: 0; /* Remove default margin */
-  width: 130px; /* Set width for each item */
-  background-color: white; /* Background color */
+  margin-bottom: 15px; /* Khoảng cách giữa các mục */
 }
 
-.nav-item a.nav-link {
-  padding: 10px; /* Add padding to links */
-  border-radius: 5px; /* Rounded corners */
-  transition: background-color 0.3s; /* Smooth transition */
-  border: 1px solid black;
+.nav-item:last-child {
+  margin-bottom: 0; /* Bỏ khoảng cách ở mục cuối cùng */
 }
 
-.nav-item a.nav-link:hover {
-  background-color: #f0f0f0; /* Background color on hover */
+/* Áp dụng cho liên kết trong danh sách điều hướng */
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  height: 50px; /* Chiều cao cố định */
+  font-size: 16px;
+  font-weight: 500;
+  color: #343a40; /* Màu chữ */
+  text-decoration: none;
+  border-radius: 6px;
+  width: 180px;
+  transition: background-color 0.3s ease, color 0.3s ease; /* Hiệu ứng chuyển đổi */
 }
 
-.nav-item a.nav-link.active {
-  color: #fff; /* Active link color */
-  background-color:  cornflowerblue; /* Background color for active link */
-  border-bottom: 2px solid #fff; /* Bottom border for active link */
+/* Hover effect */
+.nav-link:hover {
+  background-color: #e9ecef; /* Màu nền khi hover */
+  color: #007bff; /* Màu chữ khi hover */
 }
 
-.nav-item ul.nav {
-  padding-left: 15px; /* Indentation for nested items */
+/* Icon margin */
+.nav-link i {
+  margin-right: 10px;
+  transition: transform 0.3s ease; /* Hiệu ứng chuyển đổi cho biểu tượng */
 }
 
-.collapse.show {
-  background-color: #f8f9fa; /* Background color for collapsed menu */
+/* Hiệu ứng hover cho biểu tượng */
+.nav-link:hover i {
+  transform: scale(1.2); /* Phóng to biểu tượng khi hover */
+}
+
+/* Áp dụng cho trạng thái active */
+.nav-link.active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Áp dụng cho phần dropdown */
+.collapse {
+  margin-left: 10px;
+  position: relative; /* Đảm bảo menu con hiển thị trong vùng chứa */
+  z-index: 1000; /* Đảm bảo menu con hiển thị trên các phần tử khác */
+  max-height: 300px; /* Giới hạn chiều cao tối đa */
+  overflow-y: auto; /* Thêm thanh cuộn dọc nếu nội dung quá dài */
+}
+
+/* Phong cách cho các mục trong dropdown */
+.collapse .nav-link {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #495057;
+}
+
+/* Hover effect for dropdown items */
+.collapse .nav-link:hover {
+  background-color: #dee2e6;
+  color: #007bff;
 }

@@ -59,7 +59,6 @@ export const routes: Routes = [
     {'path': 'createOffline', component:CreateOfflineOrderComponent, canActivate: [AuthGuard]},
     {'path': 'updateOffline' , component:UpdateOfflineOrderComponent, canActivate: [AuthGuard]},
     {'path': 'paymentSuccess' , component:PaymentSuccessComponent},
-    {'path': 'manageDiscount' , component:ManageDiscountComponent},
     {'path': 'fillDish' , component:FillDishComponent},
     {'path': 'manageDiscount' , component:ManageDiscountComponent, canActivate: [AuthGuard]},
     {'path': 'updateOrder/:orderId' , component: UpdateOrderForGuestComponent},

@@ -1,11 +1,7 @@
 <div class="app">
   <app-HeaderOrderStaff></app-HeaderOrderStaff>
-
-
-
-
   <div class="app-body">
-    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="padding: 12px;">
       <app-SidebarOrder></app-SidebarOrder>
     </nav>
     <div class="app-body-main-content">
@@ -15,15 +11,15 @@
         </a>
         <div class="app-header-navigation">
           <div class="tabs">
-            <a href="#" class="tab active">Tổng quát</a>
-            <a href="#" class="tab">Đã thanh toán</a>
-            <a href="#" class="tab">Chưa thanh toán</a>
-            <a href="#" class="tab">Đơn hoàn tiền</a>
-            <a href="#" class="tab">Báo cáo</a>
+            <a  (click)="selectTab('overview')" [class.active]="selectedTab === 'overview'" class="tab">Tổng quát</a>
+            <a  (click)="selectTab('paid')" [class.active]="selectedTab === 'paid'" class="tab">Đã thanh toán</a>
+            <a  (click)="selectTab('unpaid')" [class.active]="selectedTab === 'unpaid'" class="tab">Chưa thanh toán</a>
+            <a  (click)="selectTab('refund')" [class.active]="selectedTab === 'refund'" class="tab">Đơn hoàn tiền</a>
+            <a  (click)="selectTab('cash-on-delivery')" [class.active]="selectedTab === 'cash-on-delivery'" class="tab">Thu tiền giao hàng</a>
           </div>
         </div>
-<br><br>
-        <div class="tiles">
+        <br><br>
+        <div *ngIf="selectedTab === 'overview'" class="tiles">
           <article class="tile">
             <div class="tile-header">
               <i class="ph-lightning-light"></i>
@@ -33,18 +29,16 @@
                 <span>10</span>
               </h3>
             </div>
-
           </article>
           <article class="tile">
             <div class="tile-header">
               <i class="ph-fire-simple-light"></i>
               <h3>
-                <span>Doanh thu </span>
+                <span>Doanh thu</span>
                 <hr>
                 <span>2.250.000đ</span>
               </h3>
             </div>
-
           </article>
           <article class="tile">
             <div class="tile-header">
@@ -55,113 +49,73 @@
                 <span>300.000đ</span>
               </h3>
             </div>
-
           </article>
         </div>
-        <div class="service-section-footer">
+
+        <!-- Chuyển phần section xuống bên dưới -->
+        <section class="transfer-section" *ngIf="selectedTab === 'overview'" style="background-color: #ededed;;">
+          <div class="transfer-section-header">
+            <h2>Nhóm hàng bán ra</h2>
+          </div>
+          <br>
+          <div class="transfers">
+            <div class="transfer">
+              <dl class="transfer-details">
+                <div>
+                  <dt>Tên</dt>
+                  <dd>Món ăn</dd>
+                </div>
+                <div>
+                  <dt>Số lượng</dt>
+                  <dd>10</dd>
+                </div>
+                <div>
+                  <dt>Doanh thu</dt>
+                  <dd>800.000đ</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </section>
+
+        <div *ngIf="selectedTab === 'paid'" class="paid-content">
         </div>
-      </section>
-      <section class="transfer-section">
-        <div class="transfer-section-header">
-          <h2>Nhóm hàng bán ra</h2>
-          <div class="filter-options">
-            <button class="icon-button">
-              <i class="ph-funnel"></i>
-            </button>
-            <button class="icon-button">
-              <i class="ph-plus"></i>
-            </button>
-          </div>
+        <div *ngIf="selectedTab === 'unpaid'" class="unpaid-content">
         </div>
-        <div class="transfers">
-          <div class="transfer">
-            <dl class="transfer-details">
-              <div>
-                <dt>Tên</dt>
-                <dd>Món ăn</dd>
-              </div>
-              <div>
-                <dt>Số lượng</dt>
-                <dd>10</dd>
-              </div>
-              <div>
-                <dt>Doanh thu</dt>
-                <dd>800.000đ</dd>
-              </div>
-            </dl>
-          </div>
-          <div class="transfer">
-            <dl class="transfer-details">
-              <div>
-                <dd>Combo</dd>
-              </div>
-              <div>
-                <dt></dt>
-                <dd>4</dd>
-              </div>
-              <div>
-                <dt></dt>
-                <dd>1.000.000đ</dd>
-              </div>
-            </dl>
-          </div>
-          <div class="transfer">
-            <dl class="transfer-details">
-              <div>
-                <dd>Đồ uống</dd>
-              </div>
-              <div>
-                <dt></dt>
-                <dd>15</dd>
-              </div>
-              <div>
-                <dt></dt>
-                <dd>150.000đ</dd>
-              </div>
-            </dl>
-          </div>
+        <div *ngIf="selectedTab === 'refund'" class="refund-content">
+        </div>
+        <div *ngIf="selectedTab === 'cash-on-delivery'" class="cod-content">
         </div>
       </section>
 
     </div>
-    <div class="app-body-sidebar">
+    <div class="app-body-sidebar" *ngIf="selectedTab === 'overview'">
       <br><br>
       <section class="payment-section">
         <h2>Phương thức thanh toán</h2>
         <br>
         <div class="payments">
           <div class="payment">
-
             <div class="payment-details">
               <p>Tiền mặt</p>
               <div>
                 <span>1.300.000đ</span>
-                <button class="icon-button">
-                  <i class="ph-caret-right-bold"></i>
-                </button>
               </div>
             </div>
           </div>
           <div class="payment">
-
             <div class="payment-details">
               <p>Chuyển khoản</p>
               <div>
                 <span>650.000đ</span>
-                <button class="icon-button">
-                  <i class="ph-caret-right-bold"></i>
-                </button>
               </div>
             </div>
           </div>
-
         </div>
-
         <div class="payment-section-footer">
           <button class="save-button">
             Xuất file báo cáo
           </button>
-
         </div>
       </section>
     </div>

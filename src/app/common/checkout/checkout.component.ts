@@ -218,8 +218,6 @@ export class CheckoutComponent implements OnInit {
       const currentTimeStr = currentTime.toTimeString().split(' ')[0].substring(0, 5);
       console.log(currentDate);
       console.log(currentTime);
-
-
       receivingTime = this.formatDateTime(currentDate, currentTimeStr);
     }
     let deposits = 0;
@@ -231,8 +229,8 @@ export class CheckoutComponent implements OnInit {
     }
     console.log(this.selectedPaymentMethod);
     console.log(this.selectedService);
-
     console.log(this.selectedDiscount);
+
     const request = {
       guestPhone: this.guestPhone,
       email: this.email,
@@ -242,7 +240,6 @@ export class CheckoutComponent implements OnInit {
       orderDate: new Date().toISOString(),
       status: 1,
       recevingOrder: receivingTime,
-      totalAmount: this.getTotalCartPrice(),
       deposits: deposits,
       note: this.note,
       type: 2,
@@ -259,7 +256,7 @@ export class CheckoutComponent implements OnInit {
 
     this.checkoutService.submitOrder(request).subscribe({
       next: response => {
-        console.log(request.totalAmount);
+        console.log(request);
         console.log('Order submitted successfully', response);
         this.cartService.clearCart();
         sessionStorage.removeItem('cartItems');
