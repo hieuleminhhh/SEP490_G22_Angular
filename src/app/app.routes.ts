@@ -64,7 +64,7 @@ export const routes: Routes = [
     {'path': 'manageDiscount' , component:ManageDiscountComponent, canActivate: [AuthGuard]},
     {'path': 'updateOrder/:orderId' , component: UpdateOrderForGuestComponent},
     {'path': 'setting' , component: SettingComponent},
-    {'path': 'manageAccount', component: ManageAccountComponent},
+    {'path': 'manageAccount', component: ManageAccountComponent, canActivate: [AuthGuard]},
     {'path': 'shipping', component: OrderShipComponent},
     {'path': 'invoice', component: ManageInvoiceComponent},
     {'path': 'manageNew', component: ManageNewComponent}

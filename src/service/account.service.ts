@@ -67,12 +67,18 @@ export class AccountService {
     const url = `${this.apiUrl}/Account/update/${id}`;
     return this.http.put<GetAccountDTO>(url, account, httpOptions);
   }
-
+  changeProfile(accountId: number, account: any): Observable<any>{
+    const url = `${this.apiUrl}/Account/${accountId}`;
+    return this.http.put<any>(url, account, httpOptions);
+  }
+  changePassword(accountId: number, account:any): Observable<any>{
+    const url = `${this.apiUrl}/Account/changepassword/${accountId}`;
+    return this.http.put<any>(url, account, httpOptions);
+  }
   updateAccountStatus(id: number, isActive: boolean): Observable<any> {
     const url = `${this.apiUrl}/Account/update-status/${id}`;
     return this.http.put<any>(url, isActive, { ...httpOptions, responseType: 'text' as 'json' });
   }
-
   setAccountId(id: number): void {
     this.accountId = id;
   }

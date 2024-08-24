@@ -14,9 +14,10 @@ export class AuthGuard implements CanActivate {
     const url = route.url[0].path; 
 
     if (user) {
+      //Cashier, Order Staff
       if (url === 'listTable' && (user.role === 'Cashier' || user.role === 'OrderStaff')) {
         return true;
-    }
+      }
       if (url === 'manageNew' && user.role === 'Cashier') {
         return true; 
       }
@@ -41,6 +42,7 @@ export class AuthGuard implements CanActivate {
       if (url === 'createOnline' && user.role === 'Cashier') {
         return true; 
       }
+      //Manager
       if (url === 'manageDiscount' && user.role === 'Manager') {
         return true; 
       } 
@@ -48,6 +50,14 @@ export class AuthGuard implements CanActivate {
         return true; 
       } 
       if (url === 'managercombo' && user.role === 'Manager') {
+        return true; 
+      } 
+      //Chef
+      if (url === 'cooking' && user.role === 'Chef') {
+        return true; 
+      } 
+      //Admin
+      if (url === 'manageAccount' && user.role === 'Admin') {
         return true; 
       } 
     }

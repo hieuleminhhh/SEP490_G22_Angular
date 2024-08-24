@@ -60,6 +60,7 @@ export interface AddNewOrder {
   returnAmount: number;
   paymentMethods: number;
   description: string;
+  accountId: number | null;
 }
 export interface ListTables {
   tableId: number;

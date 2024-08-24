@@ -70,6 +70,7 @@ export class CreateOnlineOrderComponent implements OnInit {
   selectedDiscountPercent: number = 0;
   totalAmountAfterDiscount: number = 0;
   totalAmount: number = 0;
+  accountId: number | null = null;
   addNew: AddNewOrder = {
     guestPhone: '',
     email: '',
@@ -92,7 +93,8 @@ export class CreateOnlineOrderComponent implements OnInit {
     amountReceived: 0,
     returnAmount: 0,
     paymentMethods: 0,
-    description: ''
+    description: '',
+    accountId: 0
   };
   invoice: any = {};
   orderTime: string = 'Giao hàng sớm nhất';
@@ -114,8 +116,10 @@ export class CreateOnlineOrderComponent implements OnInit {
     this.LoadActiveDiscounts();
     this.calculateAndSetTotalAmount();
     this.selectedDiscount = null;
-    console.log("Select discount "+this.selectedDiscount); // Xem giá trị hiện tại của selectedDiscount
+    console.log("Select discount "+this.selectedDiscount); 
     this.updateTimes();
+    const accountIdString = localStorage.getItem('accountId');
+    this.accountId = accountIdString ? Number(accountIdString) : null;
   }
   selectCategory(searchCategory: string) {
     this.selectedCategory = searchCategory;
@@ -323,6 +327,7 @@ createOrder() {
     discountId: this.selectedDiscount,
     taxcode: 'ABCD',
     paymentStatus: 0,
+    accountId: this.accountId
   };
 
   // Log order details for debugging
@@ -440,7 +445,8 @@ setDefaultReceivingTime() {
     amountReceived: 0,
     returnAmount: 0,
     paymentMethods: 0,
-    description: ''      // Assuming note is of type string
+    description: '' ,
+    accountId: 0     // Assuming note is of type string
       // Add more properties as required by the AddNewOrder type/interface
     };
 
@@ -493,7 +499,8 @@ setDefaultReceivingTime() {
     amountReceived: 0,
     returnAmount: 0,
     paymentMethods: 0,
-    description: ''      // Assuming note is of type string
+    description: ''  ,
+    accountId: 0    // Assuming note is of type string
       // Add more properties as required by the AddNewOrder type/interface
     };
   }

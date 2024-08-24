@@ -12,7 +12,7 @@
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <!-- Page Header -->
         <div class="container mt-5">
-          <a href="javascript:history.back()" class="back-link">
+          <a href="/dashboard" class="back-link">
             <i class="fas fa-arrow-left back-icon"></i>
           </a>
           <h1 class="text-center mb-4 heading-styled">Quản lý đơn hàng</h1>
@@ -93,13 +93,11 @@
                       data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">
                       Chi tiết
                     </button>
-                    <button *ngIf="(order.paymentStatus === 0 && order.status !== 5 && order.status !== 7) &&
+                    <button *ngIf="(order.paymentStatus === 0 && order.status !== 5 && order.status !== 7&& order.status !== 1) &&
          !((order.status === 6 || order.status === 2|| order.status === 4) && order.paymentStatus === 0 && order.paymentMethods === 2)"
                       type="button" class="btn btn-warning btn-sm" (click)="updateOrder(order.orderId)">
                       Cập nhật
                     </button>
-
-
                   </td>
                 </tr>
               </ng-container>
@@ -315,7 +313,7 @@
                       data-bs-toggle="modal" *ngIf="!orderDetail?.invoiceId">Thanh toán</button>
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
                       data-bs-toggle="modal">Hủy đơn</button>
-                    <button type="button" class="btn btn-primary me-2" *ngIf="!orderDetail?.invoiceId">In hóa đơn tạm</button>
+                    <!-- <button type="button" class="btn btn-primary me-2" *ngIf="!orderDetail?.invoiceId">In hóa đơn tạm</button> -->
                     <!-- (click)="printTemporaryInvoice()" -->
                   </ng-container>
 

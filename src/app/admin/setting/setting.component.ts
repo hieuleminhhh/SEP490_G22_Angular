@@ -19,7 +19,7 @@ export class SettingComponent implements OnInit {
   isEditing: boolean = false;
   selectedFile: File | null = null;
   selectedUpdateFile: File | null = null;
-
+  successMessage: string | null = null;
 
   currentQrcodeUrl: string | null = null;
   currentLogoUrl: string | null = null;
@@ -45,127 +45,75 @@ export class SettingComponent implements OnInit {
       }
     );
   }
-
-  enableEditing(): void {
-    this.isEditing = true;
+  onLogoChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.selectedFile = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.info[0].logo = e.target.result;  // Hiển thị ảnh mới trên giao diện
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
   }
-
+  
+  onQRCodeChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.selectedUpdateFile = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.info[0].qrcode = e.target.result;  // Hiển thị ảnh mới trên giao diện
+      };
+      reader.readAsDataURL(this.selectedUpdateFile);
+    }
+  }
   saveChanges(): void {
-    this.isEditing = false;
-    console.log('Saving info:', this.info[0]);
-
-    // Xử lý qrcode nếu nó đã thay đổi
-    if (this.info[0].qrcode && this.info[0].qrcode !== this.currentQrcodeUrl) {
-      this.convertBlobToFile(this.info[0].qrcode).then(file => {
-        this.uploadImage(file, 'qrcode');
-      });
-
-    } else if (!this.info[0].qrcode) {
-      console.error('No qrcode URL returned from the server.');
+    if (this.selectedFile) {
+      this.settingService.UploadImage(this.selectedFile).subscribe(
+        response => {
+          this.info[0].logo = response.imageUrl;
+          this.finalizeUpdate();  // Sau khi tải ảnh lên, cập nhật thông tin
+        },
+        error => {
+          console.error('Error uploading logo:', error);
+        }
+      );
+    } else if (this.selectedUpdateFile) {
+      this.settingService.UploadImage(this.selectedUpdateFile).subscribe(
+        response => {
+          this.info[0].qrcode = response.imageUrl;
+          this.finalizeUpdate();  // Sau khi tải ảnh lên, cập nhật thông tin
+        },
+        error => {
+          console.error('Error uploading QR code:', error);
+        }
+      );
+    } else {
+      this.finalizeUpdate();  // Nếu không có ảnh mới, chỉ cập nhật thông tin
     }
-
-    // Xử lý logo nếu nó đã thay đổi
-    if (this.info[0].logo && this.info[0].logo !== this.currentLogoUrl) {
-      this.convertBlobToFile(this.info[0].logo).then(file => {
-        this.uploadImage(file, 'logo');
-      });
-    } else if (!this.info[0].logo) {
-      console.error('No logo URL returned from the server.');
-    }
-
-    const updatedInfo = { ...this.info[0] };
-    if (updatedInfo.qrcode) {
-      updatedInfo.qrcode = this.addPngExtensionIfNeeded(updatedInfo.qrcode);
-    }
-    if (updatedInfo.logo) {
-      updatedInfo.logo = this.addPngExtensionIfNeeded(updatedInfo.logo);
-    }
-
-    console.log('Saving info:', updatedInfo);
-
-    this.settingService.updateInfo(updatedInfo).subscribe(
+  }
+  
+  finalizeUpdate(): void {
+    this.settingService.updateInfo(this.info[0]).subscribe(
       response => {
-        console.log('Save success:', response);
-        // Thực hiện hành động thêm nếu cần, chẳng hạn như upload hình ảnh
+        console.log('Info updated successfully:', response);
+        this.getInfo();
+        this.successMessage = 'Cập nhập thông tin quán ăn thành công';  // Set success message
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       },
       error => {
-        console.error('Save error:', error);
-        if (error.error) {
-          console.error('Error details:', error.error);
-        }
+        console.error('Error updating info:', error);
+        this.successMessage = '';  // Set error message
+        setTimeout(() => this.successMessage = null, 3000);  // Clear message after 3 seconds
       }
     );
   }
-  addPngExtensionIfNeeded(imageUrl: string): string {
-    // Lấy tên tệp từ URL (nếu có), thêm đuôi .png nếu chưa có đuôi
-    const urlParts = imageUrl.split('/');
-    let fileName = urlParts.pop() || 'file';
-    if (!fileName.includes('.')) {
-      fileName += '.png'; // Thêm đuôi .png nếu chưa có đuôi
-    }
-    return fileName;
-  }
-  convertBlobToFile(blobUrl: string): Promise<File> {
-    return fetch(blobUrl)
-      .then(response => response.blob())
-      .then(blob => {
-        // Lấy tên tệp từ URL (nếu có), thêm đuôi .png nếu không có đuôi
-        const urlParts = blobUrl.split('/');
-        let fileName = urlParts.pop() || 'file';
-        if (!fileName.includes('.')) {
-          fileName += '.png'; // Thêm đuôi .png nếu chưa có đuôi
-        }
-        return new File([blob], fileName, { type: 'image/png' }); // Đặt loại MIME là image/png
-      });
-  }
+  
 
-
-
-  uploadImage(file: File, type: string): void {
-    this.dishService.UploadImage(file).subscribe(
-      (response) => {
-        console.log(`${type} uploaded successfully:`, response.imageUrl);
-      },
-      (error) => {
-        console.error(`Error uploading ${type}:`, error);
-        if (error.error) {
-          console.error('Error details:', error.error);
-        }
-      }
-    );
-  }
-
-  cancelEditing(): void {
-    this.isEditing = false;
-    this.getInfo(); // Reload info to discard changes
-  }
-  onUpdateImageSelect(event: Event): void {
-    const fileInput = event.target as HTMLInputElement;
-    if (fileInput.files && fileInput.files.length > 0) {
-      this.selectedUpdateFile = fileInput.files[0];
-      if (this.info[0].qrcode) {
-        URL.revokeObjectURL(this.info[0].qrcode); // Thu hồi URL blob cũ
-      }
-      const imageUrl = URL.createObjectURL(this.selectedUpdateFile);
-      const cleanUrl = imageUrl.replace('blob:', ''); // Loại bỏ tiền tố 'blob:'
-      this.info[0].qrcode = cleanUrl;
-      console.log(this.info[0].qrcode);
-    }
-  }
-
-  onUpdateLogoSelect(event: Event): void {
-    const fileInput = event.target as HTMLInputElement;
-    if (fileInput.files && fileInput.files.length > 0) {
-      this.selectedUpdateFile = fileInput.files[0];
-      if (this.info[0].logo) {
-        URL.revokeObjectURL(this.info[0].logo); // Thu hồi URL blob cũ
-      }
-      const imageUrl = URL.createObjectURL(this.selectedUpdateFile);
-      const cleanUrl = imageUrl.replace('blob:', ''); // Loại bỏ tiền tố 'blob:'
-      this.info[0].logo = cleanUrl;
-      console.log(this.info[0].logo);
-    }
-  }
+  
 
 
 
