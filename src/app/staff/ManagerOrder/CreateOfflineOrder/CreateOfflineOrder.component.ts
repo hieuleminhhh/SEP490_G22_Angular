@@ -25,6 +25,7 @@ import { NoteDialogComponent } from '../../../common/material/NoteDialog/NoteDia
 import { CheckoutService } from '../../../../service/checkout.service';
 import { AccountService } from '../../../../service/account.service';
 import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
+import { ReservationService } from '../../../../service/reservation.service';
 @Component({
     selector: 'app-create-offline-order',
     templateUrl: './CreateOfflineOrder.component.html',
@@ -76,10 +77,13 @@ export class CreateOfflineOrderComponent implements OnInit {
   accountId: number | null = null;
   account: any;
   showSidebar: boolean = true; 
+  reservationData: any;
+  orderId: number| null = null
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService,
    private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService, private dialog: MatDialog
    ,private discountService: DiscountService,
-   private checkoutService: CheckoutService, private accountService: AccountService) { }
+   private checkoutService: CheckoutService, private accountService: AccountService,
+  private reservationService: ReservationService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   ngOnInit() {
     this.loadListDishes();
@@ -110,24 +114,31 @@ export class CreateOfflineOrderComponent implements OnInit {
     console.log('Loading orders for table ID:', tableId);
     this.orderService.getOrdersByTableId(tableId).subscribe(
       (response: any) => {
-        if (response && response.data && response.data.orderDetails && response.data.orderDetails.length > 0) {
-          this.selectedItems = response.data.orderDetails.map((orderItem: any) => ({
-            orderDetailId: orderItem.orderDetailId,
-            dishId: orderItem.dishId,
-            comboId: orderItem.comboId,
-            itemName: orderItem.dish.itemName,
-            unitPrice: orderItem.unitPrice,
-            dishesServed: orderItem.dishesServed || 0,
-            price: orderItem.dish.price,
-            discountedPrice: orderItem.dish.discountedPrice,
-            quantity: orderItem.quantity,
-            imageUrl: orderItem.dish.imageUrl,
-            totalPrice: orderItem.dish.discountedPrice ? orderItem.dish.discountedPrice * orderItem.quantity : orderItem.dish.price * orderItem.quantity,
-          }));
-          console.log('Fetched order details:', this.selectedItems);
+        if (response && response.data) {
+          this.orderId = response.data.orderId;
+  
+          if (response.data.orderDetails && response.data.orderDetails.length > 0) {
+            this.selectedItems = response.data.orderDetails.map((orderItem: any) => ({
+              orderDetailId: orderItem.orderDetailId,
+              dishId: orderItem.dishId,
+              comboId: orderItem.comboId,
+              itemName: orderItem.dish.itemName,
+              unitPrice: orderItem.unitPrice,
+              dishesServed: orderItem.dishesServed || 0,
+              price: orderItem.dish.price,
+              discountedPrice: orderItem.dish.discountedPrice,
+              quantity: orderItem.quantity,
+              imageUrl: orderItem.dish.imageUrl,
+              totalPrice: orderItem.dish.discountedPrice ? orderItem.dish.discountedPrice * orderItem.quantity : orderItem.dish.price * orderItem.quantity,
+            }));
+            console.log('Fetched order details:', this.selectedItems);
+          } else {
+            console.error('Invalid response: No order details found.', response);
+            this.selectedItems = [];
+          }
         } else {
-          console.error('Invalid response:', response);
-          this.selectedItems = []; 
+          console.error('Invalid response: No data found.', response);
+          this.selectedItems = [];
         }
       },
       (error: HttpErrorResponse) => {
@@ -137,6 +148,7 @@ export class CreateOfflineOrderComponent implements OnInit {
       }
     );
   }
+  
   clearCart() {
     this.selectedItems = [];
     this.selectedDiscount = null;
@@ -308,7 +320,7 @@ export class CreateOfflineOrderComponent implements OnInit {
         this.account = response;
         console.log('Account details:', this.account);
         console.log('Account role:', this.account.role);
-        this.showSidebar = this.account.role !== 'OrderStaff';
+        this.showSidebar = this.account.role !== 'OrderStaff' && this.account.role !== 'Cashier';
       },
       error => {
         console.error('Error fetching account details:', error);
@@ -659,6 +671,17 @@ export class CreateOfflineOrderComponent implements OnInit {
       } else {
         this.selectedDiscount = discountId; // Chọn mã giảm giá mới
       }
+    }
+    getReservationByOrderId(orderId: number) {
+      this.reservationService.getReservationByOrderId(orderId).subscribe(
+        (data) => {
+          this.reservationData = data;
+          console.log('Reservation Data:', this.reservationData);
+        },
+        (error) => {
+          console.error('Error fetching reservation:', error);
+        }
+      );
     }
     
 }

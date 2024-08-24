@@ -5,6 +5,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountService } from '../../../../service/account.service';
+import { SettingService } from '../../../../service/setting.service';
 @Component({
   selector: 'app-HeaderOrderStaff',
   templateUrl: './HeaderOrderStaff.component.html',
@@ -15,7 +16,7 @@ import { AccountService } from '../../../../service/account.service';
 export class HeaderOrderStaffComponent implements OnInit {
   accountId: number | null = null;
   constructor(private router: Router,
-    private route: ActivatedRoute, private accountService: AccountService) { }
+    private route: ActivatedRoute, private accountService: AccountService, private settingService: SettingService) { }
   account: any = {};
   dropdownOpen = false;
   currentPassword: string = '';
@@ -23,6 +24,8 @@ export class HeaderOrderStaffComponent implements OnInit {
   confirmPassword: string = '';
   errorMessage: string = '';
   successMessage: string = '';
+  logoUrl: string = '';
+  settings: any;
   ngOnInit() {
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
@@ -107,5 +110,17 @@ export class HeaderOrderStaffComponent implements OnInit {
       this.successMessage = ''; // Clear success message
     }
   }
-
+  getInfo(): void {
+    this.settingService.getInfo().subscribe(
+      response => {
+        this.settings = response;
+        console.log(response);
+        this.logoUrl = this.settings[0].logo;
+        console.log('URL Logo',this.logoUrl);
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
 }

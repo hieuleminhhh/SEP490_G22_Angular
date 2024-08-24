@@ -123,7 +123,7 @@ export class BookingComponent implements OnInit {
         guestNumber: this.reservation.people,
         note: this.note,
         orderDate: new Date().toISOString(),
-        status: 0,
+        status: 1,
         recevingOrder: dateTime,
         totalAmount: 0,
         deposits: 0,

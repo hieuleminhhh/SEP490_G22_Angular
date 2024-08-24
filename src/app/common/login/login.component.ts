@@ -3,6 +3,7 @@ import { AccountService } from '../../../service/account.service';
 import { FormsModule } from '@angular/forms'; 
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { SettingService } from '../../../service/setting.service';
 
 @Component({
   selector: 'app-login',
@@ -18,17 +19,13 @@ export class LoginComponent implements OnInit {
   token: string = '';
   errorMessage: string | null = null; 
   successMessage: string | null = null;
-  constructor(private accountService: AccountService,  private router: Router) { 
-    this.accountService.isLoggedIn().subscribe({
-      next: loggedIn => {
-        this.loggedIn = loggedIn;
-      },
-      error: error => {
-        console.error('Error in isLoggedIn:', error);
-      }
-    });    
+  logoUrl: string = '';
+  settings: any;
+  constructor(private accountService: AccountService,  private router: Router, private settingService: SettingService) { 
   }
-
+  ngOnInit() {
+    this.getInfo();
+  }  
   login() {
     this.accountService.login(this.username, this.password).subscribe({
       next: response => {
@@ -82,10 +79,21 @@ export class LoginComponent implements OnInit {
         break;
     }
   }
-  
+  getInfo(): void {
+    this.settingService.getInfo().subscribe(
+      response => {
+        this.settings = response;
+        console.log(response);
+        this.logoUrl = this.settings[0].logo;
+        console.log('URL Logo',this.logoUrl);
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
 
   
 
-  ngOnInit() {
-  }  
+ 
 }
