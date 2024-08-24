@@ -1,7 +1,7 @@
 <div class="container">
   <div class="header-row">
-    <button class="back-button" *ngIf="ispayment===true">Quay lại</button>
-    <button class="back-button" *ngIf="ispayment===false">Quay về trang chủ</button>
+    <button class="back-button" *ngIf="ispayment === true" (click)="goBack()">Quay lại</button>
+    <button class="back-button" *ngIf="ispayment === false" (click)="goToHome()">Quay về trang chủ</button>
     <div class="title-container">
       <h2 *ngIf="ispayment===true">THANH TOÁN TRƯỚC CHO ĐƠN ĐẶT BÀN</h2>
       <h2 *ngIf="ispayment===false" style="color: green;">YÊU CẦU ĐẶT BÀN ĐÃ ĐƯỢC TIẾP NHẬN</h2>

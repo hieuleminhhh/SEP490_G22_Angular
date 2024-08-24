@@ -173,7 +173,7 @@ export class TableManagementComponent implements OnInit {
       page: this.currentPage,
       limit: this.itemsPerPage
     };
-    this.reservationService.getReservationList(1).subscribe(
+    this.reservationService.getReservationList(2).subscribe(
       response => {
         this.dataReservationToday = response.map((reservation: any) => ({
           ...reservation,
@@ -334,7 +334,7 @@ export class TableManagementComponent implements OnInit {
       page: this.currentPage,
       limit: this.itemsPerPage
     };
-    this.reservationService.getReservationList(0).subscribe(
+    this.reservationService.getReservationList(1).subscribe(
       response => {
         this.dataReservationPending = response;
         this.totalItems = this.dataReservationPending.length; // Cập nhật lại tổng số bản ghi
@@ -504,23 +504,23 @@ export class TableManagementComponent implements OnInit {
     let label = 'Không xác định'; // Default label if status doesn't match
     let cssClass = ''; // Default class
     switch (status) {
-      case 0:
+      case 1:
         label = 'Đợi xác nhận';
         cssClass = 'status-pending';
         break;
-      case 1:
+      case 2:
         label = 'Chưa nhận bàn';
         cssClass = 'status-pending';
         break;
-      case 2:
+      case 3:
         label = 'Đã nhận bàn';
         cssClass = 'status-confirmed';
         break;
-      case 3:
+      case 4:
         label = 'Đã hoàn thành';
         cssClass = 'status-completed';
         break;
-      case 4:
+      case 5:
         label = 'Đã hủy';
         cssClass = 'status-cancelled';
         break;

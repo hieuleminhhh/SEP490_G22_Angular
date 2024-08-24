@@ -24,7 +24,7 @@ body{
   }
 }
 .cart{
-  background-color: beige;
+  background-color: white;
   padding: 4vh 5vh;
   border-bottom-left-radius: 1rem;
   border-top-left-radius: 1rem;
@@ -272,7 +272,7 @@ input[type="radio"] {
 .cart-header {
   position: sticky;
   top: 0;
-  background-color: beige; /* Ensure background matches the container */
+  background-color: white; /* Ensure background matches the container */
   z-index: 10; /* Keep the header above the scrollable content */
   padding: 10px 0; /* Optional: add padding for better spacing */
 }
