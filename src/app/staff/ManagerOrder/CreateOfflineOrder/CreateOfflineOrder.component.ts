@@ -269,7 +269,7 @@ export class CreateOfflineOrderComponent implements OnInit {
   }
   loadListDishes(search: string = '', searchCategory: string =''): void {
     console.log('Loading dishes with search term:', search); 
-    this.dishService.ListDishes(this.currentPage,this.pageSize, search, searchCategory ).subscribe(
+    this.dishService.ListDishes(this.currentPage,6, search, searchCategory ).subscribe(
       (response: ListAllDishes) => {
         if (response && response.items) {
           this.dishes = [response];

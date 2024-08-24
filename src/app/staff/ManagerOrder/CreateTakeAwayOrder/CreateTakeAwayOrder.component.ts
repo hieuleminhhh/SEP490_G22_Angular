@@ -113,7 +113,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.selectedDiscount = null;
     this.generateTimeOptions();
     this.setDefaultReceivingTime();
-
+    this.paymentMethod = '0';
   }
   selectCategory(category: string) {
     this.searchCategory = category;
@@ -363,6 +363,14 @@ printInvoice(): void {
           padding-top: 10px;
           font-style: italic;
         }
+        .qr-code-container {
+          text-align: center;
+          margin: 20px 0;
+        }
+        ..qr-code-container img {
+          width: 75px; /* Adjust the width as needed */
+          height: 75px; /* Adjust the height as needed */
+        }
       </style>
     `);
     printWindow?.document.write('</head><body>');
@@ -388,15 +396,15 @@ printInvoice(): void {
         <label for="customerName" class="form-label">Tên khách hàng:</label>
         <span id="customerName">${this.invoice.consigneeName || 'Khách lẻ'}</span>
       </div>
-       ${this.invoice.guestPhone ? `
+      ${this.invoice.guestPhone ? `
       <div class="mb-3">
         <label for="phoneNumber" class="form-label">Số điện thoại: </label>
         <span id="phoneNumber">${this.invoice.guestPhone || 'N/A'}</span>
       </div>` : ''}
       <div class="mb-3">
-    <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
-    <span id="orderDate">${this.formatDateForPrint(this.invoice?.orderDate)}</span>
-  </div>
+        <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
+        <span id="orderDate">${this.formatDateForPrint(this.invoice?.orderDate)}</span>
+      </div>
       <div class="mb-3">
         <table class="table">
           <thead>
@@ -436,6 +444,16 @@ printInvoice(): void {
       </div>
     `);
 
+    // Conditionally add QR code if paymentMethod equals '1'
+    if (this.paymentMethod === '1') {
+      printWindow?.document.write(`
+        <div class="qr-code-container">
+          <label for="qrCode" class="form-label"></label>
+          <img id="qrCode" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" class="img-fluid">
+        </div>
+      `);
+    }
+
     // Add footer
     printWindow?.document.write(`
       <div class="footer">
@@ -451,7 +469,6 @@ printInvoice(): void {
     console.error('Invoice ID is not defined.');
   }
 }
-
 
 
 
