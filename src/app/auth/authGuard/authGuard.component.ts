@@ -52,6 +52,10 @@ export class AuthGuard implements CanActivate {
       if (url === 'managercombo' && user.role === 'Manager') {
         return true; 
       } 
+      //Chef
+      if (url === 'cooking' && user.role === 'Chef') {
+        return true; 
+      } 
       //Admin
       if (url === 'manageAccount' && user.role === 'Admin') {
         return true; 

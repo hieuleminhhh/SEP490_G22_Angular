@@ -5,13 +5,14 @@ import { FormsModule } from '@angular/forms';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 import { switchMap } from 'rxjs';
 import { HeaderOrderStaffComponent } from "../ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
+import { DateFormatPipe } from '../../common/material/dateFormat/dateFormat.component';
 
 @Component({
   selector: 'app-fill-dish',
   standalone: true,
   templateUrl: './fill-dish.component.html',
   styleUrls: ['./fill-dish.component.css'],
-  imports: [CommonModule, FormsModule, CurrencyFormatPipe, HeaderOrderStaffComponent]
+  imports: [CommonModule, FormsModule, CurrencyFormatPipe, HeaderOrderStaffComponent, DateFormatPipe]
 })
 export class FillDishComponent implements OnInit {
 
@@ -28,6 +29,7 @@ export class FillDishComponent implements OnInit {
   takeawayOrders: any[] = [];
   dataShipStaff: any;
   isAnyOrderSelected: boolean = false;
+  isPrinted: boolean = false;
   constructor(private cookingService: CookingService) { }
 
   ngOnInit(): void {
@@ -96,7 +98,7 @@ export class FillDishComponent implements OnInit {
       }
     );
   }
-
+  
 
   getOrderTimeHoursMinutes(orderTime: string): string {
     const date = new Date(orderTime);
@@ -298,7 +300,6 @@ export class FillDishComponent implements OnInit {
       ).subscribe(
         statusResponse => {
           console.log(`Order ${order.orderId} status updated to 7 successfully`, statusResponse);
-          window.location.reload();
         },
         error => {
           console.error(`Error updating account or status for order ${order.orderId}:`, error);
@@ -343,10 +344,168 @@ export class FillDishComponent implements OnInit {
     console.log(this.selectedOrders);
 
   }
+  printOrder(): void {
+    const modalElement = document.getElementById('invoiceModal');
+    if (modalElement) {
+        // Create a copy of the modal to work with
+        const printElement = modalElement.cloneNode(true) as HTMLElement;
 
+        // Remove unnecessary elements from the copy
+        const headerToRemove = printElement.querySelector('.text-center.mb-3');
+        if (headerToRemove) headerToRemove.remove();
 
+        // Remove all elements with class 'card-header d-flex justify-content-center'
+        const cardHeaders = printElement.querySelectorAll('.card-header.d-flex.justify-content-center');
+        cardHeaders.forEach(header => header.remove());
 
+        // Remove all buttons inside 'card-header' elements
+        const buttonsToRemove = printElement.querySelectorAll('button');
+        buttonsToRemove.forEach(button => button.remove());
+
+        let printContents = printElement.innerHTML;
+
+        // Open a new window for printing
+        const printWindow = window.open('', '', 'width=100mm,height=150mm');
+
+        if (printWindow) {
+            // Write the content to the new window
+            printWindow.document.write('<html><head><title>Print Order</title>');
+            printWindow.document.write(`
+                <style>
+                    @media print {
+                        @page {
+                            size: 100mm 150mm;
+                            margin: 0;
+                        }
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 0;
+                            width: 100mm;
+                            height: 150mm;
+                            box-sizing: border-box;
+                        }
+                        .header {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            background: #fff;
+                            padding: 2mm;
+                            width: 100%;
+                            box-sizing: border-box;
+                            height: 20mm;
+                            text-align: center;
+                        }
+                        .footer {
+                            position: fixed;
+                            bottom: 0;
+                            left: 0;
+                            right: 0;
+                            background: #fff;
+                            padding: 2mm;
+                            width: 100%;
+                            box-sizing: border-box;
+                            height: 10mm;
+                            text-align: center;
+                        }
+                        .content {
+                            margin: 30mm 2mm 20mm 2mm;
+                            overflow: hidden;
+                        }
+                        .page-break {
+                            page-break-before: always;
+                        }
+                        .order {
+                            page-break-inside: avoid;
+                        }
+                        .content > div {
+                            margin-bottom: 5mm;
+                        }
+                    }
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 5mm;
+                    }
+                    .header h1 {
+                        margin: 0;
+                        font-size: 14px;
+                    }
+                    .header p {
+                        margin: 1px 0;
+                    }
+                    hr {
+                        margin: 5mm 0;
+                        border: 0;
+                        border-top: 1px solid #000;
+                    }
+                    .table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 5mm;
+                    }
+                    .table th, .table td {
+                        border: 1px solid #ddd;
+                        padding: 4px;
+                        text-align: left;
+                        font-size: 12px;
+                    }
+                    .table th {
+                        background-color: #f2f2f2;
+                    }
+                    .text-right {
+                        text-align: right;
+                    }
+                </style>
+            `);
+            printWindow.document.write('</head><body>');
+
+            // Add restaurant information header
+            printWindow.document.write(`
+                <div class="header">
+                    <h1>Eating House</h1>
+                    <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
+                    <p>Hotline: 0393578176 - 0987654321</p>
+                    <p>Email: eatinghouse@gmail.com</p>
+                    <hr>
+                </div>
+            `);
+
+            // Add the content of the modal with page breaks for each order
+            printWindow.document.write('<div class="content">');
+            const orders = Array.from(printElement.querySelectorAll('.card1'));
+            orders.forEach((order, index) => {
+                if (index > 0) {
+                    printWindow.document.write('<div class="page-break"></div>');
+                }
+                printWindow.document.write(order.outerHTML);
+            });
+            printWindow.document.write('</div>');
+
+            // Add footer without border
+            printWindow.document.write(`
+                <div class="footer">
+                    Cảm ơn quý khách và hẹn gặp lại!
+                </div>
+            `);
+
+            // Close the document and trigger print
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+            this.isPrinted = true;
+        }
+    } else {
+        console.error('Modal element not found.');
+    }
+}
+reloadPage(): void {
+  window.location.reload();
+  }
 
 
 }
-

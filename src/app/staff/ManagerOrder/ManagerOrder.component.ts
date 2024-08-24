@@ -86,6 +86,7 @@ export class ManagerOrderComponent implements OnInit {
   ngOnInit() {
     this.setDefaultDates();
     this.loadListOrder();
+    this.paymentMethod = '0';
   }
 
   setDefaultDates() {
@@ -104,6 +105,7 @@ export class ManagerOrderComponent implements OnInit {
         console.error('Error fetching order details:', error);
       }
     );
+
   }
 
   loadListOrder(): void {
@@ -405,7 +407,7 @@ export class ManagerOrderComponent implements OnInit {
     console.log('Invoice data before update:', this.invoice);
     if (this.invoice.invoiceId) {
       const printWindow = window.open('', '', 'height=600,width=800');
-
+    
       // Write the content to the new window
       printWindow?.document.write('<html><head><title>Invoice</title>');
       printWindow?.document.write(`
@@ -452,10 +454,18 @@ export class ManagerOrderComponent implements OnInit {
             padding-top: 10px;
             font-style: italic;
           }
+          .qr-code-container {
+            text-align: center;
+            margin: 20px 0;
+          }
+          .qr-code-container img {
+            width: 75px; /* Adjust size as needed */
+            height: 75px;
+          }
         </style>
       `);
       printWindow?.document.write('</head><body>');
-
+    
       // Add restaurant information
       printWindow?.document.write(`
         <div class="header">
@@ -466,7 +476,7 @@ export class ManagerOrderComponent implements OnInit {
           <hr>
         </div>
       `);
-
+    
       // Add invoice information
       printWindow?.document.write(`
         <div class="mb-3">
@@ -477,15 +487,15 @@ export class ManagerOrderComponent implements OnInit {
           <label for="customerName" class="form-label">Tên khách hàng:</label>
           <span id="customerName">${this.invoice.consigneeName || 'Khách lẻ'}</span>
         </div>
-         ${this.invoice.guestPhone ? `
+        ${this.invoice.guestPhone ? `
         <div class="mb-3">
           <label for="phoneNumber" class="form-label">Số điện thoại: </label>
           <span id="phoneNumber">${this.invoice.guestPhone || 'N/A'}</span>
         </div>` : ''}
         <div class="mb-3">
-      <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
-      <span id="orderDate">${this.formatDateForPrint(this.invoice?.orderDate)}</span>
-    </div>
+          <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
+          <span id="orderDate">${this.formatDateForPrint(this.invoice?.orderDate)}</span>
+        </div>
         <div class="mb-3">
           <table class="table">
             <thead>
@@ -516,7 +526,7 @@ export class ManagerOrderComponent implements OnInit {
         </div>
         <div class="mb-3">
           <label for="discount" class="form-label">Khuyến mãi:</label>
-           <span id="discount">${this.getDiscountInvoiceAmount().toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })} (${this.invoice?.discountPercent || '0'}%)</span>
+          <span id="discount">${this.getDiscountInvoiceAmount().toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })} (${this.invoice?.discountPercent || '0'}%)</span>
         </div>
         <hr>
         <div class="mb-3">
@@ -524,22 +534,35 @@ export class ManagerOrderComponent implements OnInit {
           <span id="totalAmount">${this.invoice?.paymentAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
         </div>
       `);
-
+    
+      // Conditionally add QR code if paymentMethod equals '1'
+      if (this.paymentMethod === '1') {
+        printWindow?.document.write(`
+          <div class="qr-code-container">
+            <label for="qrCode" class="form-label"></label>
+            <img id="qrCode" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt="QR Code">
+          </div>
+        `);
+      }
+    
       // Add footer
       printWindow?.document.write(`
         <div class="footer">
           Cảm ơn quý khách và hẹn gặp lại!
         </div>
       `);
-
+    
       // Close the document and trigger print
       printWindow?.document.write('</body></html>');
       printWindow?.document.close();
-      printWindow?.print();
+      setTimeout(() => {
+        printWindow?.print();
+      }, 1000); // 1 second delay
     } else {
       console.error('Invoice ID is not defined.');
     }
   }
+  
 
   // UpdateStatus(orderId: number | undefined, status: number | undefined) {
   //   if (orderId !== undefined && status !== undefined) {

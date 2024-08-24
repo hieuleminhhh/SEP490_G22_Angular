@@ -1,13 +1,13 @@
-
 <app-HeaderOrderStaff></app-HeaderOrderStaff>
 <div class="container">
   <main class="main-content">
     <div class="container">
-      <a href="javascript:history.back()" class="back-link">
-        <i class="fas fa-arrow-left back-icon"></i>
-      </a>
+
       <div class="card fixed-size">
         <div class="title">
+          <a href="javascript:history.back()" class="back-link">
+            <i class="fas fa-arrow-left back-icon"></i>
+          </a>
           <button (click)="onButtonClick('dineIn')" [class.selected]="isSelected('dineIn')">Phục vụ tại chỗ</button>
           <button (click)="onButtonClick('takeAway')" [class.selected]="isSelected('takeAway')">Đơn mang về</button>
           <button (click)="onButtonClick('ship')" [class.selected]="isSelected('ship')">Đơn giao hàng</button>
@@ -114,7 +114,7 @@
                       <td *ngIf="order.status!==1"></td>
                       <td>{{ order.orderId }}</td>
                       <td>{{order.status === 1 ? "Sẵn sàng giao" : "Chưa hoàn thành"}}</td>
-                      <td>{{order.recevingOrder  | date:'dd/MM/yyyy - HH:mm'}}</td>
+                      <td>{{order.recevingOrder | date:'dd/MM/yyyy - HH:mm'}}</td>
                       <td><button (click)="showDetails(order)">Chi tiết</button></td>
                     </tr>
                   </ng-container>
@@ -134,11 +134,15 @@
                 <div *ngFor="let shiper of dataShipStaff; let i = index" class="grid-item">
                   <div class="dish-info">
                     <p>{{shiper.firstName}}{{shiper.lastName}}</p>
-                    <button (click)="updateAccountId(shiper.accountId)">Chỉ định giao hàng</button>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Chỉ định
+                      giao hàng</button>
                   </div>
                 </div>
               </div>
             </div>
+
+
+
           </div>
         </div>
       </div>
@@ -163,8 +167,9 @@
         <thead class="table-light">
           <tr>
             <th>Món ăn</th>
-            <th>Số lượng</th>
+            <th>Số lượng</th>          
             <th>Hoàn thành</th>
+            <th>Đơn giá</th>
             <th>Tổng số tiền</th>
           </tr>
         </thead>
@@ -174,6 +179,7 @@
               <td>{{ item.nameCombo || item.itemName }}</td>
               <td>{{ item.quantity }}</td>
               <td>{{ item.dishesServed }}</td>
+              <td>{{ item.itemPrice || item.comboPrice | currencyFormat }}</td>
               <td>{{ item.unitPrice | currencyFormat }}</td>
             </tr>
           </ng-container>
@@ -184,7 +190,7 @@
           <!-- First Column -->
           <div class="col-md-6">
             <div class="d-flex justify-content-between" *ngIf="selectedItem.discountPercent">
-              <span class="fw-bold" >Tạm tính:</span>
+              <span class="fw-bold">Tạm tính:</span>
               <span>{{ selectedItem.totalAmount | currencyFormat }}</span>
             </div>
             <div *ngIf="selectedItem.discountPercent" class="d-flex justify-content-between">
@@ -203,3 +209,108 @@
     </div>
   </div>
 </div>
+
+
+
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" *ngFor="let shiper of dataShipStaff; let i = index">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Xác nhận</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Bạn có thể hiển thị thông tin về shipper tại đây -->
+        <p>Bạn có chắc chắn muốn chỉ định giao hàng cho <span class="shipper-name">{{shiper.firstName}}
+            {{shiper.lastName}}</span> ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" (click)="updateAccountId(shiper.accountId)" data-bs-target="#invoiceModal" >Xác
+          nhận</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- order Modal -->
+<div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="text-center mb-3">
+        <div class="d-flex justify-content-center align-items-center flex-column">
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="green" class="bi bi-check-circle"
+            viewBox="0 0 16 16">
+            <path
+              d="M8 16a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5.586l-3-3a.5.5 0 0 1 .707-.707L7 9.293l4.646-4.647a.5.5 0 0 1 .708.707l-5 5a.5.5 0 0 1-.708 0z" />
+          </svg>
+          <h4 class="mt-2">Chỉ định giao hàng thành công</h4>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let order of selectedOrders; let i = index">
+          <div class="card1">
+            <div class="card-header d-flex justify-content-center">
+              <h5 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" 
+                        data-bs-toggle="collapse" 
+                        [attr.data-bs-target]="'#orderDetails' + i" 
+                        aria-expanded="false" 
+                        [attr.aria-controls]="'orderDetails' + i">
+                  <span class="text-primary fw-bold">Đơn hàng: {{ order.orderId }} - Người nhận: {{ order.consigneeName }}</span>
+                  <i class="bi bi-chevron-down ms-2"></i>
+                </button>
+              </h5>
+            </div>
+            
+            
+      
+            <div [id]="'orderDetails' + i" class="collapse collapse-item">
+              <div class="card-body text-left">
+                <p><strong>Tên người nhận:</strong> {{ order.consigneeName }}</p>
+                <p><strong>Địa chỉ:</strong> {{ order.guestAddress }}</p>
+                <p><strong>Số điện thoại:</strong> {{ order.guestPhone }}</p>
+                <p><strong>Ngày nhận đơn:</strong> {{ order.recevingOrder | date:'dd/MM/yyyy HH:mm' }}</p>
+                
+                <!-- Table for item details -->
+                <table class="table table-bordered table-hover">
+                  <thead>
+                    <tr>
+                      <th>Tên món</th>
+                      <th>Số lượng</th>
+                      <th>Đơn giá</th>
+                      <th>Tổng tiền</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of order.itemInOrderDetails">
+                      <td>{{ item.itemName || item.comboName }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td>{{ item.itemPrice || item.comboPrice | currencyFormat }}</td>
+                      <td>{{ (item.quantity * item.unitPrice) | currencyFormat }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                
+                <p><strong>Tổng tiền hàng:</strong> {{ order.totalAmount | currencyFormat }}</p>
+                <p><strong>Giảm giá:</strong> {{ (order.totalAmount * (order.discountPercent / 100)) | currencyFormat }} ({{ order.discountPercent }}%)</p>
+                <hr>
+                <p><strong>Tổng tiền phải trả:</strong> {{ (order.totalAmount - (order.totalAmount * (order.discountPercent / 100))) | currencyFormat }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" *ngIf="isPrinted" (click)="reloadPage()">Đóng</button>
+        <button type="button" class="btn btn-primary" (click)="printOrder()">In đơn cho ship</button>
+    </div>
+    
+      
+    </div>
+  </div>
+</div>
+
