@@ -18,26 +18,38 @@
             <!-- Left column for address and cart details -->
             <div class="col-md-6">
               <!-- Address Selection -->
-              <div class="input-group mb-3" (clickOutside)="showDropdown = false">
-                <input type="text" class="form-control" placeholder="Select address..." (click)="toggleDropdown()"
-                  [(ngModel)]="selectedAddress" readonly>
-                <div class="dropdown-menu dropdown-scrollable" [ngClass]="{'show': showDropdown}" [style.zIndex]="1000">
-                  <div class="search-container p-2">
-                    <input type="text" class="form-control search-input" placeholder="Search..."
-                      [(ngModel)]="searchTerm" (click)="$event.stopPropagation()" (input)="filterAddresses()">
+              <div *ngIf="reservationId === null">
+                <div class="input-group mb-3" (clickOutside)="showDropdown = false">
+                  <input type="text" class="form-control" placeholder="Select address..." (click)="toggleDropdown()"
+                    [(ngModel)]="selectedAddress" readonly>
+                  <div class="dropdown-menu dropdown-scrollable" [ngClass]="{'show': showDropdown}" [style.zIndex]="1000">
+                    <div class="search-container p-2">
+                      <input type="text" class="form-control search-input" placeholder="Search..."
+                        [(ngModel)]="searchTerm" (click)="$event.stopPropagation()" (input)="filterAddresses()">
+                    </div>
+                    <button class="dropdown-item text-left" *ngIf="!searchTerm"
+                      (click)="selectKhachLe(); $event.stopPropagation();">
+                      Khách lẻ
+                    </button>
+                    <button class="dropdown-item text-left" *ngFor="let address of filteredAddresses"
+                      (click)="selectAddress(address); $event.stopPropagation();">
+                      {{ address.consigneeName }} - {{ address.guestPhone }}
+                    </button>
                   </div>
-                  <button class="dropdown-item text-left" *ngIf="!searchTerm"
-                    (click)="selectKhachLe(); $event.stopPropagation();">
-                    Khách lẻ
-                  </button>
-                  <button class="dropdown-item text-left" *ngFor="let address of filteredAddresses"
-                    (click)="selectAddress(address); $event.stopPropagation();">
-                    {{ address.consigneeName }} - {{ address.guestPhone }}
+                  <button class="btn btn-outline-secondary ml-2" type="button" data-bs-toggle="modal" data-bs-target="#formModalaa">
+                    <i class="fas fa-user"></i>
                   </button>
                 </div>
-                <button class="btn btn-outline-secondary ml-2" type="button" data-bs-toggle="modal" data-bs-target="#formModalaa">
-                  <i class="fas fa-user"></i>
-                </button>
+              </div>
+
+              <div *ngIf="reservationId !== null" class="input-group mb-3">
+                <span class="input-group-text">Tên Khách:</span>
+                <input type="text" class="form-control"
+                  [value]="selectedOrder?.guestName ? selectedOrder.guestName : 'Khách lẻ'" readonly>
+              
+                <span class="input-group-text">Điện Thoại:</span>
+                <input type="text" class="form-control"
+                  [value]="selectedOrder?.guestPhone ? selectedOrder.guestPhone : '-------------'" readonly>
               </div>
               
 
