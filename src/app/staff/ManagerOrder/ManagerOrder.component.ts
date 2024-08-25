@@ -89,7 +89,7 @@ export class ManagerOrderComponent implements OnInit {
     this.paymentMethod = '0';
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
-
+    this.customerPaid = this.DiscountedTotalAmount();
     console.log('31', this.accountId);
   }
 
@@ -410,7 +410,7 @@ export class ManagerOrderComponent implements OnInit {
     console.log('Invoice data before update:', this.invoice);
     if (this.invoice.invoiceId) {
       const printWindow = window.open('', '', 'height=600,width=800');
-    
+  
       // Write the content to the new window
       printWindow?.document.write('<html><head><title>Invoice</title>');
       printWindow?.document.write(`
@@ -468,7 +468,7 @@ export class ManagerOrderComponent implements OnInit {
         </style>
       `);
       printWindow?.document.write('</head><body>');
-    
+  
       // Add restaurant information
       printWindow?.document.write(`
         <div class="header">
@@ -479,7 +479,7 @@ export class ManagerOrderComponent implements OnInit {
           <hr>
         </div>
       `);
-    
+  
       // Add invoice information
       printWindow?.document.write(`
         <div class="mb-3">
@@ -527,34 +527,53 @@ export class ManagerOrderComponent implements OnInit {
           <label for="totalOrder" class="form-label">Tiền hàng:</label>
           <span id="totalOrder">${this.invoice?.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
         </div>
+        ${this.invoice?.discountPercent && this.invoice.discountPercent > 0 ? `
         <div class="mb-3">
           <label for="discount" class="form-label">Khuyến mãi:</label>
-          <span id="discount">${this.getDiscountInvoiceAmount().toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })} (${this.invoice?.discountPercent || '0'}%)</span>
+          <span id="discount">
+            ${this.getDiscountInvoiceAmount().toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })} (${this.invoice.discountPercent}%)
+          </span>
         </div>
         <hr>
         <div class="mb-3">
           <label for="totalAmount" class="form-label">Tổng tiền:</label>
           <span id="totalAmount">${this.invoice?.paymentAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+        </div>` : ''}
+        ${(this.paymentMethod === '0' || this.paymentMethod === '1' && this.invoice?.deposits === 0) ? `
+        <div class="mb-3">
+          <label for="prepay" class="form-label">Thanh toán trước:</label>
+          <span id="prepay">${this.invoice?.deposits.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+        </div>` : ''}
+        ${(this.paymentMethod === '0' || this.paymentMethod === '1' && this.invoice?.deposits !== 0) ? `
+        <div class="mb-3">
+          <label for="additionalPayment" class="form-label">Tiền khách phải trả thêm:</label>
+          <span id="additionalPayment">
+            ${(this.invoice?.paymentAmount - this.invoice?.deposits).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+          </span>
+        </div>` : ''}
+        <hr>
+        ${this.paymentMethod === '0' ? `
+        <div class="mb-3">
+          <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
+          <span id="customerPaid">${this.invoice?.amountReceived.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
         </div>
+        <div class="mb-3">
+          <label for="changeToGive" class="form-label">Trả lại:</label>
+          <span id="changeToGive">${this.invoice?.returnAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+        </div>` : ''}
+        ${this.paymentMethod === '1' ? `
+        <div class="mb-3 qr-code-container">
+          <img id="qrCodePrepay" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt="QR Code" class="img-fluid">
+        </div>` : ''}
       `);
-    
-      // Conditionally add QR code if paymentMethod equals '1'
-      if (this.paymentMethod === '1') {
-        printWindow?.document.write(`
-          <div class="qr-code-container">
-            <label for="qrCode" class="form-label"></label>
-            <img id="qrCode" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt="QR Code">
-          </div>
-        `);
-      }
-    
+  
       // Add footer
       printWindow?.document.write(`
         <div class="footer">
           Cảm ơn quý khách và hẹn gặp lại!
         </div>
       `);
-    
+  
       // Close the document and trigger print
       printWindow?.document.write('</body></html>');
       printWindow?.document.close();
@@ -566,7 +585,6 @@ export class ManagerOrderComponent implements OnInit {
     }
   }
   
-
   // UpdateStatus(orderId: number | undefined, status: number | undefined) {
   //   if (orderId !== undefined && status !== undefined) {
   //     this.orderService.updateOrderStatus(orderId, status).subscribe(
@@ -704,24 +722,44 @@ export class ManagerOrderComponent implements OnInit {
     const deposit = this.orderDetail?.deposits || 0;
     return totalAmount - deposit;
   }
+  isCustomerPaidValid: boolean = true;
+  validateCustomerPaid() {
+    const amountDue = this.DiscountedTotalAmount(); // Get the amount due after considering deposits and discounts
+    const customerPaidValue = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
+  
+    if (customerPaidValue < amountDue) {
+      console.error('Tiền khách trả không được nhỏ hơn tổng tiền đơn hàng.');
+      this.isCustomerPaidValid = false; // Disable input if validation fails
+
+      // Optionally reset the value if invalid
+      if (this.customerPaid !== null) {
+        this.customerPaid = null; // or you can set it to the minimum value
+      }
+    } else {
+      this.isCustomerPaidValid = true; // Enable input if validation passes
+    }
+  }
+  
+  
 
   //Offline hoan thanh goi them mon
 
   SuscessfullOrderOffline(orderId: number | undefined, invoiceId?: number) {
+  
     const paymentMethod = parseInt(this.paymentMethod, 10);
-
+  
     console.log('Payment Method:', paymentMethod);
     console.log('Customer Paid:', this.customerPaid);
     console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
-
+  
     if (orderId !== undefined) {
       if (invoiceId === undefined || invoiceId === 0 || invoiceId === null) {
+        // Create a new invoice
         let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
         const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - this.DiscountedTotalAmount() : 0;
-        // Data for creating a new invoice
         const createData = {
           orderId: orderId,
-          paymentTime: new Date().toISOString(), // Automatically sets the current date and time
+          paymentTime: new Date().toISOString(),
           paymentAmount: this.DiscountedTotalAmount(),
           taxcode: "XYZDEW",
           paymentStatus: 1,
@@ -732,12 +770,12 @@ export class ManagerOrderComponent implements OnInit {
           accountId: this.accountId,
           description: "Invoice Created"
         };
-
+  
         this.invoiceService.createInvoiceOffline(orderId, createData).subscribe(
           response => {
             console.log('Invoice created successfully:', response);
             this.loadInvoice(orderId);
-            // Handle the response, e.g., show a success message
+            // Additional handling on success
           },
           error => {
             console.error('Error creating invoice:', error);
@@ -745,21 +783,19 @@ export class ManagerOrderComponent implements OnInit {
           }
         );
       } else {
+        // Update an existing invoice
         const remainingAmountDue = this.getAmountDue();
-        console.log('687',remainingAmountDue);
-    // Determine the amount received based on payment method and customer payment
-    let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
-    console.log('690',amountReceived);
-
-    // Calculate the return amount for cash payments
-    const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - remainingAmountDue : 0;
-    console.log('694',returnAmount);
-
-
-        // Data for updating an existing invoice
+        console.log('Remaining Amount Due:', remainingAmountDue);
+  
+        let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
+        console.log('Amount Received:', amountReceived);
+  
+        const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - remainingAmountDue : 0;
+        console.log('Return Amount:', returnAmount);
+  
         const updateData = {
           status: 4,
-          paymentTime: new Date().toISOString(), // Automatically sets the current date and time
+          paymentTime: new Date().toISOString(),
           paymentAmount: this.DiscountedTotalAmount(),
           taxcode: "XYZDEW",
           paymentStatus: 1,
@@ -769,12 +805,12 @@ export class ManagerOrderComponent implements OnInit {
           description: "Invoice Updated",
           tableStatus: 0,
         };
-
+  
         this.invoiceService.updateOrderAndInvoice(orderId, updateData).subscribe(
           response => {
             console.log('Invoice updated successfully:', response);
             this.loadInvoice(orderId);
-            // Handle the response, e.g., show a success message
+            // Additional handling on success
           },
           error => {
             console.error('Error updating invoice:', error);
@@ -786,6 +822,7 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Order ID is undefined');
     }
   }
+  
   acceptOrder(orderId: number | undefined): void {
     if (orderId !== undefined) {
       const data = {
@@ -828,8 +865,10 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
-
-
-
-
+  getTablesAsString(): string {
+    if (this.orderDetail?.tables && this.orderDetail.tables.length > 0) {
+      return this.orderDetail.tables.map(table => table.tableId).join(', ');
+    }
+    return '';
+  }
 }
