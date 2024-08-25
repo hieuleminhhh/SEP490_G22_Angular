@@ -89,11 +89,15 @@
                     <td (click)="$event.stopPropagation()">
                       <form [formGroup]="forms[order.orderDetailId]"
                         (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboDetailsForChef[0]?.comboName, order.type)"
-                        class="form-inline" >
+                        class="form-inline">
                         <div class="form-group">
                           <input type="number" formControlName="dishesServed" min="0" [attr.max]="order.quantity"
                             class="form-control form-control-sm input-short" />
-                          <button type="submit" class="btn btn-primary btn-sm">Hoàn thành</button>
+                          <button type="submit" class="btn btn-primary btn-sm"
+                            [disabled]="forms[order.orderDetailId].invalid"
+                            [ngStyle]="{'cursor': forms[order.orderDetailId].invalid ? 'not-allowed' : 'pointer'}">
+                            Hoàn thành
+                          </button>
                         </div>
                       </form>
                       <div
@@ -110,6 +114,7 @@
                         </small>
                       </div>
                     </td>
+
                   </tr>
                 </ng-container>
               </tbody>
@@ -145,13 +150,11 @@
                   <th>Thời gian giao hàng</th>
                   <th>Ghi chú</th>
                   <th>Loại đơn</th>
-                  <th>Loại đơn</th>
                   <th>Số lượng hoàn thành</th>
-                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                <ng-container *ngFor="let order of filteredOrders">
+                <ng-container *ngFor="let order of preOrder">
                   <tr>
                     <td>{{order.itemName || order.comboDetailsForChef?.[0]?.comboName}}</td>
                     <td>{{order.quantity}}</td>
@@ -159,19 +162,19 @@
                     <td class="note-cell" *ngIf="order.note">{{ order.note }}</td>
                     <td *ngIf="!order.note"></td>
                     <td>{{ convertOrderType(order.type) }}</td>
-
-                    <td class="note-cell" *ngIf="order.note">{{ order.note }}</td>
-                    <td *ngIf="!order.note"></td>
-                    <td>{{ convertOrderType(order.type) }}</td>
-
-                    <td>
+                    <td *ngIf="dateTo !== dateNow "></td>
+                    <td *ngIf="dateTo === dateNow ">
                       <form [formGroup]="forms[order.orderDetailId]"
                         (ngSubmit)="completeDish(order.orderDetailId, order.itemName || order.comboDetailsForChef?.[0]?.comboName, order.type)"
                         class="form-inline">
                         <div class="form-group">
                           <input type="number" formControlName="dishesServed" min="0" [attr.max]="order.quantity"
                             class="form-control form-control-sm input-short" />
-                          <button type="submit" class="btn btn-primary btn-sm">Hoàn thành</button>
+                          <button type="submit" class="btn btn-primary btn-sm"
+                            [disabled]="forms[order.orderDetailId].invalid"
+                            [ngStyle]="{'cursor': forms[order.orderDetailId].invalid ? 'not-allowed' : 'pointer'}">
+                            Hoàn thành
+                          </button>
                         </div>
                       </form>
                       <div
@@ -188,7 +191,6 @@
                         </small>
                       </div>
                     </td>
-
                     <td></td>
                   </tr>
                 </ng-container>
@@ -196,7 +198,7 @@
             </table>
           </div>
           <br>
-          <div *ngIf="!filteredOrders || filteredOrders.length < 1" style="text-align: center;">
+          <div *ngIf="!preOrder || preOrder.length < 1" style="text-align: center;">
             <p>Không có dữ liệu </p>
           </div>
           <!-- <div class="pagination" *ngIf="totalPages>0">
@@ -221,7 +223,8 @@
   <div class="popup-content" (click)="$event.stopPropagation()">
     <span class="close" (click)="closePopup()">&times;</span>
     <div class="details-container">
-      <h3>Tên món: {{selectedItem.itemName || selectedItem.comboDetailsForChef[0]?.comboName}} x{{ selectedItem.quantity}}</h3>
+      <h3>Tên món: {{selectedItem.itemName || selectedItem.comboDetailsForChef[0]?.comboName}} x{{
+        selectedItem.quantity}}</h3>
       <div *ngFor="let item of ingredient" class="info-container">
         <div class="item-details">
           <h4>{{ item.nameCombo || item.itemName }}</h4>

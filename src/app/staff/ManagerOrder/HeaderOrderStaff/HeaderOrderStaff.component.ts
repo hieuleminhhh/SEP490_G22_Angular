@@ -46,8 +46,6 @@ export class HeaderOrderStaffComponent implements OnInit {
     this.accountService.getAccountById(accountId).subscribe(
       response => {
         this.account = response;
-        console.log('Account details:', this.account);
-        console.log('Account name:', this.account.username);
       },
       error => {
         console.error('Error fetching account details:', error);

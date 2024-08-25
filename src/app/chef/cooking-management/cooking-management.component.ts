@@ -19,6 +19,7 @@ export class CookingManagementComponent implements OnInit {
   dateNow: string = '';
   order: any;
   filteredOrders: any[] = [];
+  preOrder: any;
   forms: { [key: number]: FormGroup } = {};
   selectedItem: any;
   ingredient: any;
@@ -58,6 +59,7 @@ export class CookingManagementComponent implements OnInit {
         });
         this.filterOrdersByDate();
         this.loadCompletedDishes();
+
       },
       error => {
         console.error('Error:', error);
@@ -79,8 +81,8 @@ export class CookingManagementComponent implements OnInit {
 
   filterOrdersByDate(): void {
     if (this.dateFrom && this.dateTo) {
-      const fromDate = new Date(`${this.dateFrom}T00:00:00Z`);
-      const toDate = new Date(`${this.dateTo}T23:59:59Z`);
+      const fromDate = new Date(`${this.dateFrom}T00:00:00`);
+      const toDate = new Date(`${this.dateTo}T23:59:59`);
       this.filteredOrders = this.order.filter((order: {
         quantity: number; recevingOrder: string | Date
       }) => {
@@ -88,18 +90,15 @@ export class CookingManagementComponent implements OnInit {
         return orderDate >= fromDate && orderDate <= toDate && order.quantity > 0;
       });
       console.log(this.filteredOrders);
+      this.preOrder = this.filteredOrders;
     } else {
       this.filteredOrders = this.order.filter((order: { quantity: number }) => order.quantity > 0);
+      console.log(this.filteredOrders);
     }
   }
 
   completeDish(orderDetailId: number, itemNameOrComboName: string, type: number): void {
     const form = this.forms[orderDetailId];
-
-    if (form.invalid) {
-      alert('Số lượng nhập vào không hợp lệ!');
-      return;
-    }
     const dishesServed = form.value.dishesServed;
 
     if (type === 1 || type === 2) {
@@ -117,8 +116,6 @@ export class CookingManagementComponent implements OnInit {
     let completedDishes = JSON.parse(localStorage.getItem('completedDishes') || '[]');
     completedDishes.push({ orderDetailId, dishesServed, itemNameOrComboName });
     localStorage.setItem('completedDishes', JSON.stringify(completedDishes));
-
-    console.log('Completed Dishes:', localStorage.getItem('completedDishes'));
   }
 
   private updateOrderQuantity(orderDetailId: number, dishesServed: number): void {
@@ -130,7 +127,6 @@ export class CookingManagementComponent implements OnInit {
         this.order[orderIndex].quantity = 0;
       }
     }
-    console.log(this.order);
   }
 
   private loadCompletedDishes(): void {
@@ -139,15 +135,11 @@ export class CookingManagementComponent implements OnInit {
       this.updateOrderQuantity(dish.orderDetailId, dish.dishesServed);
 
     });
-
-    console.log('Loaded Completed Dishes:', completedDishes);
-
     this.filterOrders();
   }
 
   private filterOrders(): void {
     this.filteredOrders = this.order.filter((order: { quantity: number; }) => order.quantity > 0);
-
   }
 
   updateDishesServed(orderDetailId: number, dishesServed: number) {
@@ -198,9 +190,8 @@ export class CookingManagementComponent implements OnInit {
     const currentDate = new Date();
     const recevingOrderDate = new Date(recevingOrder);
 
-    // Tính toán khoảng cách thời gian giữa recevingOrder và thời gian hiện tại
     const timeDifference = Math.abs(currentDate.getTime() - recevingOrderDate.getTime());
-    const oneHourInMilliseconds = 60 * 60 * 1000; // 1 giờ = 3600000 milliseconds
+    const oneHourInMilliseconds = 60 * 60 * 1000;
 
     return timeDifference <= oneHourInMilliseconds;
   }
@@ -210,9 +201,8 @@ export class CookingManagementComponent implements OnInit {
 
     const recevingOrderDate = new Date(recevingOrder);
     const orderTimeDate = new Date(orderTime);
-    const oneHourInMilliseconds = 60 * 60 * 1000; // 1 giờ = 3600000 milliseconds
+    const oneHourInMilliseconds = 60 * 60 * 1000;
 
-    // Kiểm tra xem recevingOrder có lớn hơn orderTime ít nhất 1 giờ không
     return recevingOrderDate.getTime() >= (orderTimeDate.getTime() + oneHourInMilliseconds);
   }
 
@@ -226,7 +216,7 @@ export class CookingManagementComponent implements OnInit {
     this.selectedItem = null;
   }
 
-  getIngredient(name: string, quantity:number): void {
+  getIngredient(name: string, quantity: number): void {
     this.cookingService.getOrders(name).subscribe(
       response => {
         this.order = response.data || [];
@@ -246,21 +236,12 @@ export class CookingManagementComponent implements OnInit {
     );
   }
 
-
-
   formatDate(date: Date): string {
-    // Hàm chuyển đổi định dạng ngày thành chuỗi "YYYY-MM-DD"
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
-
-
-
-
-
-
 
 }
 
