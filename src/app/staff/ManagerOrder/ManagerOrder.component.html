@@ -93,8 +93,7 @@
                       data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">
                       Chi tiết
                     </button>
-                    <button *ngIf="(order.paymentStatus === 0 && order.status !== 5 && order.status !== 7&& order.status !== 1) &&
-         !((order.status === 6 || order.status === 2|| order.status === 4) && order.paymentStatus === 0 && order.paymentMethods === 2)"
+                    <button *ngIf="(order.paymentStatus === 0 || order.paymentStatus === 2) && order.status === 3"
                       type="button" class="btn btn-warning btn-sm" (click)="updateOrder(order.orderId)">
                       Cập nhật
                     </button>
@@ -261,26 +260,52 @@
                           <span class="fw-bold">Thanh toán trước:</span>
                           <span>{{ orderDetail.deposits | currencyFormat }}</span>
                         </div>
-                        <div *ngIf="orderDetail?.deposits" class="d-flex justify-content-between">
+                        <div *ngIf="orderDetail?.deposits && orderDetail?.status !== 4" class="d-flex justify-content-between">
                           <span class="fw-bold">Khách phải trả:</span>
+                          <span>{{ getAmountDue() | currencyFormat }}</span>
+                        </div>
+                        <div *ngIf="orderDetail?.deposits && orderDetail?.status === 4" class="d-flex justify-content-between">
+                          <span class="fw-bold">Khách đã thanh toán:</span>
                           <span>{{ getAmountDue() | currencyFormat }}</span>
                         </div>
                       </div>
 
                       <!-- Second Column -->
                       <div class="col-md-6 d-flex align-items-start justify-content-end">
-                        <div *ngIf="orderDetail.paymentStatus === 2 || orderDetail.paymentStatus === 0 && !(orderDetail.deposits > 0 && orderDetail.status === 1)" class="badge bg-success ms-auto badge-circle">Thanh
-                          toán trước</div>
-                        <div *ngIf="orderDetail.paymentStatus === 1" class="badge bg-success ms-auto badge-circle">Đã
-                          thanh toán</div>
+                        <!-- Online -->
+                        <div *ngIf=" orderDetail.deposits === 0 && orderDetail.type ===2"
+                          class="badge bg-danger ms-auto badge-circle">Chưa thanh toán
+                        </div>
+                        <div *ngIf=" orderDetail.deposits > 0 && orderDetail.type ===2"
+                          class="badge bg-success ms-auto badge-circle">Đã thanh toán
+                        </div>
+                        <!-- Mang ve -->
+                        <div *ngIf="orderDetail.type === 1" class="badge bg-success ms-auto badge-circle">Đã thanh toán
+                        </div>
+                        <!-- Tại quan -->
                         <div
-                          *ngIf="orderDetail.paymentStatus === 0 && !(orderDetail.deposits > 0 && orderDetail.status === 1)"
-                          class="badge bg-danger ms-auto badge-circle">Chưa thanh toán</div>
+                          *ngIf="(orderDetail.type === 4 || orderDetail.type === 3) && orderDetail.deposits > 0 && orderDetail.status !== 4"
+                          class="badge bg-success ms-auto badge-circle">Đã trả trước
+                        </div>
                         <div
-                          *ngIf="orderDetail.paymentStatus === 0 && orderDetail.deposits > 0 && orderDetail.status === 1"
-                          class="badge bg-warning ms-auto badge-circle">Đang chờ</div>
+                          *ngIf="(orderDetail.type === 4 || orderDetail.type === 3) && orderDetail.deposits === 0  && orderDetail.status !== 4"
+                          class="badge bg-danger ms-auto badge-circle">Chưa thanh toán
+                        </div>
+                        <div *ngIf="(orderDetail.type === 4 || orderDetail.type === 3) && orderDetail.status === 4"
+                          class="badge bg-success ms-auto badge-circle">Đã thanh toán
+                        </div>
                       </div>
 
+
+
+
+                      <!-- <div *ngIf="orderDetail.paymentStatus === 2" class="badge bg-success ms-auto badge-circle">Thanh
+                        toán trước</div>
+
+
+
+                      <div *ngIf="orderDetail.paymentStatus === 1" class="badge bg-success ms-auto badge-circle">Đã
+                        thanh toán</div> -->
                     </div>
 
                   </div>
@@ -329,7 +354,7 @@
 
                   <!-- Tai quan -->
                   <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && orderDetail?.deposits === 0 && orderDetail?.paymentStatus == 0 &&
-          dishesServed !== totalQuantity ">
+                  dishesServed !== totalQuantity ">
                     <button type="button" class="btn btn-success me-2" data-bs-toggle="modal"
                       data-bs-target="#prepaymentModalOffline">Thanh toán trước</button>
                   </ng-container>
@@ -339,7 +364,7 @@
                       data-bs-toggle="modal">Hủy đơn</button>
                   </ng-container>
 
-                  <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2) &&
+                  <ng-container *ngIf="(orderDetail?.type === 4 || orderDetail?.type === 3) && orderDetail?.status === 3 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2) &&
           dishesServed === totalQuantity">
                     <!-- &&
           dishesServed === totalQuantity -->

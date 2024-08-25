@@ -130,11 +130,11 @@ export class ViewTableOrderComponent implements OnInit {
 
         // Điều hướng dựa trên orderId và status
         if (status === 0) {
-          this.router.navigate(['/createOffline'], { queryParams: { tableId } });
-        } else if (status === 1 && this.orderId !== null) {
+          this.router.navigate(['/createOffline'], { queryParams: { tableId, orderId: this.orderId } });
+        }else if (status === 1 && this.orderId !== null) {
           this.router.navigate(['/updateOffline'], { queryParams: { tableId } });
         } else if (status === 1 && this.orderId === null) {
-          this.router.navigate(['/createOffline'], { queryParams: { tableId } });
+          this.router.navigate(['/createOffline'], { queryParams: { tableId, orderId: this.orderId } });
         }
       },
       (error: HttpErrorResponse) => {

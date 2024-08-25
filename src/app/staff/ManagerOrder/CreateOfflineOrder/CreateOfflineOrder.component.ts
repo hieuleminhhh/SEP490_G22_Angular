@@ -26,6 +26,7 @@ import { CheckoutService } from '../../../../service/checkout.service';
 import { AccountService } from '../../../../service/account.service';
 import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
 import { ReservationService } from '../../../../service/reservation.service';
+import { SelectedItem } from '../../../../models/order.model';
 @Component({
     selector: 'app-create-offline-order',
     templateUrl: './CreateOfflineOrder.component.html',
@@ -74,11 +75,13 @@ export class CreateOfflineOrderComponent implements OnInit {
   totalAmountAfterDiscount: number = 0;
   totalAmount: number = 0;
   addNew: any = {};
+  selectedOrder: any; 
   accountId: number | null = null;
   account: any;
   showSidebar: boolean = true; 
-  reservationData: any;
+  reservationId: number | null = null;
   orderId: number| null = null
+  status: number| null = null;
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService,
    private comboService: ManagerComboService,private orderDetailService: ManagerOrderDetailService, private invoiceService : InvoiceService, private dialog: MatDialog
    ,private discountService: DiscountService,
@@ -94,6 +97,7 @@ export class CreateOfflineOrderComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.tableId = +params['tableId']; 
       this.loadListOrderByTable(this.tableId);
+      console.log('ZZZZZZZZZZZZZ',this.orderId);
     });
     this.LoadActiveDiscounts();
     this.calculateAndSetTotalAmount();
@@ -111,43 +115,47 @@ export class CreateOfflineOrderComponent implements OnInit {
   }
 
   loadListOrderByTable(tableId: number): void {
-    console.log('Loading orders for table ID:', tableId);
     this.orderService.getOrdersByTableId(tableId).subscribe(
       (response: any) => {
         if (response && response.data) {
           this.orderId = response.data.orderId;
-  
-          if (response.data.orderDetails && response.data.orderDetails.length > 0) {
-            this.selectedItems = response.data.orderDetails.map((orderItem: any) => ({
-              orderDetailId: orderItem.orderDetailId,
-              dishId: orderItem.dishId,
-              comboId: orderItem.comboId,
-              itemName: orderItem.dish.itemName,
-              unitPrice: orderItem.unitPrice,
-              dishesServed: orderItem.dishesServed || 0,
-              price: orderItem.dish.price,
-              discountedPrice: orderItem.dish.discountedPrice,
-              quantity: orderItem.quantity,
-              imageUrl: orderItem.dish.imageUrl,
-              totalPrice: orderItem.dish.discountedPrice ? orderItem.dish.discountedPrice * orderItem.quantity : orderItem.dish.price * orderItem.quantity,
-            }));
-            console.log('Fetched order details:', this.selectedItems);
+          console.log('Order ID:', this.orderId);
+          
+          // Ensure orderId is not null before calling getReservationByOrderId
+          if (this.orderId !== null) {
+            this.getReservationByOrderId(this.orderId);
           } else {
-            console.error('Invalid response: No order details found.', response);
-            this.selectedItems = [];
+            console.error('Order ID is null');
           }
-        } else {
-          console.error('Invalid response: No data found.', response);
-          this.selectedItems = [];
+          
+          // Other processing
         }
       },
       (error: HttpErrorResponse) => {
-        console.error('Error fetching orders:', error);
-        this.errorMessage = error.error.message || 'Bàn này không có đơn hàng nào...';
-        this.selectedItems = []; // Clear the cart if there's an error
+        // Error handling
+        console.error('Error fetching order:', error);
       }
     );
   }
+  
+  getReservationByOrderId(orderId: number): void {
+    this.reservationService.getReservationByOrderId(orderId).subscribe(
+      (data) => {
+        if (data) {
+          this.reservationId = data.reservationId;
+          console.log('Reservation ID:', this.reservationId);
+        } else {
+          console.error('Invalid reservation data received');
+        }
+      },
+      (error) => {
+        console.error('Error fetching reservation:', error);
+      }
+    );
+  }
+  
+  
+  
   
   clearCart() {
     this.selectedItems = [];
@@ -672,16 +680,6 @@ export class CreateOfflineOrderComponent implements OnInit {
         this.selectedDiscount = discountId; // Chọn mã giảm giá mới
       }
     }
-    getReservationByOrderId(orderId: number) {
-      this.reservationService.getReservationByOrderId(orderId).subscribe(
-        (data) => {
-          this.reservationData = data;
-          console.log('Reservation Data:', this.reservationData);
-        },
-        (error) => {
-          console.error('Error fetching reservation:', error);
-        }
-      );
-    }
+    
     
 }
