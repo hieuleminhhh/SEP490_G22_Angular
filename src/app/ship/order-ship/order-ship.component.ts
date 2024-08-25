@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 import { CookingService } from '../../../service/cooking.service';
 import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
+import { InvoiceService } from '../../../service/invoice.service';
 
 @Component({
   selector: 'app-order-ship',
@@ -14,7 +15,7 @@ import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderS
 })
 export class OrderShipComponent implements OnInit {
 
-  constructor(private cookingService:CookingService) { }
+  constructor(private cookingService: CookingService, private invoiceService: InvoiceService) { }
   deliveryOrders: any[] = [];
   selectedItem: any;
   accountId: any;
@@ -33,8 +34,8 @@ export class OrderShipComponent implements OnInit {
     this.selectedItem = null;
   }
 
-  getListShip(accountId:number){
-    this.cookingService.getListShip(7,accountId).subscribe(
+  getListShip(accountId: number) {
+    this.cookingService.getListShip(7, accountId).subscribe(
       response => {
         this.deliveryOrders = response;
         console.log(this.deliveryOrders);
@@ -45,11 +46,27 @@ export class OrderShipComponent implements OnInit {
       }
     );
   }
-  completeOrder(order:any){
+  completeOrder(order: any) {
     const request = {
-      status : 4
+      status: 4
     };
-    this.cookingService.updateOrderStatus(order.orderId,request).subscribe(
+    this.cookingService.updateOrderStatus(order.orderId, request).subscribe(
+      response => {
+        if(order.deposits>0){
+          this.update(order.orderId, order.deposits);
+        }
+        window.location.reload();
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
+  cancelOrder(order: any) {
+    const request = {
+      status: 5
+    };
+    this.cookingService.updateOrderStatus(order.orderId, request).subscribe(
       response => {
         window.location.reload();
       },
@@ -58,17 +75,20 @@ export class OrderShipComponent implements OnInit {
       }
     );
   }
-  cancelOrder(order:any){
-    const request = {
-      status : 5
-    };
-    this.cookingService.updateOrderStatus(order.orderId,request).subscribe(
-      response => {
-        window.location.reload();
-      },
-      error => {
-        console.error('Error:', error);
+
+  update(id: number, deposits: number): void {
+      const request = {
+        paymentAmount: deposits
       }
-    );
+      this.invoiceService.updatePayment(id, request).subscribe(
+        response => {
+          window.location.reload();
+
+        },
+        error => {
+          console.error('Error:', error);
+
+        }
+      );
   }
 }

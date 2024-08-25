@@ -83,8 +83,9 @@
                     <td *ngIf="!isRecevingOrderMoreThanOneHourLater(order.recevingOrder, order.orderTime)">
 
                     </td>
-                    <td class="note-cell" *ngIf="order.note">{{ order.note }}</td>
-                    <td *ngIf="!order.note"></td>
+                    <!-- <td class="note-cell" *ngIf="order.note">{{ order.note }}</td>
+                    <td *ngIf="!order.note"></td> -->
+                    <td></td>
                     <td>{{ convertOrderType(order.type) }}</td>
                     <td (click)="$event.stopPropagation()">
                       <form [formGroup]="forms[order.orderDetailId]"
@@ -159,8 +160,9 @@
                     <td>{{order.itemName || order.comboDetailsForChef?.[0]?.comboName}}</td>
                     <td>{{order.quantity}}</td>
                     <td>{{order.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</td>
-                    <td class="note-cell" *ngIf="order.note">{{ order.note }}</td>
-                    <td *ngIf="!order.note"></td>
+                    <!-- <td class="note-cell" *ngIf="order.note">{{ order.note }}</td>
+                    <td *ngIf="!order.note"></td> -->
+                    <td></td>
                     <td>{{ convertOrderType(order.type) }}</td>
                     <td *ngIf="dateTo !== dateNow "></td>
                     <td *ngIf="dateTo === dateNow ">
