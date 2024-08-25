@@ -153,7 +153,8 @@
                     <div class="dropdown-content" [class.show]="reservation.isDropdownOpen">
                       <a (click)="openPopup(reservation.reservationId)">Xếp bàn</a>
                       <a>Thêm món</a>
-                      <a (click)="updateStatusReservation(reservation.reservationId)">Hủy đặt bàn</a>
+                      <a data-bs-toggle="modal"
+                        data-bs-target="#confirmationModal">Hủy đặt bàn</a>
                     </div>
                   </div>
                 </div>
@@ -578,4 +579,28 @@
     </section>
 
   </main>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" *ngFor="let reservation of dataReservationAccept; let i = index">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Xác nhận</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="confirmation-text">
+          Xác nhận hủy đơn đặt bàn?<br>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invoiceModal"
+        (click)="updateStatusReservation(reservation.reservationId)">Xác
+          nhận</button>
+      </div>
+    </div>
+  </div>
 </div>

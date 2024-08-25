@@ -54,18 +54,25 @@ export class TableManagementComponent implements OnInit {
   dateFrom: string = '';
   dateTo: string = '';
   dateNow: string = '';
-
+  currentReservationId: number | undefined;
   constructor(private tableService: TableService, private reservationService: ReservationService, private router: Router) { }
 
   ngOnInit(): void {
-    const today = new Date().toISOString().split('T')[0];
-    this.dateFrom = today;
-    this.dateTo = today;
-    this.dateNow = today;
+    const today = new Date();
+    this.dateFrom = this.formatDate(today);
+    this.dateTo = this.formatDate(today);
+    this.dateNow = this.formatDate(today);
     this.getTableData();
     this.searchTermSubject.pipe(debounceTime(300)).subscribe(searchTerm => {
       this.getSearchList();
     });
+  }
+
+  formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
   setView(view: string) {
     this.currentView = view;
