@@ -60,4 +60,17 @@ export class InvoiceService {
     const url = `${this.apiUrl}/Invoice/createInvoiceForOrder/${orderId}`;
     return this.http.post<any>(url, invoiceData, this.getHttpOptions());
   }
+
+  getStatistics(): Observable<any> {
+    const url = `https://localhost:7188/api/orders/statistics`;
+    return this.http.get<any>(url, this.getHttpOptions());
+  }
+  getCancelOrder(): Observable<any> {
+    const url = `https://localhost:7188/api/Invoice/GetCancelOrder`;
+    return this.http.get<any>(url, this.getHttpOptions());
+  }
+  getOrderShip(): Observable<any> {
+    const url = `https://localhost:7188/api/Invoice/Ordertoday`;
+    return this.http.get<any>(url, this.getHttpOptions());
+  }
 }
