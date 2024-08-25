@@ -271,11 +271,15 @@ export class MenuComponent {
   paginateData(data: any[]): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
-
+    if (startIndex >= data.length || startIndex < 0) {
+      console.warn('Start index out of bounds');
+      this.filteredDataSubject.next([]);
+      return;
+    }
     const paginatedData = data.slice(startIndex, endIndex);
-
     this.filteredDataSubject.next(paginatedData);
   }
+
 
   goToDesiredPage(): void {
     if (this.currentPage >= 1 && this.currentPage <= this.totalPages) {
@@ -291,12 +295,18 @@ export class MenuComponent {
       (item.itemName || item.nameCombo || '').toLowerCase().includes(search)
     );
     this.totalItems = filtered.length;
+    const totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+
+    if (this.currentPage > totalPages) {
+      this.currentPage = totalPages > 0 ? totalPages : 1;
+    }
 
     this.filteredDataSubject.next(filtered);
     console.log(this.filteredDataSubject);
 
     this.paginateData(filtered);
   }
+
 
 }
 

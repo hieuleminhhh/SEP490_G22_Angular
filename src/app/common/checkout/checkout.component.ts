@@ -9,6 +9,7 @@ import { CartService } from '../../../service/cart.service';
 import { HttpClient } from '@angular/common/http';
 import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
 import { PercentagePipe } from '../material/percentFormat/percentFormat.component';
+import { ReservationService } from '../../../service/reservation.service';
 
 @Component({
   selector: 'app-checkout',
@@ -45,7 +46,7 @@ export class CheckoutComponent implements OnInit {
   selectedDiscountDetails: any = null;
   selectedPromotion: boolean = false;
 
-  constructor(private cartService: CartService, private http: HttpClient, private router: Router, private route: ActivatedRoute, private checkoutService: CheckoutService) {
+  constructor(private cartService: CartService, private reservationService: ReservationService, private http: HttpClient, private router: Router, private route: ActivatedRoute, private checkoutService: CheckoutService) {
     const today = new Date();
     this.date = this.formatDate(today);
     this.minDate = this.formatDate(today);
@@ -221,63 +222,103 @@ export class CheckoutComponent implements OnInit {
       receivingTime = this.formatDateTime(currentDate, currentTimeStr);
     }
     let deposits = 0;
-    if (this.selectedPaymentMethod === 'banking') {
-      deposits = this.getTotalCartPrice();
-    }
-    if (this.selectedService === 'service2') {
-      deposits = this.getTotalCartPrice() / 2;
-    }
-    console.log(this.selectedPaymentMethod);
-    console.log(this.selectedService);
-    console.log(this.selectedDiscount);
-
-    const request = {
-      guestPhone: this.guestPhone,
-      email: this.email,
-      addressId: 0,
-      guestAddress: this.address,
-      consigneeName: this.consigneeName,
-      orderDate: new Date().toISOString(),
-      status: 1,
-      recevingOrder: receivingTime,
-      deposits: deposits,
-      note: this.note,
-      type: 2,
-      discountId: this.selectedDiscount ,
-      orderDetails: this.cartItems.map(item => ({
-        unitPrice: this.getTotalPrice(item),
-        quantity: item.quantity,
-        dishId: item.dishId,
-        comboId: item.comboId,
-        orderTime: new Date().toISOString()
-      }))
-    };
-    console.log(request);
-
-    this.checkoutService.submitOrder(request).subscribe({
-      next: response => {
-        console.log(request);
-        console.log('Order submitted successfully', response);
-        this.cartService.clearCart();
-        sessionStorage.removeItem('cartItems');
-        if (this.selectedPaymentMethod === 'banking' || this.selectedService === 'service2') {
-          this.checkVnPay(this.guestPhone);
-        } else {
-          this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone } });
-        }
-
-      },
-      error: error => {
-        if (error.error instanceof ErrorEvent) {
-          // Lỗi client-side hoặc mạng
-          console.error('An error occurred:', error.error.message);
-        } else {
-          // Lỗi server-side
-          console.error(`Backend returned code ${error.status}, ` +
-            `body was: ${JSON.stringify(error.error)}`);
-        }
+    if (this.selectedService === 'service1') {
+      if (this.selectedPaymentMethod === 'banking') {
+        deposits = this.getTotalCartPrice();
       }
-    });
+      const request = {
+        guestPhone: this.guestPhone,
+        email: this.email,
+        addressId: 0,
+        guestAddress: this.address,
+        consigneeName: this.consigneeName,
+        orderDate: new Date().toISOString(),
+        status: 1,
+        recevingOrder: receivingTime,
+        deposits: deposits,
+        note: this.note,
+        type: 2,
+        discountId: this.selectedDiscount,
+        orderDetails: this.cartItems.map(item => ({
+          unitPrice: this.getTotalPrice(item),
+          quantity: item.quantity,
+          dishId: item.dishId,
+          comboId: item.comboId,
+          orderTime: new Date().toISOString()
+        }))
+      };
+      console.log(request);
+      this.checkoutService.submitOrder(request).subscribe({
+        next: response => {
+          console.log(request);
+          console.log('Order submitted successfully', response);
+          this.cartService.clearCart();
+          sessionStorage.removeItem('cartItems');
+          if (this.selectedPaymentMethod === 'banking' || this.selectedService === 'service2') {
+            this.checkVnPay(this.guestPhone);
+          } else {
+            this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone } });
+          }
+
+        },
+        error: error => {
+          if (error.error instanceof ErrorEvent) {
+            // Lỗi client-side hoặc mạng
+            console.error('An error occurred:', error.error.message);
+          } else {
+            // Lỗi server-side
+            console.error(`Backend returned code ${error.status}, ` +
+              `body was: ${JSON.stringify(error.error)}`);
+          }
+        }
+      });
+    }
+
+    if (this.selectedService === 'service2') {
+      const request = {
+        guestPhone: this.guestPhone,
+        email: '',
+        guestAddress: '',
+        consigneeName: this.consigneeName,
+        reservationTime: receivingTime,
+        guestNumber: this.people,
+        note: this.note,
+        orderDate: new Date().toISOString(),
+        status: 1,
+        recevingOrder: receivingTime,
+        totalAmount: this.getTotalCartPrice(),
+        deposits: this.getTotalCartPrice() / 2,
+        type: 3,
+        orderDetails: this.cartItems.map(item => ({
+          unitPrice: this.getTotalPrice(item),
+          quantity: item.quantity,
+          dishId: item.dishId,
+          comboId: item.comboId,
+          orderTime: new Date().toISOString()
+        }))
+      };
+      console.log("Request Object:", request);
+      this.reservationService.createResevetion(request).subscribe({
+        next: response => {
+          console.log('Order submitted successfully', response);
+          this.reservationService.clearCart();
+          this.cartService.clearCart();
+          sessionStorage.setItem('request', JSON.stringify(request));
+          sessionStorage.setItem('cart', JSON.stringify(this.cartItems));
+
+          const requestForVnPay = { ...request, totalAmount: this.getTotalCartPrice() / 2 };
+          this.checkVnPayReser(requestForVnPay);
+        },
+        error: error => {
+          if (error.error instanceof ErrorEvent) {
+            console.error('An error occurred:', error.error.message);
+          } else {
+            console.error(`Backend returned code ${error.status}, ` +
+              `body was: ${JSON.stringify(error.error)}`);
+          }
+        }
+      });
+    }
   }
 
   checkVnPay(guestPhone: string) {
@@ -297,7 +338,19 @@ export class CheckoutComponent implements OnInit {
       }
     )
   }
-
+  checkVnPayReser(data: any) {
+    console.log('Data being sent:', data);
+    this.checkoutService.getVnPays(data).subscribe(response => {
+      if (response.url) {
+        window.location.href = response.url; // Redirect đến URL trả về
+      } else {
+        console.error('Unexpected response format', response);
+      }
+    }, error => {
+      console.error('Error during payment initiation', error);
+      console.error('Error details:', error.error); // Kiểm tra chi tiết lỗi từ server
+    });
+  }
   openDiscountModal(): void {
     this.getListDiscount();
     const discountModal = document.getElementById('discountModal');
