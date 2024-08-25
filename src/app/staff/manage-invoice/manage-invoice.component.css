@@ -235,3 +235,76 @@ body {
 .back-icon:hover {
   color: black; /* Màu sắc mới khi hover */
 }
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.order-table th, .order-table td {
+  padding: 5px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.order-table th {
+  background-color: #f4f4f4;
+}
+
+.scrollable-tbody {
+  max-height: 300px;
+  overflow-y: auto;
+}
+.action-cell {
+  white-space: nowrap;
+  width: 150px; /* Điều chỉnh kích thước theo nhu cầu */
+}
+
+.action-button {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 8px;
+  margin: 0 5px;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border-radius: 5px;
+}
+
+.action-button i {
+  font-size: 18px;
+  color: #555;
+}
+
+.view-button {
+  color: #007bff;
+}
+
+.complete-button {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.cancel-button {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.action-button:hover {
+  transform: scale(1.1);
+}
+
+.action-button:active {
+  transform: scale(0.9);
+}
+
+.action-button i:hover {
+  color: #000;
+}
+
+.complete-button:hover, .cancel-button:hover {
+  opacity: 0.8;
+}

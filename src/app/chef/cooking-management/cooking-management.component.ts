@@ -206,34 +206,12 @@ export class CookingManagementComponent implements OnInit {
     return recevingOrderDate.getTime() >= (orderTimeDate.getTime() + oneHourInMilliseconds);
   }
 
-  showDetails(order: any) {
-    console.log(order);
-    this.selectedItem = order;
-    this.ingredient = 1;
+  showDetails(name:string, quantity:number) {
+    this.getIngredient(name,quantity);
   }
 
   closePopup() {
-    this.selectedItem = null;
-  }
-
-  getIngredient(name: string, quantity: number): void {
-    this.cookingService.getOrders(name).subscribe(
-      response => {
-        this.order = response.data || [];
-        console.log(this.order);
-        this.order.forEach((o: { orderDetailId: number; quantity: number; dishesServed: number }) => {
-          o.dishesServed = o.dishesServed || 0;
-          this.initializeForm(o.orderDetailId, o.quantity);
-        });
-        this.filterOrdersByDate();
-        this.loadCompletedDishes();
-      },
-      error => {
-        console.error('Error:', error);
-        this.order = [];
-        this.filteredOrders = [];
-      }
-    );
+    this.ingredient = null;
   }
 
   formatDate(date: Date): string {
@@ -243,5 +221,16 @@ export class CookingManagementComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
+  getIngredient(name: string, quantity:number): void {
+    this.cookingService.getIngredient(name, quantity).subscribe(
+      response => {
+        this.ingredient = response;
+
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
 }
 
