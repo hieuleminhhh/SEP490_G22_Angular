@@ -98,7 +98,7 @@ export class FillDishComponent implements OnInit {
       }
     );
   }
-  
+
 
   getOrderTimeHoursMinutes(orderTime: string): string {
     const date = new Date(orderTime);
@@ -347,30 +347,30 @@ export class FillDishComponent implements OnInit {
   printOrder(): void {
     const modalElement = document.getElementById('invoiceModal');
     if (modalElement) {
-        // Create a copy of the modal to work with
-        const printElement = modalElement.cloneNode(true) as HTMLElement;
+      // Create a copy of the modal to work with
+      const printElement = modalElement.cloneNode(true) as HTMLElement;
 
-        // Remove unnecessary elements from the copy
-        const headerToRemove = printElement.querySelector('.text-center.mb-3');
-        if (headerToRemove) headerToRemove.remove();
+      // Remove unnecessary elements from the copy
+      const headerToRemove = printElement.querySelector('.text-center.mb-3');
+      if (headerToRemove) headerToRemove.remove();
 
-        // Remove all elements with class 'card-header d-flex justify-content-center'
-        const cardHeaders = printElement.querySelectorAll('.card-header.d-flex.justify-content-center');
-        cardHeaders.forEach(header => header.remove());
+      // Remove all elements with class 'card-header d-flex justify-content-center'
+      const cardHeaders = printElement.querySelectorAll('.card-header.d-flex.justify-content-center');
+      cardHeaders.forEach(header => header.remove());
 
-        // Remove all buttons inside 'card-header' elements
-        const buttonsToRemove = printElement.querySelectorAll('button');
-        buttonsToRemove.forEach(button => button.remove());
+      // Remove all buttons inside 'card-header' elements
+      const buttonsToRemove = printElement.querySelectorAll('button');
+      buttonsToRemove.forEach(button => button.remove());
 
-        let printContents = printElement.innerHTML;
+      let printContents = printElement.innerHTML;
 
-        // Open a new window for printing
-        const printWindow = window.open('', '', 'width=100mm,height=150mm');
+      // Open a new window for printing
+      const printWindow = window.open('', '', 'width=100mm,height=150mm');
 
-        if (printWindow) {
-            // Write the content to the new window
-            printWindow.document.write('<html><head><title>Print Order</title>');
-            printWindow.document.write(`
+      if (printWindow) {
+        // Write the content to the new window
+        printWindow.document.write('<html><head><title>Print Order</title>');
+        printWindow.document.write(`
                 <style>
                     @media print {
                         @page {
@@ -462,10 +462,10 @@ export class FillDishComponent implements OnInit {
                     }
                 </style>
             `);
-            printWindow.document.write('</head><body>');
+        printWindow.document.write('</head><body>');
 
-            // Add restaurant information header
-            printWindow.document.write(`
+        // Add restaurant information header
+        printWindow.document.write(`
                 <div class="header">
                     <h1>Eating House</h1>
                     <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
@@ -475,36 +475,36 @@ export class FillDishComponent implements OnInit {
                 </div>
             `);
 
-            // Add the content of the modal with page breaks for each order
-            printWindow.document.write('<div class="content">');
-            const orders = Array.from(printElement.querySelectorAll('.card1'));
-            orders.forEach((order, index) => {
-                if (index > 0) {
-                    printWindow.document.write('<div class="page-break"></div>');
-                }
-                printWindow.document.write(order.outerHTML);
-            });
-            printWindow.document.write('</div>');
+        // Add the content of the modal with page breaks for each order
+        printWindow.document.write('<div class="content">');
+        const orders = Array.from(printElement.querySelectorAll('.card1'));
+        orders.forEach((order, index) => {
+          if (index > 0) {
+            printWindow.document.write('<div class="page-break"></div>');
+          }
+          printWindow.document.write(order.outerHTML);
+        });
+        printWindow.document.write('</div>');
 
-            // Add footer without border
-            printWindow.document.write(`
+        // Add footer without border
+        printWindow.document.write(`
                 <div class="footer">
                     Cảm ơn quý khách và hẹn gặp lại!
                 </div>
             `);
 
-            // Close the document and trigger print
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.print();
-            this.isPrinted = true;
-        }
+        // Close the document and trigger print
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.print();
+        this.isPrinted = true;
+      }
     } else {
-        console.error('Modal element not found.');
+      console.error('Modal element not found.');
     }
-}
-reloadPage(): void {
-  window.location.reload();
+  }
+  reloadPage(): void {
+    window.location.reload();
   }
 
 

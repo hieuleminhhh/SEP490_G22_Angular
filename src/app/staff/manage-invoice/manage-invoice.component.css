@@ -308,3 +308,176 @@ body {
 .complete-button:hover, .cancel-button:hover {
   opacity: 0.8;
 }
+/* Tùy chỉnh modal container */
+#confirmationModal .modal-dialog {
+  max-width: 600px; /* Đặt kích thước tối đa cho modal */
+  margin: 1.75rem auto; /* Canh giữa modal */
+}
+
+/* Tùy chỉnh phần header của modal */
+#confirmationModal .modal-header {
+  background-color: #f8f9fa; /* Màu nền cho header */
+  border-bottom: 1px solid #dee2e6; /* Đường viền dưới */
+  padding: 15px; /* Khoảng cách padding */
+}
+
+#confirmationModal .modal-title {
+  font-size: 1.5rem; /* Cỡ chữ của tiêu đề */
+  font-weight: bold; /* Độ đậm của chữ */
+}
+
+#confirmationModal .btn-close {
+  font-size: 1.25rem; /* Cỡ chữ của nút đóng */
+  color: #000; /* Màu của nút đóng */
+}
+
+/* Tùy chỉnh phần body của modal */
+#confirmationModal .modal-body {
+  padding: 20px; /* Khoảng cách padding */
+  font-size: 1.1rem; /* Cỡ chữ */
+  line-height: 1.5; /* Chiều cao dòng */
+}
+
+#confirmationModal .shipper-name {
+  font-weight: bold; /* In đậm tên shipper */
+  color: #007bff; /* Màu chữ */
+}
+
+/* Tùy chỉnh phần footer của modal */
+#confirmationModal .modal-footer {
+  padding: 15px; /* Khoảng cách padding */
+  border-top: 1px solid #dee2e6; /* Đường viền trên */
+  display: flex; /* Flexbox để canh giữa các nút */
+  justify-content: space-between; /* Khoảng cách đều giữa các nút */
+}
+
+/* Tùy chỉnh các nút trong modal */
+#confirmationModal .btn {
+  min-width: 100px; /* Đặt chiều rộng tối thiểu cho các nút */
+}
+
+#confirmationModal .btn-secondary {
+  background-color: #6c757d; /* Màu nền nút Hủy */
+  border-color: #6c757d; /* Màu viền nút Hủy */
+}
+
+#confirmationModal .btn-primary {
+  background-color: #007bff; /* Màu nền nút Xác nhận */
+  border-color: #007bff; /* Màu viền nút Xác nhận */
+}
+/* Định dạng văn bản xác nhận */
+.confirmation-text {
+  font-size: 1rem;
+  color: #333; /* Màu chữ mặc định */
+  margin-bottom: 10px; /* Khoảng cách giữa các đoạn văn */
+}
+
+/* Định dạng tên khách hàng */
+.customer-name {
+  font-weight: bold;
+  color: #007bff; /* Màu chữ cho tên khách hàng */
+}
+
+/* Định dạng số điện thoại */
+.customer-phone {
+  font-weight: bold;
+  color: #28a745; /* Màu chữ cho số điện thoại */
+}
+
+/* Định dạng số tiền */
+.refund-amount {
+  font-weight: bold;
+  color: #dc3545; /* Màu chữ cho số tiền */
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+  position: relative;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  max-height: 80%;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.details-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.details-container h3, .details-container p {
+  margin: 10px 0;
+}
+
+.table-light {
+  background-color: #f9f9f9;
+}
+
+.summary-section {
+  margin-top: 20px;
+}
+.header-section {
+  display: flex; /* Sử dụng flexbox để căn chỉnh nội dung */
+  justify-content: space-between; /* Căn giữa khoảng cách giữa tiêu đề và dropdown */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  padding: 16px; /* Thêm padding xung quanh */
+  background-color: #f8f9fa; /* Màu nền nhẹ nhàng cho header */
+  border-bottom: 2px solid #007bff; /* Đường viền phía dưới có màu xanh */
+}
+
+.header-section h2 {
+  margin: 0; /* Loại bỏ margin để căn chỉnh chính xác */
+  font-size: 24px; /* Kích thước font chữ cho tiêu đề */
+  color: #343a40; /* Màu chữ cho tiêu đề */
+}
+
+.employee-select {
+  padding: 8px 12px; /* Thêm padding cho dropdown */
+  border: 1px solid #ced4da; /* Đường viền cho dropdown */
+  border-radius: 4px; /* Bo góc cho dropdown */
+  font-size: 16px; /* Kích thước font chữ cho dropdown */
+  color: #495057; /* Màu chữ cho dropdown */
+  background-color: #fff; /* Màu nền cho dropdown */
+  cursor: pointer; /* Hiển thị con trỏ tay khi hover */
+  transition: border-color 0.3s; /* Hiệu ứng chuyển tiếp cho đường viền */
+}
+
+.employee-select:focus {
+  border-color: #007bff; /* Đổi màu đường viền khi dropdown được chọn */
+  outline: none; /* Loại bỏ outline mặc định */
+}
+.no-orders-message {
+  text-align: center; /* Căn giữa văn bản */
+  color: #dc3545; /* Màu đỏ cho thông báo */
+  font-size: 18px; /* Kích thước chữ cho thông báo */
+  margin: 20px 0; /* Thêm khoảng cách phía trên và dưới */
+}
+.payment-section-footer {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
