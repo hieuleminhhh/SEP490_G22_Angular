@@ -155,8 +155,10 @@
                   </div>
 
                   <div *ngIf="orderDetail.tables && orderDetail.tables.length > 0" class="mb-3">
-                    <span class="fw-bold">Bàn:</span> {{ orderDetail.tables[0].tableId }}
+                    <span class="fw-bold">Bàn:</span> {{ getTablesAsString() }}
                   </div>
+                  
+                 
                   <div class="mb-3">
                     <span class="fw-bold">Trạng thái đơn:</span>
                     <ng-container [ngSwitch]="orderDetail.status">
@@ -338,8 +340,6 @@
                       data-bs-toggle="modal" *ngIf="!orderDetail?.invoiceId">Thanh toán</button>
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
                       data-bs-toggle="modal">Hủy đơn</button>
-                    <!-- <button type="button" class="btn btn-primary me-2" *ngIf="!orderDetail?.invoiceId">In hóa đơn tạm</button> -->
-                    <!-- (click)="printTemporaryInvoice()" -->
                   </ng-container>
 
                   <!-- Mang ve -->
@@ -488,15 +488,15 @@
           <div class="mb-3">
             <label class="form-label">Hình thức thanh toán:</label>
             <div>
-              <input type="radio" id="cashPrepay" name="paymentMethodPrepay" value="0" [(ngModel)]="paymentMethod">
+              <input type="radio" id="cashPrepay" name="paymentMethodPrepay21" value="0" [(ngModel)]="paymentMethod">
               <label for="cashPrepay">Tiền mặt</label>
             </div>
             <div>
-              <input type="radio" id="bankPrepay" name="paymentMethodPrepay" value="1" [(ngModel)]="paymentMethod">
+              <input type="radio" id="bankPrepay" name="paymentMethodPrepay23" value="1" [(ngModel)]="paymentMethod">
               <label for="bankPrepay">Chuyển khoản ngân hàng</label>
             </div>
             <div>
-              <input type="radio" id="cashOnDelivery" name="paymentMethod" value="2" [(ngModel)]="paymentMethod">
+              <input type="radio" id="cashOnDelivery" name="paymentMethod123" value="2" [(ngModel)]="paymentMethod">
               <label for="cashOnDelivery">Thanh toán khi nhận hàng</label>
             </div>
           </div>
@@ -541,11 +541,11 @@
           <div class="mb-3">
             <label class="form-label">Hình thức thanh toán:</label>
             <div>
-              <input type="radio" id="cashPrepay" name="paymentMethod" value="0" [(ngModel)]="paymentMethod">
+              <input type="radio" id="cashPrepay" name="paymentMethod9" value="0" [(ngModel)]="paymentMethod">
               <label for="cashPrepay">Tiền mặt</label>
             </div>
             <div>
-              <input type="radio" id="bankPrepay" name="paymentMethod2" value="1" [(ngModel)]="paymentMethod">
+              <input type="radio" id="bankPrepay" name="paymentMethod10" value="1" [(ngModel)]="paymentMethod">
               <label for="bankPrepay">Chuyển khoản ngân hàng</label>
             </div>
           </div>
@@ -570,6 +570,7 @@
       </div>
     </div>
   </div>
+
   <!-- Modal for 'Thanh toán offline pre' -->
   <div class="modal fade" id="prepaymentModalOffline" tabindex="-1" aria-labelledby="prepaymentModalOfflineLabel"
     aria-hidden="true" data-bs-backdrop="static">
@@ -590,19 +591,30 @@
           <div class="mb-3">
             <label class="form-label">Hình thức thanh toán:</label>
             <div>
-              <input type="radio" id="cashPrepay" name="paymentMethod1" value="0" [(ngModel)]="paymentMethod">
+              <input type="radio" id="cashPrepay" name="paymentMethod3" value="0" [(ngModel)]="paymentMethod">
               <label for="cashPrepay">Tiền mặt</label>
             </div>
             <div>
-              <input type="radio" id="bankPrepay" name="paymentMethod2" value="1" [(ngModel)]="paymentMethod">
+              <input type="radio" id="bankPrepay" name="paymentMethod4" value="1" [(ngModel)]="paymentMethod">
               <label for="bankPrepay">Chuyển khoản ngân hàng</label>
             </div>
           </div>
 
           <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="customerPaidPrepay" class="form-label">Tiền khách trả:</label>
-            <input type="number" id="customerPaidPrepay" class="form-control" [(ngModel)]="customerPaid">
+            <input
+              type="number"
+              id="customerPaidPrepay"
+              class="form-control"
+              [(ngModel)]="customerPaid"
+              [min]="DiscountedTotalAmount()"
+              (input)="validateCustomerPaid()"
+            >
+            <div *ngIf="customerPaid !== null && customerPaid < DiscountedTotalAmount()" class="text-danger">
+              Tiền khách trả không được nhỏ hơn tổng tiền đơn hàng.
+            </div>
           </div>
+          
 
           <div class="mb-3" *ngIf="paymentMethod === '1'">
             <label for="qrCodePrepay" class="form-label"></label>
@@ -639,11 +651,11 @@
           <div class="mb-3">
             <label class="form-label">Hình thức thanh toán:</label>
             <div>
-              <input type="radio" id="cash" name="paymentMethod" value="0" [(ngModel)]="paymentMethod">
+              <input type="radio" id="cash" name="paymentMethod19" value="0" [(ngModel)]="paymentMethod">
               <label for="cash">Tiền mặt</label>
             </div>
             <div>
-              <input type="radio" id="bank" name="paymentMethod" value="1" [(ngModel)]="paymentMethod">
+              <input type="radio" id="bank" name="paymentMethod20" value="1" [(ngModel)]="paymentMethod">
               <label for="bank">Chuyển khoản ngân hàng</label>
             </div>
 
@@ -753,15 +765,15 @@
           </div>
 
           <hr>
-          <div class="mb-3">
+          <div class="mb-3" *ngIf="invoice?.discountPercent && invoice.discountPercent > 0">
             <label for="totalAmount" class="form-label">Tổng tiền:</label>
             <span id="totalAmount">{{ invoice?.paymentAmount | currencyFormat }}</span>
           </div>
-          <div class="mb-3" *ngIf="paymentMethod === '0' && invoice?.deposites!==0">
+          <div class="mb-3" *ngIf="paymentMethod === '0' || paymentMethod === '1' && invoice?.deposites! == 0  " >
             <label for="prepay" class="form-label">Thanh toán trước:</label>
             <span id="prepay">{{ invoice?.deposits | currencyFormat }}</span>
           </div>
-          <div class="mb-3" *ngIf="paymentMethod === '0' && invoice?.deposits !== 0">
+          <div class="mb-3" *ngIf="paymentMethod === '0' || paymentMethod === '1' && invoice?.deposits !== 0">
             <label for="additionalPayment" class="form-label">Tiền khách phải trả thêm:</label>
             <span id="additionalPayment">
               {{ (invoice?.paymentAmount - invoice?.deposits) | currencyFormat }}
