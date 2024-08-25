@@ -167,7 +167,7 @@
         <thead class="table-light">
           <tr>
             <th>Món ăn</th>
-            <th>Số lượng</th>          
+            <th>Số lượng</th>
             <th>Hoàn thành</th>
             <th>Đơn giá</th>
             <th>Tổng số tiền</th>
@@ -203,7 +203,7 @@
               <span>{{ selectedItem.discountedPrice | currencyFormat }}</span>
             </div>
           </div>
-      
+
           <!-- Payment Status Badges -->
           <div class="col-md-6 d-flex align-items-center justify-content-end">
             <div *ngIf="selectedItem.deposits > 0" class="badge bg-success ms-auto badge-circle">
@@ -215,7 +215,7 @@
           </div>
         </div>
       </div>
-      
+
 
     </div>
   </div>
@@ -240,10 +240,10 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal"  data-bs-target="#invoiceModal" >Xác
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal"  data-bs-target="#invoiceModal" (click)="updateAccountId(shiper.accountId)">Xác
           nhận</button>
       </div>
-      <!-- (click)="updateAccountId(shiper.accountId)" -->
+
     </div>
   </div>
 </div>
@@ -266,26 +266,26 @@
           <div class="card1">
             <div class="card-header d-flex justify-content-center">
               <h5 class="mb-0">
-                <button class="btn btn-link collapsed" type="button" 
-                        data-bs-toggle="collapse" 
-                        [attr.data-bs-target]="'#orderDetails' + i" 
-                        aria-expanded="false" 
+                <button class="btn btn-link collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        [attr.data-bs-target]="'#orderDetails' + i"
+                        aria-expanded="false"
                         [attr.aria-controls]="'orderDetails' + i">
                   <span class="text-primary fw-bold">Đơn hàng: {{ order.orderId }} - Người nhận: {{ order.consigneeName }}</span>
                   <i class="bi bi-chevron-down ms-2"></i>
                 </button>
               </h5>
             </div>
-            
-            
-      
+
+
+
             <div [id]="'orderDetails' + i" class="collapse collapse-item">
               <div class="card-body text-left">
                 <p><strong>Tên người nhận:</strong> {{ order.consigneeName }}</p>
                 <p><strong>Địa chỉ:</strong> {{ order.guestAddress }}</p>
                 <p><strong>Số điện thoại:</strong> {{ order.guestPhone }}</p>
                 <p><strong>Ngày nhận đơn:</strong> {{ order.recevingOrder | date:'dd/MM/yyyy HH:mm' }}</p>
-                
+
                 <!-- Table for item details -->
                 <table class="table table-bordered table-hover">
                   <thead>
@@ -305,16 +305,14 @@
                     </tr>
                   </tbody>
                 </table>
-                
+
                 <p><strong>Tổng tiền hàng:</strong> {{ order.totalAmount | currencyFormat }}</p>
                 <p><strong>Giảm giá:</strong> {{ (order.totalAmount * (order.discountPercent / 100)) | currencyFormat }} ({{ order.discountPercent }}%)</p>
                 <hr>
-                <p><strong>Khách phải trả:</strong> 
+                <p><strong>Khách phải trả:</strong>
                   {{ (order.deposits > 0 ? 0 : order.totalAmount - (order.totalAmount * (order.discountPercent / 100))) | currencyFormat }}
                 </p>
               </div>
-              
-              <!-- Row for the payment status badge -->
               <div class="row">
                 <div class="col-md-6 offset-md-6 d-flex align-items-center justify-content-end">
                   <div *ngIf="order.deposits > 0" class="badge bg-success">
@@ -326,18 +324,18 @@
                 </div>
               </div>
             </div>
-            
+
 
           </div>
         </div>
       </div>
-      
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" *ngIf="isPrinted" (click)="reloadPage()">Đóng</button>
         <button type="button" class="btn btn-primary" (click)="printOrder()">In đơn cho ship</button>
     </div>
-    
-      
+
+
     </div>
   </div>
 </div>

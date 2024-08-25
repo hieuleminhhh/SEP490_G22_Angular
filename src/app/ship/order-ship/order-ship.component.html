@@ -27,7 +27,7 @@
                 <td>{{ order.guestPhone }}</td>
                 <td>{{ order.guestAddress}}</td>
                 <td>{{ order.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</td>
-                <td>{{ order.totalAmount - (order.totalAmount*order.discountPercent/100) | currencyFormat}}</td>
+                <td>{{ order.totalAmount - (order.totalAmount*order.discountPercent/100) - order.deposits | currencyFormat}}</td>
                 <td>
                   <button class="action-button view-button" (click)="showDetails(order)">
                     <i class="fas fa-eye"></i>
@@ -98,6 +98,17 @@
             <div class="d-flex justify-content-between">
               <span class="fw-bold">Tổng cộng:</span>
               <span>{{ selectedItem.totalAmount - (selectedItem.totalAmount*selectedItem.discountPercent/100) | currencyFormat }}</span>
+            </div>
+          </div>
+          <!-- Row for the payment status badge -->
+          <div class="col-md-6">
+            <div class="col-md-6 offset-md-6 d-flex align-items-center justify-content-end">
+              <div *ngIf="selectedItem.deposits > 0" class="badge bg-success">
+                Đã thanh toán
+              </div>
+              <div *ngIf="selectedItem.deposits === 0" class="badge bg-danger">
+                Chưa thanh toán
+              </div>
             </div>
           </div>
         </div>

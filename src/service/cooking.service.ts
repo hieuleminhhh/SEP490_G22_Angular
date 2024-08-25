@@ -58,4 +58,10 @@ export class CookingService {
     const url = `https://localhost:7188/api/orders/orders/status/${status}/account/${accountId}`;
     return this.http.get(url, this.getHttpOptions());
   }
+
+  getIngredient(name: string, quantity: number): Observable<any> {
+    const url = `https://localhost:7188/api/Ingredient/search-by-dish-item-name?name=${name}&quantity=${quantity}`;
+    return this.http.get(url, this.getHttpOptions());
+  }
+
 }
