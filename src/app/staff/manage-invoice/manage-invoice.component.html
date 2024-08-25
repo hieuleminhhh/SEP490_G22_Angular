@@ -12,8 +12,6 @@
         <div class="app-header-navigation">
           <div class="tabs">
             <a (click)="selectTab('overview')" [class.active]="selectedTab === 'overview'" class="tab">Tổng quát</a>
-            <a (click)="selectTab('paid')" [class.active]="selectedTab === 'paid'" class="tab">Đã thanh toán</a>
-            <a (click)="selectTab('unpaid')" [class.active]="selectedTab === 'unpaid'" class="tab">Chưa thanh toán</a>
             <a (click)="selectTab('refund')" [class.active]="selectedTab === 'refund'" class="tab">Đơn hoàn tiền</a>
             <a (click)="selectTab('cash-on-delivery')" [class.active]="selectedTab === 'cash-on-delivery'"
               class="tab">Thu tiền giao hàng</a>
@@ -42,7 +40,7 @@
             </div>
           </article>
         </div>
-        <section class="transfer-section" *ngIf="selectedTab === 'overview'" style="background-color: #ededed;;">
+        <!-- <section class="transfer-section" *ngIf="selectedTab === 'overview'" style="background-color: #ededed;;">
           <div class="transfer-section-header">
             <h2>Nhóm hàng bán ra</h2>
           </div>
@@ -65,104 +63,248 @@
               </dl>
             </div>
           </div>
-        </section>
+        </section> -->
         <section class="payment-section" *ngIf="selectedTab === 'overview'">
           <h2>Phương thức thanh toán</h2>
           <br>
-          <div class="payments">
-            <div class="payment">
-              <div class="payment-details">
-                <p>Tiền mặt</p>
-                <div>
-                  <span>{{data.revenueByPaymentMethod2 | currencyFormat }}</span>
+          <div class="row">
+            <div class="col-md-3">
+              <div class="payments">
+                <div class="payment">
+                  <div class="payment-details">
+                    <p>Tiền mặt: ({{data.orderCountByPaymentMethod0}}) đơn</p>
+                    <div>
+                      <span>{{data.revenueByPaymentMethod0 | currencyFormat }} </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div class="payment">
-              <div class="payment-details">
-                <p>Chuyển khoản</p>
-                <div>
-                  <span>{{data.revenueByPaymentMethod1 | currencyFormat }}</span>
+                <div class="payment">
+                  <div class="payment-details">
+                    <p>Chuyển khoản: ({{data.orderCountByPaymentMethod1+data.orderCountByPaymentMethod2}}) đơn</p>
+                    <div>
+                      <span>{{(data.revenueByPaymentMethod1+data.revenueByPaymentMethod2) | currencyFormat }}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          <br>
           <div class="payment-section-footer">
             <button class="save-button">
               Xuất file báo cáo
             </button>
           </div>
         </section>
-        <div *ngIf="selectedTab === 'paid'" class="paid-content">
-          <section class="payment-section" *ngIf="selectedTab === 'paid'">
-            <h2>Phương thức thanh toán</h2>
-            <br>
-            <div class="payments">
-              <div class="payment">
-                <div class="payment-details">
-                  <p>Tiền mặt</p>
-                  <div>
-                    <span>{{data.revenueByPaymentMethod2 | currencyFormat }}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="payment">
-                <div class="payment-details">
-                  <p>Chuyển khoản</p>
-                  <div>
-                    <span>{{data.revenueByPaymentMethod1 | currencyFormat }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="payment-section-footer">
-              <button class="save-button">
-                Xuất file báo cáo
-              </button>
-            </div>
-          </section>
-        </div>
-        <div *ngIf="selectedTab === 'unpaid'" class="unpaid-content">
-        </div>
+
         <div *ngIf="selectedTab === 'refund'" class="refund-content">
-        </div>
-        <div *ngIf="selectedTab === 'cash-on-delivery'" class="cod-content">
-          <section class="payment-section" *ngIf="selectedTab === 'cash-on-delivery'">
-            <h2>Đơn hàng cần thu tiền của nhân viên giao hàng</h2>
+          <section class="payment-section" *ngIf="selectedTab === 'refund'">
+            <h2>Đơn hàng cần hoàn tiền cho khách</h2>
             <br>
             <table class="order-table">
               <thead>
                 <tr>
                   <th>Mã đơn hàng</th>
+                  <th>Tên khách hàng</th>
+                  <th>Số điện thoại</th>
+                  <th>Ngày đặt hàng</th>
                   <th>Trạng thái đơn hàng</th>
-                  <th>Tổng tiền phải thu</th>
+                  <th>Lý do hủy</th>
+                  <th>Tổng tiền phải hoàn trả</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody class="scrollable-tbody">
-                <ng-container *ngFor="let order of orderShip">
+                <ng-container *ngFor="let order of orderCancel">
                   <tr>
                     <td>{{order.orderId}}</td>
+                    <td>{{order.consigneeName}}</td>
+                    <td>{{order.guestPhone}}</td>
+                    <td>{{order.orderDate | date:'dd/MM/yyyy HH:mm'}}</td>
                     <td>{{ order.status === 4?'Hoàn thành':'Đã hủy'}}</td>
-                    <td>{{ order.totalAmount - (order.totalAmount*order.discountPercent/100) | currencyFormat}}</td>
+                    <td> {{order.cancelationReason}}</td>
+                    <td>{{ (order.deposits > 0 ? order.deposits : order.totalAmount) | currencyFormat }}</td>
                     <td>
-                      <button class="action-button view-button" >
-                        <i class="fas fa-eye"></i>
+                      <button class="action-button complete-button" data-bs-toggle="modal"
+                        data-bs-target="#confirmationModal">
+                        Xác nhận hoàn tiền
                       </button>
                     </td>
-
                   </tr>
                 </ng-container>
               </tbody>
             </table>
-            <div class="payment-section-footer">
-              <h2>Số tiền phải thu</h2>
+          </section>
+        </div>
+        <div *ngIf="selectedTab === 'cash-on-delivery'" class="cod-content">
+          <section class="payment-section" *ngIf="selectedTab === 'cash-on-delivery'">
+            <div class="header-section">
+              <h2>Đơn giao hàng</h2>
+              <select class="employee-select" [(ngModel)]="selectedEmployee" (change)="filterOrdersByEmployee()">
+                <option value="">Tất cả nhân viên</option>
+                <option *ngFor="let employee of employees" [value]="employee.accountId">
+                  {{employee.firstName}} {{employee.lastName}}
+                </option>
+              </select>
+            </div>
+            <br>
+
+            <!-- Kiểm tra xem có đơn hàng không -->
+            <div *ngIf="filteredOrders.length === 0" class="no-orders-message">
+              <p>Không có đơn hàng nào.</p>
+            </div>
+            <table class="order-table" *ngIf="filteredOrders.length > 0">
+              <thead>
+                <tr>
+                  <th>Mã đơn hàng</th>
+                  <th>Ngày giao hàng</th>
+                  <th>Trạng thái đơn hàng</th>
+                  <th>Tổng tiền phải thu</th>
+                  <th>Thu của nhân viên</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody class="scrollable-tbody">
+                <ng-container *ngFor="let order of filteredOrders">
+                  <tr>
+                    <td>{{order.orderId}}</td>
+                    <td>{{order.recevingOrder | date:'dd/MM/yyyy '}}</td>
+                    <td>{{ order.status === 4?'Hoàn thành':'Đang giao hàng'}}</td>
+                    <td>{{ order.totalPaid | currencyFormat}}</td>
+                    <td>
+                      {{order.firstName}} {{order.lastName}}
+                    </td>
+                    <td *ngIf="order.paymentStatus===0">Chưa thanh toán cho thu ngân</td>
+                    <td *ngIf="order.paymentStatus===0">
+                      <button class="action-button view-button" (click)="showDetails(order.orderId)">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="action-button complete-button" data-bs-toggle="modal"
+                        data-bs-target="#confirmationModal">
+                        Thu tiền
+                      </button>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+            <br>
+            <div class="payment-section-footer" *ngIf="filteredOrders.length > 0">
+              <h4>Số tiền phải thu: {{ totalAmountDue() | currencyFormat }}</h4>
             </div>
           </section>
         </div>
+
       </section>
     </div>
+  </div>
+</div>
 
 
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" *ngIf="selectedTab === 'refund'">
+    <div class="modal-content" *ngFor="let order of orderCancel; let i = index">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Xác nhận</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="confirmation-text">
+          Xác nhận đã hoàn tiền cho khách hàng <span class="customer-name">{{order.consigneeName}}</span><br>
+          Số điện thoại: <span class="customer-phone">{{order.guestPhone}}</span><br>
+          Số tiền: <span class="refund-amount">{{order.deposits | currencyFormat}}</span>
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invoiceModal"
+          (click)="updateOrderStatus(order.orderId)">Xác
+          nhận</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-dialog" *ngIf="selectedTab === 'cash-on-delivery'">
+    <div class="modal-content" *ngFor="let order of orderShip; let i = index">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Xác nhận</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="confirmation-text">
+          Xác nhận thu tiền <span class="customer-name">{{order.firstName}}{{order.lastName}}</span><br>
+          Số tiền: <span class="refund-amount">{{order.totalPaid | currencyFormat}}</span>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invoiceModal"
+          (click)="update(order.orderId, order.totalPaid)">Xác
+          nhận</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Popup for item details -->
+<div *ngIf="selectedItem" class="popup" (click)="closePopup()">
+  <div class="popup-content" (click)="$event.stopPropagation()">
+    <span class="close" (click)="closePopup()">&times;</span>
+    <div class="details-container">
+      <h3>Đơn hàng: {{selectedItem.orderId}}</h3>
+      <p>Loại đơn: {{ selectedItem.orderType === 1 ? "Mang về" : "Giao hàng" }}</p>
+      <p>Tên người nhận: {{selectedItem.consigneeName}}</p>
+      <p>Số điện thoại: {{selectedItem.guestPhone}}</p>
+      <p>Địa chỉ: {{selectedItem.guestAddress}}</p>
+      <p>Thời gian nhận hàng: {{ selectedItem.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</p>
+
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Món ăn</th>
+            <th>Số lượng</th>
+            <th>Hoàn thành</th>
+            <th>Tổng số tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let item of selectedItem.orderDetails">
+            <tr>
+              <td>{{ item.nameCombo || item.itemName }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.dishesServed }}</td>
+              <td>{{ item.unitPrice | currencyFormat }}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+      <div class="summary-section mt-4">
+        <div class="row">
+          <!-- First Column -->
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between" *ngIf="selectedItem.discountPercent">
+              <span class="fw-bold">Tạm tính:</span>
+              <span>{{ selectedItem.totalAmount | currencyFormat }}</span>
+            </div>
+            <div *ngIf="selectedItem.discountPercent" class="d-flex justify-content-between">
+              <span class="fw-bold">Giảm giá:</span>
+              <span>{{ selectedItem.totalAmount*selectedItem.discountPercent/100 | currencyFormat }}</span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between">
+              <span class="fw-bold">Tổng cộng:</span>
+              <span>{{ selectedItem.totalAmount - (selectedItem.totalAmount*selectedItem.discountPercent/100) |
+                currencyFormat }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>

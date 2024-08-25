@@ -70,7 +70,21 @@ export class InvoiceService {
     return this.http.get<any>(url, this.getHttpOptions());
   }
   getOrderShip(): Observable<any> {
-    const url = `https://localhost:7188/api/Invoice/Ordertoday`;
+    const url = `https://localhost:7188/api/Invoice/OrderUnpaidForShip`;
+    return this.http.get<any>(url, this.getHttpOptions());
+  }
+
+  updatePayment(id:number, data: any): Observable<any> {
+    const url = `https://localhost:7188/api/Invoice/updatePaymentStatus/${id}`;
+    return this.http.put<any>(url, data, this.getHttpOptions());
+  }
+
+  updateOrderStatus(orderId: number, status: any): Observable<any> {
+    const url = `https://localhost:7188/api/orders/${orderId}/Updatestatus`;
+    return this.http.put(url, status, this.getHttpOptions());
+  }
+  getOrderDetail(id:number): Observable<any> {
+    const url = `https://localhost:7188/api/orders/${id}`;
     return this.http.get<any>(url, this.getHttpOptions());
   }
 }
