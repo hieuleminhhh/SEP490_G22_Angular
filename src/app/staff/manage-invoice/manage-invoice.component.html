@@ -41,7 +41,7 @@
                 <h3>
                   <span>Số đơn hoàn thành</span>
                   <hr>
-                  <span>{{data.totalOrders}}</span>
+                  <span>{{data?.totalOrders}}</span>
                 </h3>
               </div>
             </article>
@@ -51,7 +51,7 @@
                 <h3>
                   <span>Doanh thu</span>
                   <hr>
-                  <span>{{data.totalRevenue | currencyFormat }}</span>
+                  <span>{{data?.totalRevenue | currencyFormat }}</span>
                 </h3>
               </div>
             </article>
@@ -90,17 +90,17 @@
               <div class="payments">
                 <div class="payment">
                   <div class="payment-details">
-                    <p>Tiền mặt: ({{data.orderCountByPaymentMethod0}}) đơn</p>
+                    <p>Tiền mặt: ({{data?.orderCountByPaymentMethod0}}) đơn</p>
                     <div>
-                      <span>{{data.revenueByPaymentMethod0 | currencyFormat }} </span>
+                      <span>{{data?.revenueByPaymentMethod0 | currencyFormat }} </span>
                     </div>
                   </div>
                 </div>
                 <div class="payment">
                   <div class="payment-details">
-                    <p>Chuyển khoản: ({{data.orderCountByPaymentMethod1+data.orderCountByPaymentMethod2}}) đơn</p>
+                    <p>Chuyển khoản: ({{data?.orderCountByPaymentMethod1+data?.orderCountByPaymentMethod2}}) đơn</p>
                     <div>
-                      <span>{{(data.revenueByPaymentMethod1+data.revenueByPaymentMethod2) | currencyFormat }}</span>
+                      <span>{{(data?.revenueByPaymentMethod1+data?.revenueByPaymentMethod2) | currencyFormat }}</span>
                     </div>
                   </div>
                 </div>
@@ -259,8 +259,8 @@
       </div>
       <div class="modal-body">
         <p class="confirmation-text">
-          Xác nhận thu tiền <span class="customer-name">{{orderShipper.firstName}}{{orderShipper.lastName}}</span><br>
-          Số tiền: <span class="refund-amount">{{orderShipper.totalPaid | currencyFormat}}</span>
+          Xác nhận thu tiền <span class="customer-name">{{orderShipper?.firstName}}{{orderShipper?.lastName}}</span><br>
+          Số tiền: <span class="refund-amount">{{orderShipper?.totalPaid | currencyFormat}}</span>
         </p>
       </div>
       <div class="modal-footer">
