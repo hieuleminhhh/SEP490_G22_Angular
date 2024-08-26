@@ -785,7 +785,7 @@ hideModal() {
   if(!this.date || !this.time){
     this.isEarliest = true;
   }
-
+this.receivingTime =  this.time;
   const modal = document.getElementById('updateTimeModal');
   if (modal) {
     modal.classList.remove('show');
