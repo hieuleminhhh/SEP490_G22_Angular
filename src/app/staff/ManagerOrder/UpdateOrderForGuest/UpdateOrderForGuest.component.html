@@ -68,13 +68,13 @@
                           <button class="btn btn-outline-secondary btn-sm" (click)="increaseQuantity(i, orderId)">+</button>
                         </div>
                       </td>
-                      
+
 
                       <td>
                         <div class="d-flex align-items-center">
-                          <input type="number" 
-                                 class="form-control text-center small-input disabled-input" 
-                                 [(ngModel)]="item.dishesServed" 
+                          <input type="number"
+                                 class="form-control text-center small-input disabled-input"
+                                 [(ngModel)]="item.dishesServed"
                                  [ngModel]="item.dishesServed || 0">
                         </div>
                       </td>
@@ -112,7 +112,7 @@
                 </div>
                 <br>
                 <hr>
-                <div *ngIf="selectedItems.length > 0" class="mt-2">
+                <!-- <div *ngIf="selectedItems.length > 0" class="mt-2">
                   <strong>Tổng số tiền:</strong>
                   <span *ngIf="selectedDiscount === null">
                     {{ totalAmount | currencyFormat }}
@@ -120,11 +120,11 @@
                   <span *ngIf="selectedDiscount !== null">
                     {{ totalAmountAfterDiscount | currencyFormat }}
                   </span>
-                </div>
+                </div> -->
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
                   <button type="button" class="btn custom-btn-success btn-lg rounded-pill" data-bs-toggle="modal" data-bs-target="#confirmModal">
                     Lưu lại
-                  </button>                 
+                  </button>
                 </div>
 
               </div>
