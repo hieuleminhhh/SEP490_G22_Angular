@@ -38,13 +38,13 @@ export class UpdateOrderForGuestComponent implements OnInit {
  @ViewChild('formModal') formModal!: ElementRef;
  orderId: number = 0;
  tableId: number = 0;
- orders: any[] = []; 
+ orders: any[] = [];
  errorMessage: string = '';
  dishes: ListAllDishes[] = [];
  combo: ListAllCombo[] = [];
- addresses: Address[] = []; 
+ addresses: Address[] = [];
  filteredAddresses: any[] = [];
- selectedItems: any[] = []; 
+ selectedItems: any[] = [];
  showingDishes: boolean = true;
  discountInvalid: any = {};
  showingCombos: boolean = false;
@@ -62,7 +62,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
  searchTerm: string = '';
  selectedAddress: Address | any = {};
  paymentMethod: string = '0';
- selectedOrder: any; 
+ selectedOrder: any;
  selectedDiscount: any | null = null;
  selectedDiscountName: string = '';
  selectedDiscountPercent: number = 0;
@@ -75,7 +75,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
    guestPhone: '',
    email:'antaiquan@gmail.com',
  };
- showSidebar: boolean = true; 
+ showSidebar: boolean = true;
  customerPaid: number | null = null;
  addressId: number | null = null;
  addNew: any = {};
@@ -83,6 +83,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
  newlyAddedItems: any[] = [];
  invoice: any = {};
  initialTotalAmount: number = 0;
+ orderIdForUpdate: any;
   ngOnInit() {
     this.loadListDishes();
     this.loadListCombo();
@@ -97,10 +98,10 @@ export class UpdateOrderForGuestComponent implements OnInit {
     this.LoadActiveDiscountByOrderID(this.orderId);
     this.calculateAndSetTotalAmount();
     console.log('AAAA'+this.selectedDiscount);
-    
+
   }
   loadListDishes(search: string = '', searchCategory: string =''): void {
-    console.log('Loading dishes with search term:', search); 
+    console.log('Loading dishes with search term:', search);
     this.dishService.ListDishes(this.currentPage,this.pageSize, search, searchCategory ).subscribe(
       (response: ListAllDishes) => {
         if (response && response.items) {
@@ -152,8 +153,8 @@ export class UpdateOrderForGuestComponent implements OnInit {
       this.loadListCombo(this.search);
     }
   }
-  
-  
+
+
   showDishes() {
     this.showingDishes = true;
     this.showingCombos = false;
@@ -164,18 +165,18 @@ export class UpdateOrderForGuestComponent implements OnInit {
     this.showingCombos = !this.showingCombos;
     this.showingDishes = false;
     this.showingCombos = true;
-    this.searchCategory = ''; 
+    this.searchCategory = '';
 }
-  
+
 
 
   generateTimeOptions() {
     const startHour = 9; // 9 AM
     const endHour = 21; // 9 PM
     const interval = 30; // 30 minutes
-  
+
     this.timeOptions = []; // Clear existing time options before generating new ones
-  
+
     for (let hour = startHour; hour <= endHour; hour++) {
       for (let minute = 0; minute < 60; minute += interval) {
         const hourString = hour < 10 ? '0' + hour : hour.toString();
@@ -183,23 +184,23 @@ export class UpdateOrderForGuestComponent implements OnInit {
         this.timeOptions.push(`${hourString}:${minuteString}`);
       }
     }
-  
+
     // After generating time options, set default receiving time again if needed
     this.setDefaultReceivingTime();
   }
-  
+
   setDefaultReceivingTime() {
     const now = new Date();
     now.setHours(now.getHours() + 1); // Add one hour to the current time
     now.setMinutes(0); // Round down to the nearest hour
-  
+
     const defaultHour = now.getHours();
     const defaultMinute = now.getMinutes();
-  
+
     const defaultHourString = defaultHour < 10 ? '0' + defaultHour : defaultHour.toString();
     const defaultMinuteString = defaultMinute < 10 ? '0' + defaultMinute : defaultMinute.toString();
     const defaultTime = `${defaultHourString}:${defaultMinuteString}`;
-  
+
     // Find the closest time option and set it as default
     const closestTimeOption = this.timeOptions.find(time => time >= defaultTime) || this.timeOptions[0];
     this.receivingTime = closestTimeOption;
@@ -211,13 +212,13 @@ export class UpdateOrderForGuestComponent implements OnInit {
       return new Date(now.getTime() + utcOffset + vietnamOffset);
     }
     clearSearchTerm() {
-      this.searchTerm = ''; 
+      this.searchTerm = '';
     }
-  
+
     filterAddresses() {
       const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
-      this.filteredAddresses = this.addresses.filter(address => 
-        address.consigneeName.toLowerCase().includes(lowerCaseSearchTerm) || 
+      this.filteredAddresses = this.addresses.filter(address =>
+        address.consigneeName.toLowerCase().includes(lowerCaseSearchTerm) ||
         address.guestPhone.includes(this.searchTerm)
       );
     }
@@ -226,8 +227,8 @@ export class UpdateOrderForGuestComponent implements OnInit {
       this.addressId = address.addressId;
       this.addNew.guestPhone = address.guestPhone;
       this.addNew.email = 'antaiquan@gmail.com';
-      this.addNew.guestAddress = 'Ăn tại quán'; 
-      this.addNew.consigneeName = address.consigneeName; 
+      this.addNew.guestAddress = 'Ăn tại quán';
+      this.addNew.consigneeName = address.consigneeName;
       this.showDropdown = false;
       console.log('Selected Address:', this.addNew);
   }
@@ -241,7 +242,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
         this.successMessage = 'Địa chỉ đã được thêm thành công!';
         this.closeModal();
         setTimeout(() => this.successMessage = '', 5000);
-  
+
         // Ensure response contains correct properties in 'data'
         if (response && response.data && response.data.consigneeName && response.data.guestPhone) {
           // Update selectedAddress with the newly created address data
@@ -249,10 +250,10 @@ export class UpdateOrderForGuestComponent implements OnInit {
         } else {
           console.error('Invalid response format after creating address:', response);
         }
-  
+
         // Reload addresses to update the list
         this.loadAddresses();
-  
+
         // Clear form and close modal
         this.clearForm();
         this.closeModal();
@@ -260,7 +261,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
       error => {
         console.error('Error creating address:', error);
         this.clearAddErrors();
-  
+
         // Handle errors from response
         if (error.error) {
           const fieldErrors = error.error;
@@ -299,7 +300,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
     clearAddErrors() {
       this.addErrors = {};
     }
-  
+
     closeModal() {
       const modalElement = this.formModal.nativeElement;
       modalElement.classList.remove('show');
@@ -310,11 +311,11 @@ export class UpdateOrderForGuestComponent implements OnInit {
         modalBackdrop.parentNode.removeChild(modalBackdrop);
       }
     }
-    
+
     reloadPage() {
       window.location.reload();
     }
-    
+
   applyDiscount(orderId: number): void {
     if (this.selectedDiscount !== null) {
       // Find the selected discount
@@ -323,10 +324,10 @@ export class UpdateOrderForGuestComponent implements OnInit {
         this.selectedDiscount = discount.discountId;
         this.selectedDiscountName = discount.discountName;
         this.selectedDiscountPercent = discount.discountPercent;
-  
+
         // Recalculate the total amount with the discount applied
         this.calculateTotalAmountAfterDiscount(orderId);
-  
+
         // Optionally close the modal programmatically
         this.closeModal();
       } else {
@@ -336,7 +337,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
       console.error('No discount selected.');
     }
   }
-  
+
   calculateTotalAmountAfterDiscount(orderId: number): void {
     this.orderDetailService.getOrderDetail(orderId).subscribe((orderDetail) => {
         // totalAmount hiện tại đã được tính trước khi gọi hàm này
@@ -366,16 +367,16 @@ export class UpdateOrderForGuestComponent implements OnInit {
       this.addOrUpdateNewlyAddedItem(item);
     }
   }
-  
-  
+
+
   decreaseQuantity(index: number, orderId: number): void {
     const item = this.selectedItems[index];
     if (item) {
         // Fetch the order detail within the method
         this.orderDetailService.getOrderDetail(orderId).subscribe((orderDetail) => {
             // Find the specific detail for the item in question, using either dishId or comboId
-            const detail = orderDetail.orderDetails.find((d: any) => 
-                (item.dishId && d.dishId === item.dishId) || 
+            const detail = orderDetail.orderDetails.find((d: any) =>
+                (item.dishId && d.dishId === item.dishId) ||
                 (item.comboId && d.comboId === item.comboId)
             );
 
@@ -397,7 +398,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
     }
 }
 
-  
+
 async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
   try {
     // Fetch the current quantities from the database
@@ -415,10 +416,10 @@ async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
     console.log("Current Quantity for Item:", currentQuantity);
 
     // Check if the item already exists in newlyAddedItems
-    const selectedItemIndex = this.newlyAddedItems.findIndex(selectedItem => 
+    const selectedItemIndex = this.newlyAddedItems.findIndex(selectedItem =>
       this.itemsAreEqual(selectedItem, item)
     );
-    
+
     console.log("Index in newlyAddedItems:", selectedItemIndex);
     console.log("This new:", this.newlyAddedItems);
 
@@ -427,7 +428,7 @@ async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
     if (selectedItemIndex !== -1) {
       console.log('selectedItems', this.newlyAddedItems);
       console.log('currentQuantities:', currentQuantities);
-      
+
       // Item already exists in newlyAddedItems, update the quantity
       const newQuantity = item.quantity;
       const initialQuantity = currentQuantity; // Quantity in the database
@@ -456,9 +457,9 @@ async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
   }
 }
 
-  
-  
-  
+
+
+
  async removeOrUpdateNewlyAddedItem(item: any): Promise<void> {
   try {
     // Fetch the current quantities from the database
@@ -483,7 +484,7 @@ async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
       const initialQuantity = currentQuantity; // Assuming currentQuantity is the initial quantity in the database
       this.newlyAddedItems[newlyAddedIndex].quantity = newQuantity - initialQuantity;
       this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * (this.newlyAddedItems[newlyAddedIndex].discountedPrice || this.newlyAddedItems[newlyAddedIndex].price);
-    } 
+    }
     else {
       // Item is new, add to newlyAddedItems
       const newItem = {
@@ -499,7 +500,7 @@ async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
   }
 }
 
-  
+
   itemsAreEqual(item1: any, item2: any): boolean {
     return (item1.dishId === item2.dishId && item1.comboId === item2.comboId);
   }
@@ -528,15 +529,15 @@ async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
       this.calculateTotalAmount(orderId);
     }
   }
-  
+
   calculateTotalAmount(orderId: number): void {
     this.totalAmount = this.selectedItems.reduce((acc, item) => acc + this.getTotalPrice(item), 0);
     console.log('Calculated total amount:', this.totalAmount);
-    
+
     // Recalculate the total amount after applying any discount
     this.calculateTotalAmountAfterDiscount(orderId);
   }
-  
+
 
   // Method to calculate total price
   getTotalPrice(item: any): number {
@@ -549,23 +550,23 @@ async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
     if (item) {
       // Validate quantity within the specified range (1 to 100)
       item.quantity = Math.max(1, Math.min(item.quantity, 100));
-  
+
       // Update the total price and recalculate the total amount
       this.updateTotalPrice(index, orderId);
     }
   }
-  
-  
+
+
   async addItem(item: any) {
     // Find if the item already exists in selectedItems
     const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-  
+
     let unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
     if (isNaN(unitPrice)) {
       console.error('Unit price is not a number:', unitPrice);
       unitPrice = 0; // Ensure unitPrice has a valid number
     }
-  
+
     if (index !== -1) {
       // If the item already exists, increase its quantity and update the total price
       this.selectedItems[index].quantity++;
@@ -581,13 +582,13 @@ async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
       });
     }
     console.log('Updated Selected Items:', this.selectedItems);
-  
+
     // Recalculate totalAmount and totalAmountAfterDiscount after adding item
     this.calculateAndSetTotalAmount();
-  
+
     // Find the specific item in newlyAddedItems
     const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
-  
+
     if (newlyAddedIndex !== -1) {
       // If the item already exists in newlyAddedItems, update its quantity
       this.newlyAddedItems[newlyAddedIndex].quantity += 1;
@@ -603,8 +604,8 @@ async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
     }
     console.log('Updated Newly Added Items:', this.newlyAddedItems);
   }
-  
-  
+
+
 
   calculateAndSetTotalAmount(): void {
     if (!this.selectedItems || this.selectedItems.length === 0) {
@@ -652,8 +653,8 @@ removeItem(index: number, orderId: number): void {
   // If the item is not in the cart (newlyAddedItems), proceed with the regular removal process
   this.orderDetailService.getOrderDetail(orderId).subscribe((orderDetail) => {
       // Find the specific detail for the item using either dishId or comboId
-      const detail = orderDetail.orderDetails.find((d: any) => 
-          (removedItem.dishId && d.dishId === removedItem.dishId) || 
+      const detail = orderDetail.orderDetails.find((d: any) =>
+          (removedItem.dishId && d.dishId === removedItem.dishId) ||
           (removedItem.comboId && d.comboId === removedItem.comboId)
       );
 
@@ -757,6 +758,7 @@ removeItem(index: number, orderId: number): void {
 
 
   getOrder(orderId: number): void {
+    this.orderIdForUpdate = orderId;
     this.orderDetailService.getOrderDetail(orderId).subscribe(
       (response: ListOrderDetailByOrder) => {
         this.selectedOrder = response;
@@ -765,12 +767,15 @@ removeItem(index: number, orderId: number): void {
           this.selectedDiscount = response.discountId;
           console.log('640,'+this.selectedDiscount);
           const discount = this.discounts.find(d => d.discountId === response.discountId);
+
+
           if (discount) {
             this.selectedDiscountName = discount.discountName;
             this.selectedDiscountPercent = discount.discountPercent;
+            this.calculateAndSetTotalAmount();
           }
         }
-        this.calculateAndSetTotalAmount();
+
         console.log('Order details:', this.selectedOrder);
       },
       (error: HttpErrorResponse) => {
@@ -788,22 +793,22 @@ removeItem(index: number, orderId: number): void {
       note: item.note || '', // Assuming you have a note property or set it to an empty string
       orderTime: new Date().toISOString() // Assuming you want the current time
     }));
-  
+
     // Log the data before sending
     console.log('Updating order details with newly added items:', orderDetails);
-  
+
     // Construct the dto object
     const dto = {
       discountId: this.selectedDiscount || 0,
       orderDetails: orderDetails
     };
-  
+
     // Call the service method to update the order details
     this.orderService.updateOrderDetailsByOrderId(orderId, dto).subscribe(
       response => {
         console.log('Order details updated successfully:', response);
         this.successMessage = 'Order details updated successfully!';
-        
+        this.updateOrderDetail(this.orderIdForUpdate);
         // Clear newlyAddedItems after successful update
         this.newlyAddedItems = [];
         this.selectCategory('Món chính');
@@ -820,14 +825,26 @@ removeItem(index: number, orderId: number): void {
       }
     );
   }
-  
+
+  updateOrderDetail(orderId: number) {
+    console.log(orderId);
+
+    this.orderService.updateOrderDetail(orderId).subscribe(
+      response => {
+        console.log(response);
+      },
+      (error: HttpErrorResponse) => {
+        console.error('Error updating offline order:', error);
+      }
+    );
+  }
   onItemClick(discount: Discount) {
     this.selectedDiscount = discount.discountId;
     this.selectedDiscountName = discount.discountName;
     this.selectedDiscountPercent = discount.discountPercent;
     console.log('Discount selected:', this.selectedDiscount);
     this.updateOrderDetails(this.orderId)
-  }  
+  }
   applyExistingDiscount(): void {
     if (this.selectedDiscount !== null) {
       const discount = this.discounts.find(d => d.discountId === this.selectedDiscount);
@@ -851,7 +868,7 @@ removeItem(index: number, orderId: number): void {
         paymentMethods: 0,
         description: "string"
       };
-  
+
       this.invoiceService.updateStatusAndCreateInvoice(orderId, updateData).subscribe(
         (response) => {
           console.log('Order status updated and invoice created:', response);
@@ -880,7 +897,7 @@ removeItem(index: number, orderId: number): void {
 
     // Calculate the discount amount
     const discountAmount = totalAmount * (this.selectedDiscountPercent / 100);
-    
+
     return discountAmount;
   }
 }

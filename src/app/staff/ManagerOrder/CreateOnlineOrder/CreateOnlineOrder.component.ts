@@ -110,7 +110,7 @@ export class CreateOnlineOrderComponent implements OnInit {
     this.loadListDishes();
     this.loadListCombo();
     const today = new Date();
-    this.receivingDate = today.toISOString().split('T')[0];
+    this.receivingDate = this.formatDate(today);
     this.generateTimeOptions();
     this.setDefaultReceivingTime();
     this.selectCategory('Món chính');
@@ -121,7 +121,24 @@ export class CreateOnlineOrderComponent implements OnInit {
     this.updateTimes();
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
+    console.log(this.date);
+    console.log(this.time);
+    this.selectTime();
+
   }
+  selectTime() {
+    const currentTime = new Date();
+    currentTime.setHours(currentTime.getHours() + 1); // Thêm 1 giờ
+
+    // Lấy giờ và phút từ currentTime và định dạng thành chuỗi 'HH:MM'
+    const currentTimeStr = currentTime.toTimeString().split(' ')[0].substring(0, 5);
+
+    // Gán giá trị giờ phút cho biến receivingTime
+    this.receivingTime = currentTimeStr;
+
+    console.log(this.receivingTime); // In ra giá trị của receivingTime
+}
+
   selectCategory(searchCategory: string) {
     this.selectedCategory = searchCategory;
     if (searchCategory === 'Combo') {
@@ -351,7 +368,7 @@ createOrder() {
     response => {
       console.log('Order created successfully:', response);
       this.successMessage = 'Đơn hàng đã được tạo thành công!';
-      this.lastOrderId = response.orderId; 
+      this.lastOrderId = response.orderId;
       setTimeout(() => this.successMessage = '', 5000);
     },
     error => {
@@ -750,7 +767,7 @@ updateTotalAmountWithDiscount() {
 }
 onDiscountSelect(discountId: number) {
   if (this.selectedDiscount === discountId) {
-    this.selectedDiscount = null; 
+    this.selectedDiscount = null;
   } else {
     this.selectedDiscount = discountId;
   }
@@ -829,6 +846,7 @@ onEarliestChange() {
   if (this.isEarliest) {
     this.date = new Date().toISOString().split('T')[0];
     this.time = '';
+    this.selectTime();
   }
 }
 getDiscountAmount(): number {

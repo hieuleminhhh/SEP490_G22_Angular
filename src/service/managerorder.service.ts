@@ -76,6 +76,10 @@ export class ManagerOrderService {
     const url = `${this.apiUrl}/orders/updateOrderDetails/${tableId}`;
     return this.http.post<any>(url, dto, this.getHttpOptions());
   }
+  updateOrderDetail(orderId: number): Observable<any> {
+    const url = `https://localhost:7188/api/orders/update-total-amount/${orderId}`;
+    return this.http.put<any>(url,  this.getHttpOptions());
+  }
 
   getOrderById(orderId: number): Observable<any> {
     const url = `${this.apiUrl}/orders/GetOrderDetails/${orderId}`;

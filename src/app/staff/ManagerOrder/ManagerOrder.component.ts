@@ -28,6 +28,7 @@ export class ManagerOrderComponent implements OnInit {
   orders: ListAllOrder[] = [];
   dateFrom: string = '';
   dateTo: string = '';
+  dateNow: string = '';
   search: string = '';
   currentPage: number = 1;
   pageSize: number = 10;
@@ -85,14 +86,17 @@ export class ManagerOrderComponent implements OnInit {
 
   ngOnInit() {
     this.setDefaultDates();
-    this.selectedType = 4;
+    this.selectedType = 0;
     this.loadListOrder();
     this.paymentMethod = '0';
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
     this.customerPaid = this.DiscountedTotalAmount();
     console.log('31', this.accountId);
-
+    const today = new Date();
+    this.dateFrom = this.formatDate(today);
+    this.dateTo = this.formatDate(today);
+    this.dateNow = this.formatDate(today);
   }
 
   setDefaultDates() {
@@ -255,7 +259,7 @@ export class ManagerOrderComponent implements OnInit {
         return 'black';        // Default color
     }
   }
-  
+
 
 
   onPageChange(page: number): void {
@@ -417,7 +421,7 @@ export class ManagerOrderComponent implements OnInit {
     console.log('Invoice data before update:', this.invoice);
     if (this.invoice.invoiceId) {
       const printWindow = window.open('', '', 'height=600,width=800');
-  
+
       // Write the content to the new window
       printWindow?.document.write('<html><head><title>Invoice</title>');
       printWindow?.document.write(`
@@ -475,7 +479,7 @@ export class ManagerOrderComponent implements OnInit {
         </style>
       `);
       printWindow?.document.write('</head><body>');
-  
+
       // Add restaurant information
       printWindow?.document.write(`
         <div class="header">
@@ -486,7 +490,7 @@ export class ManagerOrderComponent implements OnInit {
           <hr>
         </div>
       `);
-  
+
       // Add invoice information
       printWindow?.document.write(`
         <div class="mb-3">
@@ -573,14 +577,14 @@ export class ManagerOrderComponent implements OnInit {
           <img id="qrCodePrepay" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt="QR Code" class="img-fluid">
         </div>` : ''}
       `);
-  
+
       // Add footer
       printWindow?.document.write(`
         <div class="footer">
           Cảm ơn quý khách và hẹn gặp lại!
         </div>
       `);
-  
+
       // Close the document and trigger print
       printWindow?.document.write('</body></html>');
       printWindow?.document.close();
@@ -591,7 +595,7 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Invoice ID is not defined.');
     }
   }
-  
+
   // UpdateStatus(orderId: number | undefined, status: number | undefined) {
   //   if (orderId !== undefined && status !== undefined) {
   //     this.orderService.updateOrderStatus(orderId, status).subscribe(
@@ -733,7 +737,7 @@ export class ManagerOrderComponent implements OnInit {
   validateCustomerPaid() {
     const amountDue = this.DiscountedTotalAmount(); // Get the amount due after considering deposits and discounts
     const customerPaidValue = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
-  
+
     if (customerPaidValue < amountDue) {
       console.error('Tiền khách trả không được nhỏ hơn tổng tiền đơn hàng.');
       this.isCustomerPaidValid = false; // Disable input if validation fails
@@ -746,19 +750,19 @@ export class ManagerOrderComponent implements OnInit {
       this.isCustomerPaidValid = true; // Enable input if validation passes
     }
   }
-  
-  
+
+
 
   //Offline hoan thanh goi them mon
 
   SuscessfullOrderOffline(orderId: number | undefined, invoiceId?: number) {
-  
+
     const paymentMethod = parseInt(this.paymentMethod, 10);
-  
+
     console.log('Payment Method:', paymentMethod);
     console.log('Customer Paid:', this.customerPaid);
     console.log('Discounted Total Amount:', this.DiscountedTotalAmount());
-  
+
     if (orderId !== undefined) {
       if (invoiceId === undefined || invoiceId === 0 || invoiceId === null) {
         // Create a new invoice
@@ -777,7 +781,7 @@ export class ManagerOrderComponent implements OnInit {
           accountId: this.accountId,
           description: "Invoice Created"
         };
-  
+
         this.invoiceService.createInvoiceOffline(orderId, createData).subscribe(
           response => {
             console.log('Invoice created successfully:', response);
@@ -793,13 +797,13 @@ export class ManagerOrderComponent implements OnInit {
         // Update an existing invoice
         const remainingAmountDue = this.getAmountDue();
         console.log('Remaining Amount Due:', remainingAmountDue);
-  
+
         let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
         console.log('Amount Received:', amountReceived);
-  
+
         const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - remainingAmountDue : 0;
         console.log('Return Amount:', returnAmount);
-  
+
         const updateData = {
           status: 4,
           paymentTime: new Date().toISOString(),
@@ -812,7 +816,7 @@ export class ManagerOrderComponent implements OnInit {
           description: "Invoice Updated",
           tableStatus: 0,
         };
-  
+
         this.invoiceService.updateOrderAndInvoice(orderId, updateData).subscribe(
           response => {
             console.log('Invoice updated successfully:', response);
@@ -829,7 +833,7 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Order ID is undefined');
     }
   }
-  
+
   acceptOrder(orderId: number | undefined): void {
     if (orderId !== undefined) {
       const data = {
@@ -877,5 +881,16 @@ export class ManagerOrderComponent implements OnInit {
       return this.orderDetail.tables.map(table => table.tableId).join(', ');
     }
     return '';
+  }
+  onDateFromChange(): void {
+
+    this.onSearch();
+  }
+
+  onDateToChange(): void {
+    if (this.dateTo < this.dateFrom) {
+      this.dateFrom = this.dateTo;
+    }
+    this.onSearch();
   }
 }
