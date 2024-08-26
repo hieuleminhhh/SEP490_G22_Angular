@@ -61,8 +61,8 @@ export class InvoiceService {
     return this.http.post<any>(url, invoiceData, this.getHttpOptions());
   }
 
-  getStatistics(): Observable<any> {
-    const url = `https://localhost:7188/api/orders/statistics`;
+  getStatistics(dateStart:any, dateEnd:any): Observable<any> {
+    const url = `https://localhost:7188/api/orders/statistics?startDate=${dateStart}&endDate=${dateEnd}`;
     return this.http.get<any>(url, this.getHttpOptions());
   }
   getCancelOrder(): Observable<any> {

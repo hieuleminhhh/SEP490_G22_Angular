@@ -134,7 +134,7 @@
                 <div *ngFor="let shiper of dataShipStaff; let i = index" class="grid-item">
                   <div class="dish-info">
                     <p>{{shiper.firstName}}{{shiper.lastName}}</p>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal" 
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal"
                     (click)="GetAccountById(shiper.accountId)">
                       Chỉ định
                       giao hàng</button>
@@ -239,7 +239,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal"  data-bs-target="#invoiceModal" >Xác
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal"  data-bs-target="#invoiceModal" (click)="updateAccountId(accountShip.accountId)">Xác
           nhận</button>
       </div>
 
@@ -247,7 +247,7 @@
   </div>
 </div>
 
-      <!-- (click)="updateAccountId(shiper.accountId)" -->
+
 <!-- order Modal -->
 <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
