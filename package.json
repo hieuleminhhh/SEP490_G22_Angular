@@ -27,12 +27,14 @@
     "bootstrap": "^5.3.3",
     "compass": "^0.1.1",
     "feather-icons": "^4.29.2",
+    "file-saver": "^2.0.5",
     "isotope-layout": "^3.0.6",
     "jquery": "^3.7.1",
     "moment": "^2.30.1",
     "ngx-pagination": "^6.0.3",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.14.3"
   },
   "devDependencies": {
