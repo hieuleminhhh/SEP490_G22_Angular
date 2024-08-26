@@ -299,17 +299,6 @@
                           class="badge bg-success ms-auto badge-circle">Đã thanh toán
                         </div>
                       </div>
-
-
-
-
-                      <!-- <div *ngIf="orderDetail.paymentStatus === 2" class="badge bg-success ms-auto badge-circle">Thanh
-                        toán trước</div>
-
-
-
-                      <div *ngIf="orderDetail.paymentStatus === 1" class="badge bg-success ms-auto badge-circle">Đã
-                        thanh toán</div> -->
                     </div>
 
                   </div>
@@ -338,8 +327,8 @@
                   <!-- Online staff -->
                   <ng-container
                     *ngIf="orderDetail?.type === 2 && (orderDetail?.status === 2 || orderDetail?.status === 6)">
-                    <button type="button" class="btn btn-success me-2" data-bs-target="#paymentModalOnline"
-                      data-bs-toggle="modal" *ngIf="!orderDetail?.invoiceId">Thanh toán</button>
+                    <!-- <button type="button" class="btn btn-success me-2" data-bs-target="#paymentModalOnline"
+                      data-bs-toggle="modal" *ngIf="!orderDetail?.invoiceId">Thanh toán</button> -->
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
                       data-bs-toggle="modal">Hủy đơn</button>
                   </ng-container>

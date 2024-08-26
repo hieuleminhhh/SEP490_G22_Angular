@@ -70,6 +70,7 @@ export class CreateOnlineOrderComponent implements OnInit {
   selectedDiscountPercent: number = 0;
   totalAmountAfterDiscount: number = 0;
   totalAmount: number = 0;
+  lastOrderId: number | undefined;
   accountId: number | null = null;
   addNew: AddNewOrder = {
     guestPhone: '',
@@ -350,6 +351,7 @@ createOrder() {
     response => {
       console.log('Order created successfully:', response);
       this.successMessage = 'Đơn hàng đã được tạo thành công!';
+      this.lastOrderId = response.orderId; 
       setTimeout(() => this.successMessage = '', 5000);
     },
     error => {
@@ -361,9 +363,9 @@ createOrder() {
   );
 }
 
-loadInvoice(invoiceId: number): void {
+loadInvoice(orderId: number): void {
   // Fetch invoice data by ID
-  this.invoiceService.getInvoiceById(invoiceId).subscribe(
+  this.invoiceService.getInvoiceByOrderId(orderId).subscribe(
     data => {
       this.invoice = data;
     },
@@ -748,9 +750,9 @@ updateTotalAmountWithDiscount() {
 }
 onDiscountSelect(discountId: number) {
   if (this.selectedDiscount === discountId) {
-    this.selectedDiscount = null; // Bỏ chọn nếu đã được chọn trước đó
+    this.selectedDiscount = null; 
   } else {
-    this.selectedDiscount = discountId; // Chọn mã giảm giá mới
+    this.selectedDiscount = discountId;
   }
 }
 saveTime() {
@@ -827,6 +829,48 @@ onEarliestChange() {
   if (this.isEarliest) {
     this.date = new Date().toISOString().split('T')[0];
     this.time = '';
+  }
+}
+getDiscountAmount(): number {
+  if (this.invoice?.totalAmount && this.invoice?.discountPercent) {
+    return (this.invoice.totalAmount * this.invoice.discountPercent) / 100;
+  }
+  return 0;
+}
+CreateInvoiceOnline(): void {
+  if (this.lastOrderId != null && this.lastOrderId !== undefined) {
+    const paymentMethod = parseInt(this.paymentMethod, 10);
+    const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
+
+    const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : totalAmount;
+    const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - totalAmount : 0;
+
+    const updateData = {
+      status: 6,
+      paymentTime: new Date().toISOString(),
+      paymentAmount: totalAmount,
+      taxcode: "HIEU",
+      paymentStatus: 1,
+      accountId: this.accountId,
+      amountReceived,
+      returnAmount,
+      paymentMethods: paymentMethod,
+      description: ""
+    };
+
+    console.log('Update Data:', updateData);
+
+    this.invoiceService.updateStatusAndCreateInvoice(this.lastOrderId, updateData).subscribe(
+      response => {
+        console.log('Order status updated and invoice created:', response);
+        this.loadInvoice(this.lastOrderId!);
+      },
+      error => {
+        console.error('Error updating order status and creating invoice:', error);
+      }
+    );
+  } else {
+    console.warn('Order ID is not valid or is undefined. LastOrderId:', this.lastOrderId);
   }
 }
 }
