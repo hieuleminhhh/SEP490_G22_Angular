@@ -49,6 +49,8 @@ export class CookingManagementComponent implements OnInit {
   }
 
   getOrders(type: string): void {
+    this.filteredOrders = [];
+    this.preOrder =[];
     this.cookingService.getOrders(type).subscribe(
       response => {
         this.order = response.data || [];

@@ -27,15 +27,18 @@
                 <td>{{ order.guestPhone }}</td>
                 <td>{{ order.guestAddress}}</td>
                 <td>{{ order.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</td>
-                <td>{{ order.totalAmount - (order.totalAmount*order.discountPercent/100) - order.deposits | currencyFormat}}</td>
+                <td>{{ order.totalAmount - (order.totalAmount*order.discountPercent/100) - order.deposits |
+                  currencyFormat}}</td>
                 <td>
                   <button class="action-button view-button" (click)="showDetails(order)">
                     <i class="fas fa-eye"></i>
                   </button>
-                  <button class="action-button complete-button" data-bs-toggle="modal" data-bs-target="#confirmationModal">
+                  <button class="action-button complete-button" data-bs-toggle="modal"
+                    data-bs-target="#confirmationModal" (click)="getOrderShip(order)">
                     Hoàn thành
                   </button>
-                  <button class="action-button cancel-button" data-bs-toggle="modal" data-bs-target="#cancelConfirmationModal">
+                  <button class="action-button cancel-button" data-bs-toggle="modal"
+                    data-bs-target="#cancelConfirmationModal" (click)="getOrderShip(order)">
                     Hủy đơn
                   </button>
 
@@ -88,7 +91,7 @@
           <!-- First Column -->
           <div class="col-md-6">
             <div class="d-flex justify-content-between" *ngIf="selectedItem.discountPercent">
-              <span class="fw-bold" >Tạm tính:</span>
+              <span class="fw-bold">Tạm tính:</span>
               <span>{{ selectedItem.totalAmount | currencyFormat }}</span>
             </div>
             <div *ngIf="selectedItem.discountPercent" class="d-flex justify-content-between">
@@ -98,13 +101,14 @@
             <hr>
             <div class="d-flex justify-content-between">
               <span class="fw-bold">Tổng cộng:</span>
-              <span>{{ selectedItem.totalAmount - (selectedItem.totalAmount*selectedItem.discountPercent/100) | currencyFormat }}</span>
+              <span>{{ selectedItem.totalAmount - (selectedItem.totalAmount*selectedItem.discountPercent/100) |
+                currencyFormat }}</span>
             </div>
           </div>
           <!-- Row for the payment status badge -->
-           <div class="col-md-2"></div>
-          <div class="col-md-3" >
-            <div class="col-md-6 offset-md-6 d-flex align-items-center justify-content-end" >
+          <div class="col-md-2"></div>
+          <div class="col-md-3">
+            <div class="col-md-6 offset-md-6 d-flex align-items-center justify-content-end">
               <div *ngIf="selectedItem.deposits > 0" class="badge bg-success" style="font-size: 18px;">
                 Đã thanh toán
               </div>
@@ -124,23 +128,24 @@
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
   aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content" *ngFor="let order of deliveryOrders; let i = index">
+    <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="confirmationModalLabel">Xác nhận</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <p class="confirmation-text">
-          Bạn muốn hoàn thành đơn hàng của khách hàng <span class="customer-name">{{order.consigneeName}}</span><br>
-          Số điện thoại: <span class="customer-phone">{{order.guestPhone}}</span><br>
-          Số tiền: <span class="refund-amount">{{order.discountedPrice | currencyFormat}}</span>
+          Bạn muốn hoàn thành đơn hàng của khách hàng <span
+            class="customer-name">{{orderShipper?.consigneeName}}</span><br>
+          Số điện thoại: <span class="customer-phone">{{orderShipper?.guestPhone}}</span><br>
+          Số tiền: <span class="refund-amount">{{(orderShipper?.discountedPrice === 0?orderShipper?.totalAmount : orderShipper?.discountedPrice)| currencyFormat}}</span>
         </p>
       </div>
 
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invoiceModal"
-          (click)="completeOrder(order)">Xác
+          (click)="completeOrder(orderShipper)">Xác
           nhận</button>
       </div>
     </div>
@@ -151,22 +156,23 @@
 <div class="modal fade" id="cancelConfirmationModal" tabindex="-1" aria-labelledby="cancelConfirmationModalLabel"
   aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content" *ngFor="let order of deliveryOrders; let i = index">
+    <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="cancelConfirmationModalLabel">Xác nhận hủy đơn hàng</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <p class="confirmation-text">
-          Bạn có chắc chắn muốn hủy đơn hàng của khách hàng <span class="customer-name">{{order.consigneeName}}</span>?<br>
-          Số điện thoại: <span class="customer-phone">{{order.guestPhone}}</span><br>
-          Tổng số tiền: <span class="refund-amount">{{order.discountedPrice | currencyFormat}}</span>
+          Bạn có chắc chắn muốn hủy đơn hàng của khách hàng <span
+            class="customer-name">{{orderShipper?.consigneeName}}</span>?<br>
+          Số điện thoại: <span class="customer-phone">{{orderShipper?.guestPhone}}</span><br>
+          Tổng số tiền: <span class="refund-amount">{{(orderShipper?.discountedPrice === 0?orderShipper?.totalAmount : orderShipper?.discountedPrice)| currencyFormat}}</span>
         </p>
       </div>
 
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-        <button type="button" class="btn btn-danger" (click)="cancelOrder(order)">Xác nhận hủy</button>
+        <button type="button" class="btn btn-danger" (click)="cancelOrder(orderShipper)">Xác nhận hủy</button>
       </div>
     </div>
   </div>

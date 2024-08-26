@@ -1,8 +1,8 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { SidebarOrderComponent } from '../../SidebarOrder/SidebarOrder.component';
 import { ManagerDishService } from '../../../../service/managerdish.service';
 import { Address, AddNewAddress } from '../../../../models/address.model';
@@ -33,7 +33,7 @@ import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.
 export class CreateOnlineOrderComponent implements OnInit {
 
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService : ManagerOrderService,
-     private invoiceService: InvoiceService,private dialog: MatDialog, private discountService: DiscountService, private checkoutService: CheckoutService) {
+     private invoiceService: InvoiceService,private dialog: MatDialog,private renderer: Renderer2, private discountService: DiscountService, private checkoutService: CheckoutService) {
       const today = new Date();
     this.date = this.formatDate(today);
     this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
@@ -104,7 +104,7 @@ export class CreateOnlineOrderComponent implements OnInit {
   minDate: string; // Ngày nhận tối thiểu là ngày hiện tại
   maxDate: string;
   availableHours: string[] = [];
-
+  @ViewChild('paymentModal') paymentModal!: ElementRef;
   ngOnInit() {
     this.loadListDishes();
     this.loadListCombo();
@@ -116,7 +116,7 @@ export class CreateOnlineOrderComponent implements OnInit {
     this.LoadActiveDiscounts();
     this.calculateAndSetTotalAmount();
     this.selectedDiscount = null;
-    console.log("Select discount "+this.selectedDiscount); 
+    console.log("Select discount "+this.selectedDiscount);
     this.updateTimes();
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
@@ -131,6 +131,18 @@ export class CreateOnlineOrderComponent implements OnInit {
       this.showingCombos = false;
       this.loadListDishes(searchCategory);
     }
+  }
+  onSubmit(form: NgForm) {
+    if (form.invalid) {
+      alert('Vui lòng nhập đủ các trường cần thiết.');
+      return;
+    }
+
+    // Mở modal nếu form hợp lệ
+    // Mở modal nếu form hợp lệ
+    this.renderer.addClass(this.paymentModal.nativeElement, 'show');
+    this.renderer.setStyle(this.paymentModal.nativeElement, 'display', 'block');
+    this.renderer.setStyle(this.paymentModal.nativeElement, 'opacity', '1');
   }
   loadListDishes(search: string = '', searchCategory: string =''): void {
     console.log('Loading dishes with search term:', search);

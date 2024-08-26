@@ -18,28 +18,46 @@
           </div>
         </div>
         <br><br>
-        <div *ngIf="selectedTab === 'overview'" class="tiles">
-          <article class="tile">
-            <div class="tile-header">
-              <i class="ph-lightning-light"></i>
-              <h3>
-                <span>Số đơn hoàn thành</span>
-                <hr>
-                <span>{{data.totalOrders}}</span>
-              </h3>
+        <div *ngIf="selectedTab === 'overview'" class="overview-section">
+          <div class="date-filters">
+            <div class="date-filter" style="max-width: 250px;">
+              <div class="input-group" >
+                <label class="input-group-text" for="dateFrom">Từ ngày</label>
+                <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom" [max]="dateTo" (change)="onDateFromChange()">
+              </div>
             </div>
-          </article>
-          <article class="tile">
-            <div class="tile-header">
-              <i class="ph-fire-simple-light"></i>
-              <h3>
-                <span>Doanh thu</span>
-                <hr>
-                <span>{{data.totalRevenue | currencyFormat }}</span>
-              </h3>
+            <div class="date-filter" style="max-width: 250px;">
+              <div class="input-group" >
+                <label class="input-group-text" for="dateTo">Đến ngày</label>
+                <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo" [max]="dateNow" (change)="onDateToChange()">
+              </div>
             </div>
-          </article>
+          </div>
+
+          <div class="tiles">
+            <article class="tile">
+              <div class="tile-header">
+                <i class="ph-lightning-light"></i>
+                <h3>
+                  <span>Số đơn hoàn thành</span>
+                  <hr>
+                  <span>{{data?.totalOrders}}</span>
+                </h3>
+              </div>
+            </article>
+            <article class="tile">
+              <div class="tile-header">
+                <i class="ph-fire-simple-light"></i>
+                <h3>
+                  <span>Doanh thu</span>
+                  <hr>
+                  <span>{{data?.totalRevenue | currencyFormat }}</span>
+                </h3>
+              </div>
+            </article>
+          </div>
         </div>
+
         <!-- <section class="transfer-section" *ngIf="selectedTab === 'overview'" style="background-color: #ededed;;">
           <div class="transfer-section-header">
             <h2>Nhóm hàng bán ra</h2>
@@ -72,17 +90,17 @@
               <div class="payments">
                 <div class="payment">
                   <div class="payment-details">
-                    <p>Tiền mặt: ({{data.orderCountByPaymentMethod0}}) đơn</p>
+                    <p>Tiền mặt: ({{data?.orderCountByPaymentMethod0}}) đơn</p>
                     <div>
-                      <span>{{data.revenueByPaymentMethod0 | currencyFormat }} </span>
+                      <span>{{data?.revenueByPaymentMethod0 | currencyFormat }} </span>
                     </div>
                   </div>
                 </div>
                 <div class="payment">
                   <div class="payment-details">
-                    <p>Chuyển khoản: ({{data.orderCountByPaymentMethod1+data.orderCountByPaymentMethod2}}) đơn</p>
+                    <p>Chuyển khoản: ({{data?.orderCountByPaymentMethod1+data?.orderCountByPaymentMethod2}}) đơn</p>
                     <div>
-                      <span>{{(data.revenueByPaymentMethod1+data.revenueByPaymentMethod2) | currencyFormat }}</span>
+                      <span>{{(data?.revenueByPaymentMethod1+data?.revenueByPaymentMethod2) | currencyFormat }}</span>
                     </div>
                   </div>
                 </div>
@@ -181,7 +199,7 @@
                         <i class="fas fa-eye"></i>
                       </button>
                       <button class="action-button complete-button" data-bs-toggle="modal"
-                        data-bs-target="#confirmationModal">
+                        data-bs-target="#confirmationModal" (click)="getOrderShip(order)">
                         Thu tiền
                       </button>
                     </td>
@@ -192,7 +210,11 @@
             <br>
             <div class="payment-section-footer" *ngIf="filteredOrders.length > 0">
               <h4>Số tiền phải thu: {{ totalAmountDue() | currencyFormat }}</h4>
+              <button type="button" class="btn btn-primary" (click)="prepareCollectAllModal(); openModal()" *ngIf="selectedEmployee">
+                Thu tất cả
+              </button>
             </div>
+
           </section>
         </div>
 
@@ -230,27 +252,49 @@
   </div>
 
   <div class="modal-dialog" *ngIf="selectedTab === 'cash-on-delivery'">
-    <div class="modal-content" *ngFor="let order of orderShip; let i = index">
+    <div class="modal-content" >
       <div class="modal-header">
         <h5 class="modal-title" id="confirmationModalLabel">Xác nhận</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <p class="confirmation-text">
-          Xác nhận thu tiền <span class="customer-name">{{order.firstName}}{{order.lastName}}</span><br>
-          Số tiền: <span class="refund-amount">{{order.totalPaid | currencyFormat}}</span>
+          Xác nhận thu tiền <span class="customer-name">{{orderShipper?.firstName}}{{orderShipper?.lastName}}</span><br>
+          Số tiền: <span class="refund-amount">{{orderShipper?.totalPaid | currencyFormat}}</span>
         </p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invoiceModal"
-          (click)="update(order.orderId, order.totalPaid)">Xác
+          (click)="update(orderShipper.orderId, orderShipper.totalPaid)">Xác
           nhận</button>
       </div>
     </div>
   </div>
 </div>
 
+
+<!-- Modal Thu Tất Cả -->
+<div #collectAllModal class="modal-total fade" tabindex="-1" aria-labelledby="collectAllModalLabel" aria-hidden="true">
+  <div class="modal-dialog-total">
+      <div class="modal-content-total">
+          <div class="modal-header-total">
+              <h5 class="modal-title-total" id="collectAllModalLabel">Xác nhận thu tất cả</h5>
+              <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+          </div>
+          <div class="modal-body-total">
+              <p class="confirmation-text">
+                  Nhân viên giao hàng: <span class="employee-name">{{ selectedEmployeeName }}</span><br>
+                  Tổng số tiền phải thu: <span class="total-amount">{{ totalAmountDue() | currencyFormat }}</span>
+              </p>
+          </div>
+          <div class="modal-footer-total">
+              <button type="button" class="btn btn-secondary" (click)="closeModal()">Hủy</button>
+              <button type="button" class="btn btn-primary" (click)="collectAllPayments()">Xác nhận</button>
+          </div>
+      </div>
+  </div>
+</div>
 <!-- Popup for item details -->
 <div *ngIf="selectedItem" class="popup" (click)="closePopup()">
   <div class="popup-content" (click)="$event.stopPropagation()">

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HeaderOrderStaffComponent } from '../ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component';
 import { SidebarOrderComponent } from "../SidebarOrder/SidebarOrder.component";
 import { FormsModule } from '@angular/forms';
@@ -24,9 +24,18 @@ export class ManageInvoiceComponent implements OnInit {
   filteredOrders: any[] = [];
   selectedEmployee: string='';
   employees: any[] = [];
-  constructor(private invoiceService: InvoiceService,private cookingService: CookingService) { }
 
+  dateFrom: string = '';
+  dateTo: string = '';
+  dateNow: string = '';
+  selectedEmployeeName: string = '';
+  constructor(private invoiceService: InvoiceService,private cookingService: CookingService) { }
+  @ViewChild('collectAllModal') collectAllModal!: ElementRef;
   ngOnInit() {
+    const today = new Date();
+    this.dateFrom = this.formatDate(today);
+    this.dateTo = this.formatDate(today);
+    this.dateNow = this.formatDate(today);
     this.selectTab('overview');
     this.getOrdersCancel();
     this.getOrdersShip();
@@ -36,9 +45,26 @@ export class ManageInvoiceComponent implements OnInit {
   selectTab(tab: string) {
     this.selectedTab = tab;
   }
+  formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  onDateFromChange(): void {
+
+    this.getOrdersStatic();
+  }
+
+  onDateToChange(): void {
+    if (this.dateTo < this.dateFrom) {
+      this.dateFrom = this.dateTo;
+    }
+    this.getOrdersStatic();
+  }
 
   getOrdersStatic(): void {
-    this.invoiceService.getStatistics().subscribe(
+    this.invoiceService.getStatistics(this.dateFrom, this.dateTo).subscribe(
       response => {
         this.data = response;
       },
@@ -63,7 +89,7 @@ export class ManageInvoiceComponent implements OnInit {
     this.invoiceService.getOrderShip().subscribe(
       response => {
         this.orderShip = response;
-        this.filteredOrders = this.orderShip; // Khởi tạo danh sách đã lọc bằng tất cả đơn hàng
+        this.filteredOrders = this.orderShip;
         console.log(this.orderShip);
       },
       error => {
@@ -71,7 +97,6 @@ export class ManageInvoiceComponent implements OnInit {
       }
     );
   }
-
 
   filterOrdersByEmployee(): void {
     console.log("Selected Employee ID:", this.selectedEmployee); // Kiểm tra giá trị đã chọn
@@ -86,45 +111,86 @@ export class ManageInvoiceComponent implements OnInit {
   }
 
   totalAmountDue(): number {
-    // Kiểm tra nếu có nhân viên được chọn
-    if (this.selectedEmployee) {
-      // Tính tổng số tiền cho đơn hàng của nhân viên đã chọn
-      return this.filteredOrders
-        .filter(order => order.accountIdId === Number(this.selectedEmployee)) // Lọc theo nhân viên
-        .reduce((total, order) => total + (order.totalPaid || 0), 0);
-    } else {
-      // Tính tổng số tiền cho tất cả các đơn hàng
-      return this.filteredOrders.reduce((total, order) => total + (order.totalPaid || 0), 0);
-    }
-  }
+    // Tổng số tiền sẽ dựa trên danh sách đã lọc
+    return this.filteredOrders.reduce((total, order) => total + (order.totalPaid || 0), 0);
+}
 
-  getEmployees(): void {
+getEmployees(): void {
     // Giả định bạn có một service để lấy danh sách nhân viên từ server
     this.cookingService.getShipStaff().subscribe(
-      response => {
-        this.employees = response;
-        console.log(this.employees);
-      },
-      error => {
-        console.error('Error:', error);
-      }
+        response => {
+            this.employees = response;
+            console.log(this.employees);
+        },
+        error => {
+            console.error('Error:', error);
+        }
     );
-  }
-  update(id: number,totalPaid:number): void {
+}
+
+prepareCollectAllModal(): void {
+    const selectedEmployee = this.employees.find(emp => emp.accountId === Number(this.selectedEmployee));
+    if (selectedEmployee) {
+        this.selectedEmployeeName = `${selectedEmployee.firstName} ${selectedEmployee.lastName}`;
+        console.log(this.selectedEmployeeName);
+
+    }
+}
+
+// Mở modal
+openModal(): void {
+    const modal = this.collectAllModal.nativeElement;
+    modal.classList.add('show');
+    modal.style.display = 'block';
+    modal.setAttribute('aria-modal', 'true');
+    modal.removeAttribute('aria-hidden');
+}
+
+// Đóng modal
+closeModal(): void {
+    const modal = this.collectAllModal.nativeElement;
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+    modal.removeAttribute('aria-modal');
+}
+
+// Xác nhận thu tất cả
+collectAllPayments(): void {
+    const updatePromises = this.filteredOrders.map(order =>
+        new Promise<void>((resolve, reject) => {
+            this.update(order.orderId, order.totalPaid);
+            resolve(); // Hoàn tất promise ngay lập tức (có thể thêm logic kiểm tra ở đây)
+        })
+    );
+
+    Promise.all(updatePromises)
+        .then(() => {
+            this.closeModal(); // Đóng modal sau khi cập nhật xong
+            window.location.reload(); // Làm mới trang sau khi thu tiền
+        })
+        .catch(error => {
+            console.error('Error collecting payments:', error);
+        });
+}
+
+  update(id: number, totalPaid: number): void {
     const request = {
       paymentAmount: totalPaid
-    }
-    this.invoiceService.updatePayment(id,request).subscribe(
-      response => {
-       window.location.reload();
+    };
 
+    this.invoiceService.updatePayment(id, request).subscribe(
+      response => {
+        // Cập nhật trạng thái đơn hàng trong danh sách mà không cần tải lại trang
+        this.filteredOrders = this.filteredOrders.filter(order => order.orderId !== id);
+        console.log(`Đơn hàng ${id} đã được thu tiền.`);
       },
       error => {
         console.error('Error:', error);
-
       }
     );
   }
+
 
   updateOrderStatus(id: number): void {
     const request = {
@@ -159,5 +225,9 @@ export class ManageInvoiceComponent implements OnInit {
 
       }
     );
+  }
+orderShipper:any;
+  getOrderShip(data:any){
+    this.orderShipper = data;
   }
 }

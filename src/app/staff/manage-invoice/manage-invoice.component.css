@@ -121,11 +121,11 @@ body {
   margin-right: 10px;
 }
 
-.tile-header h3 {
+/* .tile-header h3 {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-}
+} */
 
 .tile-header h3 span {
   display: block;
@@ -390,6 +390,7 @@ body {
   color: #dc3545; /* Màu chữ cho số tiền */
 }
 
+
 .popup {
   position: fixed;
   top: 0;
@@ -480,4 +481,180 @@ body {
   font-size: 18px;
   font-weight: bold;
   color: #333;
+}
+.overview-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.date-filters {
+  display: flex;
+  gap: 10px; /* Reduce gap between date pickers */
+  flex-wrap: wrap;
+}
+
+.date-filter {
+  flex: 1;
+  min-width: 150px; /* Decrease the minimum width */
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+}
+
+.input-group-text {
+  padding: 5px 10px; /* Reduce padding for the label */
+  font-size: 14px; /* Slightly smaller font size */
+}
+
+.form-control {
+  padding: 5px; /* Reduce padding inside the input */
+  font-size: 14px; /* Slightly smaller font size */
+  width: auto; /* Allow the input to be as wide as needed */
+}
+
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.tile {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.tile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tile-header i {
+  font-size: 30px;
+  margin-bottom: 10px;
+  color: #ff9800; /* Adjust the color according to the icon */
+}
+
+.tile-header h3 {
+  margin: 0;
+}
+
+.tile-header hr {
+  width: 50px;
+  border: none;
+  border-top: 2px solid #eee;
+  margin: 10px 0;
+}
+
+.tile-header span {
+  font-size: 24px;
+  font-weight: bold;
+}
+/* Modal Styling */
+.modal-total {
+  display: none; /* Ẩn modal theo mặc định */
+  position: fixed; /* Đặt modal ở vị trí cố định */
+  z-index: 1050; /* Đảm bảo modal ở trên cùng */
+  left: 0;
+  top: 0;
+  width: 100%; /* Mở rộng toàn bộ chiều rộng */
+  height: 100%; /* Mở rộng toàn bộ chiều cao */
+  overflow: hidden; /* Ẩn các phần thừa */
+  background-color: rgba(0, 0, 0, 0.5); /* Màu nền tối với độ trong suốt */
+}
+
+/* Modal Dialog */
+.modal-dialog-total {
+  position: relative; /* Đặt modal ở vị trí tương đối */
+  margin: 1.75rem auto; /* Căn giữa modal */
+  max-width: 500px; /* Chiều rộng tối đa của modal */
+}
+
+/* Modal Content */
+.modal-content-total {
+  background-color: #fff; /* Màu nền trắng */
+  border: 1px solid #dee2e6; /* Đường viền màu xám */
+  border-radius: 0.3rem; /* Bo góc */
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); /* Đổ bóng */
+}
+
+/* Modal Header */
+.modal-header-total {
+  display: flex; /* Sử dụng flexbox để căn giữa nội dung */
+  justify-content: space-between; /* Tách biệt tiêu đề và nút đóng */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  padding: 1rem; /* Padding cho phần đầu modal */
+  border-bottom: 1px solid #dee2e6; /* Đường viền dưới */
+}
+
+/* Modal Title */
+.modal-title-total {
+  font-size: 1.25rem; /* Kích thước chữ tiêu đề */
+  font-weight: 500; /* Đậm chữ */
+}
+
+/* Modal Body */
+.modal-body-total {
+  padding: 1rem; /* Padding cho nội dung modal */
+}
+
+/* Modal Footer */
+.modal-footer-total {
+  display: flex; /* Sử dụng flexbox để căn giữa nút */
+  justify-content: flex-end; /* Đẩy các nút về bên phải */
+  padding: 1rem; /* Padding cho phần chân modal */
+}
+
+/* Button Styling */
+.btn {
+  padding: 0.5rem 1rem; /* Padding cho nút */
+  border-radius: 0.3rem; /* Bo góc cho nút */
+  font-size: 1rem; /* Kích thước chữ nút */
+}
+
+/* Nút hủy */
+.btn-secondary {
+  background-color: #6c757d; /* Màu nền xám */
+  color: #fff; /* Màu chữ trắng */
+}
+
+/* Nút xác nhận */
+.btn-primary {
+  background-color: #007bff; /* Màu nền xanh dương */
+  color: #fff; /* Màu chữ trắng */
+}
+
+/* Hiệu ứng hover cho nút */
+.btn:hover {
+  opacity: 0.8; /* Giảm độ trong suốt khi hover */
+}
+
+/* Style cho văn bản xác nhận */
+.confirmation-text {
+  font-size: 1rem; /* Kích thước chữ */
+  line-height: 1.5; /* Khoảng cách dòng */
+}
+
+/* Tên nhân viên */
+.employee-name {
+  font-weight: bold; /* Đậm chữ */
+}
+
+/* Tổng số tiền */
+.total-amount {
+  font-weight: bold; /* Đậm chữ */
+  color: #28a745; /* Màu xanh lá cho số tiền */
 }
