@@ -91,4 +91,10 @@ export class OrderShipComponent implements OnInit {
         }
       );
   }
+  orderShipper:any;
+  getOrderShip(data:any){
+    console.log(data);
+
+    this.orderShipper = data;
+  }
 }
