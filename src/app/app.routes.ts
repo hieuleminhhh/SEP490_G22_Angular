@@ -62,7 +62,7 @@ export const routes: Routes = [
     {'path': 'fillDish' , component:FillDishComponent},
     {'path': 'manageDiscount' , component:ManageDiscountComponent, canActivate: [AuthGuard]},
     {'path': 'updateOrder/:orderId' , component: UpdateOrderForGuestComponent},
-    {'path': 'setting' , component: SettingComponent},
+    {'path': 'setting' , component: SettingComponent, canActivate: [AuthGuard]},
     {'path': 'manageAccount', component: ManageAccountComponent, canActivate: [AuthGuard]},
     {'path': 'shipping', component: OrderShipComponent},
     {'path': 'invoice', component: ManageInvoiceComponent},

@@ -141,5 +141,13 @@ export class ReservationService {
     });
     return this.http.get(url, { headers });
   }
+  getReservationByTableId(tableId: number): Observable<any> {
+    const url = `https://localhost:7188/api/Reservations/GetReservationsByTableId/${tableId}`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get(url, { headers });
+  }
   
 }

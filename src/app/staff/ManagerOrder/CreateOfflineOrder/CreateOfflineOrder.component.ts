@@ -63,7 +63,7 @@ export class CreateOfflineOrderComponent implements OnInit {
     guestAddress: '',
     consigneeName: '',
     guestPhone: '',
-    email:'antaiquan@gmail.com',
+    email:'N/A',
   };
   discountInvalid: any = {};
   paymentMethod: string = '0';
@@ -80,6 +80,7 @@ export class CreateOfflineOrderComponent implements OnInit {
   account: any;
   showSidebar: boolean = true; 
   reservationId: number | null = null;
+  reservationData: any;
   orderId: number| null = null
   status: number| null = null;
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute,  private dishService: ManagerDishService,
@@ -96,8 +97,7 @@ export class CreateOfflineOrderComponent implements OnInit {
     this.selectCategory('Món chính');
     this.route.queryParams.subscribe(params => {
       this.tableId = +params['tableId']; 
-      this.loadListOrderByTable(this.tableId);
-      console.log('ZZZZZZZZZZZZZ',this.orderId);
+      this.getReservationByTableId(this.tableId);
     });
     this.LoadActiveDiscounts();
     this.calculateAndSetTotalAmount();
@@ -114,46 +114,25 @@ export class CreateOfflineOrderComponent implements OnInit {
     }
   }
 
-  loadListOrderByTable(tableId: number): void {
-    this.orderService.getOrdersByTableId(tableId).subscribe(
-      (response: any) => {
-        if (response && response.data) {
-          this.orderId = response.data.orderId;
-          console.log('Order ID:', this.orderId);
-          
-          // Ensure orderId is not null before calling getReservationByOrderId
-          if (this.orderId !== null) {
-            this.getReservationByOrderId(this.orderId);
-          } else {
-            console.error('Order ID is null');
-          }
-          
-          // Other processing
-        }
-      },
-      (error: HttpErrorResponse) => {
-        // Error handling
-        console.error('Error fetching order:', error);
-      }
-    );
-  }
-  
-  getReservationByOrderId(orderId: number): void {
-    this.reservationService.getReservationByOrderId(orderId).subscribe(
+  getReservationByTableId(tableId: number): void {
+    this.reservationService.getReservationByTableId(tableId).subscribe(
       (data) => {
-        if (data) {
-          this.reservationId = data.reservationId;
-          console.log('Reservation ID:', this.reservationId);
+        console.log('API Response:', data); // Log the entire response to check its structure
+        if (data && data.length > 0) {
+          this.reservationId = data[0].reservationId;
+          this.reservationData = data[0];
+          console.log('Reservation Data:', this.reservationData);
         } else {
-          console.error('Invalid reservation data received');
+          console.error('No reservation data received');
+          this.reservationData = null; // Ensure reservationData is not undefined
         }
       },
       (error) => {
         console.error('Error fetching reservation:', error);
+        this.reservationData = null; // Ensure reservationData is not undefined
       }
     );
   }
-  
   
   
   
@@ -439,8 +418,8 @@ export class CreateOfflineOrderComponent implements OnInit {
     selectAddress(address: Address) {
       this.selectedAddress = `${address.consigneeName} - ${address.guestPhone}`;
       this.addNew.guestPhone = address.guestPhone;
-      this.addNew.email = 'antaiquan@gmail.com';
-      this.addNew.guestAddress = 'Ăn tại quán'; 
+      this.addNew.email = 'N/A';
+      this.addNew.guestAddress = 'N/A'; 
       this.addNew.consigneeName = address.consigneeName; 
       this.showDropdown = false;
       console.log('Selected Address:', this.addNew);
@@ -452,8 +431,8 @@ export class CreateOfflineOrderComponent implements OnInit {
     this.orderService.AddNewAddress(this.newAddress).subscribe(
       (response: any) => {
         console.log('Address created successfully:', response); // Debug: Check response here
-        this.successMessage = 'Địa chỉ đã được thêm thành công!';
-        setTimeout(() => this.successMessage = '', 5000);
+        this.successMessage = 'Thông tin đã được thêm thành công!';
+        setTimeout(() => this.successMessage = '', 3000);
   
         // Ensure response contains correct properties in 'data'
         if (response && response.data && response.data.consigneeName && response.data.guestPhone) {
@@ -468,31 +447,19 @@ export class CreateOfflineOrderComponent implements OnInit {
   
         // Clear form and close modal
         this.clearForm();
-        this.closeModal();
       },
       error => {
-        console.error('Error creating address:', error);
-        this.clearAddErrors();
-  
-        // Handle errors from response
-        if (error.error) {
-          const fieldErrors = error.error;
-          if (fieldErrors['consigneeName']) {
-            this.addErrors.consigneeNameError = fieldErrors['consigneeName'];
-          }
-          if (fieldErrors['phone']) {
-            this.addErrors.guestPhoneError = fieldErrors['phone'];
-          }
-          if (fieldErrors['guestAddress']) {
-            this.addErrors.guestAddressError = fieldErrors['guestAddress'];
-          }
+        if (error.error && error.error.message) {
+          this.errorMessage = error.error.message;
         } else {
-          this.addErrorMessage = 'An error occurred. Please try again later.';
+          this.errorMessage = 'Có lỗi xảy ra khi thêm địa chỉ. Vui lòng thử lại.';
         }
+  
+        // Clear error message after 5 seconds
+        setTimeout(() => this.errorMessage = '', 3000);
       }
     );
   }
-
   
     loadAddresses() {
       this.orderService.ListAddress().subscribe(
@@ -517,10 +484,6 @@ export class CreateOfflineOrderComponent implements OnInit {
         orderTime: new Date(),
         note: item.note
       }));
-      const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
-      const currentDate = new Date();
-      const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
-      const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; 
       const guestPhone = this.addNew.guestPhone ? this.addNew.guestPhone : '';
 
       const newOrder = {
@@ -534,6 +497,7 @@ export class CreateOfflineOrderComponent implements OnInit {
         discountId: this.selectedDiscount,
         type: 4,
         status: 3,
+        accountId: this.accountId,
         orderDetails: orderDetails
       };
       
