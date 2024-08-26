@@ -22,6 +22,7 @@ export class OrderShipComponent implements OnInit {
   ngOnInit() {
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
+    console.log(this.accountId);
 
     this.getListShip(this.accountId);
   }
