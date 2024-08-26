@@ -60,5 +60,23 @@ export class TableService {
     });
     return this.http.post(url, tableOrder, { headers });
   }
+
+  getTablesById(id:number): Observable<any> {
+    const url = `https://localhost:7188/api/Tables/${id}`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get(url, { headers });
+  }
+
+  deleteTables(id:number): Observable<any> {
+    const url = `https://localhost:7188/api/TableReservation/${id}`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.delete(url, { headers });
+  }
 }
 

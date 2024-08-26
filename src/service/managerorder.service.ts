@@ -67,6 +67,10 @@ export class ManagerOrderService {
     const url = `${this.apiUrl}/orders/createOrderForTable/${orderData.tableId}`;
     return this.http.post<any>(url, orderData, this.getHttpOptions());
   }
+  createOrderReservation(orderData: any): Observable<any> {
+    const url = `https://localhost:7188/api/orders/createOrderForReservation/${orderData.tableId}`;
+    return this.http.post<any>(url, orderData, this.getHttpOptions());
+  }
 
   updateOrderOffline(tableId: number, dto: any): Observable<any> {
     const url = `${this.apiUrl}/orders/updateOrderDetails/${tableId}`;
@@ -116,5 +120,17 @@ export class ManagerOrderService {
   AcceptOrderWaiting(orderId: number, data: any): Observable<any> {
     const url = `${this.apiUrl}/orders/AcceptOrder/${orderId}`;
     return this.http.post<any>(url, data, this.getHttpOptions());
+  }
+  getTableByReser(id: number): Observable<any> {
+    const url = `https://localhost:7188/api/TableReservation/${id}`;
+    return this.http.get<any>(url, this.getHttpOptions());
+  }
+  createOrderTable(orderData: any): Observable<any> {
+    const url = `https://localhost:7188/api/OrderTable`;
+    return this.http.post<any>(url, orderData, this.getHttpOptions());
+  }
+  updateOrderReser(data: any): Observable<any> {
+    const url = `https://localhost:7188/api/Reservations/update-order`;
+    return this.http.put(url, data, this.getHttpOptions());
   }
 }

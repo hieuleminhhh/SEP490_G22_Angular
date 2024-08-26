@@ -33,7 +33,6 @@
       <h2 *ngIf="currentView === 'booking-schedule'">Lịch đặt bàn</h2>
       <h2 *ngIf="currentView === 'booking-history'">Lịch sử đặt bàn</h2>
       <h2 *ngIf="currentView === 'detail-reservation'">Chi tiết đơn đặt bàn</h2>
-      <h2 *ngIf="currentView === 'create-reservation'">Tạo đơn đặt bàn</h2>
 
 
       <div class="col-md-3" *ngIf="currentView === 'booking-schedule'">
@@ -58,10 +57,6 @@
         <option value="all">Tất cả bàn</option>
         <option value="empty">Bàn trống</option>
       </select>
-
-      <button *ngIf="currentView === 'booking-request'" class="btn-create-order" (click)="createReservation()">
-        <i class="fas fa-plus-circle icon"></i>Tạo đơn đặt bàn
-      </button>
 
     </header>
     <hr>
@@ -152,18 +147,22 @@
                     <button class="icon" (click)="toggleDropdown(i)">...</button>
                     <div class="dropdown-content" [class.show]="reservation.isDropdownOpen">
                       <a (click)="openPopup(reservation.reservationId)">Xếp bàn</a>
-                      <a>Thêm món</a>
-                      <a data-bs-toggle="modal"
-                        data-bs-target="#confirmationModal">Hủy đặt bàn</a>
+                      <a (click)="deleteTable(reservation.reservationId, reservation.tableOfReservation)">Thay đổi
+                        bàn</a>
+                      <a data-bs-toggle="modal" data-bs-target="#confirmationModal">Hủy đặt bàn</a>
                     </div>
                   </div>
                 </div>
                 <div class="col-md-8" style="display: flex;justify-content: center;align-items: center;height: 20px;">
                   <span class="label-reser"
-                    (click)="updateReservationById(reservation.reservationId, 3, reservation.order?.orderId)"
+                    (click)="updateReservationById(reservation.reservationId, 3, reservation.order?.orderId, reservation?.reservationTime, reservation.tableOfReservation, i)"
                     [class.disabled]="!reservation.tableOfReservation || reservation.tableOfReservation.length === 0"
-                    *ngIf="reservation.tableOfReservation && reservation.tableOfReservation.length > 0">
-                    Khách nhận bàn</span>
+                    *ngIf="reservation.tableOfReservation && reservation.tableOfReservation.length > 0 ">
+                    Khách nhận bàn
+                  </span>
+                </div>
+                <div *ngIf="errorMessages[i]" class="alert alert-danger" style="max-width: 500px;">
+                  {{ errorMessages[i] }}
                 </div>
               </div>
             </div>
@@ -176,7 +175,8 @@
               <i class="fas fa-arrow-left"></i> <!-- Icon mũi tên trái -->
             </button>
 
-            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1" max="{{ totalPages }}">
+            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"
+              max="{{ totalPages }}">
 
             <span>of {{ totalPages }}</span>
 
@@ -187,7 +187,29 @@
 
         </div>
       </div>
-
+      <!-- Confirmation Modal -->
+      <div class="modal-cf fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog-cf">
+          <div class="modal-content-cf" *ngFor="let reservation of dataReservationAccept; let i = index">
+            <div class="modal-header-cf">
+              <h5 class="modal-title-cf" id="confirmationModalLabel">Xác nhận</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body-cf">
+              <p class="confirmation-text">
+                Xác nhận hủy đơn đặt bàn?<br>
+              </p>
+            </div>
+            <div class="modal-footer-cf">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invoiceModal"
+                (click)="updateStatusReservation(reservation.reservationId)">Xác
+                nhận</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Main Modal -->
       <div class="modal fade" id="updateTimeModal" tabindex="-1" role="dialog" aria-labelledby="updateTimeModalLabel"
         aria-hidden="true">
@@ -332,7 +354,8 @@
               <i class="fas fa-arrow-left"></i> <!-- Icon mũi tên trái -->
             </button>
 
-            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1" max="{{ totalPages }}">
+            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"
+              max="{{ totalPages }}">
 
             <span>of {{ totalPages }}</span>
 
@@ -428,79 +451,6 @@
       </div>
     </section>
 
-    <section *ngIf="currentView === 'create-reservation'">
-      <div class="container">
-        <div class="card">
-          <div class="reservation-form" style="max-height: 500px;">
-            <form #reservationForm="ngForm">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="name">Tên người đặt (*)</label>
-                    <input class="input-text name" type="text" id="name" name="consigneeName" placeholder="Nhập tên"
-                      required>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="phone">Số điện thoại (*)</label>
-                    <input class="input-tel phone" type="tel" id="phone" name="guestPhone"
-                      placeholder="Nhập số điện thoại" required pattern="^0\d{9,10}$">
-                  </div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-4">
-                  <div class="form-group">
-                    <label for="date">Ngày (*)</label>
-                    <input class="input-date" id="date" type="date" name="date" style="width: 100%;height: 40px;">
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="form-group">
-                    <label for="time">Giờ (*)</label>
-                    <select class="input-select" id="time" name="time" required>
-                      <option value="">Chọn</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="form-group">
-                    <label for="people">Số người (*)</label>
-                    <input class="input-number number" type="number" id="people" name="guestNumber" min="1" value="2"
-                      required>
-                  </div>
-                </div>
-              </div>
-              <div class="row" style="padding: 0 15px;margin-bottom: 15px;">
-                <div class="form-group">
-                  <label for="notes">Ghi chú</label>
-                  <textarea class="input-textarea note" id="notes" name="note" placeholder="Ghi chú"
-                    style="margin-top: 0;"></textarea>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-12 d-flex justify-content-center align-items-center">
-                  <button class="reser" type="submit">Đặt bàn</button>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="row" style="background-color: #ebebeb;padding: 10px;">
-            <div class="col-md-12 d-flex justify-content-center align-items-center">
-              <div class="plus-icon">
-                +
-              </div>
-            </div>
-            <div class="col-md-12 d-flex justify-content-center align-items-center">
-              <span>Thêm món</span>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
 
     <section *ngIf="currentView === 'booking-history'">
       <div class="container">
@@ -565,7 +515,8 @@
               <i class="fas fa-arrow-left"></i> <!-- Icon mũi tên trái -->
             </button>
 
-            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1" max="{{ totalPages }}">
+            <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1"
+              max="{{ totalPages }}">
 
             <span>of {{ totalPages }}</span>
 
@@ -579,28 +530,4 @@
     </section>
 
   </main>
-</div>
-
-<!-- Confirmation Modal -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content" *ngFor="let reservation of dataReservationAccept; let i = index">
-      <div class="modal-header">
-        <h5 class="modal-title" id="confirmationModalLabel">Xác nhận</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p class="confirmation-text">
-          Xác nhận hủy đơn đặt bàn?<br>
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invoiceModal"
-        (click)="updateStatusReservation(reservation.reservationId)">Xác
-          nhận</button>
-      </div>
-    </div>
-  </div>
 </div>

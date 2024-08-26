@@ -988,43 +988,48 @@ textarea {
 .back-icon:hover {
   color: black; /* Màu sắc mới khi hover */
 }
+#confirmationModal .modal-cf {
+  max-width: 600px; /* Đặt kích thước tối đa cho modal */
+  margin: 1.75rem auto; /* Canh giữa modal */
+  z-index: 1200;
+}
 /* Tùy chỉnh modal container */
-#confirmationModal .modal-dialog {
+#confirmationModal .modal-dialog-cf {
   max-width: 600px; /* Đặt kích thước tối đa cho modal */
   margin: 1.75rem auto; /* Canh giữa modal */
 }
 
 /* Tùy chỉnh phần header của modal */
-#confirmationModal .modal-header {
+#confirmationModal .modal-header-cf {
   background-color: #f8f9fa; /* Màu nền cho header */
   border-bottom: 1px solid #dee2e6; /* Đường viền dưới */
   padding: 15px; /* Khoảng cách padding */
 }
 
-#confirmationModal .modal-title {
+#confirmationModal .modal-title-cf {
   font-size: 1.5rem; /* Cỡ chữ của tiêu đề */
   font-weight: bold; /* Độ đậm của chữ */
 }
 
-#confirmationModal .btn-close {
+#confirmationModal .btn-close-cf {
   font-size: 1.25rem; /* Cỡ chữ của nút đóng */
   color: #000; /* Màu của nút đóng */
 }
 
 /* Tùy chỉnh phần body của modal */
-#confirmationModal .modal-body {
+#confirmationModal .modal-body-cf {
   padding: 20px; /* Khoảng cách padding */
   font-size: 1.1rem; /* Cỡ chữ */
   line-height: 1.5; /* Chiều cao dòng */
 }
 
-#confirmationModal .shipper-name {
+#confirmationModal .shipper-name-cf {
   font-weight: bold; /* In đậm tên shipper */
   color: #007bff; /* Màu chữ */
 }
 
 /* Tùy chỉnh phần footer của modal */
-#confirmationModal .modal-footer {
+#confirmationModal .modal-footer-cf {
   padding: 15px; /* Khoảng cách padding */
   border-top: 1px solid #dee2e6; /* Đường viền trên */
   display: flex; /* Flexbox để canh giữa các nút */
