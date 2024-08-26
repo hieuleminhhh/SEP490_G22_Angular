@@ -70,7 +70,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   timeOptions: string[] = [];
   addNew: AddNewOrder = {
     guestPhone: '',
-    email: '',
+    email: 'N/A',
     addressId: 0,
     guestAddress: '',
     consigneeName: '',
@@ -245,7 +245,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.selectedItems = [];
     this.selectedAddress = "Khách lẻ"
     this.selectCategory('Món chính');
-    this.successMessage = "Tất cả các mặt hàng đã được xóa khỏi giỏ hàng.";
+    this.successMessage = "Đơn hàng được thanh toán thành công.";
     this.addNew.guestPhone = null;
     this.addNew.email = null;
     this.addNew.guestAddress = null;
@@ -526,6 +526,18 @@ export class CreateTakeAwayOrderComponent implements OnInit {
         if (response && response.data && response.data.consigneeName && response.data.guestPhone) {
           // Update selectedAddress with the newly created address data
           this.selectedAddress = `${response.data.consigneeName} - ${response.data.guestPhone}`;
+          
+          // Create newAddress with all required properties
+          const newAddress: Address = {
+            addressId: response.data.addressId, // Ensure you have this property from the response
+            consigneeName: response.data.consigneeName,
+            guestPhone: response.data.guestPhone,
+            guestAddress: response.data.guestAddress || 'N/A', // Provide default value if necessary
+            email: response.data.email || 'N/A', // Provide default value if necessary
+          };
+  
+          // Call selectAddress with the newly created address data
+          this.selectAddress(newAddress);
         } else {
           console.error('Invalid response format after creating address:', response);
         }
@@ -533,8 +545,6 @@ export class CreateTakeAwayOrderComponent implements OnInit {
         // Reload addresses to update the list
         this.loadAddresses();
   
-        // Clear form and close modal
-        this.clearForm();
       },
       error => {
         if (error.error && error.error.message) {
@@ -548,7 +558,6 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       }
     );
   }
-
   closeModal() {
     const modalElement = this.formModal.nativeElement;
     modalElement.classList.remove('show');
@@ -711,13 +720,11 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     return `${date}T${time}:00.000Z`;
   }
   createOrder() {
-    // Ensure selectedItems is defined
     if (!this.selectedItems || this.selectedItems.length === 0) {
       console.error('No items selected for the order.');
       return;
     }
   
-    // Map selected items to order details
     const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
       itemId: item.id,
       quantity: item.quantity,
@@ -729,46 +736,42 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       note: item.note
     }));
   
-    // Calculate total amount and set various properties
     const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
     let receivingTime: string = '';
-      if (this.receivingDate && this.receivingTime) {
-        receivingTime = this.formatDateTime(this.receivingDate, this.receivingTime);
-      } else {
-        const currentTime = new Date();
-        currentTime.setHours(currentTime.getHours() + 1);
-        const currentDate = currentTime.toISOString().split('T')[0];
-        const currentTimeStr = currentTime.toTimeString().split(' ')[0].substring(0, 5);
-        receivingTime = this.formatDateTime(currentDate, currentTimeStr);
-      }
-    const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
-    const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; // Convert paymentMethod to number
+    if (this.receivingDate && this.receivingTime) {
+      receivingTime = this.formatDateTime(this.receivingDate, this.receivingTime);
+    } else {
+      const currentTime = new Date();
+      currentTime.setHours(currentTime.getHours() + 1);
+      receivingTime = this.formatDateTime(currentTime.toISOString().split('T')[0], currentTime.toTimeString().split(' ')[0].substring(0, 5));
+    }
+  
+    const customerPaidAmount = this.customerPaid ?? 0;
+    const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0;
   
     this.addNew = {
-      ...this.addNew, // Spread existing properties if any
+      ...this.addNew,
       totalAmount,
       orderDetails,
       orderDate: this.getVietnamTime(),
       recevingOrder: receivingTime,
-      deposits : 0,
+      deposits: 0,
       paymentMethods: paymentMethodValue,
-      description: 'Order payment description',
+      description: '',
       discountId: this.selectedDiscount,
       taxcode: 'ABCD',
       paymentStatus: 0,
       accountId: this.accountId
     };
   
-    // Log order details for debugging
-    console.log('Order Details:', orderDetails);
+    console.log('Order Details:', this.addNew);
   
-    // Call the service to add the new order
     this.orderService.AddNewOrder(this.addNew).subscribe(
       response => {
         console.log('Order created successfully:', response);
         this.successMessage = 'Đơn hàng đã được tạo thành công!';
         this.lastOrderId = response.orderId; 
-       console.log(this.lastOrderId);
+        console.log(this.lastOrderId);
         setTimeout(() => this.successMessage = '', 5000);
       },
       error => {
@@ -779,23 +782,16 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       }
     );
   }
+  
 
   CreateInvoiceTakeAway(): void {
     if (this.lastOrderId != null && this.lastOrderId !== undefined) {
       const paymentMethod = parseInt(this.paymentMethod, 10);
       const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
-
-      console.log('Order ID:', this.lastOrderId);
-      console.log('Payment Method:', paymentMethod);
-      console.log('Customer Paid:', this.customerPaid);
-      console.log('Discounted Total Amount:', totalAmount);
-
+  
       const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : totalAmount;
       const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - totalAmount : 0;
-
-      console.log('Amount Received:', amountReceived);
-      console.log('Return Amount:', returnAmount);
-
+  
       const updateData = {
         status: 6,
         paymentTime: new Date().toISOString(),
@@ -803,20 +799,20 @@ export class CreateTakeAwayOrderComponent implements OnInit {
         taxcode: "HIEU",
         paymentStatus: 1,
         accountId: this.accountId,
-        amountReceived: amountReceived,
-        returnAmount: returnAmount,
+        amountReceived,
+        returnAmount,
         paymentMethods: paymentMethod,
-        description: "strizzzg"
+        description: "Order payment description"
       };
-
+  
       console.log('Update Data:', updateData);
-
+  
       this.invoiceService.updateStatusAndCreateInvoice(this.lastOrderId, updateData).subscribe(
-        (response) => {
+        response => {
           console.log('Order status updated and invoice created:', response);
           this.loadInvoice(this.lastOrderId!);
         },
-        (error) => {
+        error => {
           console.error('Error updating order status and creating invoice:', error);
         }
       );
@@ -824,6 +820,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       console.warn('Order ID is not valid or is undefined. LastOrderId:', this.lastOrderId);
     }
   }
+  
 
   loadInvoice(orderId: number): void {
     this.invoiceService.getInvoiceByOrderId(orderId).subscribe(
