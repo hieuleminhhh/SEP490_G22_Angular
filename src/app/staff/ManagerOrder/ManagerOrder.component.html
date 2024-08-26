@@ -83,11 +83,12 @@
                   <td>{{ order.orderDate | dateFormat }}</td>
                   <td>{{ order.totalAmount | currencyFormat }}</td>
                   <td>
-                    <select (change)="onStatusChange($event, order.orderId)" [(ngModel)]="order.status"
-                      [ngStyle]="{'color': getStatusColor(order.status)}">
-                      <option *ngFor="let status of statuses" [value]="status.value">{{ status.text }}</option>
-                    </select>
+                    <span [ngStyle]="{'color': getStatusColor(order.status), 'font-weight': 'bold'}">
+                      {{ getStatusText(order.status) }}
+                    </span>
                   </td>
+                  
+                  
                   <td>
                     <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal"
                       data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">
@@ -135,7 +136,7 @@
                     <span class="fw-bold">Mã đơn hàng:</span> {{ orderDetail.orderId || 'Khách lẻ' }}
                   </div>
                   <div class="mb-3">
-                    <span class="fw-bold">Loại đơn:</span>
+                    <span class="fw-bold">Loại đơn: </span>
                     <ng-container [ngSwitch]="orderDetail.type">
                       <span *ngSwitchCase="1">Mang về</span>
                       <span *ngSwitchCase="2">Online</span>
@@ -144,35 +145,26 @@
                       <span *ngSwitchDefault>Khách lẻ</span>
                     </ng-container>
                   </div>
-                  <div *ngIf="orderDetail.paymentMethods !== null && orderDetail.paymentMethods !== undefined"
-                    class="mb-3">
-                    <span class="fw-bold">Phương thức thanh toán:</span>
-                    <ng-container [ngSwitch]="orderDetail.paymentMethods">
-                      <span *ngSwitchCase="0">Tiền mặt</span>
-                      <span *ngSwitchCase="1">Chuyển khoản ngân hàng</span>
-                      <span *ngSwitchCase="2">Thanh toán khi nhận hàng</span>
-                    </ng-container>
-                  </div>
-
+                 
                   <div *ngIf="orderDetail.tables && orderDetail.tables.length > 0" class="mb-3">
                     <span class="fw-bold">Bàn:</span> {{ getTablesAsString() }}
                   </div>
                   
                  
                   <div class="mb-3">
-                    <span class="fw-bold">Trạng thái đơn:</span>
+                    <span class="fw-bold">Trạng thái đơn: </span>
                     <ng-container [ngSwitch]="orderDetail.status">
                       <span *ngSwitchCase="1">Đang chờ</span>
                       <span *ngSwitchCase="2">Đã chấp nhận</span>
                       <span *ngSwitchCase="3">Đang phục vụ</span>
                       <span *ngSwitchCase="4">Hoàn thành</span>
                       <span *ngSwitchCase="5">Hủy</span>
-                      <span *ngSwitchCase="6">Đang chuẩn bị</span> <!-- Thanh toan Takeaway vs online -->
-                      <span *ngSwitchCase="7">Đang giao hàng</span> <!-- online -->
+                      <span *ngSwitchCase="6">Đang chuẩn bị</span> 
+                      <span *ngSwitchCase="7">Đang giao hàng</span> 
                       <span *ngSwitchDefault>Chưa xác định</span>
                     </ng-container>
-
                   </div>
+                  
                   <div class="mb-3" *ngIf="orderDetail.cancelationReason">
                     <span class="fw-bold">Lý do hủy:</span> {{ orderDetail.cancelationReason}}
                   </div>
@@ -188,7 +180,7 @@
                   <div class="mb-3" *ngIf="orderDetail?.type === 2 || orderDetail?.type === 1">
                     <span class="fw-bold">Thời gian đặt hàng:</span> {{ orderDetail.orderDate | dateFormat }}
                   </div>
-                  <div class="mb-3" *ngIf="orderDetail.recevingOrder">
+                  <div class="mb-3" *ngIf="orderDetail.recevingOrder && (orderDetail?.type === 2 || orderDetail?.type === 1)">
                     <span class="fw-bold">Thời gian giao hàng:</span> {{ orderDetail.recevingOrder | dateFormat }}
                   </div>
                   <div class="mb-3" *ngIf="orderDetail?.type === 4">
@@ -197,6 +189,16 @@
                   <div class="mb-3" *ngIf="orderDetail.recevingOrder && orderDetail?.type === 4">
                     <span class="fw-bold">Thời gian ra:</span> {{ orderDetail.recevingOrder | dateFormat }}
                   </div>
+                  <div *ngIf="orderDetail.paymentMethods !== null && orderDetail.paymentMethods !== undefined"
+                  class="mb-3">
+                  <span class="fw-bold">Phương thức thanh toán: </span>
+                  <ng-container [ngSwitch]="orderDetail.paymentMethods">
+                    <span *ngSwitchCase="0">Tiền mặt</span>
+                    <span *ngSwitchCase="1">Chuyển khoản ngân hàng</span>
+                    <span *ngSwitchCase="2">Thanh toán khi nhận hàng</span>
+                  </ng-container>
+                </div>
+
 
                   <!-- <div class="mb-3">
             <span class="fw-bold">Thanh toán:</span> {{ orderDetail.recevingOrder | dateFormat }}
@@ -502,8 +504,17 @@
           </div>
 
           <div class="mb-3" *ngIf="paymentMethod === '0'">
-            <label for="customerPaidPrepay" class="form-label">Tiền khách trả:</label>
-            <input type="number" id="customerPaidPrepay" class="form-control" [(ngModel)]="customerPaid">
+            <label for="customerPaid" class="form-label">Tiền khách trả:</label>
+            <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid" name="customerPaid"
+              required min="0" [ngModelOptions]="{ updateOn: 'blur' }">
+            
+            <!-- Error messages -->
+            <div *ngIf="customerPaid !== null && customerPaid < DiscountedTotalAmount()" class="text-danger">
+              Số tiền khách trả phải lớn hơn hoặc bằng tổng số tiền phải trả.
+            </div>
+            <div *ngIf="customerPaid === null" class="text-danger">
+              Vui lòng nhập số tiền khách trả.
+            </div>
           </div>
 
           <div class="mb-3" *ngIf="paymentMethod === '1'">
@@ -516,7 +527,8 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModalOnline"
-            (click)="CreateInvoiceOnline(orderDetail?.orderId)">Xác nhận</button>
+            (click)="CreateInvoiceOnline(orderDetail?.orderId)"
+            [disabled]="paymentMethod === '0' && (customerPaid === null || customerPaid < DiscountedTotalAmount())">Xác nhận</button>
         </div>
       </div>
     </div>
@@ -551,8 +563,17 @@
           </div>
 
           <div class="mb-3" *ngIf="paymentMethod === '0'">
-            <label for="customerPaidPrepay" class="form-label">Tiền khách trả:</label>
-            <input type="number" id="customerPaidPrepay" class="form-control" [(ngModel)]="customerPaid">
+            <label for="customerPaid" class="form-label">Tiền khách trả:</label>
+            <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid" name="customerPaid"
+              required min="0" [ngModelOptions]="{ updateOn: 'blur' }">
+            
+            <!-- Error messages -->
+            <div *ngIf="customerPaid !== null && customerPaid < getFinalAmountDue()" class="text-danger">
+              Số tiền khách trả phải lớn hơn hoặc bằng tổng số tiền phải trả.
+            </div>
+            <div *ngIf="customerPaid === null" class="text-danger">
+              Vui lòng nhập số tiền khách trả.
+            </div>
           </div>
 
           <div class="mb-3" *ngIf="paymentMethod === '1'">
@@ -564,8 +585,16 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModalOffline"
-            (click)="SuscessfullOrderOffline(orderDetail?.orderId, orderDetail?.invoiceId)">Xác nhận</button>
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            data-bs-toggle="modal" 
+            data-bs-target="#cfpaymentModalOffline"
+            (click)="SuscessfullOrderOffline(orderDetail?.orderId, orderDetail?.invoiceId)"
+            [disabled]="paymentMethod === '0' && (customerPaid === null || customerPaid < getFinalAmountDue())"
+          >
+            Xác nhận
+          </button>
         </div>
       </div>
     </div>
@@ -601,19 +630,19 @@
           </div>
 
           <div class="mb-3" *ngIf="paymentMethod === '0'">
-            <label for="customerPaidPrepay" class="form-label">Tiền khách trả:</label>
-            <input
-              type="number"
-              id="customerPaidPrepay"
-              class="form-control"
-              [(ngModel)]="customerPaid"
-              [min]="DiscountedTotalAmount()"
-              (input)="validateCustomerPaid()"
-            >
+            <label for="customerPaid" class="form-label">Tiền khách trả:</label>
+            <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid" name="customerPaid"
+              required min="0" [ngModelOptions]="{ updateOn: 'blur' }">
+            
+            <!-- Error messages -->
             <div *ngIf="customerPaid !== null && customerPaid < DiscountedTotalAmount()" class="text-danger">
-              Tiền khách trả không được nhỏ hơn tổng tiền đơn hàng.
+              Số tiền khách trả phải lớn hơn hoặc bằng tổng số tiền phải trả.
+            </div>
+            <div *ngIf="customerPaid === null" class="text-danger">
+              Vui lòng nhập số tiền khách trả.
             </div>
           </div>
+
           
 
           <div class="mb-3" *ngIf="paymentMethod === '1'">
@@ -626,6 +655,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModalOffline"
+          [disabled]="paymentMethod === '0' && (customerPaid === null || customerPaid < DiscountedTotalAmount())"
             (click)="PrePayment(orderDetail?.orderId)">Xác nhận</button>
         </div>
       </div>
@@ -663,7 +693,16 @@
 
           <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="customerPaid" class="form-label">Tiền khách trả:</label>
-            <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid">
+            <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid" name="customerPaid"
+              required min="0" [ngModelOptions]="{ updateOn: 'blur' }">
+            
+            <!-- Error messages -->
+            <div *ngIf="customerPaid !== null && customerPaid < DiscountedTotalAmount()" class="text-danger">
+              Số tiền khách trả phải lớn hơn hoặc bằng tổng số tiền phải trả.
+            </div>
+            <div *ngIf="customerPaid === null" class="text-danger">
+              Vui lòng nhập số tiền khách trả.
+            </div>
           </div>
 
           <div class="mb-3" *ngIf="paymentMethod === '1'">
@@ -677,7 +716,8 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#takepaymentModal"
-            (click)="CreateInvoiceTakeAway(orderDetail?.orderId)">Xác nhận</button>
+            (click)="CreateInvoiceTakeAway(orderDetail?.orderId)" 
+            [disabled]="paymentMethod === '0' && (customerPaid === null || customerPaid < DiscountedTotalAmount())">Xác nhận</button>
         </div>
       </div>
     </div>

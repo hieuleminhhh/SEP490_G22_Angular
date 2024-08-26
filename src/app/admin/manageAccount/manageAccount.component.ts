@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CreateAccountDTO, GetAccountDTO, UpdateAccountDTO } from '../../../models/account.model';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AccountService } from '../../../service/account.service';
 import { Observable } from 'rxjs';
 import { SidebarAdminComponent } from "../SidebarAdmin/SidebarAdmin.component";
@@ -12,15 +12,16 @@ import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderS
   templateUrl: './manageAccount.component.html',
   styleUrls: ['./manageAccount.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarAdminComponent, HeaderOrderStaffComponent]
+  imports: [CommonModule, FormsModule, SidebarAdminComponent, HeaderOrderStaffComponent, ReactiveFormsModule ]
 })
 export class ManageAccountComponent implements OnInit {
 
-  constructor(private accountService: AccountService) { }
+  constructor(private accountService: AccountService,private fb: FormBuilder) { }
   accounts: GetAccountDTO[] = [];
   selectedAccount: GetAccountDTO | null = null;
   isEditing: boolean = false;
   errorMessage: string = '';
+  accountForm!: FormGroup;
   showPasswordMap: { [key: number]: boolean } = {};
 
   currentPage = 1; // Trang hiện tại
@@ -28,6 +29,17 @@ export class ManageAccountComponent implements OnInit {
   totalItems = 0; // Tổng số bản ghi
 
   ngOnInit() {
+    this.accountForm = this.fb.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      username: ['', Validators.required],
+      password: ['', Validators.required],
+      role: ['Admin', Validators.required],
+      address: ['', Validators.required],
+      phone: ['', Validators.required],
+      isActive: [true]
+    });
     this.loadAccounts();
   }
 
@@ -148,6 +160,20 @@ export class ManageAccountComponent implements OnInit {
       console.log('Invalid page number');
     }
   }
+  onSubmit(): void {
+    if (this.accountForm.valid) {
+      const newAccount: CreateAccountDTO = this.accountForm.value;
 
-
+      this.accountService.createAccount(newAccount).subscribe({
+        next: (response: GetAccountDTO) => {
+          console.log('Account created successfully:', response);
+          // Handle successful account creation (e.g., show a success message, reset the form, etc.)
+        },
+        error: (error) => {
+          console.error('Error creating account:', error);
+          // Handle error (e.g., show an error message)
+        }
+      });
+    }
+  }
 }

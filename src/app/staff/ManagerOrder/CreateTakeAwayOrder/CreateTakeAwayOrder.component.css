@@ -551,3 +551,9 @@ input.rounded-input {
 .back-icon:hover {
   color: black; /* Màu sắc mới khi hover */
 }
+/* Custom styling for smaller alerts */
+.alert-sm {
+  font-size: 0.875rem; /* Adjust font size */
+  padding: 0.5rem;     /* Adjust padding */
+  margin-bottom: 1rem; /* Adjust margin */
+}

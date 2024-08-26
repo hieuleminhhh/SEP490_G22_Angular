@@ -33,6 +33,7 @@ export class ViewTableOrderComponent implements OnInit {
   orderId: any;
   showSidebar: boolean = true;
   tableId: number = 0;
+  selectedTables: number[] = [];
 
   constructor(private tableService: TableService, private router: Router,
     private route: ActivatedRoute, private accountService: AccountService,
@@ -150,5 +151,26 @@ export class ViewTableOrderComponent implements OnInit {
       }
     );
   }
+  onTableSelect(tableId: number): void {
+    if (this.selectedTables.includes(tableId)) {
+      // If the table is already selected, remove it
+      this.selectedTables = this.selectedTables.filter(id => id !== tableId);
+    } else {
+      // If the table is not selected, add it
+      this.selectedTables.push(tableId);
+    }
+  }
 
+  // Method to handle submission of selected tables
+  submitSelectedTables(): void {
+    if (this.selectedTables.length > 0) {
+      this.selectedTables.forEach(tableId => {
+        // Tạo đơn hàng cho bàn trống (status = 0)
+        this.navigateToOrder(tableId, 0);
+      });
+    } else {
+      console.error('No tables selected');
+    }
+  }
+  
 }

@@ -13,12 +13,17 @@
           <h2 class="order-header text-center mb-4">
             Đơn hàng tại quán <span class="highlight">(bàn {{ tableId }})</span>
           </h2>
+          <div *ngIf="errorMessage" class="alert alert-danger" style="max-width: 500px;">
+            {{ errorMessage }}
+          </div>
+          <div *ngIf="successMessage" class="alert alert-success" style="max-width: 500px;">
+            {{ successMessage }}</div>
           
           <div class="row">
             <!-- Left column for address and cart details -->
             <div class="col-md-6">
               <!-- Address Selection -->
-              <div *ngIf="reservationId === null">
+              <div *ngIf="reservationData=== null">
                 <div class="input-group mb-3" (clickOutside)="showDropdown = false">
                   <input type="text" class="form-control" placeholder="Select address..." (click)="toggleDropdown()"
                     [(ngModel)]="selectedAddress" readonly>
@@ -42,14 +47,14 @@
                 </div>
               </div>
 
-              <div *ngIf="reservationId !== null" class="input-group mb-3">
+              <div *ngIf="reservationData !== null" class="input-group mb-3">
                 <span class="input-group-text">Tên Khách:</span>
                 <input type="text" class="form-control"
-                  [value]="selectedOrder?.guestName ? selectedOrder.guestName : 'Khách lẻ'" readonly>
+                  [value]="reservationData?.consigneeName ? reservationData?.consigneeName : 'Khách lẻ'" readonly>
               
                 <span class="input-group-text">Điện Thoại:</span>
                 <input type="text" class="form-control"
-                  [value]="selectedOrder?.guestPhone ? selectedOrder.guestPhone : '-------------'" readonly>
+                  [value]="reservationData?.guestPhone ? reservationData.guestPhone : '-------------'" readonly>
               </div>
               
 
@@ -341,16 +346,24 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                <form #form="ngForm">
+                <form #form="ngForm" (ngSubmit)="createAddress()">
                   <div class="form-group">
                     <label for="customerNameForm">Tên khách hàng</label>
                     <input type="text" [(ngModel)]="newAddress.consigneeName" class="form-control" id="customerNameForm"
-                      placeholder="Nhập tên khách hàng" name="consigneeName" required>
+                      placeholder="Nhập tên khách hàng" name="consigneeName" required #consigneeName="ngModel" />
+                    <div *ngIf="consigneeName.invalid && (consigneeName.dirty || consigneeName.touched)"
+                      class="text-danger">
+                      <div *ngIf="consigneeName.errors?.['required']">Tên khách hàng là bắt buộc.</div>
+                    </div>
                   </div>
                   <div class="form-group">
                     <label for="guestPhone">Số điện thoại</label>
                     <input type="tel" [(ngModel)]="newAddress.guestPhone" class="form-control" id="guestPhone"
-                      placeholder="Nhập số điện thoại" name="guestPhone" required>
+                      placeholder="Nhập số điện thoại" name="guestPhone" required #guestPhone="ngModel" />
+                    <div *ngIf="guestPhone.invalid && (guestPhone.dirty || guestPhone.touched)" class="text-danger">
+                      <div *ngIf="guestPhone.errors?.['required']">Số điện thoại là bắt buộc.</div>
+                      <div *ngIf="guestPhone.errors?.['pattern']">Số điện thoại không hợp lệ.</div>
+                    </div>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -422,8 +435,12 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal"
-                  (click)="createOrderOffline(this.tableId)">Xác nhận</button>
+                  <!-- chỗ này phải là phải update guest từ reservation vào đây -->
+                <button *ngIf="reservationData === null" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal"
+                  (click)="createOrderOffline(this.tableId)">Xác nhận</button> 
+                
+                  <button *ngIf="reservationData !== null" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal"
+                  (click)="createOrderOffline(this.tableId)">Ok</button>
               </div>
             </div>
           </div>
