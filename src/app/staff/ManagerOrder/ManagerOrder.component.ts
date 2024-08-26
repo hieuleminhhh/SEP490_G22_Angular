@@ -73,7 +73,6 @@ export class ManagerOrderComponent implements OnInit {
   totalQuantity: number = 0;
   cancelationReason: string = '';
 
-
   constructor(
     private orderService: ManagerOrderService,
     private orderDetailService: ManagerOrderDetailService,
@@ -85,12 +84,14 @@ export class ManagerOrderComponent implements OnInit {
 
   ngOnInit() {
     this.setDefaultDates();
+    this.selectedType = 4;
     this.loadListOrder();
     this.paymentMethod = '0';
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
     this.customerPaid = this.DiscountedTotalAmount();
     console.log('31', this.accountId);
+
   }
 
   setDefaultDates() {
@@ -191,7 +192,7 @@ export class ManagerOrderComponent implements OnInit {
       const discountAmount = (this.orderDetail.totalAmount * this.orderDetail.discountPercent) / 100;
       return this.orderDetail.totalAmount - discountAmount;
     }
-    return this.orderDetail?.totalAmount ?? 0; // Sử dụng giá trị mặc định nếu orderDetail là null
+    return this.orderDetail?.totalAmount ?? 0;
   }
 
 
@@ -236,19 +237,24 @@ export class ManagerOrderComponent implements OnInit {
   getStatusColor(status: number): string {
     switch (status) {
       case 1:
-        return 'orange';
+        return 'orange';        // Đang chờ
       case 2:
-        return 'blue';
+        return 'blue';          // Đã chấp nhận
       case 3:
-        return 'purple';
+        return 'purple';       // Đang phục vụ
       case 4:
-        return 'teal';
+        return 'teal';         // Hoàn thành
       case 5:
-        return 'red';
+        return 'red';          // Hủy
+      case 6:
+        return 'brown';        // Đang chuẩn bị
+      case 7:
+        return 'green';        // Đang giao hàng
       default:
-        return 'black';
+        return 'black';        // Default color
     }
   }
+  
 
 
   onPageChange(page: number): void {
