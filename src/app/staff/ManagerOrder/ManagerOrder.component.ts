@@ -46,7 +46,8 @@ export class ManagerOrderComponent implements OnInit {
     { value: 4, text: 'Hoàn thành' },
     { value: 5, text: 'Hủy' },
     { value: 6, text: 'Đang chuẩn bị' },  // Thanh toan Takeaway vs online
-    { value: 7, text: 'Đang giao hàng' }   // online
+    { value: 7, text: 'Đang giao hàng' },
+    { value: 8, text: 'Đã hoàn tiền' }  // online
   ];
 
   types = [
