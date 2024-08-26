@@ -58,30 +58,6 @@
           </div>
         </div>
 
-        <!-- <section class="transfer-section" *ngIf="selectedTab === 'overview'" style="background-color: #ededed;;">
-          <div class="transfer-section-header">
-            <h2>Nhóm hàng bán ra</h2>
-          </div>
-          <br>
-          <div class="transfers">
-            <div class="transfer">
-              <dl class="transfer-details">
-                <div>
-                  <dt>Tên</dt>
-                  <dd>Món ăn</dd>
-                </div>
-                <div>
-                  <dt>Số lượng</dt>
-                  <dd>10</dd>
-                </div>
-                <div>
-                  <dt>Doanh thu</dt>
-                  <dd>800.000đ</dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-        </section> -->
         <section class="payment-section" *ngIf="selectedTab === 'overview'">
           <h2>Phương thức thanh toán</h2>
           <br>
@@ -109,7 +85,7 @@
           </div>
           <br>
           <div class="payment-section-footer">
-            <button class="save-button">
+            <button class="save-button" (click)="exportData()">
               Xuất file báo cáo
             </button>
           </div>
@@ -143,6 +119,9 @@
                     <td> {{order.cancelationReason}}</td>
                     <td>{{ (order.deposits > 0 ? order.deposits : order.totalAmount) | currencyFormat }}</td>
                     <td>
+                      <button class="action-button view-button" (click)="showDetails(order.orderId)">
+                        <i class="fas fa-eye"></i>
+                      </button>
                       <button class="action-button complete-button" data-bs-toggle="modal"
                         data-bs-target="#confirmationModal">
                         Xác nhận hoàn tiền
@@ -295,6 +274,7 @@
       </div>
   </div>
 </div>
+
 <!-- Popup for item details -->
 <div *ngIf="selectedItem" class="popup" (click)="closePopup()">
   <div class="popup-content" (click)="$event.stopPropagation()">
@@ -305,6 +285,7 @@
       <p>Tên người nhận: {{selectedItem.consigneeName}}</p>
       <p>Số điện thoại: {{selectedItem.guestPhone}}</p>
       <p>Địa chỉ: {{selectedItem.guestAddress}}</p>
+      <p>Thời gian đặt hàng: {{ selectedItem.orderDate | date:'dd/MM/yyyy - HH:mm' }}</p>
       <p>Thời gian nhận hàng: {{ selectedItem.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</p>
 
       <table class="table table-bordered table-hover">

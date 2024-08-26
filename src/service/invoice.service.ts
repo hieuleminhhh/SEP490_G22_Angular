@@ -87,4 +87,9 @@ export class InvoiceService {
     const url = `https://localhost:7188/api/orders/${id}`;
     return this.http.get<any>(url, this.getHttpOptions());
   }
+
+  getOrderExport(request:any): Observable<any> {
+    const url = `https://localhost:7188/api/orders/order/export/cashier?exportorderIds=${request}`;
+    return this.http.get<any>(url, this.getHttpOptions());
+  }
 }
