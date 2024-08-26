@@ -83,10 +83,11 @@
                   <td>{{ order.orderDate | dateFormat }}</td>
                   <td>{{ order.totalAmount | currencyFormat }}</td>
                   <td>
-                    <span [ngStyle]="{'color': getStatusColor(order.status)}">
+                    <span [ngStyle]="{'color': getStatusColor(order.status), 'font-weight': 'bold'}">
                       {{ getStatusText(order.status) }}
                     </span>
                   </td>
+                  
                   
                   <td>
                     <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal"
