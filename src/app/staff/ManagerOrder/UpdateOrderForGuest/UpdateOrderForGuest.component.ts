@@ -622,6 +622,7 @@ async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
 
     // Đảm bảo rằng tỷ lệ giảm giá tổng thể là một số hợp lệ
     const discountPercent = this.selectedDiscountPercent || 0;
+    console.log(discountPercent);
     this.totalAmountAfterDiscount = this.totalAmount * (1 - discountPercent / 100);
     console.log("Total Amount After Discount:", this.totalAmountAfterDiscount);
 }

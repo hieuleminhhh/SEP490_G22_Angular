@@ -107,13 +107,16 @@
 
                 <button class="btn btn-primary btn-sm" *ngIf="selectedItems.length > 0" data-bs-toggle="modal"
                   data-bs-target="#discountModal" (click)="LoadActiveDiscounts()">
-                  <i class="fas fa-tags me-2"></i> <!-- Biểu tượng Font Awesome -->
+                  <i class="fas fa-tags me-2"></i>
                   Khuyến mãi
                 </button>
                 <div *ngIf="selectedDiscount" class="mt-2">
                   <strong>Giảm giá:</strong>
                   <span>{{ selectedDiscountName }} ({{ selectedDiscountPercent | percentage }})</span>
+                  <br>
+                  <span>-{{ calculateDiscountAmount() | currencyFormat }}</span>
                 </div>
+                
                 <br>
                 <hr>
                 <div *ngIf="selectedItems.length > 0" class="mt-2">
