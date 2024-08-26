@@ -18,7 +18,7 @@
           </div>
           <div *ngIf="successMessage" class="alert alert-success" style="max-width: 500px;">
             {{ successMessage }}</div>
-          
+
           <div class="row">
             <!-- Left column for address and cart details -->
             <div class="col-md-6">
@@ -51,12 +51,12 @@
                 <span class="input-group-text">Tên Khách:</span>
                 <input type="text" class="form-control"
                   [value]="reservationData?.consigneeName ? reservationData?.consigneeName : 'Khách lẻ'" readonly>
-              
+
                 <span class="input-group-text">Điện Thoại:</span>
                 <input type="text" class="form-control"
                   [value]="reservationData?.guestPhone ? reservationData.guestPhone : '-------------'" readonly>
               </div>
-              
+
 
               <!-- Selected Items Section -->
               <div class="cart-section mt-4">
@@ -153,7 +153,7 @@
                     Hủy
                   </button>
                 </div>
-                
+
               </div>
               <!-- Discount Modal -->
               <div class="modal fade" #formModal id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel"
@@ -435,10 +435,10 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                   <!-- chỗ này phải là phải update guest từ reservation vào đây -->
                 <button *ngIf="reservationData === null" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal"
-                  (click)="createOrderOffline(this.tableId)">Xác nhận</button> 
-                
+                  (click)="createOrderOffline(this.tableId)">Xác nhận</button>
+
                   <button *ngIf="reservationData !== null" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal"
-                  (click)="createOrderOffline(this.tableId)">Ok</button>
+                  (click)="createOrderReservation(this.tableId)">Ok</button>
               </div>
             </div>
           </div>
