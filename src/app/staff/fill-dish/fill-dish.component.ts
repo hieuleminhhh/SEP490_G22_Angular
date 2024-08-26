@@ -6,6 +6,7 @@ import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currenc
 import { switchMap } from 'rxjs';
 import { HeaderOrderStaffComponent } from "../ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 import { DateFormatPipe } from '../../common/material/dateFormat/dateFormat.component';
+import { AccountService } from '../../../service/account.service';
 
 @Component({
   selector: 'app-fill-dish',
@@ -30,7 +31,7 @@ export class FillDishComponent implements OnInit {
   dataShipStaff: any;
   isAnyOrderSelected: boolean = false;
   isPrinted: boolean = false;
-  constructor(private cookingService: CookingService) { }
+  constructor(private cookingService: CookingService, private accountService: AccountService) { }
 
   ngOnInit(): void {
     this.getCompletedDishesFromLocalStorage();
@@ -505,6 +506,19 @@ export class FillDishComponent implements OnInit {
   }
   reloadPage(): void {
     window.location.reload();
+  }
+  accountShip: any;
+
+  GetAccountById(accountId: number): void {
+    this.accountService.getAccountById(accountId).subscribe(
+      (data) => {
+        this.accountShip = data; // Correctly assign the API response to accountShip
+        console.log('API Response:', this.accountShip); // Log the entire response to check its structure
+      },
+      (error) => {
+        console.error('Error fetching:', error);
+      }
+    );
   }
 
 

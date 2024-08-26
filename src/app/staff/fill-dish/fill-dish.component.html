@@ -134,7 +134,9 @@
                 <div *ngFor="let shiper of dataShipStaff; let i = index" class="grid-item">
                   <div class="dish-info">
                     <p>{{shiper.firstName}}{{shiper.lastName}}</p>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Chỉ định
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal" 
+                    (click)="GetAccountById(shiper.accountId)">
+                      Chỉ định
                       giao hàng</button>
                   </div>
                 </div>
@@ -225,25 +227,27 @@
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
   aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content" *ngFor="let shiper of dataShipStaff; let i = index">
+    <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="confirmationModalLabel">Xác nhận</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <!-- Bạn có thể hiển thị thông tin về shipper tại đây -->
-        <p>Bạn có chắc chắn muốn chỉ định giao hàng cho <span class="shipper-name">{{shiper.firstName}}
-            {{shiper.lastName}}</span> ?</p>
+        <p>Bạn có chắc chắn muốn chỉ định giao hàng cho <span class="shipper-name">{{accountShip?.firstName}} {{accountShip?.lastName}}</span> ?</p>
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal"  data-bs-target="#invoiceModal" (click)="updateAccountId(shiper.accountId)">Xác
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal"  data-bs-target="#invoiceModal" >Xác
           nhận</button>
       </div>
 
     </div>
   </div>
 </div>
+
+      <!-- (click)="updateAccountId(shiper.accountId)" -->
 <!-- order Modal -->
 <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
