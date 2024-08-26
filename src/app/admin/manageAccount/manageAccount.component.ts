@@ -3,7 +3,7 @@ import { CreateAccountDTO, GetAccountDTO, UpdateAccountDTO } from '../../../mode
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AccountService } from '../../../service/account.service';
-import { Observable } from 'rxjs';
+import { Observable, window } from 'rxjs';
 import { SidebarAdminComponent } from "../SidebarAdmin/SidebarAdmin.component";
 import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 
@@ -71,7 +71,7 @@ export class ManageAccountComponent implements OnInit {
       newAccount => {
         this.loadAccounts();
         this.selectedAccount = null;
-        alert('Account created successfully.');
+        alert('Tạo tài khoản thành công');
       },
       error => this.errorMessage = 'Error creating account.'
     );
@@ -114,7 +114,8 @@ export class ManageAccountComponent implements OnInit {
     this.accountService.updateAccountStatus(id, isActive).subscribe(
       response => {
         console.log('Response:', response);
-        alert(`Account status updated to: ${isActive ? 'Đang hoạt động' : 'Không hoạt động'}`);
+        alert(`Cập nhập trạng thái thành công: ${isActive ? 'Đang hoạt động' : 'Không hoạt động'}`);
+        globalThis.window.location.reload();
       },
       error => {
         this.errorMessage = 'Error updating account status.';

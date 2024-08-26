@@ -438,6 +438,18 @@ export class CreateOfflineOrderComponent implements OnInit {
         if (response && response.data && response.data.consigneeName && response.data.guestPhone) {
           // Update selectedAddress with the newly created address data
           this.selectedAddress = `${response.data.consigneeName} - ${response.data.guestPhone}`;
+          
+          // Create newAddress with all required properties
+          const newAddress: Address = {
+            addressId: response.data.addressId, // Ensure you have this property from the response
+            consigneeName: response.data.consigneeName,
+            guestPhone: response.data.guestPhone,
+            guestAddress: response.data.guestAddress || 'N/A', // Provide default value if necessary
+            email: response.data.email || 'N/A', // Provide default value if necessary
+          };
+  
+          // Call selectAddress with the newly created address data
+          this.selectAddress(newAddress);
         } else {
           console.error('Invalid response format after creating address:', response);
         }
@@ -445,8 +457,6 @@ export class CreateOfflineOrderComponent implements OnInit {
         // Reload addresses to update the list
         this.loadAddresses();
   
-        // Clear form and close modal
-        this.clearForm();
       },
       error => {
         if (error.error && error.error.message) {
@@ -493,7 +503,7 @@ export class CreateOfflineOrderComponent implements OnInit {
         orderDate: new Date().toISOString(),
         receivingOrder: null,
         guestPhone: guestPhone,
-        note: "This is a special request note.",
+        note: "",
         discountId: this.selectedDiscount,
         type: 4,
         status: 3,
@@ -504,7 +514,7 @@ export class CreateOfflineOrderComponent implements OnInit {
       this.orderService.createOrderOffline(newOrder).subscribe(
         response => {
           console.log('Offline order created successfully:', response);
-          this.successMessage = 'Offline order created successfully!';
+          this.successMessage = 'Đơn hàng đã được tạo thành công';
           setTimeout(() => this.successMessage = '', 5000);
         },
         error => {
@@ -612,6 +622,15 @@ export class CreateOfflineOrderComponent implements OnInit {
         this.totalAmountAfterDiscount = this.totalAmount; // Khi không có discount
       }
     }
+    getFinalTotalAmount(): number {
+      if (this.selectedDiscount && this.selectedDiscount.percent > 0) {
+        const discountAmount = (this.totalAmount * this.selectedDiscount.percent) / 100;
+        return this.totalAmount - discountAmount;
+      }
+      return this.totalAmount;
+    }
+    
+  
     
     updateTotalAmountWithDiscount() {
       const totalAmount = this.calculateTotalAmount();
