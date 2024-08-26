@@ -210,7 +210,7 @@
             <br>
             <div class="payment-section-footer" *ngIf="filteredOrders.length > 0">
               <h4>Số tiền phải thu: {{ totalAmountDue() | currencyFormat }}</h4>
-              <button type="button" class="btn btn-primary" (click)="prepareCollectAllModal(); openModal()">
+              <button type="button" class="btn btn-primary" (click)="prepareCollectAllModal(); openModal()" *ngIf="selectedEmployee">
                 Thu tất cả
               </button>
             </div>
@@ -273,23 +273,26 @@
   </div>
 </div>
 
+
 <!-- Modal Thu Tất Cả -->
-<div #collectAllModal class="modal fade" tabindex="-1" aria-labelledby="collectAllModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="collectAllModalLabel">Xác nhận thu tất cả</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal()"></button>
+<div #collectAllModal class="modal-total fade" tabindex="-1" aria-labelledby="collectAllModalLabel" aria-hidden="true">
+  <div class="modal-dialog-total">
+      <div class="modal-content-total">
+          <div class="modal-header-total">
+              <h5 class="modal-title-total" id="collectAllModalLabel">Xác nhận thu tất cả</h5>
+              <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+          </div>
+          <div class="modal-body-total">
+              <p class="confirmation-text">
+                  Nhân viên giao hàng: <span class="employee-name">{{ selectedEmployeeName }}</span><br>
+                  Tổng số tiền phải thu: <span class="total-amount">{{ totalAmountDue() | currencyFormat }}</span>
+              </p>
+          </div>
+          <div class="modal-footer-total">
+              <button type="button" class="btn btn-secondary" (click)="closeModal()">Hủy</button>
+              <button type="button" class="btn btn-primary" (click)="collectAllPayments()">Xác nhận</button>
+          </div>
       </div>
-      <div class="modal-body">
-        <p>Nhân viên giao hàng: {{ selectedEmployeeName }}</p>
-        <p>Tổng số tiền phải thu: {{ totalAmountDue() | currencyFormat }}</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Hủy</button>
-        <button type="button" class="btn btn-primary" (click)="collectAllPayments()">Xác nhận</button>
-      </div>
-    </div>
   </div>
 </div>
 <!-- Popup for item details -->

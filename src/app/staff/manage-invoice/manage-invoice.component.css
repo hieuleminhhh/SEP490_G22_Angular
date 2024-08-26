@@ -563,54 +563,98 @@ body {
   font-size: 24px;
   font-weight: bold;
 }
-/* Đảm bảo modal backdrop phủ toàn bộ màn hình */
-#collectAllModal {
-  background-color: rgba(0, 0, 0, 0.5); /* Màu nền đen trong suốt */
-  z-index: 1150; /* Đặt z-index cao hơn để đảm bảo modal hiển thị trên các phần tử khác */
+/* Modal Styling */
+.modal-total {
+  display: none; /* Ẩn modal theo mặc định */
+  position: fixed; /* Đặt modal ở vị trí cố định */
+  z-index: 1050; /* Đảm bảo modal ở trên cùng */
+  left: 0;
+  top: 0;
+  width: 100%; /* Mở rộng toàn bộ chiều rộng */
+  height: 100%; /* Mở rộng toàn bộ chiều cao */
+  overflow: hidden; /* Ẩn các phần thừa */
+  background-color: rgba(0, 0, 0, 0.5); /* Màu nền tối với độ trong suốt */
 }
 
-/* Căn giữa modal dialog */
-#collectAllModal .modal-dialog {
-  max-width: 500px; /* Đặt chiều rộng tối đa cho modal */
-  margin: auto; /* Tự động căn giữa */
-  top: 50%; /* Đặt vị trí từ trên xuống */
-  transform: translateY(-50%); /* Căn giữa theo chiều dọc */
+/* Modal Dialog */
+.modal-dialog-total {
+  position: relative; /* Đặt modal ở vị trí tương đối */
+  margin: 1.75rem auto; /* Căn giữa modal */
+  max-width: 500px; /* Chiều rộng tối đa của modal */
 }
 
-/* Thiết kế nội dung modal */
-#collectAllModal .modal-content {
-  border-radius: 8px; /* Bo tròn các góc của modal */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Đổ bóng cho modal */
+/* Modal Content */
+.modal-content-total {
+  background-color: #fff; /* Màu nền trắng */
+  border: 1px solid #dee2e6; /* Đường viền màu xám */
+  border-radius: 0.3rem; /* Bo góc */
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); /* Đổ bóng */
 }
 
-/* Tùy chỉnh tiêu đề modal */
-#collectAllModal .modal-header {
-  border-bottom: none; /* Bỏ đường viền bên dưới tiêu đề */
-  background-color: #f8f9fa; /* Màu nền sáng cho tiêu đề */
+/* Modal Header */
+.modal-header-total {
+  display: flex; /* Sử dụng flexbox để căn giữa nội dung */
+  justify-content: space-between; /* Tách biệt tiêu đề và nút đóng */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  padding: 1rem; /* Padding cho phần đầu modal */
+  border-bottom: 1px solid #dee2e6; /* Đường viền dưới */
 }
 
-/* Tùy chỉnh các nút trong modal */
-#collectAllModal .modal-footer {
-  justify-content: space-between; /* Giữa khoảng cách giữa các nút */
+/* Modal Title */
+.modal-title-total {
+  font-size: 1.25rem; /* Kích thước chữ tiêu đề */
+  font-weight: 500; /* Đậm chữ */
 }
 
-/* Hiệu ứng hover cho các nút */
-#collectAllModal .btn {
-  transition: background-color 0.2s; /* Hiệu ứng chuyển màu nền khi hover */
+/* Modal Body */
+.modal-body-total {
+  padding: 1rem; /* Padding cho nội dung modal */
+}
+
+/* Modal Footer */
+.modal-footer-total {
+  display: flex; /* Sử dụng flexbox để căn giữa nút */
+  justify-content: flex-end; /* Đẩy các nút về bên phải */
+  padding: 1rem; /* Padding cho phần chân modal */
+}
+
+/* Button Styling */
+.btn {
+  padding: 0.5rem 1rem; /* Padding cho nút */
+  border-radius: 0.3rem; /* Bo góc cho nút */
+  font-size: 1rem; /* Kích thước chữ nút */
 }
 
 /* Nút hủy */
-#collectAllModal .btn-secondary {
-  background-color: #6c757d; /* Màu xám */
+.btn-secondary {
+  background-color: #6c757d; /* Màu nền xám */
+  color: #fff; /* Màu chữ trắng */
 }
 
 /* Nút xác nhận */
-#collectAllModal .btn-primary {
-  background-color: #007bff; /* Màu xanh dương */
+.btn-primary {
+  background-color: #007bff; /* Màu nền xanh dương */
+  color: #fff; /* Màu chữ trắng */
 }
 
 /* Hiệu ứng hover cho nút */
-#collectAllModal .btn-secondary:hover,
-#collectAllModal .btn-primary:hover {
-  opacity: 0.8; /* Làm mờ màu nền khi hover */
+.btn:hover {
+  opacity: 0.8; /* Giảm độ trong suốt khi hover */
+}
+
+/* Style cho văn bản xác nhận */
+.confirmation-text {
+  font-size: 1rem; /* Kích thước chữ */
+  line-height: 1.5; /* Khoảng cách dòng */
+}
+
+/* Tên nhân viên */
+.employee-name {
+  font-weight: bold; /* Đậm chữ */
+}
+
+/* Tổng số tiền */
+.total-amount {
+  font-weight: bold; /* Đậm chữ */
+  color: #28a745; /* Màu xanh lá cho số tiền */
 }

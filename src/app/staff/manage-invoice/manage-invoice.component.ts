@@ -113,63 +113,67 @@ export class ManageInvoiceComponent implements OnInit {
   totalAmountDue(): number {
     // Tổng số tiền sẽ dựa trên danh sách đã lọc
     return this.filteredOrders.reduce((total, order) => total + (order.totalPaid || 0), 0);
-  }
+}
 
-  getEmployees(): void {
+getEmployees(): void {
     // Giả định bạn có một service để lấy danh sách nhân viên từ server
     this.cookingService.getShipStaff().subscribe(
-      response => {
-        this.employees = response;
-        console.log(this.employees);
-      },
-      error => {
-        console.error('Error:', error);
-      }
+        response => {
+            this.employees = response;
+            console.log(this.employees);
+        },
+        error => {
+            console.error('Error:', error);
+        }
     );
-  }
-  prepareCollectAllModal(): void {
+}
+
+prepareCollectAllModal(): void {
     const selectedEmployee = this.employees.find(emp => emp.accountId === Number(this.selectedEmployee));
     if (selectedEmployee) {
-      this.selectedEmployeeName = `${selectedEmployee.firstName} ${selectedEmployee.lastName}`;
-    }
-  }
+        this.selectedEmployeeName = `${selectedEmployee.firstName} ${selectedEmployee.lastName}`;
+        console.log(this.selectedEmployeeName);
 
-  // Mở modal
-  openModal(): void {
+    }
+}
+
+// Mở modal
+openModal(): void {
     const modal = this.collectAllModal.nativeElement;
     modal.classList.add('show');
     modal.style.display = 'block';
     modal.setAttribute('aria-modal', 'true');
     modal.removeAttribute('aria-hidden');
-  }
+}
 
-  // Đóng modal
-  closeModal(): void {
+// Đóng modal
+closeModal(): void {
     const modal = this.collectAllModal.nativeElement;
     modal.classList.remove('show');
     modal.style.display = 'none';
     modal.setAttribute('aria-hidden', 'true');
     modal.removeAttribute('aria-modal');
-  }
+}
 
-  // Xác nhận thu tất cả
-  collectAllPayments(): void {
+// Xác nhận thu tất cả
+collectAllPayments(): void {
     const updatePromises = this.filteredOrders.map(order =>
-      new Promise<void>((resolve, reject) => {
-        this.update(order.orderId, order.totalPaid);
-        resolve(); // Hoàn tất promise ngay lập tức (có thể thêm logic kiểm tra ở đây)
-      })
+        new Promise<void>((resolve, reject) => {
+            this.update(order.orderId, order.totalPaid);
+            resolve(); // Hoàn tất promise ngay lập tức (có thể thêm logic kiểm tra ở đây)
+        })
     );
 
     Promise.all(updatePromises)
-      .then(() => {
-        this.closeModal(); // Đóng modal sau khi cập nhật xong
-        window.location.reload(); // Làm mới trang sau khi thu tiền
-      })
-      .catch(error => {
-        console.error('Error collecting payments:', error);
-      });
-  }
+        .then(() => {
+            this.closeModal(); // Đóng modal sau khi cập nhật xong
+            window.location.reload(); // Làm mới trang sau khi thu tiền
+        })
+        .catch(error => {
+            console.error('Error collecting payments:', error);
+        });
+}
+
   update(id: number, totalPaid: number): void {
     const request = {
       paymentAmount: totalPaid
