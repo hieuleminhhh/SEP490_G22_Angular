@@ -325,7 +325,6 @@ export class TableManagementComponent implements OnInit {
       next: response => {
         console.log(response);
         this.getReservationData();
-        window.location.reload();
       },
       error: error => {
         if (error.error instanceof ErrorEvent) {

@@ -302,7 +302,7 @@
                       <td>{{ item.itemName || item.comboName }}</td>
                       <td>{{ item.quantity }}</td>
                       <td>{{ item.itemPrice || item.comboPrice | currencyFormat }}</td>
-                      <td>{{ (item.quantity * item.unitPrice) | currencyFormat }}</td>
+                      <td>{{ item.unitPrice | currencyFormat }}</td>
                     </tr>
                   </tbody>
                 </table>
