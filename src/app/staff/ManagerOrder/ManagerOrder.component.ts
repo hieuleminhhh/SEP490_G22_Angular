@@ -74,7 +74,7 @@ export class ManagerOrderComponent implements OnInit {
   dishesServed: number = 0;
   totalQuantity: number = 0;
   cancelationReason: string = '';
-
+depositOrder:any;
   constructor(
     private orderService: ManagerOrderService,
     private orderDetailService: ManagerOrderDetailService,
@@ -162,6 +162,7 @@ export class ManagerOrderComponent implements OnInit {
         orderDetail.orderDetails.forEach((detail) => {
           console.log('Dishes Served:', detail.dishesServed);
           console.log('Quantity:', detail.quantity);
+
           totalDishesServed += detail.dishesServed; // No need for parseInt
           totalQuantity += detail.quantity; // No need for parseInt
         });
@@ -174,6 +175,9 @@ export class ManagerOrderComponent implements OnInit {
         this.totalQuantity = totalQuantity;
 
         console.log('Fetched order detail:', this.orderDetail);
+
+        console.log(this.orderDetail.deposits);
+        this.depositOrder = this.orderDetail.deposits;
         console.log('Tables:', this.tables);
         console.log('Table ID:', this.tableId); // Logging the tableId
       },
@@ -835,32 +839,57 @@ export class ManagerOrderComponent implements OnInit {
   }
 
   acceptOrder(orderId: number | undefined): void {
-    if (orderId !== undefined) {
-      const data = {
-        paymentAmount: 0,
-        taxcode: "string",
-        accountId: 0,
-        amountReceived: 0,
-        returnAmount: 0,
-        paymentMethods: 2,
-        description: "string"
-      };
+    if(orderId){
+      this.loadListOrderDetails(orderId);
+      if(this.depositOrder>0){
+        const data = {
+          paymentAmount: 0,
+          taxcode: "string",
+          accountId: 0,
+          amountReceived: 0,
+          returnAmount: 0,
+          paymentMethods: 1,
+          description: "string"
+        };
 
-      this.orderService.AcceptOrderWaiting(orderId, data).subscribe(
-        response => {
-          window.location.reload();
-          console.log('Order accepted successfully:', response);
+        this.orderService.AcceptOrderWaiting(orderId, data).subscribe(
+          response => {
+            window.location.reload();
+            console.log('Order accepted successfully:', response);
+          },
+          error => {
+            console.error('Error accepting order:', error);
+            // Xử lý khi gọi API thất bại, ví dụ: hiển thị thông báo lỗi
+          }
+        );
+      }else{
+        const data = {
+          paymentAmount: 0,
+          taxcode: "string",
+          accountId: 0,
+          amountReceived: 0,
+          returnAmount: 0,
+          paymentMethods: 2,
+          description: "string"
+        };
 
-        },
-        error => {
-          console.error('Error accepting order:', error);
-          // Xử lý khi gọi API thất bại, ví dụ: hiển thị thông báo lỗi
-        }
-      );
-    } else {
-      console.error('Order ID is undefined');
-      // Xử lý khi `orderId` không xác định
+        this.orderService.AcceptOrderWaiting(orderId, data).subscribe(
+          response => {
+            window.location.reload();
+            console.log('Order accepted successfully:', response);
+
+          },
+          error => {
+            console.error('Error accepting order:', error);
+            // Xử lý khi gọi API thất bại, ví dụ: hiển thị thông báo lỗi
+          }
+        );
+      }
     }
+
+
+
+
   }
 
   getAccountDetails(accountId: number): void {

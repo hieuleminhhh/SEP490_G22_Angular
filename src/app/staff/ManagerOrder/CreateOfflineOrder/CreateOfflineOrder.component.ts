@@ -545,7 +545,7 @@ export class CreateOfflineOrderComponent implements OnInit {
       note: "",
       addressId: this.reservationData?.addressId,
       discountId: this.selectedDiscount,
-      type: 4,
+      type: 3,
       status: 3,
       accountId: this.accountId,
       orderDetails: orderDetails
