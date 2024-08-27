@@ -149,7 +149,7 @@
                       <a (click)="openPopup(reservation.reservationId)">Xếp bàn</a>
                       <a (click)="deleteTable(reservation.reservationId, reservation.tableOfReservation)">Thay đổi
                         bàn</a>
-                      <a data-bs-toggle="modal" data-bs-target="#confirmationModal">Hủy đặt bàn</a>
+                      <a (click)="updateStatusReservation(reservation.reservationId)">Hủy đặt bàn</a>
                     </div>
                   </div>
                 </div>
@@ -184,32 +184,9 @@
               <i class="fas fa-arrow-right"></i> <!-- Icon mũi tên phải -->
             </button>
           </div>
+        </div>
+      </div>
 
-        </div>
-      </div>
-      <!-- Confirmation Modal -->
-      <div class="modal-cf fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog-cf">
-          <div class="modal-content-cf" *ngFor="let reservation of dataReservationAccept; let i = index">
-            <div class="modal-header-cf">
-              <h5 class="modal-title-cf" id="confirmationModalLabel">Xác nhận</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body-cf">
-              <p class="confirmation-text">
-                Xác nhận hủy đơn đặt bàn?<br>
-              </p>
-            </div>
-            <div class="modal-footer-cf">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invoiceModal"
-                (click)="updateStatusReservation(reservation.reservationId)">Xác
-                nhận</button>
-            </div>
-          </div>
-        </div>
-      </div>
       <!-- Main Modal -->
       <div class="modal fade" id="updateTimeModal" tabindex="-1" role="dialog" aria-labelledby="updateTimeModalLabel"
         aria-hidden="true">
@@ -322,6 +299,7 @@
                   <th>Trạng thái đơn</th>
                   <th></th>
                   <th></th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody *ngFor="let reservation of dataReservationPending">
@@ -334,12 +312,16 @@
                     <td>{{reservation.deposits | currencyFormat}}</td>
                     <td><span [ngClass]="getStatusLabel(reservation.status).class" class="status-label">{{
                         getStatusLabel(reservation.status).label }}</span></td>
+                        <td>
+                          <button type="button" class="btn btn-primary btn-sm"
+                            (click)="getReservationById(reservation.reservationId)">Chi tiết</button>
+                        </td>
                     <td><button type="button" class="btn btn-primary btn-sm" style="background-color: green;"
                         (click)="updateStatusReservationById(reservation.reservationId, 2)">Nhận đơn</button></td>
-                    <td>
-                      <button type="button" class="btn btn-primary btn-sm"
-                        (click)="getReservationById(reservation.reservationId)">Chi tiết</button>
-                    </td>
+                        <td>
+                          <button type="button" class="btn btn-primary btn-sm" style="background-color: red;"
+                            (click)="updateStatusReservation(reservation.reservationId)">Hủy đơn</button>
+                        </td>
                   </tr>
                 </ng-container>
               </tbody>
