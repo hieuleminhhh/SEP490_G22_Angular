@@ -81,6 +81,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
   accountId: number | null = null;
   account: any;
   showSidebar: boolean = true;
+  orderIdForUpdate: any;
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute, private dishService: ManagerDishService,
     private comboService: ManagerComboService, private orderDetailService: ManagerOrderDetailService, private invoiceService: InvoiceService, private discountService: DiscountService,
     private checkoutService: CheckoutService, private accountService: AccountService) { }
@@ -329,14 +330,14 @@ export class UpdateOfflineOrderComponent implements OnInit {
       this.totalAmountAfterDiscount = 0;
       return;
     }
-  
+
     // Calculate the total amount considering the discounted price for each item
     this.totalAmount = this.selectedItems.reduce((acc, item) => {
       const itemPrice = item.discountedPrice ? item.discountedPrice : item.price;
       return acc + (itemPrice * item.quantity);
     }, 0);
     console.log("Total Amount Before Discount:", this.totalAmount);
-  
+
     // Ensure the overall discount percentage is a valid number
     const discountPercent = this.selectedDiscountPercent || 0;
     console.log("Discount Percent:", discountPercent);
@@ -349,11 +350,11 @@ export class UpdateOfflineOrderComponent implements OnInit {
       const itemPrice = item.discountedPrice ? item.discountedPrice : item.price;
       return acc + (itemPrice * item.quantity);
     }, 0);
-  
+
     // Sau khi tính tổng số tiền, tiếp tục tính toán tổng số tiền sau khi áp dụng khuyến mãi
     this.calculateTotalAmountAfterDiscount();
   }
-  
+
   calculateTotalAmountAfterDiscount(): void {
     if (this.selectedDiscount && this.selectedDiscount.percent > 0) {
       // Tính toán số tiền khuyến mãi
@@ -365,14 +366,14 @@ export class UpdateOfflineOrderComponent implements OnInit {
       this.totalAmountAfterDiscount = this.totalAmount;
     }
   }
-  
+
   calculateDiscountAmount(): number {
     if (this.selectedDiscountPercent && this.totalAmount) {
       return (this.totalAmount * this.selectedDiscountPercent) / 100;
     }
     return 0;
   }
-  
+
 
 
   clearSelectedDiscount() {
@@ -464,7 +465,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
       response => {
         console.log('Offline order updated successfully:', response);
         this.successMessage = 'Offline order updated successfully!';
-
+        this.updateOrderDetail(this.orderIdForUpdate);
         // Clear newlyAddedItems after successful update
         this.newlyAddedItems = [];
 
@@ -487,11 +488,27 @@ export class UpdateOfflineOrderComponent implements OnInit {
       }
     );
   }
+  updateOrderDetail(orderId: number) {
+    console.log(orderId);
+
+    this.orderService.updateOrderDetail(orderId).subscribe(
+      response => {
+        console.log(response);
+      },
+      (error: HttpErrorResponse) => {
+        console.error('Error updating offline order:', error);
+      }
+    );
+  }
 
   loadListOrderByTable(tableId: number): void {
     console.log('Loading orders for table ID:', tableId);
     this.orderService.getOrdersByTableId(tableId).subscribe(
       (response: any) => {
+        this.orderIdForUpdate = response.data.orderId;
+        console.log(this.orderIdForUpdate);
+
+
         if (response && response.data && response.data.orderDetails && response.data.orderDetails.length > 0) {
           this.selectedItems = response.data.orderDetails.map((orderItem: any) => {
             if (orderItem) {
@@ -499,7 +516,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
               let nameCombo = orderItem.combo?.nameCombo ?? '';
               const unitPrice = orderItem.dish?.discountedPrice ?? orderItem.dish?.price ?? orderItem.combo?.discountedPrice ?? orderItem.combo?.price ?? 0;
               const totalPrice = unitPrice * orderItem.quantity;
-  
+
               return {
                 orderDetailId: orderItem.orderDetailId,
                 dishId: orderItem.dishId,
@@ -519,7 +536,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
               return null;
             }
           }).filter((item: SelectedItem | null): item is SelectedItem => item !== null);
-  
+
           // Cập nhật thông tin khách hàng
           this.selectedOrder = {
             guestName: response.data.consigneeName,
@@ -529,7 +546,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
           this.orderId = response.data.orderId;
           this.LoadActiveDiscountByOrderID(this.orderId);
           console.log(428, this.orderId);
-  
+
           // Set total amount and discount
           this.totalAmount = response.data.totalAmount;
           this.totalAmountAfterDiscount = response.data.totalDiscount;
@@ -558,7 +575,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
       }
     );
   }
-  
+
 
 
   private parseDateString(dateStr: string): Date | null {

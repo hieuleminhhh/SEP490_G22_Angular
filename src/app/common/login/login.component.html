@@ -7,11 +7,6 @@
     <br>
     <label for="inputPassword" class="sr-only">Mật khẩu</label>
     <input type="password" [(ngModel)]="password" class="form-control" name="password" required>
-    <div class="checkbox mb-3">
-      <label>
-        <input type="checkbox" value="remember-me"> Ghi nhớ
-      </label>
-    </div>
     <button class="btn btn-lg btn-primary btn-block" type="submit">Đăng nhập</button>
     <!-- Suscess message display -->
     <div *ngIf="successMessage" class="alert alert-success mt-3">

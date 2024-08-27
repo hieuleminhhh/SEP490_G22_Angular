@@ -54,7 +54,10 @@ export class TableManagementComponent implements OnInit {
   dateFrom: string = '';
   dateTo: string = '';
   dateNow: string = '';
+  dateString: string = '';
   currentReservationId: number | undefined;
+  errorMessage: string = '';
+  errorMessages: { [key: number]: string } = {};
   constructor(private tableService: TableService, private reservationService: ReservationService, private router: Router) { }
 
   ngOnInit(): void {
@@ -62,6 +65,7 @@ export class TableManagementComponent implements OnInit {
     this.dateFrom = this.formatDate(today);
     this.dateTo = this.formatDate(today);
     this.dateNow = this.formatDate(today);
+    this.dateString = this.dateNow.toString();
     this.getTableData();
     this.searchTermSubject.pipe(debounceTime(300)).subscribe(searchTerm => {
       this.getSearchList();
@@ -189,6 +193,7 @@ export class TableManagementComponent implements OnInit {
         this.dataReservationAccept = [...this.dataReservationToday];
         this.filterOrdersByDate();
         console.log(response);
+        console.log(this.dateNow);
 
       },
       error => {
@@ -229,6 +234,7 @@ export class TableManagementComponent implements OnInit {
         this.getTableData();
         this.getReservation();
         this.getReservationData();
+        window.location.reload();
       },
       error => {
         console.error('Lỗi khi cập nhật trạng thái:', error);
@@ -320,6 +326,7 @@ export class TableManagementComponent implements OnInit {
       next: response => {
         console.log(response);
         this.getReservationData();
+        window.location.reload();
       },
       error: error => {
         if (error.error instanceof ErrorEvent) {
@@ -368,51 +375,83 @@ export class TableManagementComponent implements OnInit {
   }
 
 
-  updateReservationById(id: number, status: number, orderId: number | null): void {
-    this.reservationService.updateStatusReservation(id, status).pipe(
-      switchMap(response => {
-        // Update table status
-        return this.reservationService.updateStatusTable(id, 1);
-      }),
-      switchMap(response => {
-        // If orderId is provided, update the order status
-        if (orderId !== null) {
-          const status = { status: 3 };
-          return this.tableService.updateOrderStatus(orderId, status).pipe(
-            switchMap(response => {
-              // Create table order if orderId is provided
-              const tableIds = this.findTableIdsByReservationId(id);
-              const request = {
-                orderId: orderId,
-                tableIds: tableIds
-              };
-              return this.tableService.createTableOrder(request);
-            })
-          );
-        }
-        // If no orderId, just return an observable of null
-        return of(null);
-      })
-    ).subscribe(
-      response => {
-        console.log('Phản hồi từ API:', response);
-        this.getTableData();
-        this.getReservation();
-        this.getReservationData();
-        window.location.reload();
-      },
-      error => {
-        console.error('Lỗi khi cập nhật trạng thái:', error);
-        if (error.error && error.error.errors) {
-          console.error('Lỗi xác thực:', error.error.errors);
-        } else {
-          console.error('Thông tin lỗi:', error.message);
+  updateReservationById(id: number, status: number, orderId: number | null, reserTime: string, tableOfReservation: any, index: number): void {
+
+    if (tableOfReservation && tableOfReservation.length > 0) {
+      for (let i = 0; i < tableOfReservation.length; i++) {
+        const table = tableOfReservation[i];
+        const tableId = table.tableId;
+
+        // Gọi hàm checkTableStatus với tableId
+        this.checkTableStatus(tableId);
+
+        // Kiểm tra nếu this.status khác 0 thì dừng vòng lặp
+        if (this.status !== 0) {
+          console.log("Stopping the loop as status is not 0.");
+          break; // Dừng vòng lặp
         }
       }
-    );
-}
+    } else {
+      console.log("No tables to check.");
+    }
+
+    const date: string = reserTime.split('T')[0];
+    if (this.status === 0 && date === this.dateString) {
+      this.reservationService.updateStatusReservation(id, status).pipe(
+        switchMap(response => {
+          // Update table status
+          return this.reservationService.updateStatusTable(id, 1);
+        }),
+        switchMap(response => {
+          // If orderId is provided, update the order status
+          if (orderId !== null) {
+            const status = { status: 3 };
+            return this.tableService.updateOrderStatus(orderId, status).pipe(
+              switchMap(response => {
+                // Create table order if orderId is provided
+                const tableIds = this.findTableIdsByReservationId(id);
+                const request = {
+                  orderId: orderId,
+                  tableIds: tableIds
+                };
+                return this.tableService.createTableOrder(request);
+              })
+            );
+          }
+          // If no orderId, just return an observable of null
+          return of(null);
+        })
+      ).subscribe(
+        response => {
+          console.log('Phản hồi từ API:', response);
+          this.getTableData();
+          this.getReservation();
+          this.getReservationData();
+          window.location.reload();
+        },
+        error => {
+          console.error('Lỗi khi cập nhật trạng thái:', error);
+          if (error.error && error.error.errors) {
+            console.error('Lỗi xác thực:', error.error.errors);
+          } else {
+            console.error('Thông tin lỗi:', error.message);
+          }
+          // Cập nhật thông báo lỗi cụ thể với chỉ số
+          this.errorMessages[index] = 'Lỗi cập nhật trạng thái cho đặt chỗ ' + id + ': ' + (error.message || 'Có lỗi xảy ra');
+        }
+      );
+    } else {
+      this.errorMessages[index] = 'Không thể nhận bàn nhận bàn cho đặt chỗ ' ; // Thêm thông báo lỗi cụ thể với chỉ số
+      setTimeout(() => {
+        this.errorMessages[index] = ''; // Xóa thông báo
+      }, 3000);
+    }
+  }
 
 
+  updateErrorMessage(index: number, message: string) {
+    this.errorMessages[index] = message;
+  }
 
   findTableIdsByReservationId(reservationId: number): number[] {
     const reservation = this.dataReservationAccept.find((item: { reservationId: number; }) => item.reservationId === reservationId);
@@ -633,8 +672,37 @@ export class TableManagementComponent implements OnInit {
 
   //==================================================================================================================================
 
-  createReservation() {
-    this.setView('create-reservation');
+  status: number = 0;
+  checkTableStatus(id: number): void {
+    this.tableService.getTablesById(id).subscribe(
+      response => {
+        this.status = response.status;
+        console.log(id);
+
+
+      },
+      error => {
+
+      }
+    );
   }
+
+  async deleteTable(reserId: any, table: any[]) {
+    if (table && table.length > 0) {
+      for (const t of table) {
+        try {
+          const response = await this.tableService.deleteTables(reserId).toPromise();
+          console.log("Deleted successfully for table:", t);
+          window.location.reload();
+        } catch (error) {
+          console.error("Error deleting table:", t, error);
+
+        }
+      }
+    } else {
+      console.log("No tables to delete.");
+    }
+  }
+
 
 }

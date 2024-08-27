@@ -115,19 +115,17 @@
                   <span>{{ selectedDiscountName }} ({{ selectedDiscountPercent | percentage }})</span>
                   <br>
                 </div>
-                
+
                 <br>
                 <hr>
-                <div *ngIf="selectedItems.length > 0" class="mt-2">
+                <!-- <div *ngIf="selectedItems.length > 0" class="mt-2">
                   <strong>Tổng số tiền:</strong>
                   <span *ngIf="selectedDiscount === null">
                     {{ totalAmount | currencyFormat }}
                   </span>
 
-                  <span *ngIf="selectedDiscount !== null">
-                    {{ totalAmountAfterDiscount | currencyFormat }}
-                  </span>
-                </div>
+
+                </div> -->
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-2">
                   <button type="button" class="btn custom-btn-success btn-lg rounded-pill" data-bs-toggle="modal" data-bs-target="#confirmModal">
                     Lưu lại

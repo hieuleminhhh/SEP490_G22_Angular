@@ -56,6 +56,7 @@ export class CheckoutComponent implements OnInit {
     this.generateAvailableHours();
     console.log(today);
     console.log(this.date);
+    console.log(this.time);
 
 
   }

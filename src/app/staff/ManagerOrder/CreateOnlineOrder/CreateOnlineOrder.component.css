@@ -194,27 +194,27 @@ overflow: hidden; /* Prevents content overflow from affecting modal positioning 
 
 /* Style for the modal content */
 .modal-content-discount {
-background-color: #fefefe; /* Background color */
-padding: 20px;
-border: 1px solid #ccc; /* Border */
-height: 100%;
-max-height: 600px; /* Maximum height */
-width: 100%;
-max-width: 700px; /* Maximum width */
-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow */
-border-radius: 8px; /* Border radius */
-position: relative; /* To position the close button correctly */
-display: flex;
-flex-direction: column; /* Ensure proper layout */
+  background-color: #fefefe; /* Màu nền */
+  padding: 20px;
+  border: 1px solid #ccc; /* Viền */
+  width: 100%;
+  max-width: 700px; /* Chiều rộng tối đa */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng */
+  border-radius: 8px; /* Bo góc */
+  position: relative; /* Để định vị chính xác nút đóng */
+  display: flex;
+  flex-direction: column; /* Đảm bảo bố cục đúng */
+  max-height: 800px; /* Chiều cao tối đa của modal */
 }
 
-/* Style for the modal body */
+/* Style cho phần thân của modal */
 .modal-body-discount {
-flex: 1 1 auto; /* Take up remaining space */
-display: flex;
-flex-direction: column;
-overflow-y: auto; /* Add vertical scrolling if content overflows */
-padding: 15px; /* Optional: padding inside */
+  flex: 1 1 auto; /* Chiếm không gian còn lại */
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Thêm thanh cuộn dọc nếu nội dung tràn */
+  padding: 15px; /* Tùy chọn: thêm khoảng cách bên trong */
+  max-height: calc(800px - 60px); /* Đảm bảo phần body không vượt quá chiều cao của modal */
 }
 
 /* Optional: Style for modal header and footer if needed */
