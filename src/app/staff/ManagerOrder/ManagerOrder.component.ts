@@ -18,11 +18,11 @@ import { AccountService } from '../../../service/account.service';
 import { HeaderOrderStaffComponent } from "./HeaderOrderStaff/HeaderOrderStaff.component";
 
 @Component({
-    selector: 'app-ManagerOrder',
-    templateUrl: './ManagerOrder.component.html',
-    styleUrls: ['./ManagerOrder.component.css'],
-    standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe, HeaderOrderStaffComponent]
+  selector: 'app-ManagerOrder',
+  templateUrl: './ManagerOrder.component.html',
+  styleUrls: ['./ManagerOrder.component.css'],
+  standalone: true,
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe, HeaderOrderStaffComponent]
 })
 export class ManagerOrderComponent implements OnInit {
   orders: ListAllOrder[] = [];
@@ -74,15 +74,15 @@ export class ManagerOrderComponent implements OnInit {
   dishesServed: number = 0;
   totalQuantity: number = 0;
   cancelationReason: string = '';
-depositOrder:any;
+  depositOrder: any;
   constructor(
     private orderService: ManagerOrderService,
     private orderDetailService: ManagerOrderDetailService,
     private router: Router,
     private route: ActivatedRoute,
-    private invoiceService : InvoiceService,
+    private invoiceService: InvoiceService,
     private accountService: AccountService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.setDefaultDates();
@@ -145,6 +145,8 @@ depositOrder:any;
   }
 
   loadListOrderDetails(orderId: number) {
+    console.log(this.DiscountedTotalAmount());
+
     console.log('Loading details for Order ID:', orderId);
     this.orderDetailService.getOrderDetail(orderId).subscribe(
       (orderDetail: ListOrderDetailByOrder) => {
@@ -199,9 +201,10 @@ depositOrder:any;
   DiscountedTotalAmount(): number {
     if (this.orderDetail?.discountPercent && this.orderDetail.discountPercent > 0) {
       const discountAmount = (this.orderDetail.totalAmount * this.orderDetail.discountPercent) / 100;
-      return this.orderDetail.totalAmount - discountAmount;
+
+      return this.orderDetail.totalAmount - discountAmount - this.orderDetail?.deposits;
     }
-    return this.orderDetail?.totalAmount ?? 0;
+    return (this.orderDetail?.totalAmount ?? 0) - (this.orderDetail?.deposits ?? 0);
   }
 
 
@@ -620,29 +623,29 @@ depositOrder:any;
 
   CancelOrderReason(orderId: number | undefined) {
     if (orderId !== undefined) {
-        const cancelationReason = this.cancelationReason;
+      const cancelationReason = this.cancelationReason;
 
-        if (cancelationReason) {
-            const cancelationData = {
-                cancelationReason: cancelationReason
-            };
+      if (cancelationReason) {
+        const cancelationData = {
+          cancelationReason: cancelationReason
+        };
 
-            this.orderService.CancelOrder(orderId, cancelationData).subscribe(
-                response => {
-                    window.location.reload();
-                    console.log('Invoice status updated successfully:', response);
-                },
-                error => {
-                    console.error('Error updating invoice status:', error);
-                }
-            );
-        } else {
-            console.error('Cancelation reason is required');
-        }
+        this.orderService.CancelOrder(orderId, cancelationData).subscribe(
+          response => {
+            window.location.reload();
+            console.log('Invoice status updated successfully:', response);
+          },
+          error => {
+            console.error('Error updating invoice status:', error);
+          }
+        );
+      } else {
+        console.error('Cancelation reason is required');
+      }
     } else {
-        console.error('Order ID is undefined');
+      console.error('Order ID is undefined');
     }
-}
+  }
 
 
   getDiscountOrderAmount(): number {
@@ -755,7 +758,20 @@ depositOrder:any;
     }
   }
 
+  updateStatusReservation(id: number) {
+    const data = {
+      status: 4
+    }
+    this.invoiceService.updateStatusReservation(id, data).subscribe(
+      response => {
+        console.log(response);
 
+      },
+      error => {
+        console.error('Error updating order and invoice:', error);
+      }
+    );
+  }
 
   //Offline hoan thanh goi them mon
 
@@ -772,6 +788,7 @@ depositOrder:any;
         // Create a new invoice
         let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
         const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - this.DiscountedTotalAmount() : 0;
+
         const createData = {
           orderId: orderId,
           paymentTime: new Date().toISOString(),
@@ -790,6 +807,7 @@ depositOrder:any;
           response => {
             console.log('Invoice created successfully:', response);
             this.loadInvoice(orderId);
+            // this.updateStatusReservation();
             // Additional handling on success
           },
           error => {
@@ -839,9 +857,9 @@ depositOrder:any;
   }
 
   acceptOrder(orderId: number | undefined): void {
-    if(orderId){
+    if (orderId) {
       this.loadListOrderDetails(orderId);
-      if(this.depositOrder>0){
+      if (this.depositOrder > 0) {
         const data = {
           paymentAmount: 0,
           taxcode: "string",
@@ -862,7 +880,7 @@ depositOrder:any;
             // Xử lý khi gọi API thất bại, ví dụ: hiển thị thông báo lỗi
           }
         );
-      }else{
+      } else {
         const data = {
           paymentAmount: 0,
           taxcode: "string",

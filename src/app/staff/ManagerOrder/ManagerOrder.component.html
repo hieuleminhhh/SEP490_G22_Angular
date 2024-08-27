@@ -258,21 +258,21 @@
                           <span>{{ getDiscountOrderAmount() | currencyFormat }}</span>
                         </div>
                         <hr>
-                        <div class="d-flex justify-content-between">
+                        <!-- <div class="d-flex justify-content-between">
                           <span class="fw-bold">Tổng cộng:</span>
                           <span>{{ DiscountedTotalAmount() | currencyFormat }}</span>
-                        </div>
+                        </div> -->
                         <div *ngIf="orderDetail.deposits" class="d-flex justify-content-between">
                           <span class="fw-bold">Thanh toán trước:</span>
                           <span>{{ orderDetail.deposits | currencyFormat }}</span>
                         </div>
-                        <div *ngIf="orderDetail?.deposits && orderDetail?.status !== 4" class="d-flex justify-content-between">
+                        <div *ngIf="orderDetail?.status !== 4" class="d-flex justify-content-between">
                           <span class="fw-bold">Khách phải trả:</span>
-                          <span>{{ getAmountDue() | currencyFormat }}</span>
+                          <span>{{ DiscountedTotalAmount()| currencyFormat }}</span>
                         </div>
-                        <div *ngIf="orderDetail?.deposits && orderDetail?.status === 4" class="d-flex justify-content-between">
+                        <div *ngIf="orderDetail?.status === 4" class="d-flex justify-content-between">
                           <span class="fw-bold">Khách đã thanh toán:</span>
-                          <span>{{ getAmountDue() | currencyFormat }}</span>
+                          <span>{{ DiscountedTotalAmount() | currencyFormat }}</span>
                         </div>
                       </div>
 
@@ -394,8 +394,7 @@
         </div>
 
         <!-- Cancel Order Confirmation Modal -->
-        <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel"
-          aria-hidden="true">
+        <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
@@ -407,14 +406,13 @@
                 <div class="form-group">
                   <label for="cancelationReason">Lý do hủy đơn:</label>
                   <input type="text" id="cancelationReason" class="form-control" [(ngModel)]="cancelationReason"
-                    placeholder="Nhập lý do hủy đơn">
+                    placeholder="Nhập lý do hủy đơn" required>
                 </div>
               </div>
-
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
-                  (click)="CancelOrderReason(orderDetail?.orderId)">Xác nhận</button>
+                  (click)="CancelOrderReason(orderDetail?.orderId)" [disabled]="!cancelationReason">Xác nhận</button>
               </div>
             </div>
           </div>
@@ -538,7 +536,7 @@
           <!-- Thông tin hóa đơn -->
           <div class="mb-3">
             <label for="price" class="form-label">Tổng tiền phải trả:</label>
-            {{ getFinalAmountDue() | currencyFormat }}
+            {{ DiscountedTotalAmount() | currencyFormat }}
           </div>
           <!-- Template for  -->
           <div class="mb-3">
@@ -559,7 +557,7 @@
               required min="0" [ngModelOptions]="{ updateOn: 'blur' }">
 
             <!-- Error messages -->
-            <div *ngIf="customerPaid !== null && customerPaid < getFinalAmountDue()" class="text-danger">
+            <div *ngIf="customerPaid !== null && customerPaid < DiscountedTotalAmount()" class="text-danger">
               Số tiền khách trả phải lớn hơn hoặc bằng tổng số tiền phải trả.
             </div>
             <div *ngIf="customerPaid === null" class="text-danger">
@@ -736,7 +734,7 @@
           </div>
           <div class="mb-3">
             <label for="orderID" class="form-label">Mã hóa đơn: </label>
-            <span id="orderID">{{ invoice?.invoiceId || 'N/A' }}</span>
+            <span id="orderID"> {{ invoice?.invoiceId || 'N/A' }}</span>
           </div>
           <div class="mb-3" *ngIf="invoice.isUpdated; else editTemplate">
             <label for="customerName" class="form-label">Tên khách hàng:</label>
@@ -759,7 +757,7 @@
           </ng-template>
           <div class="mb-3">
             <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
-            <span id="orderDate">{{ invoice?.orderDate | dateFormat }}</span>
+            <span id="orderDate"> {{ invoice?.orderDate | dateFormat }}</span>
           </div>
           <div class="mb-3">
             <table id="items" class="table">
@@ -786,7 +784,7 @@
           </div>
           <div class="mb-3">
             <label for="totalOrder" class="form-label">Tiền hàng:</label>
-            <span id="totalOrder">{{ invoice?.totalAmount | currencyFormat }}</span>
+            <span id="totalOrder"> {{ invoice?.totalAmount | currencyFormat }}</span>
           </div>
           <div class="mb-3" *ngIf="invoice?.discountPercent && invoice.discountPercent > 0">
             <label for="discount" class="form-label">Khuyến mãi:</label>
@@ -796,29 +794,35 @@
           </div>
 
           <hr>
-          <div class="mb-3" *ngIf="invoice?.discountPercent && invoice.discountPercent > 0">
+          <!-- <div class="mb-3" *ngIf="invoice?.discountPercent && invoice.discountPercent > 0">
             <label for="totalAmount" class="form-label">Tổng tiền:</label>
             <span id="totalAmount">{{ invoice?.paymentAmount | currencyFormat }}</span>
-          </div>
-          <div class="mb-3" *ngIf="paymentMethod === '0' || paymentMethod === '1' && invoice?.deposites! == 0  " >
+          </div> -->
+          <div class="mb-3" *ngIf="(paymentMethod === '0' || paymentMethod === '1') && invoice?.deposits> 0" >
             <label for="prepay" class="form-label">Thanh toán trước:</label>
-            <span id="prepay">{{ invoice?.deposits | currencyFormat }}</span>
+            <span id="prepay"> {{ invoice?.deposits | currencyFormat }}</span>
           </div>
-          <div class="mb-3" *ngIf="paymentMethod === '0' || paymentMethod === '1' && invoice?.deposits !== 0">
+          <div class="mb-3" *ngIf="(paymentMethod === '0' || paymentMethod === '1') && invoice?.deposits> 0 && invoice?.paymentStatus===1">
             <label for="additionalPayment" class="form-label">Tiền khách phải trả thêm:</label>
             <span id="additionalPayment">
-              {{ (invoice?.paymentAmount - invoice?.deposits) | currencyFormat }}
+              {{ (invoice?.totalAmount -getDiscountInvoiceAmount()- invoice?.deposits) | currencyFormat }}
+            </span>
+          </div>
+          <div class="mb-3" *ngIf="(paymentMethod === '0' || paymentMethod === '1') && invoice?.deposits=== 0 && invoice?.paymentStatus===1">
+            <label for="additionalPayment" class="form-label">Tiền khách phải trả:</label>
+            <span id="additionalPayment">
+              {{ (invoice?.totalAmount -getDiscountInvoiceAmount()- invoice?.deposits) | currencyFormat }}
             </span>
           </div>
           <hr>
           <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
-            <span id="customerPaid">{{ invoice?.amountReceived | currencyFormat }}</span>
+            <span id="customerPaid"> {{ invoice?.amountReceived | currencyFormat }}</span>
           </div>
 
           <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="changeToGive" class="form-label">Trả lại:</label>
-            <span id="changeToGive">{{ invoice?.returnAmount | currencyFormat }}</span>
+            <span id="changeToGive"> {{ (invoice?.amountReceived- (invoice?.totalAmount -getDiscountInvoiceAmount()- invoice?.deposits))  | currencyFormat }}</span>
           </div>
           <div class="mb-3" *ngIf="paymentMethod === '1'">
             <label for="qrCodePrepay" class="form-label"></label>
