@@ -229,12 +229,11 @@ export class TableManagementComponent implements OnInit {
   }
 
   updateStatusReservation(id: number): void {
-    this.reservationService.updateStatusReservation(id, 4).subscribe(
+    this.reservationService.updateStatusReservation(id, 5).subscribe(
       response => {
         this.getTableData();
         this.getReservation();
         this.getReservationData();
-        window.location.reload();
       },
       error => {
         console.error('Lỗi khi cập nhật trạng thái:', error);
@@ -427,7 +426,6 @@ export class TableManagementComponent implements OnInit {
           this.getTableData();
           this.getReservation();
           this.getReservationData();
-          window.location.reload();
         },
         error => {
           console.error('Lỗi khi cập nhật trạng thái:', error);
@@ -441,7 +439,7 @@ export class TableManagementComponent implements OnInit {
         }
       );
     } else {
-      this.errorMessages[index] = 'Không thể nhận bàn nhận bàn cho đặt chỗ ' ; // Thêm thông báo lỗi cụ thể với chỉ số
+      this.errorMessages[index] = 'Không thể nhận bàn nhận bàn cho đặt chỗ '; // Thêm thông báo lỗi cụ thể với chỉ số
       setTimeout(() => {
         this.errorMessages[index] = ''; // Xóa thông báo
       }, 3000);
@@ -703,6 +701,5 @@ export class TableManagementComponent implements OnInit {
       console.log("No tables to delete.");
     }
   }
-
 
 }
