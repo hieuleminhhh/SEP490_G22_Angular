@@ -19,7 +19,7 @@
           <div *ngIf="successMessage" class="alert alert-success" style="max-width: 500px;">
             {{ successMessage }}</div>
 
-          <div class="row">
+          <div class="row" >
             <!-- Left column for address and cart details -->
             <div class="col-md-6">
               <!-- Address Selection -->
@@ -280,8 +280,8 @@
               </div>
 
               <!-- Dishes Section -->
-              <div class="dishes-section" *ngIf="showingDishes && dishes">
-                <div class="row">
+              <div class="dishes-section" *ngIf="showingDishes && dishes" style=" max-height: 400px;overflow-y: auto;">
+                <div class="row" >
                   <ng-container *ngFor="let list of dishes">
                     <div class="col-lg-4 col-md-6 mb-4" *ngFor="let dish of list.items">
                       <div class="card h-100 shadow-sm dish-card" (click)="addItem(dish)">

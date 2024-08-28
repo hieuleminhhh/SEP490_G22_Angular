@@ -30,7 +30,7 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
   otpMessage: string = '';
   filteredOrders: any;
   subscriptions: Subscription[] = [];
-  OTP:any;
+  OTP: string = '040902';
   constructor(
     private purchaseOrderService: PurchaseOrderService,
     private route: ActivatedRoute,

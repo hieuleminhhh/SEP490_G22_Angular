@@ -83,6 +83,8 @@
     background-color: #f8f9fa;
     padding: 20px;
     border-radius: 10px;
+    max-height: 400px; /* Đặt chiều cao tối đa */
+  overflow-y: auto;
   }
   .combos-section {
     background-color: #f8f9fa;

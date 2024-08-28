@@ -264,7 +264,7 @@ export class CreateOfflineOrderComponent implements OnInit {
   }
   loadListDishes(search: string = '', searchCategory: string = ''): void {
     console.log('Loading dishes with search term:', search);
-    this.dishService.ListDishes(this.currentPage, 6, search, searchCategory).subscribe(
+    this.dishService.ListDishes(this.currentPage, 100, search, searchCategory).subscribe(
       (response: ListAllDishes) => {
         if (response && response.items) {
           this.dishes = [response];
@@ -282,7 +282,7 @@ export class CreateOfflineOrderComponent implements OnInit {
 
   loadListCombo(search: string = ''): void {
     console.log('Loading combos with search term:', search);
-    this.comboService.ListCombo(this.currentPage, this.pageSize, search).subscribe(
+    this.comboService.ListCombo(this.currentPage, 100, search).subscribe(
       (response) => {
         if (response && response.items) {
           this.combo = [response];
