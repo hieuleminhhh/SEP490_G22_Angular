@@ -149,5 +149,12 @@ export class ReservationService {
     });
     return this.http.get(url, { headers });
   }
-  
+  updateOrderStatus(orderId: number, status: any): Observable<any> {
+    const url = `https://localhost:7188/api/orders/${orderId}/Updatestatus`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.put(url, status, { headers });
+  }
 }

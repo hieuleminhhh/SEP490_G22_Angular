@@ -295,3 +295,8 @@
     .row{
     padding-bottom: 10px;
     }
+    @media print {
+      .hide-print {
+        display: none !important;
+      }
+    }

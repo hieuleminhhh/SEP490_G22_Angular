@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 
 @Injectable({
@@ -11,7 +11,6 @@ export class PurchaseOrderService {
   constructor(private http: HttpClient) { }
 
   getOrders(phoneNumber: string): Observable<any> {
-    // Thêm số điện thoại vào URL API dưới dạng tham số truy vấn
     const urlWithPhoneNumber = `${this.apiUrl}?GuestPhone=${phoneNumber}`;
     return this.http.get<any>(urlWithPhoneNumber);
   }
@@ -21,5 +20,12 @@ export class PurchaseOrderService {
     return this.http.get<{ exists: boolean }>(url).pipe(
       map(response => response.exists)
     );
+  }
+  sendSms(): Observable<any> {
+    const apiUrl = 'https://localhost:7188/api/SendSMSAPI';
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    return this.http.post(apiUrl, { headers });
   }
 }

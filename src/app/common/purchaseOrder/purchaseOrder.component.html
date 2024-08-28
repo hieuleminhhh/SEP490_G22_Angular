@@ -1,22 +1,28 @@
 <div style="height: 500px;">
   <!-- Form nhập số điện thoại -->
   <form id="phoneForm" *ngIf="!showOtpForm && showPhoneForm" (ngSubmit)="onSubmitPhone()" class="phone-form">
-    <label for="phone">Phone Number:</label>
-    <input type="tel" id="phone" name="phone" [(ngModel)]="phoneNumber" placeholder="Enter your phone number" required>
+    <label for="phone">Số điện thoại:</label>
+    <input type="tel" id="phone" name="phone" [(ngModel)]="phoneNumber" placeholder="Nhập số điện thoại của bạn" required>
     <div class="button-container">
-      <button type="submit" class="send-otp-button">Send OTP</button>
+      <button type="submit" class="send-otp-button">Gửi mã OTP</button>
+    </div>
+    <div *ngIf="message" class="alert alert-warning">
+      {{ message }}
     </div>
   </form>
 
   <!-- Form nhập OTP -->
   <form id="otpForm" *ngIf="showOtpForm" (ngSubmit)="onSubmitOtp()">
     <label for="otp">OTP:</label>
-    <input type="text" id="otp" name="otp" [(ngModel)]="otp" placeholder="Enter the OTP" required>
+    <input type="text" id="otp" name="otp" [(ngModel)]="otp" placeholder="Nhập OTP" required>
     <div class="button-container" style="display: flex;">
       <button type="button" (click)="goBackToPhoneNumberForm()" class="back-button">
         <i class="fas fa-arrow-left"></i>
       </button>
-      <button type="submit" class="verify-button">Verify</button>
+      <button type="submit" class="verify-button">Tiếp tục</button>
+    </div>
+    <div *ngIf="otpMessage" class="alert alert-warning">
+      {{ otpMessage }}
     </div>
     <hr>
     <div *ngIf="showOtpForm && countdown > 0">

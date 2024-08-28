@@ -42,7 +42,7 @@ export class TableManagementComponent implements OnInit {
   reserId: number | undefined;
 
 
-  tabs: string[] = ['Tất cả', 'Chưa nhận bàn', 'Đã nhận bàn', 'Đã hủy', 'Đã hoàn thành'];
+  tabs: string[] = ['Tất cả',  '', 'Chưa nhận bàn','Đã nhận bàn', 'Đã hoàn thành','Đã hủy'];
   selectedIndex: number = 0;
   searchTerm: string = '';
   searchTermSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -234,6 +234,7 @@ export class TableManagementComponent implements OnInit {
         this.getTableData();
         this.getReservation();
         this.getReservationData();
+        this.getReservationId(id);
       },
       error => {
         console.error('Lỗi khi cập nhật trạng thái:', error);
@@ -243,6 +244,31 @@ export class TableManagementComponent implements OnInit {
       }
     );
   }
+
+  getReservationId(id: any) {
+    this.reservationService.getReservation(id).subscribe(
+      response => {
+        this.updateOrderStatus(response.data.order.orderId);
+      },
+      error => {
+        console.error('Error fetching invoice:', error);
+      }
+    );
+  }
+
+  updateOrderStatus(id: any) {
+    const data = {
+      status: 5
+    }
+    this.reservationService.updateOrderStatus(id, data).subscribe(
+      data => {
+      },
+      error => {
+        console.error('Error fetching invoice:', error);
+      }
+    );
+  }
+
 
   openPopup(reserId: number) {
     const modal = document.getElementById('updateTimeModal');
@@ -491,6 +517,8 @@ export class TableManagementComponent implements OnInit {
 
   getReservationList(): void {
     const status = this.selectedIndex > 0 ? this.selectedIndex : undefined;
+    console.log(status);
+
     this.reservationService.getReservationList(status).subscribe(
       response => {
         this.dataReservation = this.filterDataByStatus(response, this.selectedIndex);
