@@ -93,13 +93,14 @@ export class InvoiceService {
     return this.http.get<any>(url, this.getHttpOptions());
   }
 
-  updateStatusReservation(reservationId: number, status: any): Observable<any> {
-    const url = `https://localhost:7188/api/Reservations/${reservationId}/update-status`;
-    const payload = { status: status };
-    const token = this.authService.getToken();
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-    return this.http.put(url, payload, { headers });
+  updateOInvoice(body: any): Observable<any> {
+    const url = `https://localhost:7188/api/Invoice/update-invoice`;
+    return this.http.put(url, body, this.getHttpOptions());
   }
+
+  updateOStatusReser(body: any): Observable<any> {
+    const url = `https://localhost:7188/api/Reservations/update-reservation-status`;
+    return this.http.put(url, body, this.getHttpOptions());
+  }
+
 }

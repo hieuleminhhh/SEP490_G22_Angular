@@ -25,17 +25,18 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
   selectedTab: string = '-1';
   showPhoneForm: boolean = true;
   successMessages: string[] = [];
-
+  message: string = '';
   orders: any;
+  otpMessage: string = '';
   filteredOrders: any;
   subscriptions: Subscription[] = [];
-
+  OTP:any;
   constructor(
     private purchaseOrderService: PurchaseOrderService,
     private route: ActivatedRoute,
     private http: HttpClient,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.startCountdown();
@@ -58,8 +59,9 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
   }
 
   onSubmitPhone() {
+    this.message = ''; // Reset thông điệp trước khi kiểm tra
     if (!this.phonePattern.test(this.phoneNumber)) {
-      alert('Vui lòng nhập số điện thoại hợp lệ.');
+      this.message = 'Vui lòng nhập số điện thoại hợp lệ.';
       return;
     }
     const sub = this.purchaseOrderService.checkPhone(this.phoneNumber).subscribe(
@@ -69,17 +71,38 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
           console.log('Số điện thoại đã gửi:', this.phoneNumber);
           this.resetCountdown();
           this.showOtpForm = true;
+          this.sendSms();
         } else {
           console.error('Error during checkout: Phone does not exist');
-          alert('Không có dữ liệu của đơn hàng. Vui lòng kiểm tra lại số điện thoại.');
+          this.message = 'Không có dữ liệu của đơn hàng. Vui lòng kiểm tra lại số điện thoại.';
         }
       },
       error => {
         console.error('Error during checkout:', error);
-        alert('Không có dữ liệu của đơn hàng. Vui lòng kiểm tra lại số điện thoại.');
+        this.message = 'Không có dữ liệu của đơn hàng. Vui lòng kiểm tra lại số điện thoại.';
       }
     );
     this.subscriptions.push(sub);
+  }
+  sendSms() {
+    this.purchaseOrderService.sendSms().subscribe(
+      response => {
+        console.log('SMS sent successfully:', response);
+
+        // Trích xuất OTP từ body
+        const messageBody = response.body; // Lấy nội dung tin nhắn
+        const otpMatch = messageBody.match(/(\d{6})/); // Tìm số 6 chữ số trong body
+
+        if (otpMatch) {
+          this.OTP = otpMatch[0];
+        } else {
+          console.error('OTP not found in the message body.');
+        }
+      },
+      error => {
+        console.error('Error sending SMS:', error);
+      }
+    );
   }
 
   goBackToPhoneNumberForm() {
@@ -97,8 +120,9 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
   }
 
   onSubmitOtp() {
-    if (this.otp === '555555') {
-      this.successMessages.push('Nhập OTP hợp lệ.');
+    this.otpMessage = ''; // Reset thông điệp trước khi kiểm tra
+    if (this.otp === this.OTP) {
+      this.otpMessage = 'Nhập OTP hợp lệ.';
       this.handleCorrectOTP();
       const sub = this.purchaseOrderService.getOrders(this.phoneNumber).subscribe(
         response => {
@@ -108,15 +132,19 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
         },
         error => {
           console.error('Lỗi khi lấy dữ liệu đơn hàng:', error);
+          this.otpMessage = 'Lỗi khi lấy dữ liệu đơn hàng. Vui lòng thử lại.';
         }
       );
       this.subscriptions.push(sub);
     } else {
-      this.successMessages.push('Vui lòng nhập OTP hợp lệ.');
+      this.otpMessage = 'Vui lòng nhập OTP hợp lệ.';
     }
+
+    // Đặt timeout để xóa thông điệp sau 3 giây
     setTimeout(() => {
-      this.closeModal(this.successMessages.length - 1);
+      this.otpMessage = ''; // Reset thông điệp sau 3 giây
     }, 3000);
+
     console.log('OTP submitted:', this.otp);
   }
 
