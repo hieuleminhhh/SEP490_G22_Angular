@@ -1,13 +1,13 @@
 .image-container {
     position: relative;
   }
-  
+
   .card-img-top {
     object-fit: cover;
     height: 150px;
     width: 100%;
   }
-  
+
   .overlay {
     position: absolute;
     top: 0;
@@ -19,7 +19,7 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   .overlay-text {
     color: white;
     font-size: 18px;
@@ -83,6 +83,8 @@
     background-color: #f8f9fa;
     padding: 20px;
     border-radius: 10px;
+    max-height: 400px; /* Đặt chiều cao tối đa */
+  overflow-y: auto;
   }
   .combos-section {
     background-color: #f8f9fa;
@@ -95,12 +97,12 @@
   .dish-details {
     margin-bottom: 10px;
   }
-  
+
   .dish-name {
     font-size: 1.2em;
     font-weight: bold;
   }
-  
+
   .dish-price {
     font-size: 1em;
     color: #888;
@@ -108,12 +110,12 @@
   .combo-details {
     margin-bottom: 10px;
   }
-  
+
   .combo-name {
     font-size: 1.2em;
     font-weight: bold;
   }
-  
+
   .combo-price {
     font-size: 1em;
     color: #888;
@@ -125,7 +127,7 @@
   .input-group {
     position: relative;
   }
-  
+
   .dropdown-menu {
     position: absolute;
     top: 100%;
@@ -133,7 +135,7 @@
     right: 0;
     z-index: 1000; /* Ensure dropdown appears above other elements */
   }
-  
+
   .input-group .btn-outline-secondary {
     margin-left: 10px; /* Adjust margin to move the button away from the input */
   }
@@ -144,12 +146,12 @@
   .clickable-item {
     cursor: pointer; /* Change cursor to indicate that this part is clickable */
   }
-  
+
   /* Hide arrows in input number */
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 input[type=number] {
@@ -179,7 +181,7 @@ input.rounded-input {
   }
 }
 .modal-body {
-  max-height: 400px; 
+  max-height: 400px;
   overflow-y: auto;
 }
 /* Style for modal buttons */
