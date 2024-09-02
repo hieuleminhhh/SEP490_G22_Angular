@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { SidebarOrderComponent } from '../../SidebarOrder/SidebarOrder.component';
 import { ManagerDishService } from '../../../../service/managerdish.service';
@@ -164,7 +164,7 @@ export class CreateOnlineOrderComponent implements OnInit {
   }
   loadListDishes(search: string = '', searchCategory: string = ''): void {
     console.log('Loading dishes with search term:', search);
-    this.dishService.ListDishes(this.currentPage, this.pageSize, search, searchCategory).subscribe(
+    this.dishService.ListDishes(this.currentPage, 100, search, searchCategory).subscribe(
       (response: ListAllDishes) => {
         if (response && response.items) {
           this.dishes = [response];
@@ -182,7 +182,7 @@ export class CreateOnlineOrderComponent implements OnInit {
 
   loadListCombo(search: string = ''): void {
     console.log('Loading combos with search term:', search);
-    this.comboService.ListCombo(this.currentPage, this.pageSize, search).subscribe(
+    this.comboService.ListCombo(this.currentPage, 100, search).subscribe(
       (response) => {
         if (response && response.items) {
           this.combo = [response];
@@ -540,7 +540,24 @@ export class CreateOnlineOrderComponent implements OnInit {
     this.selectedDiscountName = '';
     this.selectedDiscountPercent = 0;
   }
+  transform(value: string | Date, format: string = 'dd/MM/yyyy HH:mm', locale: string = 'vi-VN'): string {
+    if (!value) return '';
 
+    let date: Date;
+    if (typeof value === 'string') {
+      date = new Date(value);
+      if (isNaN(date.getTime())) {
+        return value;
+      }
+    } else {
+      date = value;
+    }
+    return formatDate(date, format, locale);
+  }
+  formatDateForPrint(date: Date | string | null): string {
+    if (!date) return 'N/A';
+    return this.transform(date, 'dd/MM/yyyy HH:mm');
+  }
   printInvoice(): void {
     console.log('Invoice data before update:', this.invoice);
     if (this.invoice.invoiceId) {
@@ -623,7 +640,7 @@ export class CreateOnlineOrderComponent implements OnInit {
       </div>
       <div class="mb-3">
         <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
-        <span id="orderDate">${this.invoice?.orderDate}</span>
+        <span id="orderDate">${this.formatDateForPrint(this.invoice?.orderDate)}</span>
       </div>
       <div class="mb-3">
         <table class="table">
@@ -637,13 +654,13 @@ export class CreateOnlineOrderComponent implements OnInit {
             </tr>
           </thead>
           <tbody>
-            ${(this.invoice?.itemInvoice || []).map((item: any, i: number) => `
+            ${(this.invoice?.itemInvoice || []).map((item: ItemInvoice, i: number) => `
               <tr>
                 <td>${i + 1}</td>
                 <td>${item.itemName || item.nameCombo}</td>
                 <td>${item.quantity}</td>
-                <td>${item.unitPrice}</td>
-                <td>${item.price}</td>
+                <td>${item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
+                <td>${item.unitPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -651,23 +668,18 @@ export class CreateOnlineOrderComponent implements OnInit {
       </div>
       <div class="mb-3">
         <label for="totalOrder" class="form-label">Tiền hàng:</label>
-        <span id="totalOrder">${this.invoice?.totalAmount}</span>
+        <span id="totalOrder">${this.invoice?.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
       </div>
       <div class="mb-3">
-        <label for="discount" class="form-label">Giảm giá:</label>
-        <span id="discount">${this.invoice?.discountName || '0'} (${this.invoice?.discountPercent || '0'}%)</span>
+        <label for="discount" class="form-label">Khuyến mãi:</label>
+         <span id="discount">${this.getDiscountAmount().toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })} (${this.invoice?.discountPercent || '0'}%)</span>
       </div>
       <hr>
       <div class="mb-3">
         <label for="totalAmount" class="form-label">Tổng tiền:</label>
-        <span id="totalAmount">${this.invoice?.paymentAmount}</span>
-      </div>
-      <div class="mb-3">
-        <label for="amountToPay" class="form-label">Tiền thu của khách:</label>
-        <span id="amountToPay">${this.invoice?.paymentAmount}</span>
+        <span id="totalAmount">${this.invoice?.paymentAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
       </div>
     `);
-
       // Add footer
       printWindow?.document.write(`
       <div class="footer">

@@ -92,4 +92,15 @@ export class InvoiceService {
     const url = `https://localhost:7188/api/orders/order/export/cashier?exportorderIds=${request}`;
     return this.http.get<any>(url, this.getHttpOptions());
   }
+
+  updateOInvoice(body: any): Observable<any> {
+    const url = `https://localhost:7188/api/Invoice/update-invoice`;
+    return this.http.put(url, body, this.getHttpOptions());
+  }
+
+  updateOStatusReser(body: any): Observable<any> {
+    const url = `https://localhost:7188/api/Reservations/update-reservation-status`;
+    return this.http.put(url, body, this.getHttpOptions());
+  }
+
 }

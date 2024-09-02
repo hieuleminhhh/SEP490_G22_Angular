@@ -138,7 +138,8 @@
           Bạn muốn hoàn thành đơn hàng của khách hàng <span
             class="customer-name">{{orderShipper?.consigneeName}}</span><br>
           Số điện thoại: <span class="customer-phone">{{orderShipper?.guestPhone}}</span><br>
-          Số tiền: <span class="refund-amount">{{(orderShipper?.discountedPrice === 0?orderShipper?.totalAmount : orderShipper?.discountedPrice)| currencyFormat}}</span>
+          Số tiền: <span class="refund-amount">{{(orderShipper?.deposits === 0 ? orderShipper?.totalAmount :
+            orderShipper?.discountedPrice)| currencyFormat}}</span>
         </p>
       </div>
 
@@ -166,7 +167,8 @@
           Bạn có chắc chắn muốn hủy đơn hàng của khách hàng <span
             class="customer-name">{{orderShipper?.consigneeName}}</span>?<br>
           Số điện thoại: <span class="customer-phone">{{orderShipper?.guestPhone}}</span><br>
-          Tổng số tiền: <span class="refund-amount">{{(orderShipper?.discountedPrice === 0?orderShipper?.totalAmount : orderShipper?.discountedPrice)| currencyFormat}}</span>
+          Tổng số tiền: <span class="refund-amount">{{(orderShipper?.deposits === 0?orderShipper?.totalAmount :
+            orderShipper?.discountedPrice)| currencyFormat}}</span>
         </p>
       </div>
 

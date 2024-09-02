@@ -16,6 +16,7 @@ export interface CreateAccountDTO {
   role: string;
   address: string;
   phone: string;
+  isActive: boolean;
 }
 
 export interface UpdateAccountDTO {

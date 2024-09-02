@@ -35,9 +35,9 @@ export class ManageAccountComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       username: ['', Validators.required],
       password: ['', Validators.required],
-      role: ['Admin', Validators.required],
-      address: ['', Validators.required],
-      phone: ['', Validators.required],
+      role: ['', Validators.required],
+      address: [''],
+      phone: ['', [Validators.required, Validators.pattern(/^[0-9]{10,15}$/)]],
       isActive: [true]
     });
     this.loadAccounts();
@@ -65,24 +65,32 @@ export class ManageAccountComponent implements OnInit {
       error => this.errorMessage = 'Error fetching account details.'
     );
   }
-
-  createAccount(accountDTO: CreateAccountDTO) {
+  suscessM: any;
+  errorMessages: any = {};
+  createAccount(accountDTO: any) {
     this.accountService.createAccount(accountDTO).subscribe(
       newAccount => {
-        this.loadAccounts();
-        this.selectedAccount = null;
-        alert('Tạo tài khoản thành công');
+        console.log('Account created successfully', newAccount);
+        this.suscessM = ('Tạo tài khoản thành công');
+        globalThis.window.location.reload();
       },
-      error => this.errorMessage = 'Error creating account.'
+      error => {
+        this.errorMessages.general = 'Tạo tài khoản không thành công. Hãy thử lại.';
+        console.error('Error creating account', error);
+
+        // Clear the error message after 2 seconds
+        setTimeout(() => {
+          this.errorMessages.general = '';
+        }, 2000);
+      }
     );
   }
-
   updateAccount(id: number, accountDTO: UpdateAccountDTO) {
     this.accountService.updateAccount(id, accountDTO).subscribe(
       updatedAccount => {
         this.loadAccounts();
         this.selectedAccount = null;
-        alert('Account updated successfully.');
+        this.errorMessages.general = 'Tạo tài khoản không thành công. Hãy thử lại.';
       },
       error => this.errorMessage = 'Error updating account.'
     );
@@ -161,20 +169,12 @@ export class ManageAccountComponent implements OnInit {
       console.log('Invalid page number');
     }
   }
-  onSubmit(): void {
+  onSubmit() {
     if (this.accountForm.valid) {
-      const newAccount: CreateAccountDTO = this.accountForm.value;
-
-      this.accountService.createAccount(newAccount).subscribe({
-        next: (response: GetAccountDTO) => {
-          console.log('Account created successfully:', response);
-          // Handle successful account creation (e.g., show a success message, reset the form, etc.)
-        },
-        error: (error) => {
-          console.error('Error creating account:', error);
-          // Handle error (e.g., show an error message)
-        }
-      });
+      this.createAccount(this.accountForm.value);
+    } else {
+      // Handle form validation errors
+      console.log('Form is invalid');
     }
   }
 }

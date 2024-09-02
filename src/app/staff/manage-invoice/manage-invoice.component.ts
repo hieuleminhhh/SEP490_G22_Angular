@@ -114,6 +114,8 @@ export class ManageInvoiceComponent implements OnInit {
     this.invoiceService.getCancelOrder().subscribe(
       response => {
         this.orderCancel = response;
+        console.log(response);
+
       },
       error => {
         console.error('Error:', error);
@@ -266,7 +268,10 @@ export class ManageInvoiceComponent implements OnInit {
   getOrderShip(data: any) {
     this.orderShipper = data;
   }
-
+  orderCancelMoney: any;
+  getOrderCancel(data: any) {
+    this.orderCancelMoney = data;
+  }
   exportData(): void {
     this.getOrderExport();
   }

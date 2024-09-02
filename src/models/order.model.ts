@@ -22,6 +22,7 @@ export interface ManagerOrder {
   tableIds: ListTables[];
   invoiceId: number;
   totalAmount: number;
+  discountPercent:number;
   guestPhone:string;
   deposits:number;
   addressId: number;

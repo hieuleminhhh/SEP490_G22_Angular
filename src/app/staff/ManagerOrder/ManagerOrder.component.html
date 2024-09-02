@@ -29,14 +29,14 @@
           <!-- Select filters -->
           <div class="row mb-3">
 
-            <div class="col-md-3" >
+            <div class="col-md-3">
               <div class="input-group">
                 <label class="input-group-text" for="dateFrom">Từ ngày</label>
                 <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom" [max]="dateTo"
                   (change)="onDateFromChange()">
               </div>
             </div>
-            <div class="col-md-3" >
+            <div class="col-md-3">
               <div class="input-group">
                 <label class="input-group-text" for="dateTo">Đến ngày</label>
                 <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo" [max]="dateNow"
@@ -83,7 +83,7 @@
                   <td>{{ order.consigneeName || 'Khách lẻ' }}</td>
                   <td>{{ order.guestPhone || '------------' }}</td>
                   <td>{{ order.orderDate | dateFormat }}</td>
-                  <td>{{ order.totalAmount | currencyFormat }}</td>
+                  <td>{{ (order.totalAmount - (order.totalAmount * order.discountPercent /100) )| currencyFormat }}</td>
                   <td>
                     <span [ngStyle]="{'color': getStatusColor(order.status), 'font-weight': 'bold'}">
                       {{ getStatusText(order.status) }}
@@ -182,7 +182,8 @@
                   <div class="mb-3" *ngIf="orderDetail?.type === 2 || orderDetail?.type === 1">
                     <span class="fw-bold">Thời gian đặt hàng:</span> {{ orderDetail.orderDate | dateFormat }}
                   </div>
-                  <div class="mb-3" *ngIf="orderDetail.recevingOrder && (orderDetail?.type === 2 || orderDetail?.type === 1)">
+                  <div class="mb-3"
+                    *ngIf="orderDetail.recevingOrder && (orderDetail?.type === 2 || orderDetail?.type === 1)">
                     <span class="fw-bold">Thời gian giao hàng:</span> {{ orderDetail.recevingOrder | dateFormat }}
                   </div>
                   <div class="mb-3" *ngIf="orderDetail?.type === 4">
@@ -192,14 +193,14 @@
                     <span class="fw-bold">Thời gian ra:</span> {{ orderDetail.recevingOrder | dateFormat }}
                   </div>
                   <div *ngIf="orderDetail.paymentMethods !== null && orderDetail.paymentMethods !== undefined"
-                  class="mb-3">
-                  <span class="fw-bold">Phương thức thanh toán: </span>
-                  <ng-container [ngSwitch]="orderDetail.paymentMethods">
-                    <span *ngSwitchCase="0">Tiền mặt</span>
-                    <span *ngSwitchCase="1">Chuyển khoản ngân hàng</span>
-                    <span *ngSwitchCase="2">Thanh toán khi nhận hàng</span>
-                  </ng-container>
-                </div>
+                    class="mb-3">
+                    <span class="fw-bold">Phương thức thanh toán: </span>
+                    <ng-container [ngSwitch]="orderDetail.paymentMethods">
+                      <span *ngSwitchCase="0">Tiền mặt</span>
+                      <span *ngSwitchCase="1">Chuyển khoản ngân hàng</span>
+                      <span *ngSwitchCase="2">Thanh toán khi nhận hàng</span>
+                    </ng-container>
+                  </div>
 
 
                   <!-- <div class="mb-3">
@@ -258,35 +259,42 @@
                           <span>{{ getDiscountOrderAmount() | currencyFormat }}</span>
                         </div>
                         <hr>
-                        <div class="d-flex justify-content-between">
+                        <!-- <div class="d-flex justify-content-between">
                           <span class="fw-bold">Tổng cộng:</span>
                           <span>{{ DiscountedTotalAmount() | currencyFormat }}</span>
-                        </div>
+                        </div> -->
                         <div *ngIf="orderDetail.deposits" class="d-flex justify-content-between">
                           <span class="fw-bold">Thanh toán trước:</span>
                           <span>{{ orderDetail.deposits | currencyFormat }}</span>
                         </div>
-                        <div *ngIf="orderDetail?.deposits && orderDetail?.status !== 4" class="d-flex justify-content-between">
+                        <div *ngIf="orderDetail?.paymentStatus ===0" class="d-flex justify-content-between">
                           <span class="fw-bold">Khách phải trả:</span>
-                          <span>{{ getAmountDue() | currencyFormat }}</span>
+                          <span>{{ DiscountedTotalAmount()| currencyFormat }}</span>
                         </div>
-                        <div *ngIf="orderDetail?.deposits && orderDetail?.status === 4" class="d-flex justify-content-between">
+                        <div *ngIf="orderDetail?.paymentStatus ===1" class="d-flex justify-content-between">
                           <span class="fw-bold">Khách đã thanh toán:</span>
-                          <span>{{ getAmountDue() | currencyFormat }}</span>
+                          <span>{{ DiscountedTotalAmount() | currencyFormat }}</span>
                         </div>
                       </div>
 
                       <!-- Second Column -->
                       <div class="col-md-6 d-flex align-items-start justify-content-end">
                         <!-- Online -->
-                        <div *ngIf=" orderDetail.deposits === 0 && orderDetail.type ===2"
+                        <div *ngIf=" orderDetail.deposits === 0 && orderDetail.type ===2 && orderDetail.paymentStatus===0"
                           class="badge bg-danger ms-auto badge-circle">Chưa thanh toán
+                        </div>
+                        <div *ngIf=" orderDetail.deposits === 0 && orderDetail.type ===2 && orderDetail.paymentStatus===1"
+                          class="badge bg-success ms-auto badge-circle">Đã thanh toán
                         </div>
                         <div *ngIf=" orderDetail.deposits > 0 && orderDetail.type ===2"
                           class="badge bg-success ms-auto badge-circle">Đã thanh toán
                         </div>
                         <!-- Mang ve -->
-                        <div *ngIf="orderDetail.type === 1" class="badge bg-success ms-auto badge-circle">Đã thanh toán
+                        <div *ngIf="orderDetail.type === 1 && orderDetail.status!==5" class="badge bg-success ms-auto badge-circle">Đã thanh toán
+                        </div>
+                        <div *ngIf="orderDetail.type === 1 && orderDetail.status===5 && orderDetail.paymentStatus===0" class="badge bg-danger ms-auto badge-circle">Chưa thanh toán
+                        </div>
+                        <div *ngIf="orderDetail.type === 1 && orderDetail.status===5 && orderDetail.paymentStatus===1" class="badge bg-success ms-auto badge-circle">Đã thanh toán
                         </div>
                         <!-- Tại quan -->
                         <div
@@ -337,10 +345,6 @@
 
                   <!-- Mang ve -->
                   <ng-container *ngIf="orderDetail?.type === 1 && orderDetail?.status === 2">
-                    <button type="button" class="btn btn-success me-2" *ngIf="!orderDetail?.invoiceId"
-                      data-bs-toggle="modal" data-bs-target="#takeawaypaymentModal">
-                      Thanh toán
-                    </button>
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
                       data-bs-toggle="modal">Hủy đơn</button>
                   </ng-container>
@@ -407,14 +411,13 @@
                 <div class="form-group">
                   <label for="cancelationReason">Lý do hủy đơn:</label>
                   <input type="text" id="cancelationReason" class="form-control" [(ngModel)]="cancelationReason"
-                    placeholder="Nhập lý do hủy đơn">
+                    placeholder="Nhập lý do hủy đơn" required>
                 </div>
               </div>
-
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
-                  (click)="CancelOrderReason(orderDetail?.orderId)">Xác nhận</button>
+                  (click)="CancelOrderReason(orderDetail?.orderId)" [disabled]="!cancelationReason">Xác nhận</button>
               </div>
             </div>
           </div>
@@ -519,7 +522,8 @@
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModalOnline"
             (click)="CreateInvoiceOnline(orderDetail?.orderId)"
-            [disabled]="paymentMethod === '0' && (customerPaid === null || customerPaid < DiscountedTotalAmount())">Xác nhận</button>
+            [disabled]="paymentMethod === '0' && (customerPaid === null || customerPaid < DiscountedTotalAmount())">Xác
+            nhận</button>
         </div>
       </div>
     </div>
@@ -538,7 +542,7 @@
           <!-- Thông tin hóa đơn -->
           <div class="mb-3">
             <label for="price" class="form-label">Tổng tiền phải trả:</label>
-            {{ getFinalAmountDue() | currencyFormat }}
+            {{ DiscountedTotalAmount() | currencyFormat }}
           </div>
           <!-- Template for  -->
           <div class="mb-3">
@@ -559,7 +563,7 @@
               required min="0" [ngModelOptions]="{ updateOn: 'blur' }">
 
             <!-- Error messages -->
-            <div *ngIf="customerPaid !== null && customerPaid < getFinalAmountDue()" class="text-danger">
+            <div *ngIf="customerPaid !== null && customerPaid < DiscountedTotalAmount()" class="text-danger">
               Số tiền khách trả phải lớn hơn hoặc bằng tổng số tiền phải trả.
             </div>
             <div *ngIf="customerPaid === null" class="text-danger">
@@ -576,14 +580,9 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#cfpaymentModalOffline"
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModalOffline"
             (click)="SuscessfullOrderOffline(orderDetail?.orderId, orderDetail?.invoiceId)"
-            [disabled]="paymentMethod === '0' && (customerPaid === null || customerPaid < getFinalAmountDue())"
-          >
+            [disabled]="paymentMethod === '0' && (customerPaid === null || customerPaid < getFinalAmountDue())">
             Xác nhận
           </button>
         </div>
@@ -646,7 +645,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModalOffline"
-          [disabled]="paymentMethod === '0' && (customerPaid === null || customerPaid < DiscountedTotalAmount())"
+            [disabled]="paymentMethod === '0' && (customerPaid === null || customerPaid < DiscountedTotalAmount())"
             (click)="PrePayment(orderDetail?.orderId)">Xác nhận</button>
         </div>
       </div>
@@ -708,7 +707,8 @@
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#takepaymentModal"
             (click)="CreateInvoiceTakeAway(orderDetail?.orderId)"
-            [disabled]="paymentMethod === '0' && (customerPaid === null || customerPaid < DiscountedTotalAmount())">Xác nhận</button>
+            [disabled]="paymentMethod === '0' && (customerPaid === null || customerPaid < DiscountedTotalAmount())">Xác
+            nhận</button>
         </div>
       </div>
     </div>
@@ -730,19 +730,14 @@
             <h4 class="mt-2">Thanh toán thành công</h4>
           </div>
         </div>
-        <div class="modal-body">
+        <div class="modal-body2">
           <div class="modal-header d-flex justify-content-center align-items-center text-center">
             <h5 class="modal-title" id="paymentModalOfflineLabel">HÓA ĐƠN THANH TOÁN</h5>
           </div>
           <div class="mb-3">
             <label for="orderID" class="form-label">Mã hóa đơn: </label>
-            <span id="orderID">{{ invoice?.invoiceId || 'N/A' }}</span>
+            <span id="orderID"> {{ invoice?.invoiceId || 'N/A' }}</span>
           </div>
-          <div class="mb-3" *ngIf="invoice.isUpdated; else editTemplate">
-            <label for="customerName" class="form-label">Tên khách hàng:</label>
-            <span id="customerName">{{ invoice.consigneeName || 'Khách lẻ' }}</span>
-          </div>
-          <ng-template #editTemplate>
             <div class="mb-3">
               <label for="customerName" class="form-label">Tên khách hàng:</label>
               <input id="customerName" class="form-control" [(ngModel)]="invoice.consigneeName"
@@ -756,10 +751,9 @@
               <label for="address" class="form-label">Địa chỉ: </label>
               <input id="address" class="form-control" [(ngModel)]="invoice.address" placeholder="N/A" />
             </div>
-          </ng-template>
           <div class="mb-3">
             <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
-            <span id="orderDate">{{ invoice?.orderDate | dateFormat }}</span>
+            <span id="orderDate"> {{ invoice?.orderDate | dateFormat }}</span>
           </div>
           <div class="mb-3">
             <table id="items" class="table">
@@ -786,7 +780,7 @@
           </div>
           <div class="mb-3">
             <label for="totalOrder" class="form-label">Tiền hàng:</label>
-            <span id="totalOrder">{{ invoice?.totalAmount | currencyFormat }}</span>
+            <span id="totalOrder"> {{ invoice?.totalAmount | currencyFormat }}</span>
           </div>
           <div class="mb-3" *ngIf="invoice?.discountPercent && invoice.discountPercent > 0">
             <label for="discount" class="form-label">Khuyến mãi:</label>
@@ -796,29 +790,42 @@
           </div>
 
           <hr>
-          <div class="mb-3" *ngIf="invoice?.discountPercent && invoice.discountPercent > 0">
+          <!-- <div class="mb-3" *ngIf="invoice?.discountPercent && invoice.discountPercent > 0">
             <label for="totalAmount" class="form-label">Tổng tiền:</label>
             <span id="totalAmount">{{ invoice?.paymentAmount | currencyFormat }}</span>
-          </div>
-          <div class="mb-3" *ngIf="paymentMethod === '0' || paymentMethod === '1' && invoice?.deposites! == 0  " >
+          </div> -->
+          <div class="mb-3" *ngIf="(paymentMethod === '0' || paymentMethod === '1') && invoice?.deposits> 0">
             <label for="prepay" class="form-label">Thanh toán trước:</label>
-            <span id="prepay">{{ invoice?.deposits | currencyFormat }}</span>
+            <span id="prepay"> {{ invoice?.deposits | currencyFormat }}</span>
           </div>
-          <div class="mb-3" *ngIf="paymentMethod === '0' || paymentMethod === '1' && invoice?.deposits !== 0">
+          <div class="mb-3"
+            *ngIf="(paymentMethod === '0' || paymentMethod === '1') && invoice?.deposits> 0 && invoice?.paymentStatus===1">
             <label for="additionalPayment" class="form-label">Tiền khách phải trả thêm:</label>
             <span id="additionalPayment">
-              {{ (invoice?.paymentAmount - invoice?.deposits) | currencyFormat }}
+              {{ (invoice?.totalAmount -getDiscountInvoiceAmount()- invoice?.deposits) | currencyFormat }}
+            </span>
+          </div>
+          <div class="mb-3"
+            *ngIf="(paymentMethod === '0' || paymentMethod === '1') && invoice?.deposits=== 0 && invoice?.paymentStatus===1">
+            <label for="additionalPayment" class="form-label">Tiền khách phải trả:</label>
+            <span id="additionalPayment">
+              {{ (invoice?.totalAmount -getDiscountInvoiceAmount()- invoice?.deposits) | currencyFormat }}
             </span>
           </div>
           <hr>
           <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
-            <span id="customerPaid">{{ invoice?.amountReceived | currencyFormat }}</span>
+            <span id="customerPaid"> {{ invoice?.amountReceived | currencyFormat }}</span>
           </div>
 
-          <div class="mb-3" *ngIf="paymentMethod === '0'">
+          <div class="mb-3" *ngIf="paymentMethod === '0' && invoice?.paymentStatus===2">
             <label for="changeToGive" class="form-label">Trả lại:</label>
-            <span id="changeToGive">{{ invoice?.returnAmount | currencyFormat }}</span>
+            <span id="changeToGive"> {{ (invoice?.returnAmount) | currencyFormat }}</span>
+          </div>
+          <div class="mb-3" *ngIf="paymentMethod === '0' && invoice?.paymentStatus!==2">
+            <label for="changeToGive" class="form-label">Trả lại:</label>
+            <span id="changeToGive"> {{ (invoice?.amountReceived- (invoice?.totalAmount -getDiscountInvoiceAmount()-
+              invoice?.deposits)) | currencyFormat }}</span>
           </div>
           <div class="mb-3" *ngIf="paymentMethod === '1'">
             <label for="qrCodePrepay" class="form-label"></label>
@@ -828,8 +835,13 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="reloadPage()">Đóng</button>
-          <button type="button" class="btn btn-primary" (click)="printInvoice()">In hóa đơn</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+            (click)="reloadInvoice(invoice?.invoiceId,
+          invoice?.totalAmount - getDiscountInvoiceAmount() - invoice?.deposits + invoice?.deposits ,
+          invoice?.amountReceived - (invoice?.totalAmount - getDiscountInvoiceAmount() - invoice?.deposits))">Đóng</button>
+          <button type="button" class="btn btn-primary" (click)="printInvoiceOrder(invoice?.invoiceId,
+          invoice?.totalAmount - getDiscountInvoiceAmount() - invoice?.deposits + invoice?.deposits ,
+          invoice?.amountReceived - (invoice?.totalAmount - getDiscountInvoiceAmount() - invoice?.deposits))">In hóa đơn</button>
         </div>
       </div>
     </div>

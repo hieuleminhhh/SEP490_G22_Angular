@@ -18,11 +18,11 @@ import { AccountService } from '../../../service/account.service';
 import { HeaderOrderStaffComponent } from "./HeaderOrderStaff/HeaderOrderStaff.component";
 
 @Component({
-    selector: 'app-ManagerOrder',
-    templateUrl: './ManagerOrder.component.html',
-    styleUrls: ['./ManagerOrder.component.css'],
-    standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe, HeaderOrderStaffComponent]
+  selector: 'app-ManagerOrder',
+  templateUrl: './ManagerOrder.component.html',
+  styleUrls: ['./ManagerOrder.component.css'],
+  standalone: true,
+  imports: [RouterModule, CommonModule, FormsModule, SidebarOrderComponent, CurrencyFormatPipe, DateFormatPipe, PercentagePipe, HeaderOrderStaffComponent]
 })
 export class ManagerOrderComponent implements OnInit {
   orders: ListAllOrder[] = [];
@@ -74,15 +74,15 @@ export class ManagerOrderComponent implements OnInit {
   dishesServed: number = 0;
   totalQuantity: number = 0;
   cancelationReason: string = '';
-depositOrder:any;
+  depositOrder: any;
   constructor(
     private orderService: ManagerOrderService,
     private orderDetailService: ManagerOrderDetailService,
     private router: Router,
     private route: ActivatedRoute,
-    private invoiceService : InvoiceService,
+    private invoiceService: InvoiceService,
     private accountService: AccountService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.setDefaultDates();
@@ -145,6 +145,8 @@ depositOrder:any;
   }
 
   loadListOrderDetails(orderId: number) {
+    console.log(this.DiscountedTotalAmount());
+
     console.log('Loading details for Order ID:', orderId);
     this.orderDetailService.getOrderDetail(orderId).subscribe(
       (orderDetail: ListOrderDetailByOrder) => {
@@ -199,9 +201,10 @@ depositOrder:any;
   DiscountedTotalAmount(): number {
     if (this.orderDetail?.discountPercent && this.orderDetail.discountPercent > 0) {
       const discountAmount = (this.orderDetail.totalAmount * this.orderDetail.discountPercent) / 100;
-      return this.orderDetail.totalAmount - discountAmount;
+
+      return this.orderDetail.totalAmount - discountAmount - this.orderDetail?.deposits;
     }
-    return this.orderDetail?.totalAmount ?? 0;
+    return (this.orderDetail?.totalAmount ?? 0) - (this.orderDetail?.deposits ?? 0);
   }
 
 
@@ -420,71 +423,106 @@ depositOrder:any;
     if (!date) return 'N/A';
     return this.transform(date, 'dd/MM/yyyy HH:mm');
   }
+  printInvoiceOrder(invoiceId: number, paymentAmount: number, returnAmount: number) {
+    // Cập nhật hóa đơn
+    this.updateOInvoice(invoiceId, paymentAmount, returnAmount);
 
-  printInvoice(): void {
-    console.log('Invoice data before update:', this.invoice);
-    if (this.invoice.invoiceId) {
+    // Dữ liệu cần hiển thị
+    const customerName = this.invoice.consigneeName || 'Khách lẻ';
+    const phone = this.invoice.guestPhone || 'N/A';
+    const address = this.invoice.address || 'N/A';
+
+    // Log thông tin hóa đơn
+    console.log({
+        customerName,
+        phone,
+        address
+    });
+
+    // Tiến hành in
+    const modalBody = document.querySelector('.modal-body2');
+
+    // Kiểm tra nếu modalBody không null
+    if (modalBody) {
+        // Lưu nội dung của modalBody (sau khi xóa input)
+        const modalContent = modalBody.innerHTML;
+
+        // Xóa các thẻ div chứa input trong modal-body2
+        const inputDivs = modalBody.querySelectorAll('div.mb-3'); // Tìm tất cả các div có class mb-3
+        inputDivs.forEach(div => {
+            const input = div.querySelector('input'); // Kiểm tra có input trong div không
+            if (input) {
+                div.remove(); // Xóa thẻ div chứa input
+            }
+        });
+
+        // Cập nhật lại nội dung của modalContent sau khi xóa input
+        const updatedModalContent = modalBody.innerHTML; // Lấy nội dung đã cập nhật
+
+        // Mở cửa sổ in và chèn nội dung
+        const printWindow = window.open('', '', 'height=600,width=800');
+        if (printWindow) {
+            printWindow.document.write('<html><head><title>In hóa đơn</title>');
+            printWindow.document.write('</head><body>');
+
+            // Thêm header
+            printWindow.document.write(`
+              <div class="header">
+                <h1>Eating House</h1>
+                <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
+                <p>Hotline: 0393578176 - 0987654321</p>
+                <p>Email: eatinghouse@gmail.com</p>
+                <hr>
+              </div>
+            `);
+
+            // Thêm nội dung chính của hóa đơn với thông tin khách hàng
+            printWindow.document.write(`
+              <div class="invoice-details">
+                <p><strong>Tên khách hàng:</strong> ${customerName}</p>
+                <p><strong>Số điện thoại:</strong> ${phone}</p>
+                <p><strong>Địa chỉ:</strong> ${address}</p>
+              </div>
+              <hr>
+              ${updatedModalContent} <!-- Chèn nội dung đã được chỉnh sửa -->
+            `);
+
+            // Thêm footer
+            printWindow.document.write(`
+              <hr>
+              <div class="footer">
+                Cảm ơn quý khách và hẹn gặp lại!
+              </div>
+            `);
+
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+
+            // In tài liệu
+            printWindow.print();
+            printWindow.close();
+        }
+    } else {
+        console.error('Không tìm thấy modal-body2.');
+    }
+}
+
+
+
+
+
+  printInvoice() {
+    const printContents = document.querySelector('.modal-body2')?.innerHTML;
+    const originalContents = document.body.innerHTML;
+
+    if (printContents) {
+      // Tạo một tài liệu in tạm thời
       const printWindow = window.open('', '', 'height=600,width=800');
-
-      // Write the content to the new window
-      printWindow?.document.write('<html><head><title>Invoice</title>');
-      printWindow?.document.write(`
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-          }
-          .header {
-            text-align: center;
-            margin-bottom: 20px;
-          }
-          .header h1 {
-            margin: 0;
-          }
-          .header p {
-            margin: 5px 0;
-          }
-          hr {
-            margin: 20px 0;
-            border: 0;
-            border-top: 1px solid #000;
-          }
-          .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-          }
-          .table th, .table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-          }
-          .table th {
-            background-color: #f2f2f2;
-          }
-          .text-right {
-            text-align: right;
-          }
-          .footer {
-            text-align: center;
-            margin-top: 20px;
-            border-top: 1px solid #000;
-            padding-top: 10px;
-            font-style: italic;
-          }
-          .qr-code-container {
-            text-align: center;
-            margin: 20px 0;
-          }
-          .qr-code-container img {
-            width: 75px; /* Adjust size as needed */
-            height: 75px;
-          }
-        </style>
-      `);
+      printWindow?.document.write('<html><head><title>In hóa đơn</title>');
       printWindow?.document.write('</head><body>');
 
-      // Add restaurant information
+      // Thêm header
       printWindow?.document.write(`
         <div class="header">
           <h1>Eating House</h1>
@@ -495,110 +533,29 @@ depositOrder:any;
         </div>
       `);
 
-      // Add invoice information
-      printWindow?.document.write(`
-        <div class="mb-3">
-          <label for="orderID" class="form-label">Mã hóa đơn: </label>
-          <span id="orderID">${this.invoice?.invoiceId || 'N/A'}</span>
-        </div>
-        <div class="mb-3">
-          <label for="customerName" class="form-label">Tên khách hàng:</label>
-          <span id="customerName">${this.invoice.consigneeName || 'Khách lẻ'}</span>
-        </div>
-        ${this.invoice.guestPhone ? `
-        <div class="mb-3">
-          <label for="phoneNumber" class="form-label">Số điện thoại: </label>
-          <span id="phoneNumber">${this.invoice.guestPhone || 'N/A'}</span>
-        </div>` : ''}
-        <div class="mb-3">
-          <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
-          <span id="orderDate">${this.formatDateForPrint(this.invoice?.orderDate)}</span>
-        </div>
-        <div class="mb-3">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>STT</th>
-                <th>Tên món</th>
-                <th>SL</th>
-                <th>Đơn giá</th>
-                <th>Thành tiền</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${(this.invoice?.itemInvoice || []).map((item: ItemInvoice, i: number) => `
-                <tr>
-                  <td>${i + 1}</td>
-                  <td>${item.itemName || item.nameCombo}</td>
-                  <td>${item.quantity}</td>
-                  <td>${item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
-                  <td>${item.unitPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-        <div class="mb-3">
-          <label for="totalOrder" class="form-label">Tiền hàng:</label>
-          <span id="totalOrder">${this.invoice?.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
-        </div>
-        ${this.invoice?.discountPercent && this.invoice.discountPercent > 0 ? `
-        <div class="mb-3">
-          <label for="discount" class="form-label">Khuyến mãi:</label>
-          <span id="discount">
-            ${this.getDiscountInvoiceAmount().toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })} (${this.invoice.discountPercent}%)
-          </span>
-        </div>
-        <hr>
-        <div class="mb-3">
-          <label for="totalAmount" class="form-label">Tổng tiền:</label>
-          <span id="totalAmount">${this.invoice?.paymentAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
-        </div>` : ''}
-        ${(this.paymentMethod === '0' || this.paymentMethod === '1' && this.invoice?.deposits === 0) ? `
-        <div class="mb-3">
-          <label for="prepay" class="form-label">Thanh toán trước:</label>
-          <span id="prepay">${this.invoice?.deposits.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
-        </div>` : ''}
-        ${(this.paymentMethod === '0' || this.paymentMethod === '1' && this.invoice?.deposits !== 0) ? `
-        <div class="mb-3">
-          <label for="additionalPayment" class="form-label">Tiền khách phải trả thêm:</label>
-          <span id="additionalPayment">
-            ${(this.invoice?.paymentAmount - this.invoice?.deposits).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
-          </span>
-        </div>` : ''}
-        <hr>
-        ${this.paymentMethod === '0' ? `
-        <div class="mb-3">
-          <label for="customerPaid" class="form-label">Tiền khách đưa:</label>
-          <span id="customerPaid">${this.invoice?.amountReceived.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
-        </div>
-        <div class="mb-3">
-          <label for="changeToGive" class="form-label">Trả lại:</label>
-          <span id="changeToGive">${this.invoice?.returnAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
-        </div>` : ''}
-        ${this.paymentMethod === '1' ? `
-        <div class="mb-3 qr-code-container">
-          <img id="qrCodePrepay" src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt="QR Code" class="img-fluid">
-        </div>` : ''}
-      `);
+      // Thêm nội dung chính của hóa đơn
+      printWindow?.document.write(printContents);
 
-      // Add footer
+      // Thêm footer
       printWindow?.document.write(`
+        <hr>
         <div class="footer">
           Cảm ơn quý khách và hẹn gặp lại!
         </div>
       `);
 
-      // Close the document and trigger print
       printWindow?.document.write('</body></html>');
       printWindow?.document.close();
-      setTimeout(() => {
-        printWindow?.print();
-      }, 1000); // 1 second delay
+      printWindow?.focus();
+
+      // In tài liệu
+      printWindow?.print();
+      printWindow?.close();
     } else {
-      console.error('Invoice ID is not defined.');
+      console.error('Không thể tìm thấy nội dung hóa đơn để in.');
     }
   }
+
 
   // UpdateStatus(orderId: number | undefined, status: number | undefined) {
   //   if (orderId !== undefined && status !== undefined) {
@@ -620,29 +577,29 @@ depositOrder:any;
 
   CancelOrderReason(orderId: number | undefined) {
     if (orderId !== undefined) {
-        const cancelationReason = this.cancelationReason;
+      const cancelationReason = this.cancelationReason;
 
-        if (cancelationReason) {
-            const cancelationData = {
-                cancelationReason: cancelationReason
-            };
+      if (cancelationReason) {
+        const cancelationData = {
+          cancelationReason: cancelationReason
+        };
 
-            this.orderService.CancelOrder(orderId, cancelationData).subscribe(
-                response => {
-                    window.location.reload();
-                    console.log('Invoice status updated successfully:', response);
-                },
-                error => {
-                    console.error('Error updating invoice status:', error);
-                }
-            );
-        } else {
-            console.error('Cancelation reason is required');
-        }
+        this.orderService.CancelOrder(orderId, cancelationData).subscribe(
+          response => {
+            window.location.reload();
+            console.log('Invoice status updated successfully:', response);
+          },
+          error => {
+            console.error('Error updating invoice status:', error);
+          }
+        );
+      } else {
+        console.error('Cancelation reason is required');
+      }
     } else {
-        console.error('Order ID is undefined');
+      console.error('Order ID is undefined');
     }
-}
+  }
 
 
   getDiscountOrderAmount(): number {
@@ -755,7 +712,20 @@ depositOrder:any;
     }
   }
 
-
+  updateStatusReservation(id: number) {
+    const data = {
+      orderId:id,
+      status: 4
+    }
+    this.invoiceService.updateOStatusReser(data).subscribe(
+      response => {
+        console.log(response);
+      },
+      error => {
+        console.error('Error updating order and invoice:', error);
+      }
+    );
+  }
 
   //Offline hoan thanh goi them mon
 
@@ -772,6 +742,7 @@ depositOrder:any;
         // Create a new invoice
         let amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : this.DiscountedTotalAmount();
         const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - this.DiscountedTotalAmount() : 0;
+
         const createData = {
           orderId: orderId,
           paymentTime: new Date().toISOString(),
@@ -790,6 +761,7 @@ depositOrder:any;
           response => {
             console.log('Invoice created successfully:', response);
             this.loadInvoice(orderId);
+            this.updateStatusReservation(orderId);
             // Additional handling on success
           },
           error => {
@@ -839,9 +811,9 @@ depositOrder:any;
   }
 
   acceptOrder(orderId: number | undefined): void {
-    if(orderId){
+    if (orderId) {
       this.loadListOrderDetails(orderId);
-      if(this.depositOrder>0){
+      if (this.depositOrder > 0) {
         const data = {
           paymentAmount: 0,
           taxcode: "string",
@@ -862,7 +834,7 @@ depositOrder:any;
             // Xử lý khi gọi API thất bại, ví dụ: hiển thị thông báo lỗi
           }
         );
-      }else{
+      } else {
         const data = {
           paymentAmount: 0,
           taxcode: "string",
@@ -921,5 +893,25 @@ depositOrder:any;
       this.dateFrom = this.dateTo;
     }
     this.onSearch();
+  }
+  reloadInvoice(invoiceId: number, paymentAmount: number, returnAmount: number) {
+    this.updateOInvoice(invoiceId, paymentAmount, returnAmount);
+    window.location.reload(); // Reloads the current page
+  }
+remoney:any;
+  updateOInvoice(invoiceId: number, paymentAmount: number, returnAmount: number) {
+    const data = {
+      invoiceId: invoiceId,
+      paymentAmount: paymentAmount,
+      returnAmount: returnAmount
+    }
+    this.invoiceService.updateOInvoice(data).subscribe(
+      data => {
+        console.log(data);
+      },
+      error => {
+        console.error('Error fetching invoice:', error);
+      }
+    );
   }
 }

@@ -65,8 +65,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   selectedDiscountPercent: number = 0;
   totalAmountAfterDiscount: number = 0;
   totalAmount: number = 0;
-  receivingDate: string = '';
-  receivingTime: string = '';
+
   timeOptions: string[] = [];
   addNew: AddNewOrder = {
     guestPhone: '',
@@ -103,12 +102,17 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     guestPhone: '',
     email: 'N/A',
   };
+  date: string = '';
+  time: string = '';
+  isEarliest: boolean = true;
+  minDate: string | undefined;
+  maxDate: string | undefined;
+  availableHours: string[] = [];
   ngOnInit() {
     this.loadListDishes();
     this.loadListCombo();
     this.loadAddresses();
     const today = new Date();
-    this.receivingDate = today.toISOString().split('T')[0];
     this.selectedAddress = "Khách lẻ"
     this.selectCategory('Món chính');
     this.LoadActiveDiscounts();
@@ -119,6 +123,53 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.paymentMethod = '0';
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
+    this.date = this.formatDate(today);
+    this.minDate = this.formatDate(today);
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 7);
+    this.maxDate = this.formatDate(maxDate);
+    this.generateAvailableHours();
+    console.log(today);
+    console.log(this.date);
+    console.log(this.time);
+    this.updateTimes();
+  }
+  formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  updateTimes(): void {
+    const now = new Date();
+    const selectedDate = new Date(this.date);
+    const isToday = now.toDateString() === selectedDate.toDateString();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    this.availableHours = [];
+
+    for (let hour = 9; hour <= 21; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        if (isToday && (hour > currentHour || (hour === currentHour && minute >= currentMinute))) {
+          this.addTimeOption(hour, minute);
+        } else if (!isToday) {
+          this.addTimeOption(hour, minute);
+        }
+      }
+    }
+  }
+  addTimeOption(hour: number, minute: number): void {
+    const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+    this.availableHours.push(time);
+  }
+  generateAvailableHours() {
+    this.availableHours = [];
+    for (let hour = 9; hour <= 21; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const formattedHour = hour.toString().padStart(2, '0') + ':' + minute.toString().padStart(2, '0');
+        this.availableHours.push(formattedHour);
+      }
+    }
   }
   selectCategory(category: string) {
     this.searchCategory = category;
@@ -133,7 +184,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   }
   loadListDishes(search: string = '', searchCategory: string = ''): void {
     console.log('Loading dishes with search term:', search);
-    this.dishService.ListDishes(this.currentPage, this.pageSize, search, searchCategory).subscribe(
+    this.dishService.ListDishes(this.currentPage, 100, search, searchCategory).subscribe(
       (response: ListAllDishes) => {
         if (response && response.items) {
           this.dishes = [response];
@@ -151,7 +202,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
 
   loadListCombo(search: string = ''): void {
     console.log('Loading combos with search term:', search);
-    this.comboService.ListCombo(this.currentPage, this.pageSize, search).subscribe(
+    this.comboService.ListCombo(this.currentPage, 100, search).subscribe(
       (response) => {
         if (response && response.items) {
           this.combo = [response];
@@ -245,7 +296,6 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.selectedItems = [];
     this.selectedAddress = "Khách lẻ"
     this.selectCategory('Món chính');
-    this.successMessage = "Đơn hàng được thanh toán thành công.";
     this.addNew.guestPhone = null;
     this.addNew.email = null;
     this.addNew.guestAddress = null;
@@ -440,7 +490,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       </div>
       <div class="mb-3">
         <label for="discount" class="form-label">Khuyến mãi:</label>
-         <span id="discount">${this.getDiscountAmount()} (${this.invoice?.discountPercent || '0'}%)</span>
+         <span id="discount">${this.getDiscountAmount().toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })} (${this.invoice?.discountPercent || '0'}%)</span>
       </div>
       <hr>
       <div class="mb-3">
@@ -510,7 +560,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.showDropdown = false;
     this.clearSearchTerm();
   }
-  
+
   createAddress() {
     this.saveAddress();
   }
@@ -521,12 +571,12 @@ export class CreateTakeAwayOrderComponent implements OnInit {
         console.log('Address created successfully:', response); // Debug: Check response here
         this.successMessage = 'Thông tin đã được thêm thành công!';
         setTimeout(() => this.successMessage = '', 3000);
-  
+
         // Ensure response contains correct properties in 'data'
         if (response && response.data && response.data.consigneeName && response.data.guestPhone) {
           // Update selectedAddress with the newly created address data
           this.selectedAddress = `${response.data.consigneeName} - ${response.data.guestPhone}`;
-          
+
           // Create newAddress with all required properties
           const newAddress: Address = {
             addressId: response.data.addressId, // Ensure you have this property from the response
@@ -535,16 +585,16 @@ export class CreateTakeAwayOrderComponent implements OnInit {
             guestAddress: response.data.guestAddress || 'N/A', // Provide default value if necessary
             email: response.data.email || 'N/A', // Provide default value if necessary
           };
-  
+
           // Call selectAddress with the newly created address data
           this.selectAddress(newAddress);
         } else {
           console.error('Invalid response format after creating address:', response);
         }
-  
+
         // Reload addresses to update the list
         this.loadAddresses();
-  
+
       },
       error => {
         if (error.error && error.error.message) {
@@ -552,7 +602,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
         } else {
           this.errorMessage = 'Có lỗi xảy ra khi thêm địa chỉ. Vui lòng thử lại.';
         }
-  
+
         // Clear error message after 5 seconds
         setTimeout(() => this.errorMessage = '', 3000);
       }
@@ -601,7 +651,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
 
     // Find the closest time option and set it as default
     const closestTimeOption = this.timeOptions.find(time => time >= defaultTime) || this.timeOptions[0];
-    this.receivingTime = closestTimeOption;
+    this.time = closestTimeOption;
   }
   loadAddresses() {
     this.orderService.ListAddress().subscribe(
@@ -724,7 +774,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       console.error('No items selected for the order.');
       return;
     }
-  
+
     const orderDetails: AddOrderDetail[] = this.selectedItems.map(item => ({
       itemId: item.id,
       quantity: item.quantity,
@@ -735,20 +785,20 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       orderTime: this.getVietnamTime(),
       note: item.note
     }));
-  
+
     const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
     let receivingTime: string = '';
-    if (this.receivingDate && this.receivingTime) {
-      receivingTime = this.formatDateTime(this.receivingDate, this.receivingTime);
+    if (this.date && this.time) {
+      receivingTime = this.formatDateTime(this.date, this.time);
     } else {
       const currentTime = new Date();
       currentTime.setHours(currentTime.getHours() + 1);
       receivingTime = this.formatDateTime(currentTime.toISOString().split('T')[0], currentTime.toTimeString().split(' ')[0].substring(0, 5));
     }
-  
+
     const customerPaidAmount = this.customerPaid ?? 0;
     const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0;
-  
+
     this.addNew = {
       ...this.addNew,
       totalAmount,
@@ -763,14 +813,13 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       paymentStatus: 0,
       accountId: this.accountId
     };
-  
+
     console.log('Order Details:', this.addNew);
-  
+
     this.orderService.AddNewOrder(this.addNew).subscribe(
       response => {
         console.log('Order created successfully:', response);
-        this.successMessage = 'Đơn hàng đã được tạo thành công!';
-        this.lastOrderId = response.orderId; 
+        this.lastOrderId = response.orderId;
         console.log(this.lastOrderId);
         setTimeout(() => this.successMessage = '', 5000);
       },
@@ -782,18 +831,17 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       }
     );
   }
-  
+
 
   CreateInvoiceTakeAway(): void {
     if (this.lastOrderId != null && this.lastOrderId !== undefined) {
       const paymentMethod = parseInt(this.paymentMethod, 10);
       const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
-  
+
       const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : totalAmount;
       const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - totalAmount : 0;
-  
+
       const updateData = {
-        status: 6,
         paymentTime: new Date().toISOString(),
         paymentAmount: totalAmount,
         taxcode: "HIEU",
@@ -804,9 +852,9 @@ export class CreateTakeAwayOrderComponent implements OnInit {
         paymentMethods: paymentMethod,
         description: "Order payment description"
       };
-  
+
       console.log('Update Data:', updateData);
-  
+
       this.invoiceService.updateStatusAndCreateInvoice(this.lastOrderId, updateData).subscribe(
         response => {
           console.log('Order status updated and invoice created:', response);
@@ -820,7 +868,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       console.warn('Order ID is not valid or is undefined. LastOrderId:', this.lastOrderId);
     }
   }
-  
+
 
   loadInvoice(orderId: number): void {
     this.invoiceService.getInvoiceByOrderId(orderId).subscribe(
@@ -852,4 +900,19 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       this.customerPaid = formattedValue;
     }
   }
+
+  updateOrderStatus(id:any){
+    const data ={
+      status: 5
+    }
+    this.invoiceService.updateOrderStatus(id,data).subscribe(
+      data => {
+        this.clearCart();
+      },
+      error => {
+        console.error('Error fetching invoice:', error);
+      }
+    );
+  }
+
 }

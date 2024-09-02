@@ -191,7 +191,7 @@
       <div class="modal fade" id="updateTimeModal" tabindex="-1" role="dialog" aria-labelledby="updateTimeModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
-          <div class="modal-content">
+          <div class="modal-content" style="overflow: auto;">
             <div class="modal-header">
               <h5 class="modal-title" id="updateTimeModalLabel">Đăng ký bàn</h5>
               <div class="text-center text-white flex-fill" style="font-size: 18px;">
@@ -211,7 +211,7 @@
                   </select>
                 </div>
                 <div class="col-md-7">
-                  <div class="card">
+                  <div class="card" style="max-height: 400px; overflow: auto;">
                     <div class="table-grid">
                       <div class="table" *ngFor="let table of dataTable"
                         [ngClass]="{'status-in-use': table.status !== 0}" (click)="toggleTableSelection(table)">
