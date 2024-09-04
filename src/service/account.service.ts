@@ -86,4 +86,15 @@ export class AccountService {
   getAccountId(): number | null {
     return this.accountId;
   }
+  googleLogin(tokenId: string): Observable<any> {
+    const googleLoginUrl = `${this.apiUrl}/GoogleAuth/login`;
+    return this.http.post<any>(googleLoginUrl, { tokenId }, httpOptions).pipe(
+      tap(response => {
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+          this.loggedIn.next(true);
+        }
+      })
+    );
+  }
 }

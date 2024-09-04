@@ -39,7 +39,7 @@
                     <th>Hình ảnh</th>
                     <th>Tên thể loại</th>
                     <th>Trạng thái</th>
-                    <th></th>
+                    <th>##</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -55,7 +55,12 @@
                         <span [ngStyle]="{'color': dish.isActive ? 'green' : 'red'}">
                             {{ dish.isActive ? 'Đang hoạt động' : 'Không hoạt động' }}
                         </span>
-                    </td>                    
+                    </td> 
+                    <td>
+                      <button type="button" class="btn btn-warning" data-bs-toggle="modal"data-bs-target="#updateDishModal" (click)="getDishById(dish.dishId)">
+                        Cập nhật
+                      </button>
+                    </td>                   
                     </tr>
                   </ng-container>
                 </tbody>

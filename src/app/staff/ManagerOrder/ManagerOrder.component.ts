@@ -16,6 +16,7 @@ import { ItemInvoice } from '../../../models/invoice.model';
 import { Table } from '../../../models/table.model';
 import { AccountService } from '../../../service/account.service';
 import { HeaderOrderStaffComponent } from "./HeaderOrderStaff/HeaderOrderStaff.component";
+import { SettingService } from '../../../service/setting.service';
 
 @Component({
   selector: 'app-ManagerOrder',
@@ -81,7 +82,8 @@ export class ManagerOrderComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private invoiceService: InvoiceService,
-    private accountService: AccountService
+    private accountService: AccountService,
+    private settingService: SettingService
   ) { }
 
   ngOnInit() {
@@ -97,6 +99,7 @@ export class ManagerOrderComponent implements OnInit {
     this.dateFrom = this.formatDate(today);
     this.dateTo = this.formatDate(today);
     this.dateNow = this.formatDate(today);
+    this.getInfo();
   }
 
   setDefaultDates() {
@@ -911,6 +914,21 @@ remoney:any;
       },
       error => {
         console.error('Error fetching invoice:', error);
+      }
+    );
+  }
+  settings: any;
+  QRUrl: string = '';
+  getInfo(): void {
+    this.settingService.getInfo().subscribe(
+      response => {
+        this.settings = response;
+        console.log(response);
+        this.QRUrl = this.settings[0].qrcode;
+        console.log('URL Logo',this.QRUrl);
+      },
+      error => {
+        console.error('Error:', error);
       }
     );
   }

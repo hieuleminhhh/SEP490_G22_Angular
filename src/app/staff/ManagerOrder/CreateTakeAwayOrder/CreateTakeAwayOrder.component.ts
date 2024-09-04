@@ -24,6 +24,7 @@ import { DiscountService } from '../../../../service/discount.service';
 import { CheckoutService } from '../../../../service/checkout.service';
 import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal/modal.module';
+import { SettingService } from '../../../../service/setting.service';
 
 @Component({
   selector: 'app-CreateTakeAwayOrder',
@@ -36,7 +37,8 @@ export class CreateTakeAwayOrderComponent implements OnInit {
 
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService,
     private orderService: ManagerOrderService, private cd: ChangeDetectorRef, private invoiceService: InvoiceService,
-    private route: ActivatedRoute, private dialog: MatDialog, private discountService: DiscountService, private checkoutService: CheckoutService) { }
+    private route: ActivatedRoute, private dialog: MatDialog, private discountService: DiscountService, private checkoutService: CheckoutService,
+    private settingService: SettingService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   dishes: ListAllDishes[] = [];
   combo: ListAllCombo[] = [];
@@ -133,6 +135,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     console.log(this.date);
     console.log(this.time);
     this.updateTimes();
+    this.getInfo();
   }
   formatDate(date: Date): string {
     const year = date.getFullYear();
@@ -914,5 +917,20 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       }
     );
   }
-
+  settings: any;
+  QRUrl: string = '';
+  getInfo(): void {
+    this.settingService.getInfo().subscribe(
+      response => {
+        this.settings = response;
+        console.log(response);
+        this.QRUrl = this.settings[0].qrcode;
+        console.log(this.QRUrl);
+        console.log('URL Logo',this.QRUrl);
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
 }
