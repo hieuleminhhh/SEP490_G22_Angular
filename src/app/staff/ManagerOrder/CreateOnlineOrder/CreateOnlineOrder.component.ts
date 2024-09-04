@@ -23,6 +23,7 @@ import { PercentagePipe } from '../../../common/material/percentFormat/percentFo
 import { Discount } from '../../../../models/discount.model';
 import { CheckoutService } from '../../../../service/checkout.service';
 import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
+import { SettingService } from '../../../../service/setting.service';
 @Component({
   selector: 'app-CreateOnlineOrder',
   templateUrl: './CreateOnlineOrder.component.html',
@@ -33,7 +34,8 @@ import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.
 export class CreateOnlineOrderComponent implements OnInit {
 
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService: ManagerOrderService,
-    private invoiceService: InvoiceService, private dialog: MatDialog, private renderer: Renderer2, private discountService: DiscountService, private checkoutService: CheckoutService) {
+    private invoiceService: InvoiceService, private dialog: MatDialog, private renderer: Renderer2, private discountService: DiscountService, private checkoutService: CheckoutService,
+    private settingService: SettingService) {
     const today = new Date();
     this.date = this.formatDate(today);
     this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
@@ -124,7 +126,7 @@ export class CreateOnlineOrderComponent implements OnInit {
     console.log(this.date);
     console.log(this.time);
     this.selectTime();
-
+    this.getInfo();
   }
   selectTime() {
     const currentTime = new Date();
@@ -905,5 +907,20 @@ export class CreateOnlineOrderComponent implements OnInit {
     } else {
       console.warn('Order ID is not valid or is undefined. LastOrderId:', this.lastOrderId);
     }
+  }
+  settings: any;
+  QRUrl: string = '';
+  getInfo(): void {
+    this.settingService.getInfo().subscribe(
+      response => {
+        this.settings = response;
+        console.log(response);
+        this.QRUrl = this.settings[0].qrcode;
+        console.log('URL Logo',this.QRUrl);
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
   }
 }

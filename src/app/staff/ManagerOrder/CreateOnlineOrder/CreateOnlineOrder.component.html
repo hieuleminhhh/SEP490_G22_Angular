@@ -568,9 +568,7 @@
 
         <div class="mb-3" *ngIf="paymentMethod === '1'">
           <label for="qrCodePrepay" class="form-label"></label>
-          <img id="qrCodePrepay"
-            src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7"
-            class="img-fluid">
+          <img id="qrCode" [src]="QRUrl" class="img-fluid">
         </div>
       </div>
       <div class="modal-footer">
@@ -676,9 +674,7 @@ aria-hidden="true">
 
       <div class="mb-3" *ngIf="paymentMethod === '1'">
         <label for="qrCode" class="form-label"></label>
-        <img id="qrCode"
-          src="https://th.bing.com/th/id/OIP.SzaQ2zk5Q5EsnORQ_zpvGAHaHa?w=202&h=202&c=7&r=0&o=5&dpr=1.3&pid=1.7"
-          class="img-fluid">
+        <img id="qrCode" [src]="QRUrl" class="img-fluid">
       </div>
 
     </div>

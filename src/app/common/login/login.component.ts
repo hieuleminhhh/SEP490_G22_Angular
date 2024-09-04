@@ -25,6 +25,7 @@ export class LoginComponent implements OnInit {
   }
   ngOnInit() {
     this.getInfo();
+    this.loginWithGoogle();
   }  
   login() {
     this.accountService.login(this.username, this.password).subscribe({
@@ -92,8 +93,38 @@ export class LoginComponent implements OnInit {
       }
     );
   }
-
+  loginWithGoogle() {
+    const googleAuth: any = (window as any).google;
   
-
- 
+    if (googleAuth && googleAuth.accounts) {
+      googleAuth.accounts.id.initialize({
+        client_id: '21202956432-pdk6dbthlbnb9mspamh3cgl03dceeoah.apps.googleusercontent.com',
+        callback: (response: any) => this.handleGoogleSignIn(response)
+      });
+  
+      googleAuth.accounts.id.prompt();
+    } else {
+      console.error('Google API not loaded.');
+    }
+  }
+  
+  
+  
+  handleGoogleSignIn(response: any) {
+    const tokenId = response.credential;
+    this.accountService.googleLogin(tokenId).subscribe({
+      next: (response: any) => {
+        this.successMessage = 'Đăng nhập thành công!';
+        this.errorMessage = null;
+        
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('accountId', response.accountId.toString());
+  
+        this.handleUserRole(response.role);
+      },
+      error: (error) => {
+        this.errorMessage = 'Đăng nhập thất bại. Vui lòng thử lại.';
+      }
+    });
+  }
 }
