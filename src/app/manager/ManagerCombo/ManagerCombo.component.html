@@ -34,11 +34,11 @@
                   <tr>
                     <th>Tên Combo</th>
                     <th>Giá</th>
-                    <th>Ghi chú</th>
+                    <th class="note-column">Ghi chú</th>
                     <th>Hình ảnh</th>
                     <th>Món ăn</th>
                     <th>Trạng thái</th>                 
-                    <th></th>
+                    <th>##</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -46,7 +46,7 @@
                     <tr *ngFor="let combo of list.items">
                       <td>{{ combo.nameCombo }}</td>
                       <td>{{ combo.price | currencyFormat  }}</td>
-                      <td>{{ combo.note }}</td>
+                      <td class="note-column">{{ combo.note }}</td>
                       <td>
                         <img [src]="combo.imageUrl" [alt]="combo.nameCombo" *ngIf="combo.imageUrl" style="width: 200px; height: 200px; object-fit: cover;">
                     </td>                    
@@ -64,6 +64,11 @@
                           {{ combo.isActive ? 'Đang hoạt động' : 'Không hoạt động' }}
                       </span>
                       </td>
+                      <td>
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal"data-bs-target="#updateComboModal" (click)="getComboById(combo.comboId)">
+                          Cập nhật
+                        </button>
+                      </td>     
                      
                     </tr>
                   </ng-container>

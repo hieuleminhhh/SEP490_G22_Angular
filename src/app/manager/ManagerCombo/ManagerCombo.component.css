@@ -42,4 +42,7 @@
     width: 100px; /* Adjust width as needed */
     height: auto; /* Maintain aspect ratio */
   }
+  .note-column {
+    width: 300px; /* Bạn có thể điều chỉnh chiều rộng theo nhu cầu */
+  }
   

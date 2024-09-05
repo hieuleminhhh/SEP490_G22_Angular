@@ -2,20 +2,44 @@
   <form class="form-signin" (ngSubmit)="login()">
     <img class="mb-4" [src]="logoUrl" alt="Logo" width="72" height="72">
     <h1 class="h3 mb-3 font-weight-normal">Vui lòng đăng nhập</h1>
+    
     <label for="inputUsername" class="sr-only">Tài khoản</label>
     <input type="text" [(ngModel)]="username" class="form-control" name="username" required>
     <br>
+    
     <label for="inputPassword" class="sr-only">Mật khẩu</label>
     <input type="password" [(ngModel)]="password" class="form-control" name="password" required>
+    
     <button class="btn btn-lg btn-primary btn-block" type="submit">Đăng nhập</button>
-    <!-- Suscess message display -->
+    
+    <!-- Login with Google button with margin-top for spacing -->
+    <button 
+      class="btn btn-light d-flex align-items-center justify-content-center mx-auto mt-3" 
+      type="button" 
+      (click)="loginWithGoogle()" 
+      style="padding: 5px 10px; border-width: 1px; max-height: 50px; max-width: 250px;">
+    
+      <img 
+        src="https://developers.google.com/identity/images/g-logo.png" 
+        alt="Google Logo" 
+        width="20" 
+        height="20" 
+        class="google-logo"
+        style="margin-top: 20px; margin-right: 8px;">
+        
+      <span style="font-size: 14px;">Đăng nhập với Google</span>
+    </button>
+    
+    <!-- Success message display -->
     <div *ngIf="successMessage" class="alert alert-success mt-3">
       {{ successMessage }}
     </div>
+    
     <!-- Error message display -->
     <div *ngIf="errorMessage" class="alert alert-danger mt-3">
       {{ errorMessage }}
     </div>
-
   </form>
 </div>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
