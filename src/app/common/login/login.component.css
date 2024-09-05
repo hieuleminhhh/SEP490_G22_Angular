@@ -1,66 +1,100 @@
 body {
-    background-color: #f8f9fa;
-    padding-top: 5rem;
+  background-color: #f8f9fa;
+  padding-top: 5rem;
 }
 
 .form-signin {
-    width: 100%;
-    max-width: 330px;
-    padding: 15px;
-    margin: auto;
+  width: 100%;
+  max-width: 330px;
+  padding: 15px;
+  margin: auto;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-    .form-signin .form-control {
-        position: relative;
-        box-sizing: border-box;
-        height: auto;
-        padding: 10px;
-        font-size: 16px;
-    }
+.form-signin img {
+  margin-bottom: 20px;
+}
 
-        .form-signin .form-control:focus {
-            z-index: 2;
-        }
+.form-signin h1 {
+  color: #343a40;
+}
 
-    .form-signin input[type="text"] {
-        margin-bottom: -1px;
-        border-bottom-right-radius: 0;
-        border-bottom-left-radius: 0;
-    }
+.form-signin .form-control {
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #ced4da;
+}
 
-    .form-signin input[type="password"] {
-        margin-bottom: 10px;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-    }
-      .form-signin {
-        background-color: #ffffff;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      }
-      .form-signin img {
-        margin-bottom: 20px;
-      }
-      .form-signin h1 {
-        color: #343a40;
-      }
-      .form-signin .form-control {
-        margin-bottom: 15px;
-        border-radius: 5px;
-        border: 1px solid #ced4da;
-      }
-      .form-signin .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-      }
-      .form-signin .btn-primary:hover {
-        background-color: #0056b3;
-        border-color: #0056b3;
-      }
-      .form-signin .checkbox label {
-        color: #6c757d;
-      }
-      .form-signin .text-muted {
-        color: #6c757d;
-      }
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+
+.form-signin input[type="text"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.form-signin .btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.form-signin .btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.form-signin .checkbox label,
+.form-signin .text-muted {
+  color: #6c757d;
+}
+
+/* Old high contrast mode for older versions of Internet Explorer/Edge */
+@media (-ms-high-contrast: active) {
+  body {
+      background-color: black;
+      color: white;
+  }
+  .form-signin {
+      background-color: black;
+      color: white;
+      border: 1px solid white;
+  }
+  .form-signin .btn-primary {
+      background-color: #0056b3;
+      border-color: white;
+  }
+}
+
+/* New forced colors mode for modern browsers */
+@media (forced-colors: active) {
+  body {
+      background-color: Canvas;
+      color: CanvasText;
+  }
+  .form-signin {
+      background-color: Canvas;
+      color: CanvasText;
+      border: 1px solid ButtonText;
+  }
+  .form-signin .btn-primary {
+      background-color: ButtonFace;
+      border-color: ButtonText;
+      color: ButtonText;
+  }
+}

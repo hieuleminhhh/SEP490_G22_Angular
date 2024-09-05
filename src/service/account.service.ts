@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { Account, CreateAccountDTO, GetAccountDTO, UpdateAccountDTO } from '../models/account.model';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -86,15 +86,31 @@ export class AccountService {
   getAccountId(): number | null {
     return this.accountId;
   }
-  googleLogin(tokenId: string): Observable<any> {
-    const googleLoginUrl = `${this.apiUrl}/GoogleAuth/login`;
-    return this.http.post<any>(googleLoginUrl, { tokenId }, httpOptions).pipe(
-      tap(response => {
-        if (response.token) {
-          localStorage.setItem('token', response.token);
-          this.loggedIn.next(true);
-        }
+  googleLogin(code: string): Observable<any> {
+  const tokenUrl = 'https://oauth2.googleapis.com/token';
+  const clientId = '21202956432-pdk6dbthlbnb9mspamh3cgl03dceeoah.apps.googleusercontent.com';
+  const clientSecret = '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'; // Replace with your client secret
+  const redirectUri = 'http://localhost:4200/auth/callback';
+  const grantType = 'authorization_code';
+
+  return this.http.post<any>(tokenUrl, {
+    code,
+    client_id: clientId,
+    client_secret: clientSecret,
+    redirect_uri: redirectUri,
+    grant_type: grantType
+  }).pipe(
+    map(response => response.access_token) // Assuming the token is in the response
+  );
+}
+
+  getGoogleUserProfile(accessToken: string) {
+    const profileUrl = 'https://www.googleapis.com/oauth2/v2/userinfo';
+    return this.http.get<any>(profileUrl, {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${accessToken}`
       })
-    );
+    });
   }
+  
 }

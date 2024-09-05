@@ -32,6 +32,7 @@ import { OrderShipComponent } from './ship/order-ship/order-ship.component';
 import { ManageInvoiceComponent } from './staff/manage-invoice/manage-invoice.component';
 import { ManageNewComponent } from './manager/ManageNew/ManageNew.component';
 import { AuthGuard } from './auth/authGuard/authGuard.component';
+import { AuthCallbackComponent } from './common/login/callback/authCallback/authCallback.component';
 
 
 export const routes: Routes = [
@@ -66,5 +67,6 @@ export const routes: Routes = [
     {'path': 'manageAccount', component: ManageAccountComponent, canActivate: [AuthGuard]},
     {'path': 'shipping', component: OrderShipComponent},
     {'path': 'invoice', component: ManageInvoiceComponent},
-    {'path': 'manageNew', component: ManageNewComponent}
+    {'path': 'manageNew', component: ManageNewComponent},
+    {'path': 'auth/callback', component: AuthCallbackComponent}
 ];
