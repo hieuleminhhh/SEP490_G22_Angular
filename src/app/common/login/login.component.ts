@@ -24,9 +24,8 @@ export class LoginComponent implements OnInit {
   constructor(private accountService: AccountService,  private router: Router, private settingService: SettingService) { 
   }
   ngOnInit() {
-    this.getInfo();
-    this.loginWithGoogle();
-  }  
+      this.getInfo();
+  }
   login() {
     this.accountService.login(this.username, this.password).subscribe({
       next: response => {
@@ -94,37 +93,13 @@ export class LoginComponent implements OnInit {
     );
   }
   loginWithGoogle() {
-    const googleAuth: any = (window as any).google;
+    const clientId = '21202956432-pdk6dbthlbnb9mspamh3cgl03dceeoah.apps.googleusercontent.com';
+    const redirectUri = encodeURIComponent('http://localhost:4200/auth/callback');
+    const responseType = 'code';
+    const scope = encodeURIComponent('email profile');
+    
+    const googleOAuthUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&access_type=offline`;
   
-    if (googleAuth && googleAuth.accounts) {
-      googleAuth.accounts.id.initialize({
-        client_id: '21202956432-pdk6dbthlbnb9mspamh3cgl03dceeoah.apps.googleusercontent.com',
-        callback: (response: any) => this.handleGoogleSignIn(response)
-      });
-  
-      googleAuth.accounts.id.prompt();
-    } else {
-      console.error('Google API not loaded.');
-    }
-  }
-  
-  
-  
-  handleGoogleSignIn(response: any) {
-    const tokenId = response.credential;
-    this.accountService.googleLogin(tokenId).subscribe({
-      next: (response: any) => {
-        this.successMessage = 'Đăng nhập thành công!';
-        this.errorMessage = null;
-        
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('accountId', response.accountId.toString());
-  
-        this.handleUserRole(response.role);
-      },
-      error: (error) => {
-        this.errorMessage = 'Đăng nhập thất bại. Vui lòng thử lại.';
-      }
-    });
+    window.location.href = googleOAuthUrl;
   }
 }
