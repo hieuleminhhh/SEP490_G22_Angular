@@ -15,7 +15,38 @@
           <i class="fas fa-shopping-cart cart-icon"></i> <!-- Icon giỏ hàng -->
         </a>
       </li>
-      <li><a routerLink="/login" routerLinkActive="active">Đăng nhập</a></li>
+      <li *ngIf="!accountId; else loggedInTemplate">
+        <a routerLink="/login" routerLinkActive="active">Đăng nhập</a>
+      </li>
+      
+      <ng-template #loggedInTemplate>
+        <div class="user-info d-flex align-items-center ms-3" id="utk">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" (click)="logout()">
+                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+              </a>
+            </li>
+          </ul>
+          <i class="fas fa-user-circle user-avatar" (click)="toggleDropdown()" style="font-size: 1.5rem;"></i>
+
+          <span class="user-name ms-2" (click)="toggleDropdown()" style="font-size: 1.2rem;">{{ account?.username }}</span>
+          
+          <div class="dropdown-menu-container">
+            <ul class="dropdown-menu" [class.show]="dropdownOpen">
+              <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">Xem thông tin</a></li>
+              <hr>
+              <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Đổi mật khẩu</a></li>
+              <hr>
+              <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#orderModal">Xem đơn hàng</a></li>
+              <hr>
+              <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paymentModal">Ví tiền</a></li>
+            </ul>
+          </div>
+        </div>
+      </ng-template>
+      
+      
     </ul>
   </nav>
 </div>

@@ -35,6 +35,7 @@
                   <tr>
                     <th>Tên món ăn</th>
                     <th>Mô tả</th>
+                    <th>Số lượng</th>
                     <th>Giá</th>
                     <th>Hình ảnh</th>
                     <th>Tên thể loại</th>
@@ -47,6 +48,7 @@
                     <tr *ngFor="let dish of list.items">
                       <td>{{ dish.itemName }}</td>
                       <td>{{ dish.itemDescription }}</td>
+                      <td>{{ dish.quantityDish || 0 }}</td>
                       <td>{{ dish.price | currencyFormat }}</td>
                       <td><img [src]="dish.imageUrl" [alt]="dish.itemName" *ngIf="dish.imageUrl" style="width: 200px; height: 200px; object-fit: cover;"></td>
                       <td>{{ dish.categoryName }}</td>
