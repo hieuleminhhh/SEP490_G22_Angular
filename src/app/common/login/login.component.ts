@@ -94,12 +94,12 @@ export class LoginComponent implements OnInit {
   }
   loginWithGoogle() {
     const clientId = '21202956432-pdk6dbthlbnb9mspamh3cgl03dceeoah.apps.googleusercontent.com';
-    const redirectUri = encodeURIComponent('http://localhost:4200/auth/callback');
+    const redirectUri = 'http://localhost:4200/auth/callback';
+    const scope = 'profile email';
     const responseType = 'code';
-    const scope = encodeURIComponent('email profile');
-    
-    const googleOAuthUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&access_type=offline`;
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
   
-    window.location.href = googleOAuthUrl;
+    window.location.href = authUrl;
   }
+  
 }

@@ -87,22 +87,28 @@ export class AccountService {
     return this.accountId;
   }
   googleLogin(code: string): Observable<any> {
-  const tokenUrl = 'https://oauth2.googleapis.com/token';
-  const clientId = '21202956432-pdk6dbthlbnb9mspamh3cgl03dceeoah.apps.googleusercontent.com';
-  const clientSecret = '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'; // Replace with your client secret
-  const redirectUri = 'http://localhost:4200/auth/callback';
-  const grantType = 'authorization_code';
-
-  return this.http.post<any>(tokenUrl, {
-    code,
-    client_id: clientId,
-    client_secret: clientSecret,
-    redirect_uri: redirectUri,
-    grant_type: grantType
-  }).pipe(
-    map(response => response.access_token) // Assuming the token is in the response
-  );
-}
+    const tokenUrl = 'https://oauth2.googleapis.com/token';
+    const clientId = '21202956432-pdk6dbthlbnb9mspamh3cgl03dceeoah.apps.googleusercontent.com';
+    const clientSecret = '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'; 
+    const redirectUri = 'http://localhost:4200/auth/callback';
+    const grantType = 'authorization_code';
+  
+    const body = new URLSearchParams();
+    body.set('code', code);
+    body.set('client_id', clientId);
+    body.set('client_secret', clientSecret);
+    body.set('redirect_uri', redirectUri);
+    body.set('grant_type', grantType);
+  
+    return this.http.post<any>(tokenUrl, body.toString(), {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/x-www-form-urlencoded'
+      })
+    }).pipe(
+      map(response => response.access_token)
+    );
+  }
+  
 
   getGoogleUserProfile(accessToken: string) {
     const profileUrl = 'https://www.googleapis.com/oauth2/v2/userinfo';
@@ -112,5 +118,16 @@ export class AccountService {
       })
     });
   }
+  registerGoogleAccount(email: string): Observable<any> {
+    const url = `${this.apiUrl}/GoogleAuth/register`;
+    const body = { email };
+  
+    return this.http.post<any>(url, body, httpOptions).pipe(
+      tap(response => {
+        console.log('Google account registered:', response);
+      })
+    );
+  }
+  
   
 }

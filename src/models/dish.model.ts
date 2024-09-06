@@ -53,4 +53,5 @@ export interface ManagerDish {
   isActive: boolean;
   discountedPrice: number;
   discountPercentage: number;
+  quantityDish: number;
 }
