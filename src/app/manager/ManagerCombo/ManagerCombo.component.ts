@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../Header/Header.component';
@@ -68,7 +68,7 @@ export class ManagerComboComponent implements OnInit {
     message: '',
     dishIds: [],
   };
-  constructor(private comboService: ManagerComboService) { }
+  constructor(private comboService: ManagerComboService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.loadListCombo();
@@ -94,6 +94,29 @@ export class ManagerComboComponent implements OnInit {
       },
       (error) => {
         console.error('Error fetching combos:', error);
+      }
+    );
+  }
+  selectedCombos: { [key: number]: boolean } = {};
+
+  loadListDisheSetting(search: string = ''): void {
+    this.comboService.ListCombo(this.currentPage, this.pageSize, search).subscribe(
+      (response: ListAllCombo) => {
+        if (response && response.items) {
+          this.combo = [response]; // Wrap response in an array
+          const comboItems = response.items; // Extract items from response
+  
+          // Initialize selectedDishes
+          this.selectedCombos = {}; // Reset selectedDishes
+          comboItems.forEach(combo => {
+            this.selectedCombos[combo.comboId] = false; // Initialize selection status
+          });
+        } else {
+          console.error('Invalid response:', response);
+        }
+      },
+      (error) => {
+        console.error('Error fetching dishes:', error);
       }
     );
   }
@@ -378,5 +401,42 @@ export class ManagerComboComponent implements OnInit {
       fileInput.value = '';
     }
   }
+  quantityToSet: number = 1;
+applyQuantity(): void {
+  // Iterate over dishes and update the quantity if the dish is selected
+  for (const list of this.combo) {
+    for (const combos of list.items) {
+      if (this.selectedCombos[combos.comboId]) {
+        // Update the quantityDish property of the dish
+        combos.quantityCombo = this.quantityToSet;
+        console.log(`Số lượng cho món ${combos.comboId} đã được đặt là ${this.quantityToSet}`);
+      }
+    }
+  }
+
+  // Force Angular to detect changes
+  this.cdr.detectChanges();
+}
+onComboSelectionChange(comboId: number, event: any): void {
+  console.log(`Checkbox for dish ${comboId} changed to ${event.target.checked}`);
+  this.selectedCombos[comboId] = event.target.checked;
+}
+selectAll(event: any): void {
+  const checked = event.target.checked;
+  if (this.combo.length > 0) {
+    const dishesItems = this.combo[0].items;
+    dishesItems.forEach(combo => this.selectedCombos[combo.comboId] = checked);
+  }
+}
+validateQuantity(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const value = Number(input.value);
   
+  if (value < 1) {
+    input.value = '1'; // Reset input value to 1 if less than 1
+    this.quantityToSet = 1; // Update model to ensure consistency
+  } else {
+    this.quantityToSet = value; // Update model if value is valid
+  }
+}
 }

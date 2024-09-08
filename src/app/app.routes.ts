@@ -55,7 +55,7 @@ export const routes: Routes = [
     {'path': 'paymentReservation', component:PaymentReservationComponent},
     {'path': 'createTakeaway', component:CreateTakeAwayOrderComponent, canActivate: [AuthGuard]},
     {'path': 'createOnline', component:CreateOnlineOrderComponent, canActivate: [AuthGuard]},
-    {'path': 'cooking', component:CookingManagementComponent},
+    {'path': 'cooking', component:CookingManagementComponent, canActivate: [AuthGuard]},
     {'path': 'listTable', component:ViewTableOrderComponent, canActivate: [AuthGuard]},
     {'path': 'createOffline', component:CreateOfflineOrderComponent, canActivate: [AuthGuard]},
     {'path': 'updateOffline' , component:UpdateOfflineOrderComponent, canActivate: [AuthGuard]},
