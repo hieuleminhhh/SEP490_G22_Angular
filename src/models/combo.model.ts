@@ -22,6 +22,7 @@ export interface ManagerCombo {
   note:string;
   imageUrl: string;
   isActive: boolean;
+  quantityCombo: number;
   dishes: ManagerDish[]
 }
 export interface UpdateCombo{

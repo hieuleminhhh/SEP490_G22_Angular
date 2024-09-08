@@ -41,4 +41,13 @@
     width: 100px; /* Adjust width as needed */
     height: auto; /* Maintain aspect ratio */
   }
-  
+  /* Define custom brown color for buttons */
+.btn-custom-brown {
+  background-color: #8B4513; /* Brown color */
+  border: none; /* Remove border if desired */
+  color: white; /* Text color for better contrast */
+}
+
+.btn-custom-brown:hover {
+  background-color: #6F3E02; /* Darker brown for hover effect */
+}
