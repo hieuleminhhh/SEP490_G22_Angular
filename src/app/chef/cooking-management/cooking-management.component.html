@@ -73,7 +73,7 @@
                     'yellow-row': order.recevingOrder &&
                                   (order.recevingOrder.substring(0, 16) !== addOneHour(order.orderTime) &&
                                    !isRecevingOrderCloseToCurrentTime(order.recevingOrder))
-                  }" (click)="showDetails(order.itemName, order.quantity)">
+                  }" (click)="showDetails(order.itemName || order.comboDetailsForChef[0]?.comboName, order.quantity)">
                     <td>{{ order.itemName || order.comboDetailsForChef[0]?.comboName }}</td>
                     <td>{{order.quantity}}</td>
                     <td>{{order.orderTime | date:'dd/MM/yyyy - HH:mm' }}</td>
@@ -224,13 +224,27 @@
 <div *ngIf="ingredient" class="popup" (click)="closePopup()">
   <div class="popup-content" (click)="$event.stopPropagation()">
     <span class="close" (click)="closePopup()">&times;</span>
-    <div class="details-container">
+    <div class="details-container" *ngIf="ingredient.dishName">
       <h3>Tên món: {{ingredient.dishName }} </h3>
       <p>Thành phần:</p>
       <div *ngFor="let item of ingredient.ingredients" class="info-container">
         <div class="item-details">
           <h4>{{ item.name }}</h4>
           <p>Số lượng: {{ item.quantitative }}{{ item.unit }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="details-container" *ngIf="ingredient.comboName">
+      <h3>Tên combo: {{ingredient.comboName }} </h3>
+      <div *ngFor="let item of ingredient.dishes" class="info-container">
+        <p>Tên món: {{item.dishName }}</p>
+        <p>Thành phần:</p>
+        <div *ngFor="let item of item.ingredients" class="info-container">
+          <div class="item-details">
+            <h4>{{ item.materialName }}</h4>
+            <p>Số lượng: {{ item.quantitative }}{{ item.unit }}</p>
+          </div>
         </div>
       </div>
     </div>
