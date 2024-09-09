@@ -45,4 +45,11 @@
   .note-column {
     width: 300px; /* Bạn có thể điều chỉnh chiều rộng theo nhu cầu */
   }
-  
+  .btn-custom-brown {
+    background-color: #8B4513; /* Brown color */
+    border: none; /* Remove border if desired */
+    color: white; /* Text color for better contrast */
+}
+.btn-custom-brown:hover {
+  background-color: #6F3E02; /* Darker brown for hover effect */
+}

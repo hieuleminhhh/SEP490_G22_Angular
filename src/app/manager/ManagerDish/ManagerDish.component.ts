@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, Inject, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ManagerDishService } from '../../../service/managerdish.service';
 import { SideBarComponent } from '../SideBar/SideBar.component';
 import { RouterModule } from '@angular/router';
@@ -73,22 +73,43 @@ export class ManagerDishComponent implements OnInit {
     imageError: '',
     categoryError: '',
   };
-  constructor(@Inject(ManagerDishService) private dishService: ManagerDishService) { }
+  constructor(@Inject(ManagerDishService) private dishService: ManagerDishService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.loadListDishes();
     this.loadCategories();
+    this.loadListDisheSetting();
   }
 
   loadListDishes(search: string = ''): void {
-    console.log('Loading dishes with search term:', search);
     this.dishService.ListDishes(this.currentPage, this.pageSize, this.searchCategory, search).subscribe(
-      (response: ListAllDishes) => {
+      (response) => {
         if (response && response.items) {
           this.dishes = [response];
           this.totalCount = response.totalCount;
           this.updateTotalPagesArray(response.totalPages);
-          console.log('Fetched dishes:', this.dishes);
+          console.log('Fetched dish:', this.dishes);
+        } else {
+          console.error('Invalid response:', response);
+        }
+      },
+      (error) => {
+        console.error('Error fetching dish:', error);
+      }
+    );
+  }
+  loadListDisheSetting(search: string = ''): void {
+    this.dishService.ListDishes(this.currentPage, this.pageSize, this.searchCategory, search).subscribe(
+      (response: ListAllDishes) => {
+        if (response && response.items) {
+          this.dishes = [response]; // Wrap response in an array
+          const dishesItems = response.items; // Extract items from response
+  
+          // Initialize selectedDishes
+          this.selectedDishes = {}; // Reset selectedDishes
+          dishesItems.forEach(dish => {
+            this.selectedDishes[dish.dishId] = false; // Initialize selection status
+          });
         } else {
           console.error('Invalid response:', response);
         }
@@ -98,6 +119,7 @@ export class ManagerDishComponent implements OnInit {
       }
     );
   }
+  
 
   onSearch(): void {
     this.currentPage = 1;
@@ -392,6 +414,49 @@ onCheckboxChange(event: Event, dishId: number): void {
     this.updateDishStatus(dishId, isActive);
   } else {
     console.error('Event target is null');
+  }
+}
+selectedDishes: { [key: number]: boolean } = {};
+
+selectAll(event: any): void {
+  const checked = event.target.checked;
+  if (this.dishes.length > 0) {
+    const dishesItems = this.dishes[0].items;
+    dishesItems.forEach(dish => this.selectedDishes[dish.dishId] = checked);
+  }
+}
+onDishSelectionChange(dishId: number, event: any): void {
+  console.log(`Checkbox for dish ${dishId} changed to ${event.target.checked}`);
+  this.selectedDishes[dishId] = event.target.checked;
+}
+
+quantityToSet: any;
+applyQuantity(): void {
+  // Iterate over dishes and update the quantity if the dish is selected
+  for (const list of this.dishes) {
+    for (const dish of list.items) {
+      if (this.selectedDishes[dish.dishId]) {
+        dish.quantityDish = this.quantityToSet;
+        console.log(this.quantityToSet);
+        console.log(dish.quantityDish);
+        console.log(`Số lượng cho món ${dish.dishId} đã được đặt là ${this.quantityToSet}`);
+      }
+    }
+  }
+
+  this.cdr.detectChanges();
+}
+resetModal(): void {
+  window.location.reload();
+}
+validateQuantity(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const value = Number(input.value);
+  if (value < 1) {
+    input.value = '1';
+    this.quantityToSet = 1;
+  } else {
+    this.quantityToSet = value;
   }
 }
 }

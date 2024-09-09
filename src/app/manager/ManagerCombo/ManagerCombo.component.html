@@ -19,13 +19,17 @@
                       <div class="input-group">
                         <input type="text" class="form-control" placeholder="Tìm kiếm..." aria-label="Search" [(ngModel)]="search" aria-describedby="button-addon2">
                         <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="onSearch()" >Tìm kiếm</button>
-                    </div>
-                    
+                    </div>       
                     </div>
                 </div>
                 <div class="btn-group">
                     <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addComboModal">Thêm Combo mới<i class="bi bi-plus"></i></button>
                 </div>
+                <div class="btn-group">
+                  <button type="button" class="btn btn-sm btn-custom-brown" data-bs-toggle="modal" data-bs-target="#settingComboModal">
+                      Cấu hình combo
+                  </button>
+              </div>
             </div>
 
             <div class="table-responsive">
@@ -33,6 +37,7 @@
                 <thead>
                   <tr>
                     <th>Tên Combo</th>
+                    <th>Số lượng</th>
                     <th>Giá</th>
                     <th class="note-column">Ghi chú</th>
                     <th>Hình ảnh</th>
@@ -45,6 +50,7 @@
                   <ng-container *ngFor="let list of combo">
                     <tr *ngFor="let combo of list.items">
                       <td>{{ combo.nameCombo }}</td>
+                      <td>{{ combo.quantityCombo || 0 }}</td>
                       <td>{{ combo.price | currencyFormat  }}</td>
                       <td class="note-column">{{ combo.note }}</td>
                       <td>
@@ -196,6 +202,79 @@
     </div>
   </div>
   
-  
+  <!-- Setting Combo Modal -->
+<div class="modal fade" #settingComboModal id="settingComboModal" tabindex="-1" aria-labelledby="settingComboModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="settingComboModalLabel">Cấu hình combo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <!-- Input for Quantity -->
+          <label for="selectQuantity" class="form-label">Nhập số lượng:</label>
+          <input
+            type="number"
+            class="form-control"
+            id="selectQuantity"
+            [(ngModel)]="quantityToSet"
+            min="1"
+            (input)="validateQuantity($event)"
+            required
+          >
+          <button
+            type="button"
+            class="btn btn-info mt-2"
+            (click)="applyQuantity()"
+          >
+            Áp dụng số lượng
+          </button>
+        </div>
+        
+        <form #comboForm="ngForm">
+
+          <div class="form-check">
+            <!-- Select All Checkbox -->
+            <input class="form-check-input" type="checkbox" id="selectAllCombos" (change)="selectAll($event)">
+            <label class="form-check-label" for="selectAllCombos">Chọn tất cả</label>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Chọn</th>
+                  <th>Tên combo</th>
+                  <th>Số lượng</th>
+                </tr>
+              </thead>
+              <tbody>
+                <ng-container *ngFor="let list of combo">
+                  <tr *ngFor="let combo of list.items; let i = index;">
+                    <td>
+                      <input class="form-check-input" type="checkbox" [id]="'selectCombo' + i"
+                        [checked]="selectedCombos[combo.comboId]" (change)="onComboSelectionChange(combo.comboId, $event)">
+                    </td>
+                    <td>{{ combo.nameCombo }}</td>
+                    <td>
+                      <input type="number" class="form-control" [(ngModel)]="combo.quantityCombo" [name]="'quantityCombo' + i"
+                        min="1" [disabled]="!selectedCombos[combo.comboId]">
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" >Cập nhật</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 

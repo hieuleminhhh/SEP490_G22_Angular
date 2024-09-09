@@ -15,7 +15,94 @@
           <i class="fas fa-shopping-cart cart-icon"></i> <!-- Icon giỏ hàng -->
         </a>
       </li>
-      <li><a routerLink="/login" routerLinkActive="active">Đăng nhập</a></li>
+      <li *ngIf="!accountId; else loggedInTemplate">
+        <a routerLink="/login" routerLinkActive="active">Đăng nhập</a>
+      </li>
+
+      <ng-template #loggedInTemplate>
+        <div class="user-info d-flex align-items-center ms-3" id="utk">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" (click)="logout()">
+                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+              </a>
+            </li>
+          </ul>
+          <i class="fas fa-user-circle user-avatar" (click)="toggleDropdown()" style="font-size: 1.5rem;"></i>
+
+          <span class="user-name ms-2" (click)="toggleDropdown()" style="font-size: 1.2rem;">{{ account?.username
+            }}</span>
+
+          <div class="dropdown-menu-container">
+            <ul class="dropdown-menu" [class.show]="dropdownOpen">
+              <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">Xem
+                  thông tin</a></li>
+              <hr>
+              <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal"
+                  data-bs-target="#changePasswordModal">Đổi mật khẩu</a></li>
+              <hr>
+              <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#orderModal">Xem đơn
+                  hàng</a></li>
+              <hr>
+              <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paymentModal">Ví
+                  tiền</a></li>
+            </ul>
+          </div>
+        </div>
+      </ng-template>
+
+
     </ul>
   </nav>
+</div>
+<!-- change pass -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changePasswordModalLabel">Đổi mật khẩu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+        <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+        <!-- Condition to check if currentPassword exists -->
+        <div *ngIf="currentPassword" class="form-group">
+          <label for="currentPassword">Mật khẩu hiện tại:</label>
+          <input type="password" id="currentPassword" class="form-control" placeholder="Nhập mật khẩu hiện tại"
+            [(ngModel)]="currentPassword" name="currentPassword" required>
+        </div>
+
+        <!-- Always show these fields if currentPassword exists or not -->
+        <div *ngIf="currentPassword" class="form-group">
+          <label for="newPassword">Mật khẩu mới:</label>
+          <input type="password" id="newPassword" class="form-control" placeholder="Nhập mật khẩu mới"
+            [(ngModel)]="newPassword" name="newPassword" required>
+        </div>
+        <div *ngIf="currentPassword" class="form-group">
+          <label for="confirmNewPassword">Xác nhận mật khẩu mới:</label>
+          <input type="password" id="confirmNewPassword" class="form-control" placeholder="Xác nhận mật khẩu mới"
+            [(ngModel)]="confirmPassword" name="confirmPassword" required>
+        </div>
+
+        <!-- Always show these fields -->
+        <div *ngIf="!currentPassword" class="form-group">
+          <label for="newPassword">Nhập mật khẩu:</label>
+          <input type="password" id="newPassword" class="form-control" placeholder="Nhập mật khẩu mới"
+            [(ngModel)]="newPassword" name="newPassword" required>
+        </div>
+        <div *ngIf="!currentPassword" class="form-group">
+          <label for="confirmNewPassword">Xác nhận mật khẩu:</label>
+          <input type="password" id="confirmNewPassword" class="form-control" placeholder="Xác nhận mật khẩu mới"
+            [(ngModel)]="confirmPassword" name="confirmPassword" required>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" (click)="changePassword()">Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
 </div>
