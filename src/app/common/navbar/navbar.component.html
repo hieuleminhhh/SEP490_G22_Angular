@@ -54,6 +54,44 @@
     </ul>
   </nav>
 </div>
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="profileModalLabel">Thông tin cá nhân</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Profile details here -->
+        <div class="mb-3">
+          <label for="firstName" class="form-label">Họ</label>
+          <input type="text" class="form-control" id="firstName" [(ngModel)]="account.firstName">
+        </div>
+        <div class="mb-3">
+          <label for="lastName" class="form-label">Tên</label>
+          <input type="text" class="form-control" id="lastName" [(ngModel)]="account.lastName">
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" [(ngModel)]="account.email" readonly>
+        </div>
+        <div class="mb-3">
+          <label for="address" class="form-label">Địa chỉ</label>
+          <input type="text" class="form-control" id="address" [(ngModel)]="account.address">
+        </div>
+        <div class="mb-3">
+          <label for="phone" class="form-label">Số điện thoại</label>
+          <input type="tel" class="form-control" id="phone" [(ngModel)]="account.phone">
+        </div>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="changeProfile()">Lưu</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- change pass -->
 <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel"
   aria-hidden="true">
@@ -67,31 +105,31 @@
         <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
         <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
         <!-- Condition to check if currentPassword exists -->
-        <div *ngIf="currentPassword" class="form-group">
+        <div *ngIf="!isChangingPassword && currentPassword !== null" class="form-group">
           <label for="currentPassword">Mật khẩu hiện tại:</label>
           <input type="password" id="currentPassword" class="form-control" placeholder="Nhập mật khẩu hiện tại"
-            [(ngModel)]="currentPassword" name="currentPassword" required>
+            [(ngModel)]="passwordCu" name="currentPassword" required>
         </div>
 
         <!-- Always show these fields if currentPassword exists or not -->
-        <div *ngIf="currentPassword" class="form-group">
+        <div *ngIf="currentPassword !== null" class="form-group">
           <label for="newPassword">Mật khẩu mới:</label>
           <input type="password" id="newPassword" class="form-control" placeholder="Nhập mật khẩu mới"
             [(ngModel)]="newPassword" name="newPassword" required>
         </div>
-        <div *ngIf="currentPassword" class="form-group">
+        <div *ngIf="currentPassword !== null" class="form-group">
           <label for="confirmNewPassword">Xác nhận mật khẩu mới:</label>
           <input type="password" id="confirmNewPassword" class="form-control" placeholder="Xác nhận mật khẩu mới"
             [(ngModel)]="confirmPassword" name="confirmPassword" required>
         </div>
 
         <!-- Always show these fields -->
-        <div *ngIf="!currentPassword" class="form-group">
+        <div *ngIf="currentPassword ===null" class="form-group">
           <label for="newPassword">Nhập mật khẩu:</label>
           <input type="password" id="newPassword" class="form-control" placeholder="Nhập mật khẩu mới"
             [(ngModel)]="newPassword" name="newPassword" required>
         </div>
-        <div *ngIf="!currentPassword" class="form-group">
+        <div *ngIf="currentPassword === null" class="form-group">
           <label for="confirmNewPassword">Xác nhận mật khẩu:</label>
           <input type="password" id="confirmNewPassword" class="form-control" placeholder="Xác nhận mật khẩu mới"
             [(ngModel)]="confirmPassword" name="confirmPassword" required>
@@ -105,3 +143,4 @@
     </div>
   </div>
 </div>
+
