@@ -61,7 +61,7 @@ export class TableService {
     return this.http.post(url, tableOrder, { headers });
   }
 
-  getTablesById(id:number): Observable<any> {
+  getTablesById(id: number): Observable<any> {
     const url = `https://localhost:7188/api/Tables/${id}`;
     const token = this.authService.getToken();
     const headers = new HttpHeaders({
@@ -70,8 +70,32 @@ export class TableService {
     return this.http.get(url, { headers });
   }
 
-  deleteTables(id:number): Observable<any> {
+  deleteTables(id: number): Observable<any> {
     const url = `https://localhost:7188/api/TableReservation/${id}`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.delete(url, { headers });
+  }
+  createTables(body: any): Observable<any> {
+    const url = `https://localhost:7188/api/Tables`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.post(url, body, { headers });
+  }
+  updateTable(id:number, body:any): Observable<any> {
+    const url = `https://localhost:7188/api/Tables/${id}`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.put(url, body, { headers });
+  }
+  deleteTable(id: number): Observable<any> {
+    const url = `https://localhost:7188/api/Tables/${id}`;
     const token = this.authService.getToken();
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`

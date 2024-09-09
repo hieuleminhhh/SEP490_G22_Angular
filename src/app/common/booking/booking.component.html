@@ -130,6 +130,9 @@
       <label for="notes">Ghi chú</label>
       <textarea id="notes" name="note" placeholder="Ghi chú" [(ngModel)]="note"></textarea>
     </div>
+    <div *ngIf="message" class="error-message">
+      {{ message }}
+    </div>
     <button type="submit">Đặt bàn</button>
   </form>
   <p class="note">

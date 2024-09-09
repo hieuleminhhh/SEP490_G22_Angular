@@ -295,3 +295,7 @@ tr:hover {
 .show {
   display: block;
 }
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
