@@ -1,0 +1,280 @@
+.card {
+  padding: 16px; /* Padding inside the card */
+  margin: 16px; /* Margin around the card */
+  max-width: 2500px;
+  width: 115%;
+  box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 1rem;
+  border: transparent;
+  flex: 1;
+  background-color: #fff; /* White background for the card */
+}
+
+@media(max-width:767px) {
+  .card {
+    margin: 3vh auto;
+  }
+}
+
+.container {
+  display: flex;
+  gap: 10px;
+  padding-top: 20px;
+  width: 100%; /* Điều chỉnh lại từ 115% */
+}
+
+.short-card {
+  flex: none;
+  /* Prevent this card from growing */
+  width: 200px;
+  /* Set a fixed width, adjust as needed */
+  box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 1rem;
+  border: transparent;
+  margin: auto;
+}
+.table-layout h2 {
+  margin-bottom: 20px;
+}
+
+.table-layout-buttons {
+  display: flex;
+  flex-direction: row; /* Điều chỉnh từ column sang row */
+  flex-wrap: wrap; /* Cho phép xuống dòng nếu quá nhiều nút */
+  justify-content: center; /* Đặt các nút ở giữa */
+  gap: 10px;
+}
+
+.table-layout-buttons button {
+  background-color: #45221f8f;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+}
+
+.table-layout-buttons button.active {
+  background-color: #3e8e41;
+}
+
+.table-layout-buttons button:hover {
+  background-color: #45a049;
+}
+
+.table-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); /* Tăng kích thước tối thiểu của table */
+  gap: 16px;
+}
+
+.table {
+  position: relative;
+  border: 1px solid black; /* Green border for table */
+  border-radius: 8px; /* Rounded corners for table */
+  padding: 16px; /* Padding inside the table */
+  text-align: center; /* Centered text */
+  background-color: #f9f9f9; /* Light background for table */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for table */
+  font-size: 16px; /* Font size for table text */
+  cursor: pointer;
+}
+
+.table hr {
+  border: none; /* Remove default border */
+  border-top: 1px solid black; /* Light gray border line */
+  margin: 8px 0; /* Margin around the horizontal rule */
+}
+
+.icon-table {
+  position: absolute;
+  top: -5px;
+  color: green;
+  font-size: 20px;
+  left: 160px;
+}
+.icon-sl{
+  position: absolute;
+  top: -1px;
+  color: black;
+  font-size: 18px;
+  left: 0;
+  border: 1px solid black;
+  border-radius: 8px;
+}
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  .table-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Kích thước bảng nhỏ hơn trên màn hình nhỏ */
+  }
+
+  .table-layout-buttons button {
+    font-size: 14px; /* Giảm kích thước font của các nút */
+    padding: 10px;
+  }
+}
+button {
+  color: black; /* Màu chữ trắng */
+  border: none; /* Không có viền */
+  padding: 12px 20px; /* Khoảng đệm bên trong nút */
+  text-align: center; /* Canh giữa chữ */
+  text-decoration: none; /* Loại bỏ gạch dưới */
+  display: inline-block; /* Hiển thị nút trên cùng một hàng */
+  font-size: 16px; /* Kích thước chữ */
+  margin: 4px 2px; /* Khoảng cách bên ngoài nút */
+  cursor: pointer; /* Con trỏ chuột thay đổi khi hover */
+  border-radius: 8px; /* Bo góc nút */
+  transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu khi hover */
+}
+
+button:hover {
+  background-color: #45a049; /* Màu nền khi hover */
+}
+
+button:active {
+  background-color: #3e8e41; /* Màu nền khi nút bị click */
+}
+/* Tổng quan về modal */
+.modal-content {
+  border-radius: 10px; /* Bo tròn các góc của modal */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Hiệu ứng đổ bóng */
+  background-color: #fff; /* Màu nền trắng */
+  padding: 20px; /* Khoảng đệm trong modal */
+}
+
+.modal-header {
+  border-bottom: none; /* Xóa đường viền dưới phần header */
+  display: flex;
+  justify-content: space-between; /* Căn giữa tiêu đề và nút đóng */
+  align-items: center;
+}
+
+.modal-title {
+  font-size: 20px; /* Kích thước chữ của tiêu đề */
+  font-weight: bold; /* Làm đậm tiêu đề */
+  color: #333; /* Màu tiêu đề */
+}
+/*
+.btn-close {
+  font-size: 1.2rem;
+  border: none;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+} */
+
+.btn-close:hover {
+  opacity: 1; /* Tăng độ rõ khi hover */
+}
+
+.modal-body {
+  padding: 20px; /* Khoảng đệm trong phần nội dung */
+  font-size: 16px; /* Kích thước chữ nội dung */
+}
+
+.modal-footer {
+  border-top: none; /* Xóa đường viền trên phần footer */
+  padding: 15px 0; /* Khoảng đệm giữa các nút */
+  display: flex;
+  justify-content: flex-end; /* Căn nút sang bên phải */
+}
+
+.modal-footer button {
+  margin-left: 10px; /* Khoảng cách giữa các nút */
+}
+
+.btn-secondary {
+  background-color: #6c757d; /* Màu nền nút "Đóng" */
+  color: #fff; /* Màu chữ nút "Đóng" */
+  border-radius: 5px;
+  padding: 8px 20px;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268; /* Đổi màu khi hover */
+}
+
+.btn-primary {
+  background-color: #007bff; /* Màu nền nút "Lưu thay đổi" */
+  color: white;
+  border-radius: 5px;
+  padding: 8px 20px;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3; /* Đổi màu khi hover */
+}
+.alert {
+  margin-top: 10px;
+}
+
+
+
+
+
+/* Đảm bảo modal có chiều rộng tối ưu */
+.modal-dialog {
+  max-width: 500px; /* Thay đổi kích thước nếu cần */
+  margin: 1.75rem auto; /* Căn giữa modal */
+}
+
+/* Nâng cao phần đầu modal */
+.modal-header {
+  background-color: white; /* Màu nền cho header */
+  color: white; /* Màu chữ */
+  border-bottom: 2px solid #0056b3; /* Đường viền dưới */
+}
+
+/* Tăng khoảng cách cho modal body */
+.modal-body {
+  padding: 20px;
+}
+
+/* Cải thiện kiểu cho nút */
+.modal-footer .btn {
+  padding: 10px 20px; /* Tăng khoảng cách cho nút */
+  font-weight: bold; /* Làm đậm chữ */
+}
+
+/* Nút xóa có màu đỏ */
+.btn-danger {
+  background-color: #dc3545; /* Màu đỏ */
+  border: none; /* Không viền */
+  color: white;
+}
+
+/* Nút chỉnh sửa có màu vàng */
+.btn-warning {
+  background-color: #ffc107; /* Màu vàng */
+  border: none; /* Không viền */
+  color: white;
+}
+
+/* Đổi màu cho nút khi hover */
+.btn:hover {
+  opacity: 0.8; /* Giảm độ trong suốt khi hover */
+  transition: opacity 0.3s ease; /* Hiệu ứng chuyển đổi */
+}
+
+
+/* Căn giữa nội dung trong modal body */
+.modal-body p {
+  margin-bottom: 15px; /* Khoảng cách giữa các đoạn văn */
+}
+
+.modal-body strong {
+  margin-right: 10px; /* Khoảng cách giữa tiêu đề và nội dung */
+}

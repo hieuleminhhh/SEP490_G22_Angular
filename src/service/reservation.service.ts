@@ -157,4 +157,13 @@ export class ReservationService {
     });
     return this.http.put(url, status, { headers });
   }
+
+  checkValidTable(reservationTime: string, number:number): Observable<any> {
+    const url = `https://localhost:7188/api/Reservations/checkAvailability?reservationTime=${reservationTime}&guestNumber=${number}`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get(url, { headers });
+  }
 }

@@ -227,6 +227,7 @@ export class CookingManagementComponent implements OnInit {
     this.cookingService.getIngredient(name, quantity).subscribe(
       response => {
         this.ingredient = response;
+console.log(this.ingredient);
 
       },
       error => {

@@ -37,8 +37,11 @@ export class BookingComponent implements OnInit {
   availableTimes: string[] = [];
   formSubmitted = false;
   cartItems: Dish[] = [];
+  isValid: boolean = false;
+  currentRequest: any;
+  message: string = '';
 
-  constructor(private reservationService: ReservationService, private router: Router,public dialog: MatDialog) {
+  constructor(private reservationService: ReservationService, private router: Router, public dialog: MatDialog) {
     const today = new Date();
     this.minDate = this.formatDate(today);
     const maxDate = new Date();
@@ -85,19 +88,20 @@ export class BookingComponent implements OnInit {
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
+
   updateTimes(): void {
     const now = new Date();
     const selectedDate = new Date(this.reservation.date);
     const isToday = now.toDateString() === selectedDate.toDateString();
+    now.setMinutes(now.getMinutes() + 30);
     const currentHour = now.getHours();
     const currentMinute = now.getMinutes();
+
     this.availableTimes = [];
 
     for (let hour = 9; hour <= 21; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
-        if (isToday && (hour > currentHour || (hour === currentHour && minute >= currentMinute))) {
-          this.addTimeOption(hour, minute);
-        } else if (!isToday) {
+        if (!isToday || (hour > currentHour || (hour === currentHour && minute >= currentMinute))) {
           this.addTimeOption(hour, minute);
         }
       }
@@ -105,9 +109,47 @@ export class BookingComponent implements OnInit {
   }
 
   addTimeOption(hour: number, minute: number): void {
-    const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-    this.availableTimes.push(time);
+    const formattedTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+    this.availableTimes.push(formattedTime);
   }
+  checkTable(reservationTime: string, number: number) {
+    this.reservationService.checkValidTable(reservationTime, number).subscribe({
+      next: response => {
+        this.isValid = response.canReserve;
+        if (this.isValid === true) {
+          sessionStorage.setItem('request', JSON.stringify(this.currentRequest));
+          sessionStorage.setItem('cart', JSON.stringify(this.cartItems));
+
+          if (this.currentRequest.orderDetails.length > 0) {
+            this.router.navigate(['/paymentReservation']);
+          } else {
+            this.reservationService.createResevetion(this.currentRequest).subscribe({
+              next: response => {
+                console.log('Order submitted successfully', response);
+                this.reservationService.clearCart();
+                this.router.navigate(['/paymentReservation']);
+              },
+              error: error => {
+                if (error.error instanceof ErrorEvent) {
+                  console.error('An error occurred:', error.error.message);
+                } else {
+                  console.error(`Backend returned code ${error.status}, ` +
+                    `body was: ${JSON.stringify(error.error)}`);
+                }
+              }
+            });
+          }
+        } else {
+          this.message = response.message;  // Thông báo lỗi
+        }
+      },
+      error: error => {
+        console.error('An error occurred:', error.error.message);
+        this.message = 'Có lỗi xảy ra khi kiểm tra bàn, vui lòng thử lại.';  // Thông báo lỗi
+      }
+    });
+  }
+
 
   submitForm(form: any) {
     this.formSubmitted = true;
@@ -136,34 +178,16 @@ export class BookingComponent implements OnInit {
           orderTime: new Date().toISOString()
         }))
       };
+
+      // Lưu request hiện tại để sử dụng sau khi kiểm tra bàn hợp lệ
+      this.currentRequest = request;
       console.log(request);
-      sessionStorage.setItem('request', JSON.stringify(request));
-      sessionStorage.setItem('cart', JSON.stringify(this.cartItems));
 
-      if (request.orderDetails.length > 0) {
-        this.router.navigate(['/paymentReservation']);
-      } else {
-        this.reservationService.createResevetion(request).subscribe({
-          next: response => {
-            console.log('Order submitted successfully', response);
-            this.reservationService.clearCart();
-            this.router.navigate(['/paymentReservation']);
-
-          },
-          error: error => {
-            if (error.error instanceof ErrorEvent) {
-              // Lỗi client-side hoặc mạng
-              console.error('An error occurred:', error.error.message);
-            } else {
-              // Lỗi server-side
-              console.error(`Backend returned code ${error.status}, ` +
-                `body was: ${JSON.stringify(error.error)}`);
-            }
-          }
-        });
-      }
+      // Gọi kiểm tra bàn hợp lệ trước khi thực hiện tiếp
+      this.checkTable(request.reservationTime, request.guestNumber);
     }
   }
+
   formatDateTime(date: string, time: string): string {
     const datetimeString = `${date}T${time}:00`;
     const dateObj = new Date(datetimeString);
