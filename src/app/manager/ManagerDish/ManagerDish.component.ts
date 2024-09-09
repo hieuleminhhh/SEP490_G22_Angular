@@ -459,4 +459,24 @@ validateQuantity(event: Event) {
     this.quantityToSet = value;
   }
 }
+updateSelectedDishes() {
+  this.dishes.forEach(list => {
+    list.items.forEach(dish => {
+      if (this.selectedDishes[dish.dishId]) {
+        this.dishService.UpdateDishQuantity(dish.dishId, dish.quantityDish)
+          .subscribe({
+            next: (response) => {
+              console.log(`Dish ${dish.dishId} updated successfully`, response);
+            },
+            error: (error) => {
+              console.error(`Error updating dish ${dish.dishId}`, error);
+            }
+          });
+      }
+    });
+  });
+
+  // // Optionally, close the modal after updating
+  // this.resetModal();
+}
 }

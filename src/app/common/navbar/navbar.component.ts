@@ -20,6 +20,7 @@ export class NavbarComponent implements OnInit {
   currentPassword: string = '';
   newPassword: string = '';
   confirmPassword: string = '';
+  passwordCu: string = '';
   constructor(private cartService: CartService, private accountService: AccountService) { }
 
   ngOnInit(): void {
@@ -38,6 +39,7 @@ export class NavbarComponent implements OnInit {
     this.accountService.getAccountById(accountId).subscribe(
       response => {
         this.account = response;
+        this.currentPassword = response.password;
       },
       error => {
         console.error('Error fetching account details:', error);
@@ -54,17 +56,18 @@ export class NavbarComponent implements OnInit {
     this.accountService.logout();
     window.location.href = '/';
   }
+  isChangingPassword: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
   changePassword() {
-    if (this.accountId && this.newPassword && this.confirmPassword && this.currentPassword) {
+    if (this.accountId && this.newPassword && this.confirmPassword && this.passwordCu) {
       if (this.newPassword !== this.confirmPassword) {
         this.errorMessage = 'New password and confirmation do not match';
         this.successMessage = ''; // Clear success message
         return;
       }
       const passwordData = {
-        currentPassword: this.currentPassword,
+        currentPassword: this.passwordCu,
         newPassword: this.newPassword,
         confirmPassword: this.confirmPassword
       };
@@ -77,9 +80,9 @@ export class NavbarComponent implements OnInit {
           // Display success message for 3 seconds before reloading
           setTimeout(() => {
             window.location.reload();
-          }, 2000); // 3000 milliseconds = 3 seconds
+          }, 2000); 
 
-          this.currentPassword = '';
+          this.passwordCu = '';
           this.newPassword = '';
           this.confirmPassword = '';
           this.dropdownOpen = false;  // Close dropdown after password change
@@ -92,6 +95,22 @@ export class NavbarComponent implements OnInit {
     } else {
       this.errorMessage = 'Đổi mật khẩu không thành công xem lại thông tin nhập'; // Set error message for missing fields
       this.successMessage = ''; // Clear success message
+    }
+  }
+  changeProfile() {
+    if (this.accountId) {
+      this.accountService.changeProfile(this.accountId, this.account).subscribe({
+        next: (updatedAccount) => {
+          console.log('Profile updated successfully:', updatedAccount);
+          // Reload the page
+          window.location.reload();
+        },
+        error: (error) => {
+          console.error('Error updating profile:', error);
+        }
+      });
+    } else {
+      console.error('No account ID provided');
     }
   }
 }
