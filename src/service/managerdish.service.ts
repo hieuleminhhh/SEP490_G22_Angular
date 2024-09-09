@@ -76,4 +76,15 @@ export class ManagerDishService {
     const url = `${this.apiUrl}/Dish/${dishId}/status`;
     return this.http.patch<any>(url, { isActive }, this.getHttpOptions());
   }
+
+  UpdateDishQuantity(dishId: number, quantity: number): Observable<any> {
+    const url = `${this.apiUrl}/Dish/${dishId}/update-quantity`;
+    return this.http.put<any>(url, { quantityDish: quantity }, this.getHttpOptions())
+      .pipe(
+        catchError((error: any) => {
+          console.error('An error occurred:', error);
+          return throwError(error);
+        })
+      );
+  }
 }

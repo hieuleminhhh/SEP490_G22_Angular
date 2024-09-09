@@ -80,4 +80,14 @@ export class ManagerComboService {
   AddComboDetails(comboDetails: any[]): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/combo-details`, comboDetails, this.getHttpOptions());
   }
+  UpdateComboQuantity(comboId: number, quantity: number): Observable<any> {
+    const url = `${this.apiUrl}/combo/${comboId}/update-quantity`;
+    return this.http.put<any>(url, { quantityCombo: quantity }, this.getHttpOptions())
+      .pipe(
+        catchError((error: any) => {
+          console.error('An error occurred:', error);
+          return throwError(error);
+        })
+      );
+  }
 }

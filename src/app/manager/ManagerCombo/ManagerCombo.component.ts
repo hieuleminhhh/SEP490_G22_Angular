@@ -439,4 +439,24 @@ validateQuantity(event: Event) {
     this.quantityToSet = value; // Update model if value is valid
   }
 }
+updateSelectedCombos() {
+  this.combo.forEach(list => {
+    list.items.forEach(combos => {
+      if (this.selectedCombos[combos.comboId]) {
+        this.comboService.UpdateComboQuantity(combos.comboId, combos.quantityCombo)
+          .subscribe({
+            next: (response) => {
+              console.log(`Combo ${combos.comboId} updated successfully`, response);
+            },
+            error: (error) => {
+              console.error(`Error updating dish ${combos.comboId}`, error);
+            }
+          });
+      }
+    });
+  });
+
+  // // Optionally, close the modal after updating
+  // this.resetModal();
+}
 }
