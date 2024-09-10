@@ -39,14 +39,14 @@ export class ManagerComboService {
   }
 
   getComboById(comboId: number): Observable<UpdateCombo> {
-    const url = `${this.apiUrl}/Combo/GetComboById/${comboId}`; 
+    const url = `${this.apiUrl}/Combo/GetComboById/${comboId}`;
     return this.http.get<UpdateCombo>(url, this.getHttpOptions());
   }
 
   AddNewCombo(newCombo: AddNewCombo): Observable<AddNewCombo> {
     return this.http.post<AddNewCombo>(`${this.apiUrl}/Combo/CreateComboWithDishes`, newCombo, this.getHttpOptions())
       .pipe(
-        catchError((error: any) => { 
+        catchError((error: any) => {
           console.error('An error occurred:', error);
           return throwError(error);
         })
@@ -80,9 +80,9 @@ export class ManagerComboService {
   AddComboDetails(comboDetails: any[]): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/combo-details`, comboDetails, this.getHttpOptions());
   }
-  UpdateComboQuantity(comboId: number, quantity: number): Observable<any> {
-    const url = `${this.apiUrl}/combo/${comboId}/update-quantity`;
-    return this.http.put<any>(url, { quantityCombo: quantity }, this.getHttpOptions())
+  UpdateComboQuantity(body:any): Observable<any> {
+    const url = `https://localhost:7188/api/Combo/update-quantity`;
+    return this.http.put<any>(url, body, this.getHttpOptions())
       .pipe(
         catchError((error: any) => {
           console.error('An error occurred:', error);

@@ -144,12 +144,11 @@ button:hover {
 }
 
 .tab-buttons {
-  position: fixed; /* Giữ các button ở vị trí cố định trên màn hình */
-  top: 80px; /* Điều chỉnh vị trí từ trên xuống (tùy chỉnh theo ý muốn) */
-  left: 50%; /* Đặt vị trí bắt đầu từ giữa màn hình */
-  transform: translateX(-50%);
+  position: sticky;
+  top: 80px;
   width: 70%; /* Chiều rộng */
   max-width: 800px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between; /* Căn các button cạnh nhau mà không có khoảng trống giữa */
   background-color: white; /* Màu nền của container button */

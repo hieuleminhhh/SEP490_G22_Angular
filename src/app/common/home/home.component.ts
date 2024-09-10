@@ -57,7 +57,6 @@ export class HomeComponent {
 
     return this.http.get<any>(apiUrl).pipe(
       map(response => {
-        console.log('API response:', response);
 
         if (Array.isArray(response)) {
           return response.filter((dish: Dish) => dish.isActive);

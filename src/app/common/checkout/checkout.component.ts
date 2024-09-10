@@ -45,6 +45,7 @@ export class CheckoutComponent implements OnInit {
   selectedDiscount: number | null = null;
   selectedDiscountDetails: any = null;
   selectedPromotion: boolean = false;
+  accountId: number=0;
 
   constructor(private cartService: CartService, private reservationService: ReservationService, private http: HttpClient, private router: Router, private route: ActivatedRoute, private checkoutService: CheckoutService) {
     const today = new Date();
@@ -57,16 +58,18 @@ export class CheckoutComponent implements OnInit {
     console.log(today);
     console.log(this.date);
     console.log(this.time);
-
-
   }
 
   ngOnInit() {
     // Lấy dữ liệu từ sessionStorage khi component được khởi tạo
     const cartItemsString = sessionStorage.getItem('cartItems');
+    const accountIdString = localStorage.getItem('accountId');
     if (cartItemsString) {
-      this.cartItems = JSON.parse(cartItemsString); // Chuyển đổi chuỗi JSON thành mảng đối tượng JavaScript
+      this.cartItems = JSON.parse(cartItemsString);
       console.log(this.cartItems);
+    }
+    if (accountIdString) {
+      this.accountId = JSON.parse(accountIdString);
     }
     this.updateTimes();
   }
@@ -228,6 +231,7 @@ export class CheckoutComponent implements OnInit {
         deposits = this.getTotalCartPrice();
       }
       const request = {
+        accountId: this.accountId,
         guestPhone: this.guestPhone,
         email: this.email,
         addressId: 0,
