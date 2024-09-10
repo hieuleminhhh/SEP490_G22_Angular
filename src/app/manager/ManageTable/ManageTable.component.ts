@@ -31,7 +31,7 @@ export class ManageTableComponent implements OnInit {
   newFloor: any;
   floors: number[] = [];
   errorMessage: string = '';
-  newTable: number = 0;
+  newTable: string='';
   capacityError: string | null = null;
   selectedTableId: any;
   tableDetail: any = {};
@@ -57,13 +57,10 @@ export class ManageTableComponent implements OnInit {
   getTableData(): void {
     this.tableService.getTables().subscribe(
       response => {
-        this.originalDataTable = response; // Lưu dữ liệu ban đầu
+        this.originalDataTable = response;
         this.dataTable = [...this.originalDataTable];
         this.filterTablesByFloorAndStatus(this.selectedTable);
-
-        // Tính toán newTable là tableId cuối cùng + 1
         const tableIds = this.originalDataTable.map(table => table.tableId);
-        this.newTable = Math.max(...tableIds) + 1; // Lấy tableId lớn nhất và cộng thêm 1
 
         this.floors = this.getFloors();
       },
@@ -76,10 +73,8 @@ export class ManageTableComponent implements OnInit {
   filterTablesByFloorAndStatus(selectedTable: string): void {
     const currentFloor = this.selectedFloor;
     if (selectedTable === 'all') {
-      // Nếu chọn 'all', hiển thị tất cả các bàn của tầng đang chọn
       this.dataTable = this.originalDataTable.filter(table => table.floor === currentFloor);
     } else if (selectedTable === 'empty') {
-      // Nếu chọn 'empty', chỉ hiển thị các bàn trống của tầng đang chọn
       this.dataTable = this.originalDataTable.filter(table => table.floor === currentFloor && table.status === 0);
     }
   }
@@ -181,8 +176,6 @@ export class ManageTableComponent implements OnInit {
       modal.classList.remove('show');
       modal.style.display = 'none';
       document.body.classList.remove('modal-open');
-
-      // Xóa backdrop nếu không còn modal nào mở
       this.removeExistingBackdrop();
     }
   }
@@ -206,7 +199,7 @@ export class ManageTableComponent implements OnInit {
     if (this.capacity < 1 || this.capacity > 20) {
       this.capacityError = 'Số chỗ ngồi phải nằm trong khoảng từ 1 đến 20.';
     } else {
-      this.capacityError = null; // Reset error message if valid
+      this.capacityError = null;
     }
   }
   showTableDetails(table: any): void {
@@ -226,14 +219,12 @@ export class ManageTableComponent implements OnInit {
     }
   }
 
-  // Đóng modal hiển thị thông tin bàn
   closeTableDetailsModal(): void {
     const modal = this.tableDetailsModal.nativeElement;
     if (modal) {
       modal.classList.remove('show');
       modal.style.display = 'none';
       document.body.classList.remove('modal-open');
-      // Xóa backdrop nếu không còn modal nào mở
       this.removeExistingBackdrop();
     }
   }
@@ -251,13 +242,13 @@ export class ManageTableComponent implements OnInit {
   }
 
   deleteTable(table: any): void {
-    this.tableToDelete = table; // Lưu bàn cần xóa
-    this.openConfirmDeleteModal(); // Mở modal xác nhận
+    this.tableToDelete = table;
+    this.openConfirmDeleteModal();
   }
 
   openConfirmDeleteModal(): void {
-    this.isTableDetailsVisible = true; // Đánh dấu modal chi tiết đang hiển thị
-    this.closeTableDetailsModal(); // Đóng modal chi tiết trước
+    this.isTableDetailsVisible = true;
+    this.closeTableDetailsModal();
 
     const modal = this.confirmDeleteModal.nativeElement;
     if (modal) {
@@ -276,11 +267,9 @@ export class ManageTableComponent implements OnInit {
       modal.style.display = 'none';
       document.body.classList.remove('modal-open');
       this.removeExistingBackdrop();
-
-      // Nếu modal chi tiết đã được mở trước đó, mở lại modal chi tiết
       if (this.isTableDetailsVisible) {
         this.openTableDetails();
-        this.isTableDetailsVisible = false; // Reset trạng thái
+        this.isTableDetailsVisible = false;
       }
     }
   }
@@ -290,47 +279,38 @@ export class ManageTableComponent implements OnInit {
       this.tableService.deleteTable(this.tableToDelete.tableId).subscribe(
         () => {
           console.log('Bàn đã được xóa thành công!');
-          this.getTableData(); // Tải lại danh sách bàn sau khi xóa
-          this.closeConfirmDeleteModal(); // Đóng modal xác nhận
+          this.getTableData();
+          this.closeConfirmDeleteModal();
           this.closeTableDetailsModal();
           window.location.reload();
-          // Không mở lại modal chi tiết ở đây
         },
         error => {
           console.error('Error deleting table:', error);
-          // Nếu có lỗi trong quá trình xóa, mở lại modal chi tiết
           this.openTableDetails();
         }
       );
     }
   }
   get tableStatus(): number {
-    // Nếu status là 0 hoặc 1, trả về 1 để hiển thị 'Đang hoạt động'
     return this.tableDetail.status === 0 || this.tableDetail.status === 1 ? 1 : 2;
   }
 
   set tableStatus(value: any) {
-    console.log(value);
-
-    if (value === "1") {
+    if (value === 1) {
       this.tableDetail.status = 0;
-      console.log(this.tableDetail.status);
-
     } else {
       this.tableDetail.status = 2;
-      console.log(this.tableDetail.status);
-
     }
   }
 
   editTable(table: any): void {
-    this.tableToEdit = table; // Lưu bàn cần chỉnh sửa
-    this.openConfirmEditModal(); // Mở modal xác nhận
+    this.tableToEdit = table;
+    this.openConfirmEditModal();
   }
 
   openConfirmEditModal(): void {
-    this.isTableDetailsVisible = true; // Đánh dấu modal chi tiết đang hiển thị
-    this.closeTableDetailsModal(); // Đóng modal chi tiết trước
+    this.isTableDetailsVisible = true;
+    this.closeTableDetailsModal();
 
     const modal = this.confirmEditModal.nativeElement;
     if (modal) {
@@ -351,37 +331,34 @@ export class ManageTableComponent implements OnInit {
       document.body.classList.remove('modal-open');
       this.removeExistingBackdrop();
 
-      // Nếu modal chi tiết đã được mở trước đó, mở lại modal chi tiết
       if (this.isTableDetailsVisible) {
         this.openTableDetails();
-        this.isTableDetailsVisible = false; // Reset trạng thái
+        this.isTableDetailsVisible = false;
       }
     }
   }
 
   confirmEditTable(tableDetail:any): void {
     if (this.tableToEdit) {
-      // Gọi hàm để thực hiện cập nhật thay đổi
       this.updateTable(tableDetail);
     }
   }
-  // Phương thức chỉnh sửa bàn
+
   updateTable(tableDetail: any): void {
     const request = {
       status: tableDetail.status,
       capacity: tableDetail.capacity,
       floor: tableDetail.floor
     }
-    console.log(this.tableDetail.status);
 
     this.tableService.updateTable(this.tableDetail.tableId, request).subscribe(
       response => {
         const index = this.originalDataTable.findIndex(table => table.tableId === this.tableDetail.tableId);
         if (index !== -1) {
-          this.originalDataTable[index] = response; // Cập nhật thông tin bàn
-          this.dataTable[index] = response; // Cập nhật dữ liệu hiển thị
+          this.originalDataTable[index] = response;
+          this.dataTable[index] = response;
         }
-        this.closeTableDetailsModal(); // Đóng modal
+        this.closeTableDetailsModal();
         window.location.reload();
       },
       error => {
@@ -389,6 +366,8 @@ export class ManageTableComponent implements OnInit {
       }
     );
   }
+  getWaitingTable(){
 
+  }
 
 }

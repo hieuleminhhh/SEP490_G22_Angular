@@ -104,7 +104,7 @@ export class ManagerDishComponent implements OnInit {
         if (response && response.items) {
           this.dishes = [response]; // Wrap response in an array
           const dishesItems = response.items; // Extract items from response
-  
+
           // Initialize selectedDishes
           this.selectedDishes = {}; // Reset selectedDishes
           dishesItems.forEach(dish => {
@@ -119,7 +119,7 @@ export class ManagerDishComponent implements OnInit {
       }
     );
   }
-  
+
 
   onSearch(): void {
     this.currentPage = 1;
@@ -462,8 +462,12 @@ validateQuantity(event: Event) {
 updateSelectedDishes() {
   this.dishes.forEach(list => {
     list.items.forEach(dish => {
+      const body={
+        dishId:dish.dishId,
+        quantityDish:dish.quantityDish
+      }
       if (this.selectedDishes[dish.dishId]) {
-        this.dishService.UpdateDishQuantity(dish.dishId, dish.quantityDish)
+        this.dishService.UpdateDishQuantity(body)
           .subscribe({
             next: (response) => {
               console.log(`Dish ${dish.dishId} updated successfully`, response);
@@ -477,6 +481,6 @@ updateSelectedDishes() {
   });
 
   // // Optionally, close the modal after updating
-  // this.resetModal();
+  this.resetModal();
 }
 }

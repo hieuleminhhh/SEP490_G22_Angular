@@ -42,7 +42,7 @@ export class ManagerDishService {
   AddNewDish(newDish: AddNewDish): Observable<AddNewDish> {
     return this.http.post<AddNewDish>(`${this.apiUrl}/Dish`, newDish, this.getHttpOptions())
       .pipe(
-        catchError((error: any) => { 
+        catchError((error: any) => {
           console.error('An error occurred:', error);
           return throwError(error);
         })
@@ -77,9 +77,9 @@ export class ManagerDishService {
     return this.http.patch<any>(url, { isActive }, this.getHttpOptions());
   }
 
-  UpdateDishQuantity(dishId: number, quantity: number): Observable<any> {
-    const url = `${this.apiUrl}/Dish/${dishId}/update-quantity`;
-    return this.http.put<any>(url, { quantityDish: quantity }, this.getHttpOptions())
+  UpdateDishQuantity(body:any): Observable<any> {
+    const url = `https://localhost:7188/api/Dish/update-quantity`;
+    return this.http.put<any>(url, body, this.getHttpOptions())
       .pipe(
         catchError((error: any) => {
           console.error('An error occurred:', error);

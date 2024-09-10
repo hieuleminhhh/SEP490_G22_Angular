@@ -34,6 +34,7 @@ import { ManageNewComponent } from './manager/ManageNew/ManageNew.component';
 import { AuthGuard } from './auth/authGuard/authGuard.component';
 import { AuthCallbackComponent } from './common/login/callback/authCallback/authCallback.component';
 import { ManageTableComponent } from './manager/ManageTable/ManageTable.component';
+import { NotificationComponent } from './common/notification/notification.component';
 
 
 export const routes: Routes = [
@@ -50,7 +51,7 @@ export const routes: Routes = [
     {'path': 'managercombo', component:ManagerComboComponent, canActivate: [AuthGuard]},
     {'path': 'purchase', component:PurchaseOrderComponent},
     {'path': 'checkout', component:CheckoutComponent},
-    {'path': 'orderDetail', component:OrderDetailComponent},
+    {'path': 'orderDetail/:id', component:OrderDetailComponent},
     {'path': 'tableManagement', component:TableManagementComponent},
     {'path': 'managerorder', component:ManagerOrderComponent, canActivate: [AuthGuard]},
     {'path': 'paymentReservation', component:PaymentReservationComponent},
@@ -70,5 +71,7 @@ export const routes: Routes = [
     {'path': 'invoice', component: ManageInvoiceComponent},
     {'path': 'manageNew', component: ManageNewComponent},
     {'path': 'auth/callback', component: AuthCallbackComponent},
-    {'path': 'manageTable', component: ManageTableComponent}
+    {'path': 'manageTable', component: ManageTableComponent},
+    {'path': 'notification', component: NotificationComponent}
+
 ];

@@ -25,7 +25,7 @@ export class ManagerComboComponent implements OnInit {
   allDishes: Dish[] = [];
   selectedDishes: number[] = [];
   imageUrl: string = '';
-  search: string = '';  
+  search: string = '';
   currentPage: number = 1;
   pageSize: number = 5;
   totalCount: number = 0;
@@ -33,7 +33,7 @@ export class ManagerComboComponent implements OnInit {
   selectedUpdateFile: File | null = null;
   totalPagesArray: number[] = [];
   successMessage: string = '';
-  addErrorMessage: string = ''; 
+  addErrorMessage: string = '';
   updateErrorMessage: string = '';
   addErrors = {
     nameComboError: '',
@@ -58,12 +58,12 @@ export class ManagerComboComponent implements OnInit {
     message: '',
     dishIds: [],
   };
-  
+
   updatedCombo: UpdateCombo = {
     comboId: 0,
-    nameCombo: '', 
-    price: null as number | null, 
-    note : '', 
+    nameCombo: '',
+    price: null as number | null,
+    note : '',
     imageUrl: '',
     message: '',
     dishIds: [],
@@ -74,11 +74,11 @@ export class ManagerComboComponent implements OnInit {
     this.loadListCombo();
     this.loadAllDishes();
   }
-  
 
-  
-  
-  
+
+
+
+
   loadListCombo(search: string = ''): void {
     console.log('Loading combos with search term:', search);
     this.comboService.ListCombo(this.currentPage, this.pageSize, search).subscribe(
@@ -105,7 +105,7 @@ export class ManagerComboComponent implements OnInit {
         if (response && response.items) {
           this.combo = [response]; // Wrap response in an array
           const comboItems = response.items; // Extract items from response
-  
+
           // Initialize selectedDishes
           this.selectedCombos = {}; // Reset selectedDishes
           comboItems.forEach(combo => {
@@ -153,7 +153,7 @@ export class ManagerComboComponent implements OnInit {
     this.comboService.UpdateComboStatus(comboId, isActive).subscribe(
       (response) => {
         console.log('Combo status updated successfully:', response);
-        this.loadListCombo(); 
+        this.loadListCombo();
       },
       (error) => {
         console.error('Error updating combo status:', error);
@@ -176,7 +176,7 @@ export class ManagerComboComponent implements OnInit {
   }
   onSearch(): void {
     this.currentPage = 1;
-    console.log('Search term:', this.search);  
+    console.log('Search term:', this.search);
     this.loadListCombo(this.search);
   }
   onUpdateImageSelect(event: Event): void {
@@ -184,25 +184,25 @@ export class ManagerComboComponent implements OnInit {
     if (fileInput.files && fileInput.files.length > 0) {
       this.selectedUpdateFile = fileInput.files[0];
       const imageUrl = URL.createObjectURL(this.selectedUpdateFile);
-      this.updatedCombo.imageUrl = imageUrl;  
+      this.updatedCombo.imageUrl = imageUrl;
     }
   }
   onImageSelect(event: Event): void {
     const fileInput = event.target as HTMLInputElement;
     if (fileInput.files && fileInput.files.length > 0) {
       const file = fileInput.files[0];
-      
+
       // Optional: Validate file size (e.g., 2MB max)
       if (file.size > 2 * 1024 * 1024) {
         this.addErrors.imageError = 'File size exceeds 2MB';
-  
+
         return;
       }
       // Create a URL for the selected file
       this.selectedFile = file;
       this.imageUrl = URL.createObjectURL(file);
     } else {
-  
+
       this.addErrors.imageError = 'No file selected';
     }
   }
@@ -222,7 +222,7 @@ export class ManagerComboComponent implements OnInit {
       console.error('No file selected.');
     }
   }
-  updateCombo(selectedDishes: number[]): void {  
+  updateCombo(selectedDishes: number[]): void {
     console.log('Selected dishes:', selectedDishes);
     this.updatedCombo.dishIds = selectedDishes;
     if (this.selectedUpdateFile) {
@@ -302,7 +302,7 @@ export class ManagerComboComponent implements OnInit {
       this.saveCombo();
     }
   }
-  
+
 
   saveCombo(): void {
     this.comboService.AddNewCombo(this.addNew).subscribe(
@@ -325,7 +325,7 @@ export class ManagerComboComponent implements OnInit {
           const fieldErrors = error.error;
           if (fieldErrors['nameCombo']) {
             this.addErrors.nameComboError = fieldErrors['nameCombo'];
-          }          
+          }
           if (fieldErrors['price']) {
             this.addErrors.priceError = fieldErrors['price'];
           }
@@ -344,8 +344,8 @@ export class ManagerComboComponent implements OnInit {
       }
     );
   }
-  
-  
+
+
   clearAddErrors(): void {
     this.addErrors = {
       nameComboError: '',
@@ -431,7 +431,7 @@ selectAll(event: any): void {
 validateQuantity(event: Event) {
   const input = event.target as HTMLInputElement;
   const value = Number(input.value);
-  
+
   if (value < 1) {
     input.value = '1'; // Reset input value to 1 if less than 1
     this.quantityToSet = 1; // Update model to ensure consistency
@@ -442,8 +442,12 @@ validateQuantity(event: Event) {
 updateSelectedCombos() {
   this.combo.forEach(list => {
     list.items.forEach(combos => {
+      const body={
+        comboId:combos.comboId,
+        quantityCombo: combos.quantityCombo
+      }
       if (this.selectedCombos[combos.comboId]) {
-        this.comboService.UpdateComboQuantity(combos.comboId, combos.quantityCombo)
+        this.comboService.UpdateComboQuantity(body)
           .subscribe({
             next: (response) => {
               console.log(`Combo ${combos.comboId} updated successfully`, response);
@@ -457,6 +461,9 @@ updateSelectedCombos() {
   });
 
   // // Optionally, close the modal after updating
-  // this.resetModal();
+  this.resetModal();
+}
+resetModal(): void {
+  window.location.reload();
 }
 }
