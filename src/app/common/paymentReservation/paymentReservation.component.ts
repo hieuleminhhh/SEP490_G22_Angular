@@ -18,7 +18,7 @@ export class PaymentReservationComponent implements OnInit {
   data: any;
   cartItem: any;
   ispayment: boolean = false;
-
+  accountId: number=0;
   constructor(private reservationService: ReservationService, private router: Router, private checkoutService: CheckoutService) {
 
   }
@@ -51,9 +51,10 @@ export class PaymentReservationComponent implements OnInit {
       this.data = JSON.parse(request);
     }
 
-    console.log(this.data);
-    console.log(this.cartItem);
-    console.log(this.ispayment);
+    const accountIdString = localStorage.getItem('accountId');
+    if (accountIdString) {
+      this.accountId = JSON.parse(accountIdString);
+    }
   }
 
 
@@ -72,6 +73,7 @@ export class PaymentReservationComponent implements OnInit {
     const offset = localDateTime.getTimezoneOffset() * 60000; // offset in milliseconds
     const localISOTime = new Date(localDateTime.getTime() - offset).toISOString().slice(0, -1);
     const request = {
+      accountId:this.accountId,
       guestPhone: this.data.guestPhone,
       email: '',
       guestAddress: '',
