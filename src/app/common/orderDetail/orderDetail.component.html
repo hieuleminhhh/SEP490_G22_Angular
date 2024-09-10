@@ -1,53 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Completion Page</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Completion Page</title>
 </head>
+
 <body>
-    <div class="order-page">
-        <header>
-            <button class="back-btn">&lt; TRỞ LẠI</button>
-            <div class="order-info">
-                <span class="order-id">MÃ ĐƠN HÀNG: 240509TRTR85D1</span>
-                <span class="order-status">ĐƠN HÀNG ĐÃ HOÀN THÀNH</span>
-            </div>
-        </header>
+  <div class="order-page">
+    <header>
+      <button class="back-btn" (click)="goBack()">&lt; TRỞ LẠI</button>
+      <div class="order-info">
+        <span class="order-id">MÃ ĐƠN HÀNG: {{orderDetail?.orderId}}</span>
+        <!-- <span class="order-status">ĐƠN HÀNG ĐÃ HOÀN THÀNH</span> -->
+        <span *ngIf="orderDetail?.status === 4" class="text-success">TRẠNG THÁI ĐƠN HÀNG: HOÀN THÀNH</span>
+        <span *ngIf="orderDetail?.status === 1" style="color: rgb(69, 69, 18);">TRẠNG THÁI ĐƠN HÀNG: ĐỢI XÁC NHẬN</span>
+        <span *ngIf="orderDetail?.status === 8" style="color: blue;">TRẠNG THÁI ĐƠN HÀNG: ĐANG GIAO HÀNG</span>
+        <span *ngIf="orderDetail?.status === 5" class="text-danger">TRẠNG THÁI ĐƠN HÀNG: ĐÃ HỦY</span>
+      </div>
+    </header>
 
-        <button class="buy-again-btn">Mua Lại</button>
+    <section class="shipping-info">
+      <div class="shipping-details">
+        <h2>Địa Chỉ Nhận Hàng</h2>
+        <p>{{orderDetail?.consigneeName}}</p>
+        <p>{{orderDetail?.guestPhone}}</p>
+        <p>{{orderDetail?.guestAddress}}</p>
+      </div>
+    </section>
+    <hr>
+    <section class="order-summary">
+      <div class="pr">
+        <div *ngFor="let item of orderDetail?.orderDetails" class="product">
+          <img [src]="item.imageUrl" [alt]="item.itemName" class="product-image">
+          <div class="product-details">
+            <h3>{{ item.itemName }}</h3>
+            <p>Số lượng: {{ item.quantity }}</p>
+          </div>
+          <div class="product-price">{{ item.unitPrice | currencyFormat}}</div>
+        </div>
+      </div>
 
-        <section class="shipping-info">
-            <h2>Địa Chỉ Nhận Hàng</h2>
-            <div class="shipping-details">
-                <p>Lê Dương</p>
-                <p>(+84) 393578176</p>
-                <p>Nhà trọ An Giang, thôn 5, xã Thạch Hòa, huyện Thạch Thất, Hà Nội, Xã Thạch Hòa, Huyện Thạch Thất, Hà Nội</p>
-            </div>
 
-        </section>
-
-        <section class="order-summary">
-            <div class="product">
-                <img src="https://via.placeholder.com/150" alt="Tai nghe Xiaomi Chính Hãng Mi Basic">
-                <div class="product-details">
-                    <h3>Tai nghe Xiaomi Chính Hãng Mi Basic Nghe nhạc Chơi Game Gọi điện Thu âm Jack 3.5mm NOZTI bảo hành 6 tháng</h3>
-                    <p>Phân loại hàng: Tai Nghe + Hộp Đựng</p>
-                    <p>Trả hàng miễn phí 15 ngày</p>
-                </div>
-                <div class="product-price">₫85.000</div>
-            </div>
-            <div class="price-breakdown">
-                <div class="price-total">
-                    <span>Tổng thanh toán</span>
-                    <span>₫92.500</span>
-                </div>
-            </div>
-            <hr>
-            <div >
-                <p>Thanh toán khi nhận hàng</p>
-            </div>
-        </section>
-    </div>
+      <div class="price-breakdown">
+        <div class="price-total">
+          <span>Tổng tiền hàng:</span>
+          <span>{{orderDetail?.totalAmount | currencyFormat}}</span>
+        </div>
+        <div class="price-total">
+          <span>Khuyến mãi:</span>
+          <span>{{orderDetail?.totalAmount*orderDetail?.discountPercent/100 | currencyFormat}}</span>
+        </div>
+        <div class="price-total">
+          <span>Thành tiền:</span>
+          <span>{{orderDetail?.totalAmount - (orderDetail?.totalAmount*orderDetail?.discountPercent/100) |
+            currencyFormat}}</span>
+        </div>
+      </div>
+      <hr>
+      <div>
+        <p>Phương thức thanh toán: {{orderDetail?.deposits===0?'Thanh toán khi nhận hàng':'Thanh toán bằng ví'}}</p>
+        <button class="buy-again-btn" *ngIf="orderDetail?.status!==5">Mua Lại</button>
+      </div>
+    </section>
+  </div>
 </body>
+
 </html>

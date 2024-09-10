@@ -8,20 +8,36 @@
       <li><a routerLink="/booking" routerLinkActive="active">Đặt bàn</a></li>
     </ul>
     <ul class="right-menu">
+      <li *ngIf="accountId" (mouseenter)="showNotifications = true" (mouseleave)="showNotifications = false"
+        class="dropdown">
+        <a routerLink="/notification" routerLinkActive="active" class="cart-link">
+          <span class="item-count">{{ itemCountNoti }}</span>
+          <i class="fas fa-bell cart-icon"></i>
+        </a>
+        <div class="dropdown-menu" [class.show]="showNotifications && notifications.length > 0">
+          <ul>
+            <li *ngFor="let notification of notifications | slice:0:5" class="notification-item">
+              {{ notification }}
+            </li>
+          </ul>
+          <a routerLink="/notification" class="view-all-btn">Xem tất cả</a>
+        </div>
+      </li>
+
       <li>
         <a routerLink="/cart" routerLinkActive="active" class="cart-link">
           <span class="item-count">{{ itemCount }}</span>
-          <i class="fas fa-shopping-cart cart-icon"></i> <!-- Icon giỏ hàng -->
+          <i class="fas fa-shopping-cart cart-icon"></i>
         </a>
       </li>
+
       <li *ngIf="!accountId; else loggedInTemplate">
-        <a routerLink="/login" routerLinkActive="active">Đăng nhập</a>
+        <a routerLink="/login" routerLinkActive="active" class="cart-link">Đăng nhập</a>
       </li>
 
       <ng-template #loggedInTemplate>
         <div class="user-info d-flex align-items-center ms-3" id="utk">
           <i class="fas fa-user-circle user-avatar" (click)="toggleDropdown()" style="font-size: 1.5rem;"></i>
-
           <span class="user-name ms-2" (click)="toggleDropdown()" style="font-size: 1.2rem;">{{ account?.username
             }}</span>
 
@@ -33,8 +49,7 @@
               <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal"
                   data-bs-target="#changePasswordModal">Đổi mật khẩu</a></li>
               <hr>
-              <li class="li-detail"><a class="dropdown-item" (click)="viewOrder()">Xem đơn
-                  hàng</a></li>
+              <li class="li-detail"><a class="dropdown-item" (click)="viewOrder()">Xem đơn hàng</a></li>
               <hr>
               <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paymentModal">Ví
                   tiền</a></li>
@@ -47,9 +62,8 @@
           </div>
         </div>
       </ng-template>
-
-
     </ul>
+
   </nav>
 </div>
 <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">

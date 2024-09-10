@@ -14,13 +14,15 @@ import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.co
   styleUrls: ['./purchaseOrder.component.css'],
   imports: [CommonModule, FormsModule, HttpClientModule, CurrencyFormatPipe]
 })
-export class PurchaseOrderComponent implements OnInit {
+export class PurchaseOrderComponent implements OnInit, OnDestroy {
   interval: any;
   showTabs: boolean = true;
   selectedTab: string = '-1';
-  orders: any;
-  filteredOrders: any;
+  orders: any[] = []; // Khai báo orders như một mảng
+  filteredOrders: any[] = []; // Khai báo filteredOrders như một mảng
   subscriptions: Subscription[] = [];
+  accountId: number | null = null; // Khai báo accountId là null
+
   constructor(
     private purchaseOrderService: PurchaseOrderService,
     private route: ActivatedRoute,
@@ -29,54 +31,63 @@ export class PurchaseOrderComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    const accountIdString = localStorage.getItem('accountId');
+    this.accountId = accountIdString ? Number(accountIdString) : null;
 
+    // Kiểm tra xem accountId có hợp lệ không
+    if (this.accountId !== null) {
+      this.getOrdersPurchase(this.accountId);
+    } else {
+      console.error('Account ID is not valid');
+    }
   }
+
   showData(tab: string) {
     this.selectedTab = tab;
-    this.filterOrdersByStatus(parseInt(tab)); // Convert tab to number
-  }
-
-
-  closeModal(index: number) {
-
+    this.filterOrdersByStatus(parseInt(tab));
   }
 
   filterOrdersByStatus(status: number) {
     if (status === -1) {
       this.filteredOrders = this.orders;
     } else {
-      this.filteredOrders = this.orders.filter((order: { status: number; }) => order.status === status);
+      this.filteredOrders = this.orders.filter(order => order.status === status);
     }
     console.log(this.filteredOrders);
   }
 
   goToOrderDetail(orderId: string) {
-    // Chuyển hướng đến trang chi tiết đơn hàng với orderId được truyền vào
     this.router.navigate(['/orderDetail', orderId]);
   }
 
   reorder(orderId: number) {
-    console.log(this.orders);
-    if (Array.isArray(this.orders)) {
-      console.log('Orders is an array', this.orders);
-      const order = this.orders.find(order => order.orderId === orderId);
+    const order = this.orders.find(order => order.orderId === orderId);
 
-      if (order && Array.isArray(order.orderDetails)) {
-        console.log('Order found', order);
-        const orderDetails = order.orderDetails;
-        sessionStorage.setItem('reorder', JSON.stringify(orderDetails));
-        sessionStorage.setItem('isReorder', 'true'); // Set reorder flag
-        this.router.navigateByUrl('/cart');
-      } else {
-        console.error('Order not found or orderDetails is not an array');
-      }
+    if (order && Array.isArray(order.orderDetails)) {
+      sessionStorage.setItem('reorder', JSON.stringify(order.orderDetails));
+      sessionStorage.setItem('isReorder', 'true');
+      this.router.navigateByUrl('/cart');
     } else {
-      console.error('Orders is not an array or undefined');
+      console.error('Order not found or orderDetails is not an array');
     }
   }
 
+  getOrdersPurchase(accountId: number): void {
+    this.purchaseOrderService.getOrdersPurchase(accountId).subscribe(
+      response => {
+        this.orders = response.orders; // Giả sử response chứa orders
+        this.filteredOrders = this.orders; // Khởi tạo filteredOrders với tất cả các đơn hàng
+        console.log(this.orders);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
 
 
-
-
+  ngOnDestroy() {
+    // Hủy tất cả subscriptions để tránh rò rỉ bộ nhớ
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
 }

@@ -28,4 +28,14 @@ export class PurchaseOrderService {
     });
     return this.http.post(apiUrl, { headers });
   }
+  getOrdersPurchase(accountId: number): Observable<any> {
+    const url = `https://localhost:7188/api/Cart/account/${accountId}`;
+    return this.http.get<any>(url);
+  }
+
+  getOrderDetail(orderId: number): Observable<any> {
+    const url = `https://localhost:7188/api/orders/${orderId}`;
+    return this.http.get<any>(url);
+  }
+
 }

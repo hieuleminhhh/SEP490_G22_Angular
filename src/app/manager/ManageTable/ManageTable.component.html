@@ -11,14 +11,15 @@
       <div style="float: right;">
         <button (click)="openManageTablesModal()" style="background-color: rgb(76, 169, 227);">Thêm bàn mới</button>
       </div>
-
       <div class="container">
-
         <div class="card short-card">
           <div class="table-layout-buttons">
             <button *ngFor="let floor of getFloors()" (click)="getTableOFFloor(floor)"
               [class.active]="selectedFloor === floor">
               Tầng {{ floor }}
+            </button>
+            <button (click)="getWaitingTable()">
+              Bàn chờ xếp
             </button>
           </div>
         </div>
@@ -35,10 +36,10 @@
           </div>
         </div>
       </div>
-
     </main>
   </div>
 </div>
+
 <!-- Modal Hiển Thị Thông Tin Bàn -->
 <div class="modal fade" #tableDetailsModal id="tableDetailsModal" tabindex="-1" aria-labelledby="tableDetailsModalLabel"
   aria-hidden="true">
@@ -51,12 +52,18 @@
       <div class="modal-body" *ngIf="tableDetail">
         <div class="mb-3">
           <label for="tableStatus" class="form-label">Trạng thái:</label>
-          <select id="tableStatus" class="form-select" [(ngModel)]="tableStatus" name="tableStatus">
-            <option [value]="1">Đang hoạt động</option>
-            <option [value]="2">Không hoạt động</option>
-          </select>
-        </div>
+          <div>
+            <input type="radio" id="active" name="tableStatus" [(ngModel)]="tableStatus" [value]="1" class="form-check-input d-inline-block">
+            <label for="active" class="d-inline-block ms-2">Đang hoạt động</label>
 
+            <input type="radio" id="inactive" name="tableStatus" [(ngModel)]="tableStatus" [value]="2" class="form-check-input d-inline-block ms-4">
+            <label for="inactive" class="d-inline-block ms-2">Không hoạt động</label>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="label" class="form-label">Tên bàn</label>
+          <input type="text" class="form-control" id="label" [(ngModel)]="newTable" name="label"  />
+        </div>
         <div class="mb-3">
           <label for="capacity" class="form-label">Số chỗ ngồi</label>
           <input type="number" class="form-control" id="capacity" [(ngModel)]="capacity" name="capacity" min="1"
@@ -132,14 +139,11 @@
       </div>
       <div class="modal-body">
         <form (ngSubmit)="submitForm()">
-          <!-- Input cho Bàn -->
           <div class="mb-3">
-            <label for="tableNumber" class="form-label">Bàn</label>
-            <input type="number" class="form-control" id="tableNumber" [(ngModel)]="newTable" name="tableNumber"
-              disabled>
+            <label for="tableNumber" class="form-label">Tên bàn</label>
+            <input type="number" class="form-control" id="tableNumber" [(ngModel)]="newTable" name="tableNumber" placeholder="Nhập tên bàn">
           </div>
 
-          <!-- Select cho Tầng -->
           <div class="mb-3">
             <label for="floorSelect" class="form-label">Tầng</label>
             <div class="d-flex align-items-center">
@@ -147,7 +151,6 @@
                 required>
                 <option *ngFor="let floor of floors" [value]="floor">Tầng {{ floor }}</option>
               </select>
-              <!-- Nút thêm tầng mới -->
               <button type="button" class="btn btn-outline-secondary" (click)="openAddFloorModal()"
                 style="font-size: 18px; padding: 2px;">
                 <i class="fas fa-plus"></i>
@@ -155,12 +158,10 @@
             </div>
           </div>
 
-          <!-- Input cho Số chỗ ngồi -->
           <div class="mb-3">
             <label for="capacity" class="form-label">Số chỗ ngồi</label>
             <input type="number" class="form-control" id="capacity" [(ngModel)]="capacity" name="capacity" min="1"
               max="20" required (ngModelChange)="validateCapacity()" />
-            <!-- Hiển thị thông báo lỗi -->
             <div *ngIf="capacityError" class="text-danger">{{ capacityError }}</div>
           </div>
 
@@ -190,12 +191,9 @@
             <input type="number" class="form-control" id="newFloorNumber" [(ngModel)]="newFloor" name="newFloor"
               required>
           </div>
-
-          <!-- Hiển thị thông báo lỗi -->
           <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
             {{ errorMessage }}
           </div>
-
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" (click)="closeAddFloorModal()">Đóng</button>
             <button type="submit" class="btn btn-primary">Lưu tầng</button>

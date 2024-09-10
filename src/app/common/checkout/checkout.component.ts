@@ -58,8 +58,6 @@ export class CheckoutComponent implements OnInit {
     console.log(today);
     console.log(this.date);
     console.log(this.time);
-
-
   }
 
   ngOnInit() {

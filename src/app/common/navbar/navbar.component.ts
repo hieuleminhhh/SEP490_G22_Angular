@@ -2,13 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CartService } from '../../../service/cart.service';
 import { AccountService } from '../../../service/account.service';
-import { NgIf } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, NgIf,FormsModule],
+  imports: [RouterLink, RouterLinkActive, NgIf,FormsModule,CommonModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
@@ -21,6 +21,17 @@ export class NavbarComponent implements OnInit {
   newPassword: string = '';
   confirmPassword: string = '';
   passwordCu: string = '';
+  showNotifications = false;
+  notifications: any[] = [
+    { message: 'Notification 1' },
+    { message: 'Notification 2' },
+    { message: 'Notification 3' },
+    { message: 'Notification 4' },
+    { message: 'Notification 5' },
+    { message: 'Notification 6' }
+  ];
+  itemCountNoti = this.notifications.length;
+
   constructor(private cartService: CartService, private accountService: AccountService) { }
 
   ngOnInit(): void {
@@ -116,5 +127,8 @@ export class NavbarComponent implements OnInit {
     } else {
       console.error('No account ID provided');
     }
+  }
+  toggleNotifications() {
+    this.showNotifications = !this.showNotifications;
   }
 }

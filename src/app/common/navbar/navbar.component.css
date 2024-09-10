@@ -90,7 +90,7 @@ label.logo {
 }
 
 nav ul li {
-  line-height: 80px;
+  line-height: 50px;
   margin: 0 5px;
 }
 
@@ -196,4 +196,71 @@ hr {
 }
 .li-detail{
   width: 500px;
+}
+/* Dropdown container */
+.dropdown {
+  position: relative; /* Để dropdown-menu có thể hiển thị chính xác */
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+  position: absolute;
+  background-color: white; /* Màu nền của menu */
+  border: 1px solid #e0e0e0; /* Đường viền của menu */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Đổ bóng */
+  z-index: 1000; /* Đảm bảo menu nằm trên các phần tử khác */
+  opacity: 0; /* Ẩn menu ban đầu */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Hiệu ứng chuyển tiếp */
+  transform: translateY(-10px); /* Di chuyển menu lên trên */
+  pointer-events: none; /* Ngăn sự kiện chuột khi ẩn */
+}
+
+/* Hiển thị menu khi hover */
+.dropdown:hover .dropdown-menu,
+.dropdown-menu.show {
+  opacity: 1; /* Hiển thị menu */
+  transform: translateY(0); /* Di chuyển menu về vị trí ban đầu */
+  pointer-events: auto; /* Cho phép sự kiện chuột khi hiển thị */
+}
+
+/* Item trong dropdown menu */
+.notification-item, .dropdown-item {
+  padding: 5px 10px; /* Giảm khoảng cách trong item */
+  line-height: 1.2; /* Giảm chiều cao dòng để các item ngắn hơn */
+  color: #333; /* Màu chữ */
+  text-decoration: none; /* Bỏ gạch chân */
+  cursor: pointer; /* Con trỏ chuột */
+}
+
+/* Hover effect cho item */
+.notification-item:hover, .dropdown-item:hover {
+  background-color: #f0f0f0; /* Màu nền khi hover */
+}
+
+/* Nút "Xem tất cả" */
+.view-all-btn {
+  display: block; /* Chuyển đổi thành block để có toàn bộ chiều rộng */
+  padding: 5px 10px; /* Giảm khoảng cách */
+  text-align: center; /* Canh giữa chữ */
+  color: #007bff; /* Màu chữ */
+  text-decoration: none; /* Bỏ gạch chân */
+  font-weight: bold; /* Chữ đậm */
+}
+
+/* Hover effect cho nút "Xem tất cả" */
+.view-all-btn:hover {
+  background-color: #e9ecef; /* Màu nền khi hover */
+}
+
+/* Tách biệt giữa các item */
+.li-detail {
+  padding: 0; /* Bỏ padding cho item */
+  margin: 0; /* Bỏ margin cho item */
+}
+
+.li-detail hr {
+  margin: 5px 0; /* Khoảng cách giữa các item */
+  border: 0; /* Bỏ viền */
+  height: 1px; /* Độ cao của đường */
+  background-color: #e0e0e0; /* Màu đường */
 }
