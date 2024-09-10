@@ -6,7 +6,7 @@ body {
 }
 
 .order-page {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 20px auto;
   background-color: white;
   padding: 20px;
@@ -121,8 +121,8 @@ header {
 }
 
 .product img {
-  width: 150px;
-  height: 150px;
+  width: 100px;
+  height: 100px;
   margin-right: 20px;
 }
 
@@ -169,4 +169,86 @@ header {
   color: white;
   padding: 10px;
   text-align: center;
+}
+.order-tracking {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  position: relative;
+}
+
+.order-step {
+  text-align: center;
+  position: relative;
+  flex: 1;
+}
+
+.order-step::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 100%;
+  height: 2px;
+  background-color: #4caf50; /* Màu xanh lá cây */
+  z-index: -1;
+}
+
+.order-step:last-child::after {
+  content: none; /* Bỏ đường kẻ sau bước cuối */
+}
+
+.step-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  border: 2px solid #4caf50;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+}
+
+.step-icon i {
+  color: #4caf50;
+}
+
+.step-text h4 {
+  font-size: 16px;
+  margin: 10px 0 5px;
+  color: #4caf50;
+}
+
+.step-text p {
+  font-size: 12px;
+  margin: 0;
+  color: gray;
+}
+
+.completed .step-icon {
+  background-color: #4caf50;
+  color: white;
+}
+
+.completed .step-icon i {
+  color: white;
+}
+
+.completed .step-text h4 {
+  color: #4caf50;
+}
+
+.pending .step-icon {
+  background-color: white;
+  border-color: gray;
+}
+
+.pending .step-icon i {
+  color: gray;
+}
+
+.pending .step-text h4 {
+  color: gray;
 }

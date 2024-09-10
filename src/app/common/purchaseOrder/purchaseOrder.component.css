@@ -76,72 +76,6 @@ button:hover {
   margin-top: 10px; /* Khoảng cách giữa input và button */
 }
 
-/* Thiết lập CSS cho button "Send OTP" */
-.send-otp-button {
-  padding: 10px 20px; /* Thiết lập padding cho button */
-  background-color: #4CAF50; /* Màu nền cho button "Send OTP" */
-  color: white; /* Màu chữ cho button "Send OTP" */
-  border: none; /* Xóa border của button */
-  cursor: pointer; /* Đổi con trỏ chuột thành pointer khi di chuột vào button */
-}
-
-
-.modal-dialog {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1050;
-  width: 320px;
-  transition: transform 0.3s ease-out;
-  transform: translateX(100%);
-}
-
-.modal-content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  background-color: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 6px;
-  outline: 0;
-}
-
-.modal-header {
-  padding: 1rem;
-  border-bottom: 1px solid #e9ecef;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-}
-
-.modal-title {
-  margin-bottom: 0;
-  line-height: 1.5;
-}
-
-.modal-body {
-  position: relative;
-  flex: 1 1 auto;
-  padding: 1rem;
-}
-
-.close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 1;
-  padding: 1rem;
-}
-
-.close:focus, .close:hover {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.modal-dialog.slide-in {
-  transform: translateX(0);
-}
 
 .tab-buttons {
   position: sticky;
@@ -256,4 +190,28 @@ button:hover {
     flex: 0 0 100%;
     max-width: 100%;
   }
+}
+.col-7 {
+  display: flex;
+  flex-direction: column; /* Chuyển thành cột */
+  align-items: flex-start; /* Căn trái các phần tử */
+}
+
+.dish-name {
+  font-weight: bold; /* Bôi đậm tên món ăn */
+}
+
+.quantity {
+  margin-top: 4px; /* Khoảng cách giữa tên món ăn và số lượng */
+  color: gray; /* Màu sắc cho số lượng */
+}
+
+.col-3{
+  display: flex;
+  align-items: center;
+}
+
+.btn-danger {
+  background-color: red; /* Màu nền đỏ */
+  color: white; /* Màu chữ trắng */
 }
