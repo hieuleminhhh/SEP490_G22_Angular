@@ -80,7 +80,7 @@ export class NavbarComponent implements OnInit {
           // Display success message for 3 seconds before reloading
           setTimeout(() => {
             window.location.reload();
-          }, 2000); 
+          }, 2000);
 
           this.passwordCu = '';
           this.newPassword = '';
@@ -97,6 +97,10 @@ export class NavbarComponent implements OnInit {
       this.successMessage = ''; // Clear success message
     }
   }
+  viewOrder() {
+    window.location.href = '/purchase';
+  }
+
   changeProfile() {
     if (this.accountId) {
       this.accountService.changeProfile(this.accountId, this.account).subscribe({

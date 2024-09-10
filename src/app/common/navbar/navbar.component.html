@@ -20,13 +20,6 @@
 
       <ng-template #loggedInTemplate>
         <div class="user-info d-flex align-items-center ms-3" id="utk">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link" (click)="logout()">
-                <i class="fas fa-sign-out-alt"></i> Đăng xuất
-              </a>
-            </li>
-          </ul>
           <i class="fas fa-user-circle user-avatar" (click)="toggleDropdown()" style="font-size: 1.5rem;"></i>
 
           <span class="user-name ms-2" (click)="toggleDropdown()" style="font-size: 1.2rem;">{{ account?.username
@@ -40,11 +33,16 @@
               <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal"
                   data-bs-target="#changePasswordModal">Đổi mật khẩu</a></li>
               <hr>
-              <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#orderModal">Xem đơn
+              <li class="li-detail"><a class="dropdown-item" (click)="viewOrder()">Xem đơn
                   hàng</a></li>
               <hr>
               <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paymentModal">Ví
                   tiền</a></li>
+              <li class="nav-item">
+                <a class="nav-link" (click)="logout()">
+                  <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -83,7 +81,7 @@
           <label for="phone" class="form-label">Số điện thoại</label>
           <input type="tel" class="form-control" id="phone" [(ngModel)]="account.phone">
         </div>
-        
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -143,4 +141,3 @@
     </div>
   </div>
 </div>
-

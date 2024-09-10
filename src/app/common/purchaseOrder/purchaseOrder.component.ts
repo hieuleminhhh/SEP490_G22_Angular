@@ -41,12 +41,6 @@ export class PurchaseOrderComponent implements OnInit {
 
   }
 
-  formatTime(seconds: number): string {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}m ${remainingSeconds}s`;
-  }
-
   filterOrdersByStatus(status: number) {
     if (status === -1) {
       this.filteredOrders = this.orders;
