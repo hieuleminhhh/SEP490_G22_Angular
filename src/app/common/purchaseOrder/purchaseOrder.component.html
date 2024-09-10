@@ -1,11 +1,14 @@
 <div style="height: auto; margin-bottom: 10px;">
   <div *ngIf="showTabs">
     <div class="tab-buttons">
-      <button (click)="showData('-1')" [class.active]="selectedTab === '-1'" style="width: 160px;">Tất cả</button>
-      <button (click)="showData('0')" [class.active]="selectedTab === '0'" style="width: 160px;">Đợi xác nhận</button>
-      <button (click)="showData('1')" [class.active]="selectedTab === '1'" style="width: 160px;">Đang giao hàng</button>
-      <button (click)="showData('3')" [class.active]="selectedTab === '3'" style="width: 160px;">Hoàn thành</button>
-      <button (click)="showData('4')" [class.active]="selectedTab === '4'" style="width: 160px;">Đã hủy</button>
+      <button (click)="showData('-1')" [class.active]="selectedTab === '-1'" style="width: 100px;">Tất cả</button>
+      <button (click)="showData('1')" [class.active]="selectedTab === '1'" style="width: 140px;">Đợi xác nhận</button>
+      <button (click)="showData('2')" [class.active]="selectedTab === '2' || selectedTab === '6'" style="width: 150px;">
+        Đang chuẩn bị
+      </button>
+      <button (click)="showData('7')" [class.active]="selectedTab === '7'" style="width: 160px;">Đang giao hàng</button>
+      <button (click)="showData('4')" [class.active]="selectedTab === '4'" style="width: 150px;">Hoàn thành</button>
+      <button (click)="showData('5')" [class.active]="selectedTab === '5'" style="width: 100px;">Đã hủy</button>
     </div>
 
     <div class="tab-content">
@@ -13,55 +16,102 @@
         <div class="card-body">
           <div class="order-header d-flex justify-content-between align-items-center mb-2">
             <div class="order-status ml-auto">
-              <span *ngIf="order.status === 4" class="text-success">TRẠNG THÁI ĐƠN HÀNG: HOÀN THÀNH</span>
-              <span *ngIf="order.status === 1" style="color: rgb(69, 69, 18);">TRẠNG THÁI ĐƠN HÀNG: ĐỢI XÁC NHẬN</span>
-              <span *ngIf="order.status === 8" style="color: blue;">TRẠNG THÁI ĐƠN HÀNG: ĐANG GIAO HÀNG</span>
-              <span *ngIf="order.status === 5" class="text-danger">TRẠNG THÁI ĐƠN HÀNG: ĐÃ HỦY</span>
-              <span *ngIf="order.status === 8" class="text-danger">TRẠNG THÁI ĐƠN HÀNG: HOÀN TIỀN</span>
+              <span *ngIf="order.status === 4" style="color: teal;">HOÀN THÀNH</span>
+              <span *ngIf="order.status === 1" style="color: orange;">ĐỢI XÁC NHẬN ĐƠN HÀNG</span>
+              <span *ngIf="order.status === 7" style="color: green;">ĐANG GIAO HÀNG</span>
+              <span *ngIf="order.status === 2" style="color: blue;">ĐÃ CHẤP NHẬN ĐƠN HÀNG</span>
+              <span *ngIf="order.status === 6" style="color: brown;">ĐANG CHUẨN BỊ ĐƠN HÀNG</span>
+              <span *ngIf="order.status === 5 || order.status === 8 " style="color: red;">ĐÃ HỦY</span>
             </div>
           </div>
 
-          <!-- <div class="info">
-            <div class="row">
-              <div class="col-4">
-                <strong>Tên khách hàng:</strong> {{ order.address.consigneeName }}
-              </div>
-              <div class="col-4">
-                <strong>Địa chỉ:</strong> {{ order.address.guestAddress }}
-              </div>
-              <div class="col-4">
-                <strong>Số điện thoại:</strong> {{ order.address.guestPhone }}
-              </div>
-            </div>
-          </div> -->
-
           <div class="order-items">
-            <div *ngFor="let item of order.orderDetails" class="row border-top border-bottom py-2" (click)="goToOrderDetail(order.orderId)">
+            <div *ngFor="let item of order.orderDetails" class="row border-top border-bottom py-2"
+              (click)="goToOrderDetail(order.orderId)" style="cursor: pointer;">
               <div class="col-2">
-                <img class="img-fluid" [src]="item.imageUrlOfCombo || item.imageUrlOfDish" alt="{{ item.dishName || item.comboName }} Image">
+                <img class="img-fluid" [src]="item.imageUrl"
+                  alt="{{ item.dishName || item.comboName }} Image" style="width: 100px;height: 100px;">
               </div>
               <div class="col-7" (click)="goToOrderDetail(order.orderId)">
-                <div>{{ item.dishName || item.comboName }}</div>
-                <div>x{{ item.quantity }}</div>
+                <div class="dish-name">{{ item.dishName || item.comboName }}</div>
+                <div class="quantity">x{{ item.quantity }}</div>
               </div>
               <div class="col-3 text-right">
                 <div class="price">{{ item.unitPrice | currencyFormat }}</div>
               </div>
             </div>
           </div>
-
           <div class="order-footer d-flex justify-content-end align-items-center mt-3">
             <div class="mr-3">
-              <span class="total-price">Thành tiền: {{ order.totalAmount | currencyFormat }}</span>
+              <span class="total-price">Thành tiền: {{ order.totalAmountAfterDiscount | currencyFormat }}</span><br>
             </div>
             <div>
-              <button class="btn btn-primary btn-sm" (click)="reorder(order.orderId)">Mua Lại</button>
+              <button class="btn btn-primary btn-sm" (click)="reorder(order.orderId)"
+                *ngIf="order.status === 4 || order.status === 5">Mua Lại</button>
+              <button class="btn btn-danger btn-sm" data-bs-target="#cancelOrderModal" data-bs-toggle="modal"
+              (click)="choiceOrderCancel(order.orderId)"
+                *ngIf="order.status === 1 || order.status === 2 || order.status === 6">Hủy đơn</button>
             </div>
           </div>
-          <div *ngIf="order.status===5">
-            <p style="color: red;">Lý do hủy: {{order.cancelationReason}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Cancel Order Confirmation Modal -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="cancelOrderModalLabel">Xác nhận hủy đơn</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color: white;"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <p>Bạn có chắc chắn muốn hủy đơn này không?</p>
+        <div class="form-group">
+          <label for="cancelationReason">Lý do hủy đơn:</label>
+          <br><br>
+          <div class="form-check">
+            <input type="radio" id="reason1" name="cancelationReason" class="form-check-input"
+              [(ngModel)]="cancelationReason" value="Không còn nhu cầu" />
+            <label class="form-check-label" for="reason1"> Không còn nhu cầu</label>
+          </div>
+          <div class="form-check">
+            <input type="radio" id="reason2" name="cancelationReason" class="form-check-input"
+              [(ngModel)]="cancelationReason" value="Đơn hàng sai" />
+            <label class="form-check-label" for="reason2"> Đơn hàng sai</label>
+          </div>
+          <div class="form-check">
+            <input type="radio" id="reason3" name="cancelationReason" class="form-check-input"
+              [(ngModel)]="cancelationReason" value="Thời gian giao hàng quá lâu" />
+            <label class="form-check-label" for="reason3"> Thời gian giao hàng quá lâu</label>
+          </div>
+          <div class="form-check">
+            <input type="radio" id="reason4" name="cancelationReason" class="form-check-input"
+              [(ngModel)]="cancelationReason" value="Chất lượng sản phẩm không đạt yêu cầu" />
+            <label class="form-check-label" for="reason4"> Chất lượng sản phẩm không đạt yêu cầu</label>
+          </div>
+          <div class="form-check">
+            <input type="radio" id="reason5" name="cancelationReason" class="form-check-input"
+              [(ngModel)]="cancelationReason" value="Lý do khác" />
+            <label class="form-check-label" for="reason5">Lý do khác</label>
           </div>
         </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+          Đóng
+        </button>
+        <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal"
+          (click)="cancelOrder(choiceOrder)">
+          Xác nhận
+        </button>
       </div>
     </div>
   </div>
