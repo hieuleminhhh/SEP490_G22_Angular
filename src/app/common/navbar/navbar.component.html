@@ -120,7 +120,7 @@
         <div *ngIf="!isChangingPassword && currentPassword !== null" class="form-group">
           <label for="currentPassword">Mật khẩu hiện tại:</label>
           <input type="password" id="currentPassword" class="form-control" placeholder="Nhập mật khẩu hiện tại"
-            [(ngModel)]="passwordCu" name="currentPassword" required>
+            [(ngModel)]="cupass" name="currentPassword" required>
         </div>
 
         <!-- Always show these fields if currentPassword exists or not -->
@@ -136,16 +136,20 @@
         </div>
 
         <!-- Always show these fields -->
-        <div *ngIf="currentPassword ===null" class="form-group">
-          <label for="newPassword">Nhập mật khẩu:</label>
-          <input type="password" id="newPassword" class="form-control" placeholder="Nhập mật khẩu mới"
-            [(ngModel)]="newPassword" name="newPassword" required>
-        </div>
-        <div *ngIf="currentPassword === null" class="form-group">
-          <label for="confirmNewPassword">Xác nhận mật khẩu:</label>
-          <input type="password" id="confirmNewPassword" class="form-control" placeholder="Xác nhận mật khẩu mới"
-            [(ngModel)]="confirmPassword" name="confirmPassword" required>
-        </div>
+       <!-- Hide this when currentPassword is not null -->
+<!-- Show new password and confirm password when currentPassword is not null -->
+<div *ngIf="currentPassword === null" class="form-group">
+  <label for="newPassword">Nhập mật khẩu:</label>
+  <input type="password" id="newPassword" class="form-control" placeholder="Nhập mật khẩu mới"
+    [(ngModel)]="newPassword" name="newPassword" required>
+</div>
+
+<div *ngIf="currentPassword === null" class="form-group">
+  <label for="confirmNewPassword">Xác nhận mật khẩu:</label>
+  <input type="password" id="confirmNewPassword" class="form-control" placeholder="Xác nhận mật khẩu mới"
+    [(ngModel)]="confirmPassword" name="confirmPassword" required>
+</div>
+
 
       </div>
       <div class="modal-footer">

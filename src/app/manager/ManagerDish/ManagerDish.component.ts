@@ -141,15 +141,28 @@ export class ManagerDishComponent implements OnInit {
 
 
   getDishById(dishId: number): void {
+    // Fetch the dish details
     this.dishService.getDishById(dishId).subscribe(
       (dish: UpdateDish) => {
         this.updatedDish = dish;
+  
+        // After fetching the dish, check if it is in any order
+        this.dishService.checkDishInOrderDetails(dishId).subscribe(
+          (isInOrder: boolean) => {
+            // If the dish is in an order, disable the name field
+            this.isDishInOrder = isInOrder;
+          },
+          (error) => {
+            console.error('Error checking if dish is in order details:', error);
+          }
+        );
       },
       (error) => {
         console.error('Error fetching dish:', error);
       }
     );
-}
+  }
+  
 uploadImage(): void {
   if (this.selectedFile !== null) {
     this.dishService.UploadImage(this.selectedFile).subscribe(
@@ -483,4 +496,5 @@ updateSelectedDishes() {
   // // Optionally, close the modal after updating
   this.resetModal();
 }
+isDishInOrder: boolean = false;
 }

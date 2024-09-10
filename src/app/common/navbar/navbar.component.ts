@@ -20,7 +20,6 @@ export class NavbarComponent implements OnInit {
   currentPassword: string = '';
   newPassword: string = '';
   confirmPassword: string = '';
-  passwordCu: string = '';
   showNotifications = false;
   notifications: any[] = [
     { message: 'Notification 1' },
@@ -70,44 +69,49 @@ export class NavbarComponent implements OnInit {
   isChangingPassword: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
+  cupass: string = '';
   changePassword() {
-    if (this.accountId && this.newPassword && this.confirmPassword && this.passwordCu) {
-      if (this.newPassword !== this.confirmPassword) {
-        this.errorMessage = 'New password and confirmation do not match';
-        this.successMessage = ''; // Clear success message
-        return;
-      }
-      const passwordData = {
-        currentPassword: this.passwordCu,
-        newPassword: this.newPassword,
-        confirmPassword: this.confirmPassword
-      };
-      this.accountService.changePassword(this.accountId, passwordData).subscribe({
-        next: (response) => {
-          console.log('Password changed successfully:', response);
-          this.successMessage = 'Đổi mật khẩu thành công';
-          this.errorMessage = ''; // Clear error message on success
-
-          // Display success message for 3 seconds before reloading
-          setTimeout(() => {
-            window.location.reload();
-          }, 2000);
-
-          this.passwordCu = '';
-          this.newPassword = '';
-          this.confirmPassword = '';
-          this.dropdownOpen = false;  // Close dropdown after password change
-        },
-        error: (error) => {
-          this.errorMessage = 'Đổi mật khẩu không thành công xem lại thông tin nhập'; // Set error message on failure
-          this.successMessage = ''; // Clear success message
-        }
-      });
-    } else {
-      this.errorMessage = 'Đổi mật khẩu không thành công xem lại thông tin nhập'; // Set error message for missing fields
+    // Check if new password matches confirm password
+    if (this.newPassword !== this.confirmPassword) {
+      this.errorMessage = 'Mật khẩu không khớp, vui lòng kiểm tra lại.';
       this.successMessage = ''; // Clear success message
+      return;
     }
+  
+    // Prepare password data for the API call
+    const passwordData = {
+      currentPassword: this.cupass, // Use cupass if currentPassword is null
+      newPassword: this.newPassword,
+      confirmPassword: this.confirmPassword
+    };
+  
+    // Call the API to change password
+    this.accountService.changePassword(this.accountId ?? 0, passwordData)
+  .subscribe({
+      next: (response) => {
+        console.log('Password changed successfully:', response);
+        this.successMessage = 'Đổi mật khẩu thành công.';
+        this.errorMessage = ''; // Clear error message on success
+  
+        // Display success message for 3 seconds before reloading
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+  
+        // Reset form fields
+        this.newPassword = '';
+        this.confirmPassword = '';
+        this.dropdownOpen = false; // Close dropdown after password change
+      },
+      error: (error) => {
+        console.error('Password change failed:', error);
+        this.errorMessage = 'Đổi mật khẩu không thành công, vui lòng kiểm tra thông tin.';
+        this.successMessage = ''; // Clear success message
+      }
+    });
   }
+  
+  
   viewOrder() {
     window.location.href = '/purchase';
   }

@@ -90,4 +90,9 @@ export class ManagerComboService {
         })
       );
   }
+  checkComboInOrderDetails(comboId: number): Observable<boolean> {
+    const url = `${this.apiUrl}/orders/CheckComboInOrderDetails/${comboId}`;
+    return this.http.get<boolean>(url, this.getHttpOptions());
+  }
+  
 }

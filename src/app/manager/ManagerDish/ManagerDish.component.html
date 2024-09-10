@@ -31,11 +31,12 @@
             data-bs-target="#addDishModal">Thêm món ăn mới<i class="bi bi-plus"></i></button>
         </div>
         <div class="btn-group">
-          <button type="button" class="btn btn-sm btn-custom-brown" data-bs-toggle="modal" data-bs-target="#settingDishModal">
-              Cấu hình món ăn<i class="bi bi-plus"></i>
+          <button type="button" class="btn btn-sm btn-custom-brown" data-bs-toggle="modal"
+            data-bs-target="#settingDishModal">
+            Cấu hình món ăn<i class="bi bi-plus"></i>
           </button>
-      </div>
-      
+        </div>
+
       </div>
 
       <div class="table-responsive">
@@ -73,12 +74,14 @@
                     (click)="getDishById(dish.dishId)">
                     Cập nhật
                   </button>
+                  <button type="button" class="btn btn-danger" >
+                    Xóa
+                  </button>
+                  <!-- (click)="deleteDish(dish.dishId)" -->
                 </td>
               </tr>
             </ng-container>
           </tbody>
-
-
         </table>
         <nav aria-label="Page navigation">
           <ul class="pagination">
@@ -178,12 +181,10 @@
       </div>
       <div class="modal-body">
         <form>
-          <div class="mb-3">
-            <label for="itemName" class="form-label">Tên món ăn</label>
-            <input type="text" class="form-control" id="itemName" placeholder="Enter item name"
-              [(ngModel)]="updatedDish.itemName" name="itemName">
-            <div *ngIf="updateErrors.itemNameError" class="alert alert-danger">{{ updateErrors.itemNameError }}</div>
-          </div>
+          <input type="text" class="form-control" id="itemName" placeholder="Enter item name"
+            [(ngModel)]="updatedDish.itemName" name="itemName" [disabled]="isDishInOrder">
+          <div *ngIf="updateErrors.itemNameError" class="alert alert-danger">{{ updateErrors.itemNameError }}</div>
+
           <div class="mb-3">
             <label for="description" class="form-label">Mô tả</label>
             <textarea class="form-control" id="description" rows="3" placeholder="Enter description"
@@ -238,28 +239,17 @@
         <div class="mb-3">
           <!-- Input for Quantity -->
           <label for="selectQuantity" class="form-label">Nhập số lượng:</label>
-          <input
-            type="number"
-            class="form-control"
-            id="selectQuantity"
-            [(ngModel)]="quantityToSet"
-            min="1"
-            (input)="validateQuantity($event)"
-            required
-          >
-          <button
-            type="button"
-            class="btn btn-info mt-2"
-            (click)="applyQuantity()"
-          >
+          <input type="number" class="form-control" id="selectQuantity" [(ngModel)]="quantityToSet" min="1"
+            (input)="validateQuantity($event)" required>
+          <button type="button" class="btn btn-info mt-2" (click)="applyQuantity()">
             Áp dụng số lượng
           </button>
         </div>
-        
-        
+
+
         <form #dishForm="ngForm">
-          
-        
+
+
           <div class="form-check">
             <!-- Select All Checkbox -->
             <input class="form-check-input" type="checkbox" id="selectAllDishes" (change)="selectAll($event)">
@@ -291,7 +281,7 @@
                   </tr>
                 </ng-container>
               </tbody>
-              
+
             </table>
           </div>
         </form>
