@@ -74,10 +74,11 @@
                     (click)="getDishById(dish.dishId)">
                     Cập nhật
                   </button>
-                  <button type="button" class="btn btn-danger" >
+                  <button *ngIf="!isDishInOrderMap[dish.dishId]" type="button" class="btn btn-danger"
+                    data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                    (click)="setDishIdForDeletion(dish.dishId)">
                     Xóa
                   </button>
-                  <!-- (click)="deleteDish(dish.dishId)" -->
                 </td>
               </tr>
             </ng-container>
@@ -289,6 +290,25 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetModal()">Hủy</button>
         <button type="button" class="btn btn-primary" (click)="updateSelectedDishes()">Cập nhật</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Bạn có chắc chắn muốn xóa món ăn này không?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="confirmDelete()">Đồng ý</button>
       </div>
     </div>
   </div>

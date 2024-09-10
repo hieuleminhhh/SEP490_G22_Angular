@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../Header/Header.component';
 import { SideBarComponent } from '../SideBar/SideBar.component';
 import { ManagerComboService } from '../../../service/managercombo.service';
-import { AddNewCombo, ListAllCombo, UpdateCombo } from '../../../models/combo.model';
+import { AddNewCombo, ListAllCombo, ManagerCombo, UpdateCombo } from '../../../models/combo.model';
 import { AddNewDish, Dish, ManagerDish } from '../../../models/dish.model';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
@@ -74,19 +74,33 @@ export class ManagerComboComponent implements OnInit {
     this.loadListCombo();
     this.loadAllDishes();
   }
-
-
-
-
-
+  isComboInOrderMap: { [key: number]: boolean } = {};
   loadListCombo(search: string = ''): void {
     console.log('Loading combos with search term:', search);
     this.comboService.ListCombo(this.currentPage, this.pageSize, search).subscribe(
       (response) => {
         if (response && response.items) {
+          // Keep wrapping response in an array
           this.combo = [response];
           this.totalCount = response.totalCount;
           this.updateTotalPagesArray(response.totalPages);
+  
+          // Initialize the isComboInOrderMap
+          this.isComboInOrderMap = {};
+  
+          // Iterate over response.items to check each combo
+          response.items.forEach((combo: ManagerCombo) => {
+            this.comboService.checkComboInOrderDetails(combo.comboId).subscribe(
+              (isInOrder: boolean) => {
+                // Store the result in the map using comboId as the key
+                this.isComboInOrderMap[combo.comboId] = isInOrder;
+              },
+              (error) => {
+                console.error('Error checking if combo is in order details:', error);
+              }
+            );
+          });
+  
           console.log('Fetched combos:', this.combo);
         } else {
           console.error('Invalid response:', response);
@@ -97,6 +111,7 @@ export class ManagerComboComponent implements OnInit {
       }
     );
   }
+  
   selectedCombos: { [key: number]: boolean } = {};
 
   loadListDisheSetting(search: string = ''): void {
@@ -478,5 +493,28 @@ updateSelectedCombos() {
 }
 resetModal(): void {
   window.location.reload();
+}
+deleteCombo(comboId: number): void {
+  this.comboService.DeleteCombo(comboId).subscribe(
+    () => {
+      // Successfully deleted the combo, reload the list to reflect changes
+      this.loadListCombo();
+    },
+    (error) => {
+      console.error('Error deleting combo:', error);
+    }
+  );
+}
+private comboIdToDelete: number | null = null;
+setComboIdForDeletion(comboId: number): void {
+  this.comboIdToDelete = comboId;
+}
+
+// Method to confirm deletion
+confirmDeleteCombo(): void {
+  if (this.comboIdToDelete !== null) {
+    this.deleteCombo(this.comboIdToDelete);
+    this.successMessage = 'Xóa món combo thành công';
+  }
 }
 }
