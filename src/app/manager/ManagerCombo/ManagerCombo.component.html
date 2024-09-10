@@ -74,6 +74,10 @@
                         <button type="button" class="btn btn-warning" data-bs-toggle="modal"data-bs-target="#updateComboModal" (click)="getComboById(combo.comboId)">
                           Cập nhật
                         </button>
+                        <button type="button" class="btn btn-danger" >
+                          Xóa
+                        </button>
+                        <!-- (click)="deleteCombo(combo.comboId)" -->
                       </td>     
                      
                     </tr>
@@ -167,9 +171,10 @@
           <form>
             <div class="mb-3">
               <label for="comboName" class="form-label">Tên combo</label>
-              <input type="text" class="form-control" id="comboName" placeholder="Enter combo name"  [(ngModel)]="updatedCombo.nameCombo" name="comboName">
+              <input type="text" class="form-control" id="comboName" placeholder="Enter combo name"
+                [(ngModel)]="updatedCombo.nameCombo" name="comboName" [disabled]="isComboInOrder">
               <div *ngIf="updateErrors.nameComboError" class="alert alert-danger">{{ updateErrors.nameComboError }}</div>
-            </div>         
+            </div>
             <div class="mb-3">
               <label for="price" class="form-label">Giá</label>
               <input type="number" class="form-control" id="price" placeholder="Enter price" [(ngModel)]="updatedCombo.price" name="price">

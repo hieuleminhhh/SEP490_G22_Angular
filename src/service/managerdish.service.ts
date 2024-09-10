@@ -87,4 +87,15 @@ export class ManagerDishService {
         })
       );
   }
+  checkDishInOrderDetails(dishId: number): Observable<boolean> {
+    const url = `${this.apiUrl}/orders/CheckDishInOrderDetails/${dishId}`;
+    return this.http.get<boolean>(url, this.getHttpOptions())
+      .pipe(
+        catchError((error: any) => {
+          console.error('An error occurred while checking dish in order details:', error);
+          return throwError(error);
+        })
+      );
+  }
+
 }

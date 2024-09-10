@@ -130,17 +130,30 @@ export class ManagerComboComponent implements OnInit {
       }
     );
   }
-
+  isComboInOrder: boolean = false;
   getComboById(comboId: number): void {
+    // Fetch the combo details
     this.comboService.getComboById(comboId).subscribe(
       (combo: UpdateCombo) => {
         this.updatedCombo = combo;
+  
+        // After fetching the combo, check if it is in any order
+        this.comboService.checkComboInOrderDetails(comboId).subscribe(
+          (isInOrder: boolean) => {
+            // If the combo is in an order, disable the name field
+            this.isComboInOrder = isInOrder;
+          },
+          (error) => {
+            console.error('Error checking if combo is in order details:', error);
+          }
+        );
       },
       (error) => {
         console.error('Error fetching combo:', error);
       }
     );
-}
+  }
+  
   updateTotalPagesArray(totalPages: number): void {
     this.totalPagesArray = Array(totalPages).fill(0).map((x, i) => i + 1);
   }
