@@ -40,6 +40,7 @@ export class BookingComponent implements OnInit {
   isValid: boolean = false;
   currentRequest: any;
   message: string = '';
+  accountId: number=0;
 
   constructor(private reservationService: ReservationService, private router: Router, public dialog: MatDialog) {
     const today = new Date();
@@ -65,6 +66,10 @@ export class BookingComponent implements OnInit {
       this.cartItems = cartItems;
       this.calculateItemQuantity();
     });
+    const accountIdString = localStorage.getItem('accountId');
+    if (accountIdString) {
+      this.accountId = JSON.parse(accountIdString);
+    }
   }
   ngOnDestroy() {
     if (this.cartSubscription) {
@@ -157,6 +162,7 @@ export class BookingComponent implements OnInit {
       let dateTime = this.formatDateTime(this.reservation.date, this.reservation.time);
 
       const request = {
+        accountId:this.accountId,
         guestPhone: this.guestPhone,
         email: '',
         guestAddress: '',
