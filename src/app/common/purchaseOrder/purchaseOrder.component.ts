@@ -6,6 +6,8 @@ import { PurchaseOrderService } from '../../../service/purchaseOrder.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
+import { CookingService } from '../../../service/cooking.service';
+import { PaymentService } from '../../../service/payment.service';
 
 @Component({
   selector: 'app-purchaseOrder',
@@ -22,12 +24,14 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
   filteredOrders: any[] = []; // Khai báo filteredOrders như một mảng
   subscriptions: Subscription[] = [];
   accountId: number | null = null; // Khai báo accountId là null
-
+  cancelationReason: string = 'Không còn nhu cầu';
+  orderCancelled: boolean = false;
+  choiceOrder: any;
   constructor(
     private purchaseOrderService: PurchaseOrderService,
     private route: ActivatedRoute,
     private http: HttpClient,
-    private router: Router
+    private router: Router, private cookingService: CookingService, private paymentService: PaymentService
   ) { }
 
   ngOnInit() {
@@ -41,11 +45,14 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
       console.error('Account ID is not valid');
     }
   }
-
   showData(tab: string) {
+    if (tab === '6') {
+      tab = '2';  // Chuyển '6' về '2' để xử lý logic tương tự
+    }
     this.selectedTab = tab;
     this.filterOrdersByStatus(parseInt(tab));
   }
+
 
   filterOrdersByStatus(status: number) {
     if (status === -1) {
@@ -53,6 +60,8 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
     } else {
       this.filteredOrders = this.orders.filter(order => order.status === status);
     }
+    console.log(status);
+
     console.log(this.filteredOrders);
   }
 
@@ -71,6 +80,36 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
       console.error('Order not found or orderDetails is not an array');
     }
   }
+  cancelOrder(orderId: number) {
+
+    const url = `https://localhost:7188/api/orders/${orderId}/cancel`;
+    this.http.put(url, {}).subscribe(
+      response => {
+        console.log('Order cancelled:', response);
+        this.orderCancelled = true;
+        this.updateCancelResion(orderId);
+        window.location.reload();
+      },
+      error => {
+        console.error('Error during order cancellation:', error);
+      }
+    );
+  }
+
+  updateCancelResion(orderId: number) {
+    const request = {
+      cancelationReason: this.cancelationReason
+    };
+
+    this.paymentService.updateResionCancle(orderId, request).subscribe(
+      response => {
+        console.log(response);
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
 
   getOrdersPurchase(accountId: number): void {
     this.purchaseOrderService.getOrdersPurchase(accountId).subscribe(
@@ -85,9 +124,12 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
     );
   }
 
-
   ngOnDestroy() {
     // Hủy tất cả subscriptions để tránh rò rỉ bộ nhớ
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
+
+  choiceOrderCancel(orderId: number) {
+    this.choiceOrder = orderId;
   }
 }

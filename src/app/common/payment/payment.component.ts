@@ -20,6 +20,7 @@ export class PaymentComponent implements OnInit {
   orderCancelled: boolean = false;
   guestPhone: string | null = null;
   cancelationReason: string = 'Không còn nhu cầu';
+  cancelBy: string = 'Người mua';
 
   constructor(private route: ActivatedRoute, private paymentService: PaymentService, private http: HttpClient, private router: Router, private checkoutService: CheckoutService) { } // Inject Router
 
@@ -77,7 +78,8 @@ export class PaymentComponent implements OnInit {
 
   updateCancelResion() {
     const request ={
-      cancelationReason: this.cancelationReason
+      cancelationReason: this.cancelationReason,
+      cancelBy: this.cancelBy
     };
     console.log(this.data.orderId);
 
