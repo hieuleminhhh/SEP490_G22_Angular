@@ -137,4 +137,13 @@ export class ManagerOrderService {
     const url = `https://localhost:7188/api/Reservations/update-order`;
     return this.http.put(url, data, this.getHttpOptions());
   }
+  sendOrderEmail(orderId: number): Observable<any> {
+    const url = `${this.apiUrl}/orders/${orderId}/email`;
+    return this.http.get<any>(url, this.getHttpOptions());
+  }
+  sendEmail(toEmail: string, subject: string, body: string): Observable<any> {
+    const url = `${this.apiUrl}/Email/send-email`;
+    const emailData = { toEmail, subject, body };
+    return this.http.post<any>(url, emailData, this.getHttpOptions());
+  }
 }

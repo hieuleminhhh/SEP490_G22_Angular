@@ -812,60 +812,68 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Order ID is undefined');
     }
   }
-
   acceptOrder(orderId: number | undefined): void {
     if (orderId) {
       this.loadListOrderDetails(orderId);
-      if (this.depositOrder > 0) {
-        const data = {
-          paymentAmount: 0,
-          taxcode: "string",
-          accountId: 0,
-          amountReceived: 0,
-          returnAmount: 0,
-          paymentMethods: 1,
-          description: "string"
-        };
-
-        this.orderService.AcceptOrderWaiting(orderId, data).subscribe(
-          response => {
-            window.location.reload();
-            console.log('Order accepted successfully:', response);
-          },
-          error => {
-            console.error('Error accepting order:', error);
-            // Xử lý khi gọi API thất bại, ví dụ: hiển thị thông báo lỗi
-          }
-        );
-      } else {
-        const data = {
-          paymentAmount: 0,
-          taxcode: "string",
-          accountId: 0,
-          amountReceived: 0,
-          returnAmount: 0,
-          paymentMethods: 2,
-          description: "string"
-        };
-
-        this.orderService.AcceptOrderWaiting(orderId, data).subscribe(
-          response => {
-            window.location.reload();
-            console.log('Order accepted successfully:', response);
-
-          },
-          error => {
-            console.error('Error accepting order:', error);
-            // Xử lý khi gọi API thất bại, ví dụ: hiển thị thông báo lỗi
-          }
-        );
-      }
+  
+      // Define the common data object
+      const commonData = {
+        paymentAmount: 0,
+        taxcode: "string",
+        accountId: 0,
+        amountReceived: 0,
+        returnAmount: 0,
+        description: "string"
+      };
+  
+      // Determine payment methods based on depositOrder
+      const paymentData = {
+        ...commonData,
+        paymentMethods: this.depositOrder > 0 ? 1 : 2
+      };
+  
+      // Accept the order
+      this.orderService.AcceptOrderWaiting(orderId, paymentData).subscribe(
+        response => {
+          console.log('Order accepted successfully:', response);
+          
+          // Call sendOrderEmail to get the email address
+          this.orderService.sendOrderEmail(orderId).subscribe(
+            emailResponse => {
+              // Extract email address
+              const customerEmail = emailResponse.email;
+              console.log(customerEmail); // Adjust based on your response structure
+  
+              // Define email content
+              const subject = 'Order Confirmation';
+              const body = 'Your order has been accepted and is being processed.';
+  
+              // Send the email
+              this.orderService.sendEmail(customerEmail, subject, body).subscribe(
+                emailSentResponse => {
+                  console.log('Email sent successfully:', emailSentResponse);
+                  // window.location.reload();
+                },
+                emailError => {
+                  console.error('Error sending email:', emailError);
+                  // Handle error when sending email
+                }
+              );
+            },
+            emailError => {
+              console.error('Error fetching email address:', emailError);
+              // Handle error when fetching email address
+            }
+          );
+        },
+        error => {
+          console.error('Error accepting order:', error);
+          // Handle error when accepting the order
+        }
+      );
     }
-
-
-
-
   }
+  
 
   getAccountDetails(accountId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
