@@ -1,0 +1,67 @@
+<br>
+<br>
+<div class="signup-container" style="padding-top: 100px;">
+  <form class="form-signup" (ngSubmit)="signup()">
+    <h1 class="form-title">Đăng ký</h1>
+
+    <!-- Username -->
+    <label for="inputUsername" class="sr-only">Tài khoản</label>
+    <input type="text" [(ngModel)]="username" class="form-control form-input" name="username" placeholder="Tài khoản"
+      required>
+    <br>
+
+    <!-- Email -->
+    <label for="inputEmail" class="sr-only">Email</label>
+    <input type="email" [(ngModel)]="email" class="form-control form-input" name="email" placeholder="Email" required>
+    <br>
+
+    <!-- Password -->
+    <label for="inputPassword" class="sr-only">Mật khẩu</label>
+    <input type="password" [(ngModel)]="password" class="form-control form-input" name="password" placeholder="Mật khẩu"
+      required>
+    <br>
+
+    <!-- Confirm Password -->
+    <label for="inputConfirmPassword" class="sr-only">Xác nhận mật khẩu</label>
+    <input type="password" [(ngModel)]="confirmPassword" class="form-control form-input" name="confirmPassword"
+      placeholder="Xác nhận mật khẩu" required>
+    <br>
+
+    <!-- Error message if passwords do not match -->
+    <div *ngIf="passwordError" class="alert alert-danger form-alert">
+      {{ passwordError }}
+    </div>
+
+    <!-- Submit button -->
+    <button class="btn btn-lg btn-primary btn-block form-button" type="submit">Đăng ký</button>
+
+    <!-- Success message display -->
+    <div *ngIf="successMessage" class="alert alert-success form-alert">
+      {{ successMessage }}
+    </div>
+
+    <!-- Error message display -->
+    <div *ngIf="errorMessage" class="alert alert-danger form-alert">
+      {{ errorMessage }}
+    </div>
+  </form>
+  <button class="btn btn-light d-flex align-items-center justify-content-center mx-auto mt-3" type="button"
+    (click)="loginWithGoogle()" style="padding: 5px 10px; border-width: 1px; max-height: 50px; max-width: 250px;">
+
+    <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" width="20" height="20"
+      class="google-logo" style="margin-top: 3px; margin-right: 8px;"> <!-- Giảm giá trị margin-top -->
+
+    <span style="font-size: 14px;">Đăng ký với Google</span>
+  </button>
+
+
+  <!-- Success message display -->
+  <div *ngIf="successMessage" class="alert alert-success mt-3">
+    {{ successMessage }}
+  </div>
+
+  <!-- Error message display -->
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+  </div>
+</div>
