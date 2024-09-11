@@ -77,14 +77,14 @@ export class NavbarComponent implements OnInit {
       this.successMessage = ''; // Clear success message
       return;
     }
-  
+
     // Prepare password data for the API call
     const passwordData = {
       currentPassword: this.cupass, // Use cupass if currentPassword is null
       newPassword: this.newPassword,
       confirmPassword: this.confirmPassword
     };
-  
+
     // Call the API to change password
     this.accountService.changePassword(this.accountId ?? 0, passwordData)
   .subscribe({
@@ -92,12 +92,12 @@ export class NavbarComponent implements OnInit {
         console.log('Password changed successfully:', response);
         this.successMessage = 'Đổi mật khẩu thành công.';
         this.errorMessage = ''; // Clear error message on success
-  
+
         // Display success message for 3 seconds before reloading
         setTimeout(() => {
           window.location.reload();
         }, 2000);
-  
+
         // Reset form fields
         this.newPassword = '';
         this.confirmPassword = '';
@@ -110,8 +110,8 @@ export class NavbarComponent implements OnInit {
       }
     });
   }
-  
-  
+
+
   viewOrder() {
     window.location.href = '/purchase';
   }
