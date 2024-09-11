@@ -35,6 +35,7 @@ import { AuthGuard } from './auth/authGuard/authGuard.component';
 import { AuthCallbackComponent } from './common/login/callback/authCallback/authCallback.component';
 import { ManageTableComponent } from './manager/ManageTable/ManageTable.component';
 import { NotificationComponent } from './common/notification/notification.component';
+import { SignupComponent } from './common/signup/signup/signup.component';
 
 
 export const routes: Routes = [
@@ -72,6 +73,7 @@ export const routes: Routes = [
     {'path': 'manageNew', component: ManageNewComponent},
     {'path': 'auth/callback', component: AuthCallbackComponent},
     {'path': 'manageTable', component: ManageTableComponent},
-    {'path': 'notification', component: NotificationComponent}
+    {'path': 'notification', component: NotificationComponent},
+    {'path': 'signup', component: SignupComponent}
 
 ];

@@ -102,7 +102,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
   }
   loadListDishes(search: string = '', searchCategory: string =''): void {
     console.log('Loading dishes with search term:', search);
-    this.dishService.ListDishes(this.currentPage,100, search, searchCategory ).subscribe(
+    this.dishService.ListDishesActive(this.currentPage,100, search, searchCategory ).subscribe(
       (response: ListAllDishes) => {
         if (response && response.items) {
           this.dishes = [response];
@@ -120,7 +120,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
 
   loadListCombo(search: string = ''): void {
     console.log('Loading combos with search term:', search);
-    this.comboService.ListCombo(this.currentPage, 100, search).subscribe(
+    this.comboService.ListComboActive(this.currentPage, 100, search).subscribe(
       (response) => {
         if (response && response.items) {
           this.combo = [response];
@@ -455,9 +455,21 @@ async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
   } catch (error) {
     console.error('Error updating newly added items:', error);
   }
+  
 }
 
-
+getMaxQuantity(item: any): number {
+  // Check if the item is a combo or a dish
+  if (item.hasOwnProperty('quantityCombo')) {
+    // Return the quantityCombo if the item is a combo
+    return item.quantityCombo;
+  } else if (item.hasOwnProperty('quantityDish')) {
+    // Return the quantityDish if the item is a dish
+    return item.quantityDish;
+  }
+  // Default to a high number if quantity properties are not found
+  return Number.MAX_SAFE_INTEGER;
+}
 
 
  async removeOrUpdateNewlyAddedItem(item: any): Promise<void> {
@@ -560,49 +572,88 @@ async addOrUpdateNewlyAddedItem(item: any): Promise<void> {
   async addItem(item: any) {
     // Find if the item already exists in selectedItems
     const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-
+    
+    // Determine the maximum allowable quantity based on item type
+    const maxQuantity = this.getMaxQuantity(item);
+  
+    // Ensure unitPrice is a valid number
     let unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
     if (isNaN(unitPrice)) {
       console.error('Unit price is not a number:', unitPrice);
       unitPrice = 0; // Ensure unitPrice has a valid number
     }
-
+  
     if (index !== -1) {
-      // If the item already exists, increase its quantity and update the total price
-      this.selectedItems[index].quantity++;
-      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * unitPrice;
+      // If the item already exists, check if we can increase its quantity
+      if (this.selectedItems[index].quantity < maxQuantity) {
+        this.selectedItems[index].quantity++;
+        this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * unitPrice;
+      } else {
+        // Show an error message if the quantity exceeds the available stock
+        this.errorMessage = 'Không thể thêm món này nữa, số lượng đã đạt giới hạn.';
+        this.clearErrorMessageAfterTimeout();
+        return; // Exit the method early
+      }
     } else {
       // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
-      this.selectedItems.push({
-        ...item,
-        quantity: 1,
-        unitPrice: unitPrice,
-        totalPrice: unitPrice,
-        dishesServed: 0
-      });
+      if (item.quantityDish > 0 || item.quantityCombo > 0) { // Ensure there is stock available
+        this.selectedItems.push({
+          ...item,
+          quantity: 1,
+          unitPrice: unitPrice,
+          totalPrice: unitPrice,
+          dishesServed: 0
+        });
+      } else {
+        // Show an error message if the item is out of stock
+        this.errorMessage = 'Món này đã hết hàng.';
+        this.clearErrorMessageAfterTimeout();
+        return; // Exit the method early
+      }
     }
+    
     console.log('Updated Selected Items:', this.selectedItems);
-
+  
     // Recalculate totalAmount and totalAmountAfterDiscount after adding item
     this.calculateAndSetTotalAmount();
-
+  
     // Find the specific item in newlyAddedItems
     const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
-
+  
     if (newlyAddedIndex !== -1) {
       // If the item already exists in newlyAddedItems, update its quantity
-      this.newlyAddedItems[newlyAddedIndex].quantity += 1;
-      this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * unitPrice;
+      if (this.newlyAddedItems[newlyAddedIndex].quantity < maxQuantity) {
+        this.newlyAddedItems[newlyAddedIndex].quantity += 1;
+        this.newlyAddedItems[newlyAddedIndex].totalPrice = this.newlyAddedItems[newlyAddedIndex].quantity * unitPrice;
+      } else {
+        // Show an error message if the quantity exceeds the available stock
+        this.errorMessage = 'Không thể thêm món này nữa, số lượng đã đạt giới hạn.';
+        this.clearErrorMessageAfterTimeout();
+        return; // Exit the method early
+      }
     } else {
       // If the item does not exist in newlyAddedItems, add it with the correct quantity
-      this.newlyAddedItems.push({
-        ...item,
-        quantity: 1,
-        unitPrice: unitPrice,
-        totalPrice: unitPrice,
-      });
+      if (item.quantityDish > 0 || item.quantityCombo > 0) { // Ensure there is stock available
+        this.newlyAddedItems.push({
+          ...item,
+          quantity: 1,
+          unitPrice: unitPrice,
+          totalPrice: unitPrice,
+        });
+      } else {
+        // Show an error message if the item is out of stock
+        this.errorMessage = 'Món này đã hết hàng.';
+        this.clearErrorMessageAfterTimeout();
+        return; // Exit the method early
+      }
     }
+    
     console.log('Updated Newly Added Items:', this.newlyAddedItems);
+  }
+   clearErrorMessageAfterTimeout() {
+    setTimeout(() => {
+      this.errorMessage = '';  // Clear the message after 5 seconds
+    }, 2000);  // 5000 milliseconds = 5 seconds
   }
 
 

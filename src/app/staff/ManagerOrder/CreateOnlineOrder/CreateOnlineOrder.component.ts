@@ -166,7 +166,7 @@ export class CreateOnlineOrderComponent implements OnInit {
   }
   loadListDishes(search: string = '', searchCategory: string = ''): void {
     console.log('Loading dishes with search term:', search);
-    this.dishService.ListDishes(this.currentPage, 100, search, searchCategory).subscribe(
+    this.dishService.ListDishesActive(this.currentPage, 100, search, searchCategory).subscribe(
       (response: ListAllDishes) => {
         if (response && response.items) {
           this.dishes = [response];
@@ -184,7 +184,7 @@ export class CreateOnlineOrderComponent implements OnInit {
 
   loadListCombo(search: string = ''): void {
     console.log('Loading combos with search term:', search);
-    this.comboService.ListCombo(this.currentPage, 100, search).subscribe(
+    this.comboService.ListComboActive(this.currentPage, 100, search).subscribe(
       (response) => {
         if (response && response.items) {
           this.combo = [response];
@@ -239,34 +239,84 @@ export class CreateOnlineOrderComponent implements OnInit {
   }
   validateQuantity(index: number): void {
     const item = this.selectedItems[index];
+    
+    // Determine the maximum quantity based on whether the item is a dish or a combo
+    const maxQuantity = this.getMaxQuantity(item);
+    
+    // Ensure the quantity is at least 1
     if (item.quantity < 1) {
       item.quantity = 1;
-    } else if (item.quantity > 100) {
-      item.quantity = 100;
+    } 
+    // Ensure the quantity doesn't exceed the available quantity
+    else if (item.quantity > maxQuantity) {
+      item.quantity = maxQuantity;
     }
+  
     // Update the total price after validating the quantity
     item.totalPrice = item.quantity * item.unitPrice;
-    // Recalculate total amount
+  
+    // Recalculate the total amount after changes
     this.calculateAndSetTotalAmount();
   }
-  addItem(item: any) {
-    // Find if the item already exists in selectedItems
-    const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
+  
+  getMaxQuantity(item: any): number {
+    // Check if the item is a combo or a dish
+    if (item.hasOwnProperty('quantityCombo')) {
+      // Return the quantityCombo if the item is a combo
+      return item.quantityCombo;
+    } else if (item.hasOwnProperty('quantityDish')) {
+      // Return the quantityDish if the item is a dish
+      return item.quantityDish;
+    }
+    // Default to a high number if quantity properties are not found
+    return Number.MAX_SAFE_INTEGER;
+  }
+  
+  errorMessage: string = '';
 
-    if (index !== -1) {
-      // If the item already exists, increase its quantity and update the total price
+  addItem(item: any) {
+  // Determine whether the item is a dish or a combo
+  const isCombo = item.hasOwnProperty('quantityCombo');
+  
+  // Use the appropriate quantity property based on whether it's a dish or combo
+  const availableQuantity = isCombo ? item.quantityCombo : item.quantityDish;
+
+  // Find if the item already exists in selectedItems
+  const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
+
+  if (index !== -1) {
+    // If the item already exists, check if we can still increase its quantity
+    if (this.selectedItems[index].quantity < availableQuantity) {
+      // Increase its quantity and update the total price if the quantity is less than available stock
       this.selectedItems[index].quantity++;
       this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
     } else {
-      // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
-      // Use discountedPrice if available, otherwise fallback to price
-      const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
-      this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
+      // Show a message if the quantity exceeds the available stock
+      this.errorMessage = 'Không thể thêm món này nữa, số lượng đã đạt giới hạn.';
+      this.clearErrorMessageAfterTimeout();
     }
+  } else {
+    // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
+    const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
 
-    // Recalculate totalAmount and totalAmountAfterDiscount after adding item
-    this.calculateAndSetTotalAmount();
+    // Only add if there is at least 1 item available in stock
+    if (availableQuantity > 0) {
+      this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
+    } else {
+      this.errorMessage = 'Món này đã hết hàng.';
+      this.clearErrorMessageAfterTimeout();
+    }
   }
+
+  // Recalculate totalAmount and totalAmountAfterDiscount after adding the item
+  this.calculateAndSetTotalAmount();
+}
+
+clearErrorMessageAfterTimeout() {
+  setTimeout(() => {
+    this.errorMessage = '';  // Clear the message after 5 seconds
+  }, 5000);  // 5000 milliseconds = 5 seconds
+}
 
 
 
