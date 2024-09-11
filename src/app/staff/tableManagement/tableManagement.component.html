@@ -75,7 +75,7 @@
         <div class="card">
           <div class="table-grid">
             <div class="table" *ngFor="let table of dataTable">
-              {{ table.tableId }}<br>
+              {{ table.lable }}<br>
               <hr>{{ table.status === 0 ? 'Bàn trống' : 'Đang sử dụng' }}
               <span class="icon-sl"><i class="fas fa-chair"></i>{{ table.capacity }}</span>
               <span class="icon-table" *ngIf="table.status === 1">&#10004;</span>
@@ -312,16 +312,16 @@
                     <td>{{reservation.deposits | currencyFormat}}</td>
                     <td><span [ngClass]="getStatusLabel(reservation.status).class" class="status-label">{{
                         getStatusLabel(reservation.status).label }}</span></td>
-                        <td>
-                          <button type="button" class="btn btn-primary btn-sm"
-                            (click)="getReservationById(reservation.reservationId)">Chi tiết</button>
-                        </td>
+                    <td>
+                      <button type="button" class="btn btn-primary btn-sm"
+                        (click)="getReservationById(reservation.reservationId)">Chi tiết</button>
+                    </td>
                     <td><button type="button" class="btn btn-primary btn-sm" style="background-color: green;"
                         (click)="updateStatusReservationById(reservation.reservationId, 2)">Nhận đơn</button></td>
-                        <td>
-                          <button type="button" class="btn btn-primary btn-sm" style="background-color: red;"
-                            (click)="updateStatusReservation(reservation.reservationId)">Hủy đơn</button>
-                        </td>
+                    <td>
+                      <button type="button" class="btn btn-primary btn-sm" style="background-color: red;"
+                        (click)="updateStatusReservation(reservation.reservationId)">Hủy đơn</button>
+                    </td>
                   </tr>
                 </ng-container>
               </tbody>
