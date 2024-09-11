@@ -19,7 +19,7 @@
           <div *ngIf="successMessage" class="alert alert-success" style="max-width: 500px;">
             {{ successMessage }}</div>
 
-          <div class="row" >
+          <div class="row">
             <!-- Left column for address and cart details -->
             <div class="col-md-6">
               <!-- Address Selection -->
@@ -27,7 +27,8 @@
                 <div class="input-group mb-3" (clickOutside)="showDropdown = false">
                   <input type="text" class="form-control" placeholder="Select address..." (click)="toggleDropdown()"
                     [(ngModel)]="selectedAddress" readonly>
-                  <div class="dropdown-menu dropdown-scrollable" [ngClass]="{'show': showDropdown}" [style.zIndex]="1000">
+                  <div class="dropdown-menu dropdown-scrollable" [ngClass]="{'show': showDropdown}"
+                    [style.zIndex]="1000">
                     <div class="search-container p-2">
                       <input type="text" class="form-control search-input" placeholder="Search..."
                         [(ngModel)]="searchTerm" (click)="$event.stopPropagation()" (input)="filterAddresses()">
@@ -41,7 +42,8 @@
                       {{ address.consigneeName }} - {{ address.guestPhone }}
                     </button>
                   </div>
-                  <button class="btn btn-outline-secondary ml-2" type="button" data-bs-toggle="modal" data-bs-target="#formModalaa">
+                  <button class="btn btn-outline-secondary ml-2" type="button" data-bs-toggle="modal"
+                    data-bs-target="#formModalaa">
                     <i class="fas fa-user"></i>
                   </button>
                 </div>
@@ -92,13 +94,25 @@
                       </td>
                       <td>
                         <div class="d-flex align-items-center">
+                          <!-- Decrease Button -->
                           <button class="btn btn-outline-secondary btn-sm" (click)="decreaseQuantity(i)">-</button>
+                          
+                          <!-- Quantity Input Field -->
                           <input type="number"
                             class="form-control text-center small-input mx-2 no-spinners rounded-input"
-                            [(ngModel)]="item.quantity" (change)="validateQuantity(i)" min="1" max="100">
-                          <button class="btn btn-outline-secondary btn-sm" (click)="increaseQuantity(i)">+</button>
+                            [(ngModel)]="item.quantity"
+                            (change)="validateQuantity(i)"
+                            min="1"
+                            [max]="getMaxQuantity(item)"
+                            [readonly]="item.quantity >= getMaxQuantity(item)">
+                          
+                          <!-- Increase Button -->
+                          <button class="btn btn-outline-secondary btn-sm"
+                            (click)="increaseQuantity(i)"
+                            [disabled]="item.quantity >= getMaxQuantity(item)">+</button>
                         </div>
                       </td>
+                      
                       <td>
                         <div *ngIf="item.discountedPrice" class="d-flex align-items-center">
                           <span>{{ item.discountedPrice | currencyFormat }}</span>
@@ -146,7 +160,8 @@
                   </span>
                 </div>
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-3">
-                  <button type="button" class="btn custom-btn-success btn-lg rounded-pill" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                  <button type="button" class="btn custom-btn-success btn-lg rounded-pill" data-bs-toggle="modal"
+                    data-bs-target="#paymentModal">
                     Tạo đơn
                   </button>
                   <button class="btn custom-btn-danger btn-lg rounded-pill" (click)="clearCart()">
@@ -280,11 +295,13 @@
               </div>
 
               <!-- Dishes Section -->
-              <div class="dishes-section" *ngIf="showingDishes && dishes" style=" max-height: 400px;overflow-y: auto;">
-                <div class="row" >
+              <div class="dishes-section" *ngIf="showingDishes && dishes" style="max-height: 400px; overflow-y: auto;">
+                <div class="row">
                   <ng-container *ngFor="let list of dishes">
                     <div class="col-lg-4 col-md-6 mb-4" *ngFor="let dish of list.items">
-                      <div class="card h-100 shadow-sm dish-card" (click)="addItem(dish)">
+                      <div class="card h-100 shadow-sm dish-card" 
+                           [ngClass]="{'out-of-stock': dish.quantityDish === 0 || dish.quantityDish === null}"
+                           (click)="dish.quantityDish > 0 ? addItem(dish) : null">
                         <div class="image-container">
                           <img class="card-img-top" [src]="dish.imageUrl" alt="Dish image">
                         </div>
@@ -292,13 +309,17 @@
                           <div class="dish-details">
                             <div class="dish-name font-weight-bold mb-2">{{ dish.itemName }}</div>
                             <div *ngIf="dish.discountedPrice" class="dish-price">
-                              <span class="text-decoration-line-through text-muted">{{ dish.price | currencyFormat
-                                }}</span>
+                              <span class="text-decoration-line-through text-muted">{{ dish.price | currencyFormat }}</span>
                               <br>
                               <span class="text-danger">{{ dish.discountedPrice | currencyFormat }}</span>
                             </div>
-                            <div *ngIf="!dish.discountedPrice" class="dish-price font-weight-bold">{{ dish.price |
-                              currencyFormat }}</div>
+                            <div *ngIf="!dish.discountedPrice" class="dish-price font-weight-bold">{{ dish.price | currencyFormat }}</div>
+                          </div>
+              
+                          <!-- Display Remaining Quantity -->
+                          <div class="remaining-quantity mt-3">
+                            <span *ngIf="dish.quantityDish > 0" class="text-muted">Còn lại: {{ dish.quantityDish }} món</span>
+                            <span *ngIf="dish.quantityDish === 0 || dish.quantityDish === null" class="text-danger">Hết hàng</span>
                           </div>
                         </div>
                       </div>
@@ -306,20 +327,29 @@
                   </ng-container>
                 </div>
               </div>
+              
 
               <!-- Combos Section -->
               <div class="combos-section" *ngIf="showingCombos && combo">
                 <div class="row">
                   <ng-container *ngFor="let list of combo">
                     <div class="col-lg-4 col-md-6 mb-4" *ngFor="let cb of list.items">
-                      <div class="card h-100 shadow-sm combo-card" (click)="addItem(cb)">
+                      <!-- Conditionally add 'out-of-stock' class based on quantityCombo -->
+                      <div class="card h-100" 
+                           [ngClass]="{'out-of-stock': cb.quantityCombo === 0 || cb.quantityCombo === null}"
+                           (click)="addItem(cb)">
                         <div class="image-container">
                           <img class="card-img-top" [src]="cb.imageUrl" alt="Combo image">
                         </div>
                         <div class="card-body text-center">
                           <div class="combo-details">
-                            <div class="combo-name font-weight-bold mb-2">{{ cb.nameCombo }}</div>
-                            <div class="combo-price font-weight-bold">{{ cb.price | currencyFormat }}</div>
+                            <div class="combo-name">{{ cb.nameCombo }}</div>
+                            <div class="combo-price">{{ cb.price | currencyFormat }}</div>
+                          </div>
+                          <!-- Display Remaining Quantity -->
+                          <div class="remaining-quantity mt-3">
+                            <span *ngIf="cb.quantityCombo > 0" class="text-muted">Còn lại: {{ cb.quantityCombo }} món</span>
+                            <span *ngIf="cb.quantityCombo === 0 || cb.quantityCombo === null" class="text-danger">Hết hàng</span>
                           </div>
                         </div>
                       </div>
@@ -433,12 +463,12 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                  <!-- chỗ này phải là phải update guest từ reservation vào đây -->
-                <button *ngIf="reservationData === null" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal"
-                  (click)="createOrderOffline(this.tableId)">Xác nhận</button>
+                <!-- chỗ này phải là phải update guest từ reservation vào đây -->
+                <button *ngIf="reservationData === null" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                  data-bs-target="#cfpaymentModal" (click)="createOrderOffline(this.tableId)">Xác nhận</button>
 
-                  <button *ngIf="reservationData !== null" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cfpaymentModal"
-                  (click)="createOrderReservation(this.tableId)">Xác nhận</button>
+                <button *ngIf="reservationData !== null" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                  data-bs-target="#cfpaymentModal" (click)="createOrderReservation(this.tableId)">Xác nhận</button>
               </div>
             </div>
           </div>

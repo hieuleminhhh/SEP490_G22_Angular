@@ -32,6 +32,15 @@ export class ManagerComboService {
     const url = `${this.apiUrl}/Combo/ListCombo`;
     return this.http.get<ListAllCombo>(url, { params, ...this.getHttpOptions() });
   }
+  ListComboActive(page: number = 1, pageSize: number = 10, search: string = ''): Observable<ListAllCombo> {
+    let params = new HttpParams()
+        .set('page', page.toString())
+        .set('pageSize', pageSize.toString())
+        .set('search', search.toString());
+
+    const url = `${this.apiUrl}/Combo/ListComboActive`;
+    return this.http.get<ListAllCombo>(url, { params, ...this.getHttpOptions() });
+  }
 
   getAllDishes(): Observable<Dish[]> {
     const url = `${this.apiUrl}/Dish`;

@@ -488,6 +488,24 @@ input.rounded-input {
   .back-icon:hover {
     color: black; /* Màu sắc mới khi hover */
   }
-
+  .out-of-stock {
+    pointer-events: none; /* Disable click */
+    opacity: 0.6; /* Dim the card */
+    position: relative;
+  }
+  
+  .out-of-stock .image-container::after {
+    content: "Hết hàng";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    padding: 10px;
+    font-size: 18px;
+    text-align: center;
+    border-radius: 5px;
+  }
   
   
