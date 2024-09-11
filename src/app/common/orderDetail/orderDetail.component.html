@@ -13,15 +13,17 @@
       <button class="back-btn" (click)="goBack()">&lt; TRỞ LẠI</button>
       <div class="order-info">
         <span class="order-id">MÃ ĐƠN HÀNG: {{orderDetail?.orderId}}</span>
-        <!-- <span class="order-status">ĐƠN HÀNG ĐÃ HOÀN THÀNH</span> -->
-        <span *ngIf="orderDetail?.status === 4" class="text-success">TRẠNG THÁI ĐƠN HÀNG: HOÀN THÀNH</span>
-        <span *ngIf="orderDetail?.status === 1" style="color: rgb(69, 69, 18);">TRẠNG THÁI ĐƠN HÀNG: ĐỢI XÁC NHẬN</span>
-        <span *ngIf="orderDetail?.status === 8" style="color: blue;">TRẠNG THÁI ĐƠN HÀNG: ĐANG GIAO HÀNG</span>
-        <span *ngIf="orderDetail?.status === 5" class="text-danger">TRẠNG THÁI ĐƠN HÀNG: ĐÃ HỦY</span>
+        <span *ngIf="orderDetail?.status === 4" style="color: teal;">HOÀN THÀNH</span>
+        <span *ngIf="orderDetail?.status === 1" style="color: orange;">ĐỢI XÁC NHẬN ĐƠN HÀNG</span>
+        <span *ngIf="orderDetail?.status === 7" style="color: green;">ĐANG GIAO HÀNG</span>
+        <span *ngIf="orderDetail?.status === 2" style="color: blue;">ĐÃ CHẤP NHẬN ĐƠN HÀNG</span>
+        <span *ngIf="orderDetail?.status === 6" style="color: brown;">ĐANG CHUẨN BỊ ĐƠN HÀNG</span>
+        <span *ngIf="orderDetail?.status === 5 || orderDetail?.status === 8 " style="color: red;">ĐÃ HỦY</span>
       </div>
     </header>
-    <div class="order-tracking" *ngIf="orderDetail?.status!==5">
-      <div *ngFor="let step of steps; let i = index" class="order-step" [ngClass]="{'completed': isCompleted(i), 'pending': !isCompleted(i)}">
+    <div class="order-tracking" *ngIf="orderDetail?.status!==5 && orderDetail?.type===2">
+      <div *ngFor="let step of steps; let i = index" class="order-step"
+        [ngClass]="{'completed': isCompleted(i), 'pending': !isCompleted(i)}">
         <div class="step-icon">
           <i [class]="step.icon"></i>
         </div>
@@ -32,12 +34,21 @@
       </div>
     </div>
 
-    <section class="shipping-info">
+    <section class="shipping-info" *ngIf="orderDetail?.type===2">
       <div class="shipping-details">
         <h2>Địa Chỉ Nhận Hàng:</h2>
         <p>{{orderDetail?.consigneeName}}</p>
         <p>{{orderDetail?.guestPhone}}</p>
         <p>{{orderDetail?.guestAddress}}</p>
+      </div>
+    </section>
+    <section class="shipping-info" *ngIf="orderDetail?.type===3">
+      <div class="shipping-details">
+        <h2>Thông tin đặt bàn:</h2>
+        <p>Tên khách hàng: {{orderDetail?.consigneeName}}</p>
+        <p>Số điện thoại: {{orderDetail?.guestPhone}}</p>
+        <p>Thời gian đặt bàn: {{ orderDetail?.reservation.reservationTime | date:'dd/MM/yyyy - HH:mm' }}</p>
+        <p>Số người: {{orderDetail?.reservation.guestNumber}}</p>
       </div>
     </section>
     <hr>
@@ -67,13 +78,18 @@
           <span>{{orderDetail?.totalAmount - (orderDetail?.totalAmount*orderDetail?.discountPercent/100) |
             currencyFormat}}</span>
         </div>
+        <div class="price-total" *ngIf="orderDetail?.deposits>0">
+          <span>Đã thanh toán:</span>
+          <span>{{orderDetail?.deposits | currencyFormat}}</span>
+        </div>
       </div>
       <hr>
       <div>
-        <p>Phương thức thanh toán: {{orderDetail?.deposits===0?'Thanh toán khi nhận hàng':'Thanh toán bằng ví'}}</p>
-        <button class="btn btn-primary btn-sm" (click)="reorder(orderDetail?.orderId)" *ngIf="orderDetail?.status === 4">Mua Lại</button>
-        <button class="btn btn-danger btn-sm" data-bs-target="#cancelOrderModal"
-        data-bs-toggle="modal" *ngIf="orderDetail?.status === 1 || orderDetail?.status === 2 || orderDetail?.status === 6">Hủy đơn</button>
+        <p>Phương thức thanh toán: {{orderDetail?.deposits===0?'Thanh toán khi nhận hàng':'Thanh toán chuyển khoản qua VNPay'}}</p>
+        <button class="btn btn-primary btn-sm" (click)="reorder(orderDetail?.orderId)"
+          *ngIf="orderDetail?.status === 4">Mua Lại</button>
+        <button class="btn btn-danger btn-sm" data-bs-target="#cancelOrderModal" data-bs-toggle="modal"
+          *ngIf="orderDetail?.status === 1 || orderDetail?.status === 2 || orderDetail?.status === 6">Hủy đơn</button>
       </div>
       <hr>
       <div *ngIf="orderDetail?.status===5">
@@ -83,63 +99,64 @@
     </section>
   </div>
 </body>
+
 </html>
 
 <!-- Cancel Order Confirmation Modal -->
-<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel"
-aria-hidden="true">
-<div class="modal-dialog">
-  <div class="modal-content">
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
 
-    <!-- Modal Header -->
-    <div class="modal-header">
-      <h5 class="modal-title" id="cancelOrderModalLabel">Xác nhận hủy đơn</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="cancelOrderModalLabel">Xác nhận hủy đơn</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
 
-    <!-- Modal Body -->
-    <div class="modal-body">
-      <p>Bạn có chắc chắn muốn hủy đơn này không?</p>
-      <div class="form-group">
-        <label for="cancelationReason">Lý do hủy đơn:</label>
-        <br><br>
-        <div class="form-check">
-          <input type="radio" id="reason1" name="cancelationReason" class="form-check-input"
-            [(ngModel)]="cancelationReason" value="Không còn nhu cầu" />
-          <label class="form-check-label" for="reason1"> Không còn nhu cầu</label>
-        </div>
-        <div class="form-check">
-          <input type="radio" id="reason2" name="cancelationReason" class="form-check-input"
-            [(ngModel)]="cancelationReason" value="Đơn hàng sai" />
-          <label class="form-check-label" for="reason2"> Đơn hàng sai</label>
-        </div>
-        <div class="form-check">
-          <input type="radio" id="reason3" name="cancelationReason" class="form-check-input"
-            [(ngModel)]="cancelationReason" value="Thời gian giao hàng quá lâu" />
-          <label class="form-check-label" for="reason3"> Thời gian giao hàng quá lâu</label>
-        </div>
-        <div class="form-check">
-          <input type="radio" id="reason4" name="cancelationReason" class="form-check-input"
-            [(ngModel)]="cancelationReason" value="Chất lượng sản phẩm không đạt yêu cầu" />
-          <label class="form-check-label" for="reason4"> Chất lượng sản phẩm không đạt yêu cầu</label>
-        </div>
-        <div class="form-check">
-          <input type="radio" id="reason5" name="cancelationReason" class="form-check-input"
-            [(ngModel)]="cancelationReason" value="Lý do khác" />
-          <label class="form-check-label" for="reason5">Lý do khác</label>
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <p>Bạn có chắc chắn muốn hủy đơn này không?</p>
+        <div class="form-group">
+          <label for="cancelationReason">Lý do hủy đơn:</label>
+          <br><br>
+          <div class="form-check">
+            <input type="radio" id="reason1" name="cancelationReason" class="form-check-input"
+              [(ngModel)]="cancelationReason" value="Không còn nhu cầu" />
+            <label class="form-check-label" for="reason1"> Không còn nhu cầu</label>
+          </div>
+          <div class="form-check">
+            <input type="radio" id="reason2" name="cancelationReason" class="form-check-input"
+              [(ngModel)]="cancelationReason" value="Đơn hàng sai" />
+            <label class="form-check-label" for="reason2"> Đơn hàng sai</label>
+          </div>
+          <div class="form-check">
+            <input type="radio" id="reason3" name="cancelationReason" class="form-check-input"
+              [(ngModel)]="cancelationReason" value="Thời gian giao hàng quá lâu" />
+            <label class="form-check-label" for="reason3"> Thời gian giao hàng quá lâu</label>
+          </div>
+          <div class="form-check">
+            <input type="radio" id="reason4" name="cancelationReason" class="form-check-input"
+              [(ngModel)]="cancelationReason" value="Chất lượng sản phẩm không đạt yêu cầu" />
+            <label class="form-check-label" for="reason4"> Chất lượng sản phẩm không đạt yêu cầu</label>
+          </div>
+          <div class="form-check">
+            <input type="radio" id="reason5" name="cancelationReason" class="form-check-input"
+              [(ngModel)]="cancelationReason" value="Lý do khác" />
+            <label class="form-check-label" for="reason5">Lý do khác</label>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Modal Footer -->
-    <div class="modal-footer justify-content-between">
-      <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-        Đóng
-      </button>
-      <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal" (click)="cancelOrder(orderDetail.orderId)">
-        Xác nhận
-      </button>
+      <!-- Modal Footer -->
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+          Đóng
+        </button>
+        <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal"
+          (click)="cancelOrder(orderDetail.orderId)">
+          Xác nhận
+        </button>
+      </div>
     </div>
   </div>
-</div>
 </div>
