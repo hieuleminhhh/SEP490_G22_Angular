@@ -31,27 +31,33 @@ export class ManageTableComponent implements OnInit {
   newFloor: any;
   floors: number[] = [];
   errorMessage: string = '';
-  newTable: string='';
+  newTable: string = '';
   capacityError: string | null = null;
   selectedTableId: any;
   tableDetail: any = {};
   tableToDelete: any;
   tableToEdit: any;
   isTableDetailsVisible: boolean = false;
+  isTableNameInvalid: boolean = false;
+  isDetail: boolean = false;
+  isEditing: boolean = false;
+  newSelectedFloor: number | null = null;
+  waitingTables: any[] = [];
+  isWaitingTableView: boolean = false;
+  isFloorInvalid: boolean = false;
 
   @ViewChild('addFloorModal') addFloorModal!: ElementRef;
   @ViewChild('manageTablesModal') manageTablesModal!: ElementRef;
   @ViewChild('tableDetailsModal') tableDetailsModal!: ElementRef;
   @ViewChild('confirmDeleteModal') confirmDeleteModal!: ElementRef;
   @ViewChild('confirmEditModal') confirmEditModal!: ElementRef;
+  @ViewChild('editFloorModal') editFloorModal!: ElementRef;
+  @ViewChild('confirmDeleteFloorModal') confirmDeleteFloorModal!: ElementRef;
 
   constructor(private tableService: TableService) { }
 
   ngOnInit(): void {
-
     this.getTableData();
-    console.log(this.dataTable);
-
   }
 
   getTableData(): void {
@@ -81,18 +87,24 @@ export class ManageTableComponent implements OnInit {
 
   getFloors(): number[] {
     const uniqueFloors = new Set<number>();
+
     if (Array.isArray(this.originalDataTable)) {
       this.originalDataTable.forEach(table => {
-        uniqueFloors.add(table.floor);
+        if (table.floor !== null && table.floor !== undefined) { // Kiểm tra giá trị null hoặc undefined
+          uniqueFloors.add(table.floor);
+        }
       });
     } else {
       console.error('originalDataTable is not an array:', this.originalDataTable);
     }
+
     return Array.from(uniqueFloors).sort((a, b) => a - b);
   }
 
+
   getTableOFFloor(floor: number) {
     this.selectedFloor = floor;
+    this.isWaitingTableView = false;
     this.filterTablesByFloorAndStatus(this.selectedTable);
   }
 
@@ -102,13 +114,15 @@ export class ManageTableComponent implements OnInit {
       const newTableData = {
         status: 0,
         capacity: this.capacity,
-        floor: this.selectedFloor
+        floor: this.selectedFloor,
+        lable: this.newTable
       };
       this.tableService.createTables(newTableData).subscribe(
         response => {
           console.log('Bàn đã được thêm thành công:', response);
           this.getTableData();
           this.closeManageTablesModal();
+          window.location.reload();
         },
         error => {
           console.error('Error khi thêm bàn:', error);
@@ -126,7 +140,11 @@ export class ManageTableComponent implements OnInit {
       this.newFloor = null;
       this.errorMessage = '';
       this.closeAddFloorModal();
-      this.openManageTablesModal();
+      if (this.isDetail === true) {
+        this.openTableDetails();
+      } else {
+        this.openManageTablesModal();
+      }
     } else if (this.floors.includes(this.newFloor)) {
       this.errorMessage = 'Tầng đã tồn tại!';
     } else {
@@ -145,8 +163,10 @@ export class ManageTableComponent implements OnInit {
       backdrop.className = 'modal-backdrop fade show';
       document.body.appendChild(backdrop);
     }
+    this.isDetail = false;
   }
   openAddFloorModal() {
+    this.closeTableDetailsModal();
     this.closeManageTablesModal();
     const modal = this.addFloorModal.nativeElement;
     if (modal) {
@@ -167,7 +187,13 @@ export class ManageTableComponent implements OnInit {
       document.body.classList.remove('modal-open');
       this.updateBackdrop();
     }
-    this.openManageTablesModal();
+    console.log(this.isDetail);
+
+    if (this.isDetail === true) {
+      this.openTableDetails();
+    } else {
+      this.openManageTablesModal();
+    }
   }
 
   closeManageTablesModal() {
@@ -196,14 +222,16 @@ export class ManageTableComponent implements OnInit {
     }
   }
   validateCapacity(): void {
-    if (this.capacity < 1 || this.capacity > 20) {
-      this.capacityError = 'Số chỗ ngồi phải nằm trong khoảng từ 1 đến 20.';
+    if (this.capacity < 1) {
+      this.capacityError = 'Số chỗ ngồi không hợp lệ.';
     } else {
       this.capacityError = null;
     }
   }
   showTableDetails(table: any): void {
     this.getTableById(table.tableId);
+    this.isDetail = true;
+    console.log(this.isDetail);
 
   }
 
@@ -233,6 +261,9 @@ export class ManageTableComponent implements OnInit {
       response => {
         console.log(response);
         this.tableDetail = response;
+        this.selectedFloor=this.tableDetail.floor;
+        this.newTable = this.tableDetail.lable;
+        this.capacity = this.tableDetail.capacity;
         this.openTableDetails();
       },
       error => {
@@ -304,6 +335,12 @@ export class ManageTableComponent implements OnInit {
   }
 
   editTable(table: any): void {
+    this.validateTableName();
+    this.validateFloor();
+    if (this.isTableNameInvalid && this.isFloorInvalid) {
+      console.error('Tên bàn không được để trống');
+      return;
+    }
     this.tableToEdit = table;
     this.openConfirmEditModal();
   }
@@ -338,19 +375,25 @@ export class ManageTableComponent implements OnInit {
     }
   }
 
-  confirmEditTable(tableDetail:any): void {
+  confirmEditTable(tableDetail: any): void {
     if (this.tableToEdit) {
       this.updateTable(tableDetail);
     }
+  }
+  validateTableName() {
+    this.isTableNameInvalid = !this.newTable || this.newTable.trim() === '';
+  }
+  validateFloor() {
+    this.isFloorInvalid = this.selectedFloor===null;
   }
 
   updateTable(tableDetail: any): void {
     const request = {
       status: tableDetail.status,
-      capacity: tableDetail.capacity,
-      floor: tableDetail.floor
+      capacity: this.capacity,
+      floor: this.selectedFloor,
+      lable: this.newTable
     }
-
     this.tableService.updateTable(this.tableDetail.tableId, request).subscribe(
       response => {
         const index = this.originalDataTable.findIndex(table => table.tableId === this.tableDetail.tableId);
@@ -366,8 +409,118 @@ export class ManageTableComponent implements OnInit {
       }
     );
   }
-  getWaitingTable(){
-
+  getWaitingTable() {
+    this.tableService.getTablesEmpty().subscribe(
+      response => {
+        this.waitingTables = response;
+        this.isWaitingTableView = true;
+      },
+      error => {
+        console.error('Error updating table:', error);
+      }
+    );
   }
 
+  openEditFloorModal(): void {
+    const modal = this.editFloorModal.nativeElement;
+    if (modal) {
+      modal.classList.add('show');
+      modal.style.display = 'block';
+      document.body.classList.add('modal-open');
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop fade show';
+      document.body.appendChild(backdrop);
+    }
+  }
+
+  closeEditFloorModal(): void {
+    const modal = this.editFloorModal.nativeElement;
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      this.removeExistingBackdrop();
+    }
+    this.isEditing = false;
+    this.newSelectedFloor = null;
+  }
+
+  toggleEdit(): void {
+    console.log(this.selectedFloor);
+    if (this.isEditing) {
+      this.saveChanges();
+    } else {
+      this.isEditing = true;
+      this.newSelectedFloor = this.selectedFloor;
+    }
+  }
+
+  saveChanges(): void {
+    if (this.newSelectedFloor !== null && this.newSelectedFloor !== this.selectedFloor) {
+      const body = {
+        currentFloor: this.selectedFloor,
+        newFloor: this.newSelectedFloor
+      }
+      this.tableService.updateFloor(body).subscribe(
+        response => {
+          console.log(response);
+          window.location.reload();
+        },
+        error => {
+          console.error('Error updating table:', error);
+        }
+      );
+      this.selectedFloor = this.newSelectedFloor;
+    } else {
+      console.log('Không có thay đổi tầng');
+    }
+    this.isEditing = false;
+  }
+
+  // Hàm xóa tầng
+  confirmDeleteFloor(): void {
+    const body = {
+      currentFloor: this.selectedFloor,
+      newFloor: 0
+    }
+    this.tableService.updateFloor(body).subscribe(
+      response => {
+        console.log(response);
+        window.location.reload();
+      },
+      error => {
+        console.error('Error updating table:', error);
+      }
+    );
+  }
+  getAvailableFloors(): number[] {
+    return this.floors.filter(floor => floor !== this.selectedFloor);
+  }
+  deleteFloor(): void {
+    this.openConfirmDeleteFloorModal();
+  }
+
+  openConfirmDeleteFloorModal(): void {
+    this.closeEditFloorModal();
+
+    const modal = this.confirmDeleteFloorModal.nativeElement;
+    if (modal) {
+      modal.classList.add('show');
+      modal.style.display = 'block';
+      document.body.classList.add('modal-open');
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop fade show';
+      document.body.appendChild(backdrop);
+    }
+  }
+  closeConfirmDeleteFloorModal(): void {
+    const modal = this.confirmDeleteFloorModal.nativeElement;
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      this.removeExistingBackdrop();
+    }
+    this.openEditFloorModal();
+  }
 }
