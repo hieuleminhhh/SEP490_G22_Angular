@@ -102,5 +102,23 @@ export class TableService {
     });
     return this.http.delete(url, { headers });
   }
+
+  getTablesEmpty(): Observable<any> {
+    const url = `https://localhost:7188/api/Tables/status2-floor-null`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get(url, { headers });
+  }
+
+  updateFloor( body:any): Observable<any> {
+    const url = `https://localhost:7188/api/Tables/update-floor`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.put(url, body, { headers });
+  }
 }
 

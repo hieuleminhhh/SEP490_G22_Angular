@@ -1,4 +1,5 @@
 .card {
+  position: relative;
   padding: 16px; /* Padding inside the card */
   margin: 16px; /* Margin around the card */
   max-width: 2500px;
@@ -24,6 +25,7 @@
 }
 
 .short-card {
+  position: relative;
   flex: none;
   /* Prevent this card from growing */
   width: 200px;
@@ -37,6 +39,18 @@
   margin-bottom: 20px;
 }
 
+.edit-icon {
+  position: absolute;
+  top: 10px; /* Khoảng cách từ trên */
+  right: 10px; /* Khoảng cách từ phải */
+  cursor: pointer;
+  font-size: 18px; /* Kích thước icon */
+  color: #333; /* Màu sắc của icon */
+}
+
+.edit-icon:hover {
+  color: #007bff; /* Đổi màu khi hover */
+}
 .table-layout-buttons {
   display: flex;
   flex-direction: row; /* Điều chỉnh từ column sang row */
