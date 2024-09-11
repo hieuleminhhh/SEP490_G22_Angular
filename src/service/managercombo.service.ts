@@ -94,5 +94,14 @@ export class ManagerComboService {
     const url = `${this.apiUrl}/orders/CheckComboInOrderDetails/${comboId}`;
     return this.http.get<boolean>(url, this.getHttpOptions());
   }
-  
+  DeleteCombo(comboId: number): Observable<void> {
+    const url = `${this.apiUrl}/Combo/${comboId}`;
+    return this.http.delete<void>(url, this.getHttpOptions())
+      .pipe(
+        catchError((error: any) => {
+          console.error('An error occurred while deleting the combo:', error);
+          return throwError(error);
+        })
+      );
+  }
 }

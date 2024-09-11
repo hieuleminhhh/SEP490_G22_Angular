@@ -97,5 +97,14 @@ export class ManagerDishService {
         })
       );
   }
-
+  DeleteDish(dishId: number): Observable<void> {
+    const url = `${this.apiUrl}/Dish/${dishId}`;
+    return this.http.delete<void>(url, this.getHttpOptions())
+      .pipe(
+        catchError((error: any) => {
+          console.error('An error occurred while deleting the dish:', error);
+          return throwError(error);
+        })
+      );
+  }
 }

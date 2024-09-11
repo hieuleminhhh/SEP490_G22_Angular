@@ -80,15 +80,31 @@ export class ManagerDishComponent implements OnInit {
     this.loadCategories();
     this.loadListDisheSetting();
   }
-
+  isDishInOrderMap: { [key: number]: boolean } = {};
   loadListDishes(search: string = ''): void {
     this.dishService.ListDishes(this.currentPage, this.pageSize, this.searchCategory, search).subscribe(
       (response) => {
         if (response && response.items) {
+          // Keep wrapping response in an array
           this.dishes = [response];
           this.totalCount = response.totalCount;
           this.updateTotalPagesArray(response.totalPages);
-          console.log('Fetched dish:', this.dishes);
+  
+          // Initialize the isDishInOrderMap
+          this.isDishInOrderMap = {};
+  
+          // Iterate over response.items to check each dish
+          response.items.forEach((dish: ManagerDish) => {
+            this.dishService.checkDishInOrderDetails(dish.dishId).subscribe(
+              (isInOrder: boolean) => {
+                // Store the result in the map using dishId as the key
+                this.isDishInOrderMap[dish.dishId] = isInOrder;
+              },
+              (error) => {
+                console.error('Error checking if dish is in order details:', error);
+              }
+            );
+          });
         } else {
           console.error('Invalid response:', response);
         }
@@ -98,6 +114,10 @@ export class ManagerDishComponent implements OnInit {
       }
     );
   }
+  
+  
+  
+  
   loadListDisheSetting(search: string = ''): void {
     this.dishService.ListDishes(this.currentPage, this.pageSize, this.searchCategory, search).subscribe(
       (response: ListAllDishes) => {
@@ -497,4 +517,31 @@ updateSelectedDishes() {
   this.resetModal();
 }
 isDishInOrder: boolean = false;
+deleteDish(dishId: number): void {
+  this.dishService.DeleteDish(dishId).subscribe(
+    (response) => {
+      console.log('Delete response:', response);
+      this.successMessage = 'Xóa món ăn thành công';
+      this.loadListDishes();
+    },
+    (error) => {
+      console.error('Error deleting dish:', error);
+
+      // Show error message
+      alert('Error deleting dish!');
+    }
+  );
+}
+private dishIdToDelete: number | null = null;
+setDishIdForDeletion(dishId: number): void {
+  this.dishIdToDelete = dishId;
+}
+
+// Method to confirm deletion
+confirmDelete(): void {
+  if (this.dishIdToDelete !== null) {
+    this.deleteDish(this.dishIdToDelete);
+    this.successMessage = 'Xóa món ăn thành công';
+  }
+}
 }
