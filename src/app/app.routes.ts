@@ -36,6 +36,7 @@ import { AuthCallbackComponent } from './common/login/callback/authCallback/auth
 import { ManageTableComponent } from './manager/ManageTable/ManageTable.component';
 import { NotificationComponent } from './common/notification/notification.component';
 import { SignupComponent } from './common/signup/signup/signup.component';
+import { OtpVerificationComponent } from './common/login/OtpVerification/OtpVerification/OtpVerification.component';
 
 
 export const routes: Routes = [
@@ -74,6 +75,7 @@ export const routes: Routes = [
     {'path': 'auth/callback', component: AuthCallbackComponent},
     {'path': 'manageTable', component: ManageTableComponent},
     {'path': 'notification', component: NotificationComponent},
-    {'path': 'signup', component: SignupComponent}
+    {'path': 'signup', component: SignupComponent},
+    {'path': 'otp-verification', component: OtpVerificationComponent},
 
 ];

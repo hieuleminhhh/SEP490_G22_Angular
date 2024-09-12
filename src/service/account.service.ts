@@ -128,6 +128,25 @@ export class AccountService {
       })
     );
   }
+  sendOtp(email: string): Observable<any> {
+    const url = `${this.apiUrl}/GoogleAuth/Send-OTP`;
+    const body = { email };
+    
+    return this.http.post<any>(url, body, httpOptions).pipe(
+      tap(response => {
+        console.log('OTP sent to:', email);
+      })
+    );
+  }
+  verifyOtp(email: string, otp: string): Observable<any> {
+    const url = `${this.apiUrl}/GoogleAuth/verify-otp`;
+    const body = { email, otp };
   
+    return this.http.post<any>(url, body, httpOptions).pipe(
+      tap(response => {
+        console.log('OTP verification response:', response);
+      })
+    );
+  }
   
 }
