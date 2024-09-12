@@ -90,6 +90,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
     this.loadListDishes();
     this.loadListCombo();
     this.loadAddresses();
+    this.loadCurrentQuantities();
     this.selectCategory('Món chính');
     this.route.queryParams.subscribe(params => {
       this.tableId = +params['tableId'];
@@ -106,15 +107,47 @@ export class UpdateOfflineOrderComponent implements OnInit {
       console.error('Account ID is not available');
     }
   }
+  currentQuantities: any[] = [];
+  getCurrentQuantity(item: any): number {
+    // Lấy số lượng hiện tại từ database (nếu có)
+    const currentQuantityObj = this.currentQuantities.find(
+      (qtyObj: any) =>
+        (qtyObj.dishId === item.dishId && item.dishId !== null) ||
+        (qtyObj.comboId === item.comboId && item.comboId !== null)
+    );
+    return currentQuantityObj ? currentQuantityObj.quantity : 0;
+  }
+  loadCurrentQuantities(): void {
+    this.orderService.getQuantityOrderDetails(this.orderId).toPromise()
+      .then((quantities: any[]) => {
+        this.currentQuantities = quantities;
+      })
+      .catch(error => {
+        console.error('Error fetching quantities from database:', error);
+      });
+  }
   increaseQuantity(index: number): void {
     const item = this.selectedItems[index];
     if (item) {
-      item.quantity++;
-      this.updateTotalPrice(index);
-      this.addOrUpdateNewlyAddedItem(item);
+      // Lấy số lượng tối đa từ hàm getMaxQuantity
+      const maxQuantity = this.getMaxQuantity(item);
+  
+      // Lấy số lượng hiện tại từ currentQuantities
+      const currentQuantity = this.getCurrentQuantity(item);
+      const totalQuantity = item.quantity + currentQuantity; // Tổng số lượng dự kiến (bao gồm giỏ hàng và database)
+  
+      // Kiểm tra nếu tổng số lượng dự kiến nhỏ hơn số lượng tối đa
+      if (totalQuantity < maxQuantity) {
+        item.quantity++;
+        this.updateTotalPrice(index);
+        this.addOrUpdateNewlyAddedItem(item);
+      } else {
+        console.warn('Số lượng đã đạt tới giới hạn tối đa:', maxQuantity);
+        // Có thể hiển thị thông báo cho người dùng biết
+      }
     }
   }
-
+  
   // Method to decrease item quantity
   decreaseQuantity(index: number, orderId: number): void {
     const item = this.selectedItems[index];
@@ -363,15 +396,22 @@ export class UpdateOfflineOrderComponent implements OnInit {
     return item.quantity * (item.discountedPrice || item.price);
   }
 
-  // Method to validate quantity
-  validateQuantity(index: number): void {
-    const item = this.selectedItems[index];
-    if (item) {
-      item.quantity = Math.max(1, Math.min(item.quantity, 100)); // Example: limit between 1 and 100
-      this.updateTotalPrice(index);
-      this.calculateTotalAmount();
-    }
+ // Method to validate quantity
+validateQuantity(index: number): void {
+  const item = this.selectedItems[index];
+  if (item) {
+    // Lấy số lượng tối đa từ hàm getMaxQuantity
+    const maxQuantity = this.getMaxQuantity(item);
+
+    // Giới hạn số lượng trong khoảng từ 1 đến maxQuantity
+    item.quantity = Math.max(1, Math.min(item.quantity, maxQuantity)); 
+    
+    // Cập nhật giá tiền và tổng số lượng
+    this.updateTotalPrice(index);
+    this.calculateTotalAmount();
   }
+}
+
 
 
   calculateAndSetTotalAmount(): void {

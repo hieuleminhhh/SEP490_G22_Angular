@@ -73,6 +73,7 @@ export class ManagerComboComponent implements OnInit {
   ngOnInit() {
     this.loadListCombo();
     this.loadAllDishes();
+    this.loadListComboSetting();
   }
   isComboInOrderMap: { [key: number]: boolean } = {};
   loadListCombo(search: string = ''): void {
@@ -82,6 +83,7 @@ export class ManagerComboComponent implements OnInit {
         if (response && response.items) {
           // Keep wrapping response in an array
           this.combo = [response];
+          console.log('Combo response:', response);
           this.totalCount = response.totalCount;
           this.updateTotalPagesArray(response.totalPages);
   
@@ -113,12 +115,12 @@ export class ManagerComboComponent implements OnInit {
   }
   
   selectedCombos: { [key: number]: boolean } = {};
-
-  loadListDisheSetting(search: string = ''): void {
-    this.comboService.ListCombo(this.currentPage, this.pageSize, search).subscribe(
+  combosetting: ListAllCombo[] = [];
+  loadListComboSetting(search: string = ''): void {
+    this.comboService.ListCombo(this.currentPage, 100, search).subscribe(
       (response: ListAllCombo) => {
         if (response && response.items) {
-          this.combo = [response]; // Wrap response in an array
+          this.combosetting = [response]; // Wrap response in an array
           const comboItems = response.items; // Extract items from response
 
           // Initialize selectedDishes
@@ -432,7 +434,7 @@ export class ManagerComboComponent implements OnInit {
   quantityToSet: number = 1;
 applyQuantity(): void {
   // Iterate over dishes and update the quantity if the dish is selected
-  for (const list of this.combo) {
+  for (const list of this.combosetting) {
     for (const combos of list.items) {
       if (this.selectedCombos[combos.comboId]) {
         // Update the quantityDish property of the dish
@@ -451,8 +453,8 @@ onComboSelectionChange(comboId: number, event: any): void {
 }
 selectAll(event: any): void {
   const checked = event.target.checked;
-  if (this.combo.length > 0) {
-    const dishesItems = this.combo[0].items;
+  if (this.combosetting.length > 0) {
+    const dishesItems = this.combosetting[0].items;
     dishesItems.forEach(combo => this.selectedCombos[combo.comboId] = checked);
   }
 }
@@ -468,7 +470,7 @@ validateQuantity(event: Event) {
   }
 }
 updateSelectedCombos() {
-  this.combo.forEach(list => {
+  this.combosetting.forEach(list => {
     list.items.forEach(combos => {
       const body={
         comboId:combos.comboId,

@@ -61,26 +61,28 @@
                           <p class="mb-0">{{ item.itemName || item.nameCombo }}</p>
                         </div>
                       </td>
-                       <td>
-                          <div class="d-flex align-items-center">
-                            <!-- Decrease Button -->
-                            <button class="btn btn-outline-secondary btn-sm" (click)="decreaseQuantity(i, orderId)">-</button>
-                            
-                            <!-- Quantity Input Field -->
-                            <input type="number"
-                              class="form-control text-center small-input mx-2 no-spinners rounded-input"
-                              [(ngModel)]="item.quantity"
-                              (change)="validateQuantity(i)"
-                              min="1"
-                              [max]="getMaxQuantity(item)"
-                              [readonly]="item.quantity >= getMaxQuantity(item)">
-                            
-                            <!-- Increase Button -->
-                            <button class="btn btn-outline-secondary btn-sm"
-                              (click)="increaseQuantity(i)"
-                              [disabled]="item.quantity >= getMaxQuantity(item)">+</button>
-                          </div>
-                        </td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <!-- Nút giảm số lượng -->
+                          <button class="btn btn-outline-secondary btn-sm" (click)="decreaseQuantity(i, orderId)">-</button>
+                      
+                          <!-- Trường nhập số lượng -->
+                          <input type="number"
+                            class="form-control text-center small-input mx-2 no-spinners rounded-input"
+                            [(ngModel)]="item.quantity"
+                            (change)="validateQuantity(i)"
+                            min="1"
+                            [max]="getMaxQuantity(item)"
+                            [readonly]="item.quantity + getCurrentQuantity(item) >= getMaxQuantity(item)">
+                          
+                          <!-- Nút tăng số lượng -->
+                          <button class="btn btn-outline-secondary btn-sm"
+                            (click)="increaseQuantity(i)"
+                            [disabled]="item.quantity + getCurrentQuantity(item) >= getMaxQuantity(item)">+</button>
+                        </div>
+                      </td>
+                      
+                      
 
 
                       <td>
