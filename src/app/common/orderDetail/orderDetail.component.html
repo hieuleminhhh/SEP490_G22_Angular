@@ -9,6 +9,9 @@
 
 <body>
   <div class="order-page">
+    <div class="detail">
+      <p>Chi tiết đơn hàng</p>
+    </div>
     <header>
       <button class="back-btn" (click)="goBack()">&lt; TRỞ LẠI</button>
       <div class="order-info">
@@ -127,17 +130,12 @@
           <div class="form-check">
             <input type="radio" id="reason2" name="cancelationReason" class="form-check-input"
               [(ngModel)]="cancelationReason" value="Đơn hàng sai" />
-            <label class="form-check-label" for="reason2"> Đơn hàng sai</label>
+            <label class="form-check-label" for="reason2"> Thông tin đơn hàng không chính xác</label>
           </div>
           <div class="form-check">
             <input type="radio" id="reason3" name="cancelationReason" class="form-check-input"
               [(ngModel)]="cancelationReason" value="Thời gian giao hàng quá lâu" />
-            <label class="form-check-label" for="reason3"> Thời gian giao hàng quá lâu</label>
-          </div>
-          <div class="form-check">
-            <input type="radio" id="reason4" name="cancelationReason" class="form-check-input"
-              [(ngModel)]="cancelationReason" value="Chất lượng sản phẩm không đạt yêu cầu" />
-            <label class="form-check-label" for="reason4"> Chất lượng sản phẩm không đạt yêu cầu</label>
+            <label class="form-check-label" for="reason3"> Muốn thay đổi sản phẩm trong đơn hàng </label>
           </div>
           <div class="form-check">
             <input type="radio" id="reason5" name="cancelationReason" class="form-check-input"
@@ -153,7 +151,7 @@
           Đóng
         </button>
         <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal"
-          (click)="cancelOrder(orderDetail.orderId)">
+          (click)="cancelOrder(orderDetail?.orderId, orderDetail?.reservation.reservationId)">
           Xác nhận
         </button>
       </div>

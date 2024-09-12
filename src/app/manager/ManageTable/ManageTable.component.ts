@@ -45,6 +45,10 @@ export class ManageTableComponent implements OnInit {
   waitingTables: any[] = [];
   isWaitingTableView: boolean = false;
   isFloorInvalid: boolean = false;
+  allTable:any;
+  isNameDuplicate: boolean = false;
+  lableTable:string='';
+  message: string = '';
 
   @ViewChild('addFloorModal') addFloorModal!: ElementRef;
   @ViewChild('manageTablesModal') manageTablesModal!: ElementRef;
@@ -58,17 +62,20 @@ export class ManageTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.getTableData();
+
   }
 
   getTableData(): void {
     this.tableService.getTables().subscribe(
       response => {
         this.originalDataTable = response;
+        this.allTable = response;
         this.dataTable = [...this.originalDataTable];
         this.filterTablesByFloorAndStatus(this.selectedTable);
         const tableIds = this.originalDataTable.map(table => table.tableId);
-
         this.floors = this.getFloors();
+        console.log(this.allTable);
+
       },
       error => {
         console.error('Error:', error);
@@ -107,15 +114,28 @@ export class ManageTableComponent implements OnInit {
     this.isWaitingTableView = false;
     this.filterTablesByFloorAndStatus(this.selectedTable);
   }
+  checkTableName() {
+    const isDuplicate = this.allTable.some((table: { lable: string; }) => table.lable === this.lableTable.trim());
+    this.isNameDuplicate = isDuplicate;
+
+    // Cập nhật thông điệp
+    this.message = isDuplicate ? 'Tên bàn đã tồn tại!' : '';
+  }
 
   submitForm(): void {
     this.validateCapacity();
-    if (!this.capacityError && this.newTable !== null && this.selectedFloor) {
+    this.checkTableName();
+    if (!this.lableTable || this.lableTable.trim() === '') {
+      this.message = 'Tên bàn không được để trống!';
+      this.isNameDuplicate = false;
+      return;
+    }
+    if (!this.capacityError && this.selectedFloor && !this.isNameDuplicate) {
       const newTableData = {
         status: 0,
         capacity: this.capacity,
         floor: this.selectedFloor,
-        lable: this.newTable
+        lable: this.lableTable
       };
       this.tableService.createTables(newTableData).subscribe(
         response => {

@@ -8,6 +8,7 @@ import { Location } from '@angular/common';
 import { CookingService } from '../../../service/cooking.service';
 import { HttpClient } from '@angular/common/http';
 import { PaymentService } from '../../../service/payment.service';
+import { ReservationService } from '../../../service/reservation.service';
 
 @Component({
   selector: 'app-orderDetail',
@@ -36,7 +37,7 @@ export class OrderDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private purchaseOrderService: PurchaseOrderService,
     private location: Location, private router: Router, private cookingService: CookingService,
-    private paymentService: PaymentService, private http: HttpClient
+    private paymentService: PaymentService, private http: HttpClient, private reservationService: ReservationService
   ) { }
 
   ngOnInit() {
@@ -114,7 +115,7 @@ export class OrderDetailComponent implements OnInit {
     }
   }
 
-  cancelOrder(orderId: number) {
+  cancelOrder(orderId: number, reserId:number) {
 
     const url = `https://localhost:7188/api/orders/${orderId}/cancel`;
     this.http.put(url, {}).subscribe(
@@ -122,7 +123,8 @@ export class OrderDetailComponent implements OnInit {
         console.log('Order cancelled:', response);
         this.orderCancelled = true;
         this.updateCancelResion(orderId);
-        // window.location.reload();
+        this.updateStatusReservation(reserId);
+        window.location.reload();
       },
       error => {
         console.error('Error during order cancellation:', error);
@@ -145,6 +147,28 @@ export class OrderDetailComponent implements OnInit {
       }
     );
   }
+  updateStatusReservation(id: number) {
+    this.reservationService.updateStatusReservation(id, 5).subscribe(
+      response => {
+        console.log(response);
 
+        const request = {
+          reasonCancel: this.cancelationReason,
+          cancelBy: this.cancelBy
+        };
+        this.reservationService.updatereasonCancel(id, request).subscribe(
+          response => {
+            console.log(response);
+          },
+          error => {
+            console.error('Error:', error);
+          }
+        );
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
 
 }

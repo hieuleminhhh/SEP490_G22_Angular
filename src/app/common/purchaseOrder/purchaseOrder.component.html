@@ -1,9 +1,12 @@
 <div style="height: auto; margin-bottom: 10px;">
   <div *ngIf="showTabs">
+    <div class="detail">
+      <p>Đơn mua hàng của bạn</p>
+    </div>
     <div class="tab-buttons">
       <button (click)="showData('-1')" [class.active]="selectedTab === '-1'" style="width: 100px;">Tất cả</button>
       <button (click)="showData('1')" [class.active]="selectedTab === '1'" style="width: 140px;">Đợi xác nhận</button>
-      <button (click)="showData('2')" [class.active]="selectedTab === '2' || selectedTab === '6'" style="width: 150px;">
+      <button (click)="showData('2')" [class.active]="selectedTab === '2'" style="width: 150px;">
         Đang chuẩn bị
       </button>
       <button (click)="showData('7')" [class.active]="selectedTab === '7'" style="width: 160px;">Đang giao hàng</button>
@@ -52,7 +55,7 @@
               <button class="btn btn-primary btn-sm" (click)="reorder(order.orderId)"
                 *ngIf="order.status === 4 || order.status === 5">Mua Lại</button>
               <button class="btn btn-danger btn-sm" data-bs-target="#cancelOrderModal" data-bs-toggle="modal"
-              (click)="choiceOrderCancel(order.orderId)"
+              (click)="choiceOrderCancel(order.orderId, order.reservation.reservationId)"
                 *ngIf="order.status === 1 || order.status === 2 || order.status === 6">Hủy đơn</button>
             </div>
           </div>
@@ -85,18 +88,13 @@
           </div>
           <div class="form-check">
             <input type="radio" id="reason2" name="cancelationReason" class="form-check-input"
-              [(ngModel)]="cancelationReason" value="Đơn hàng sai" />
-            <label class="form-check-label" for="reason2"> Đơn hàng sai</label>
+              [(ngModel)]="cancelationReason" value="Thông tin đơn hàng không chính xác" />
+            <label class="form-check-label" for="reason2"> Thông tin đơn hàng không chính xác</label>
           </div>
           <div class="form-check">
             <input type="radio" id="reason3" name="cancelationReason" class="form-check-input"
-              [(ngModel)]="cancelationReason" value="Thời gian giao hàng quá lâu" />
-            <label class="form-check-label" for="reason3"> Thời gian giao hàng quá lâu</label>
-          </div>
-          <div class="form-check">
-            <input type="radio" id="reason4" name="cancelationReason" class="form-check-input"
-              [(ngModel)]="cancelationReason" value="Chất lượng sản phẩm không đạt yêu cầu" />
-            <label class="form-check-label" for="reason4"> Chất lượng sản phẩm không đạt yêu cầu</label>
+              [(ngModel)]="cancelationReason" value="Muốn thay đổi sản phẩm trong đơn hàng" />
+            <label class="form-check-label" for="reason3"> Muốn thay đổi sản phẩm trong đơn hàng </label>
           </div>
           <div class="form-check">
             <input type="radio" id="reason5" name="cancelationReason" class="form-check-input"
