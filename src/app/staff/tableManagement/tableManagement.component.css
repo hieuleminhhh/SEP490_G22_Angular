@@ -296,11 +296,8 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 50px; /* Điều chỉnh kích thước của phần tử */
-  height: 50px; /* Điều chỉnh kích thước của phần tử */
   border: 1px solid black;
   font-weight: bold;
-  font-size: 24px;
 }
 
 .label-reser{
@@ -992,4 +989,101 @@ textarea {
   & ~ .modal-backdrop.show {
     opacity: 0 !important;
   }
+}
+.modal-body .table-status-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.modal-body .table-status-container p {
+  font-weight: bold;
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.modal-body .checkbox-container {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.modal-body .checkbox-container input[type="checkbox"] {
+  margin-left: 10px;
+  transform: scale(1.2); /* Phóng to checkbox */
+  cursor: pointer;
+}
+
+.modal-body .checkbox-container label {
+  margin-left: 5px;
+  font-size: 1rem;
+  font-weight: normal;
+  color: #000; /* Màu mặc định cho nhãn */
+}
+
+.modal-body .checkbox-container input[type="checkbox"]:first-child + label {
+  color: red; /* Màu đỏ cho nhãn "Chưa đủ" */
+}
+
+.modal-body .checkbox-container input[type="checkbox"]:nth-child(2) + label {
+  color: green; /* Màu xanh cho nhãn "Đã đủ" */
+}
+
+.toggle-dropdown {
+  font-weight: bold;
+  font-size: 24px;
+  cursor: pointer;
+  padding-left: 10px;
+}
+
+.table-dropdown {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  top: 40px;
+}
+
+/* Điều chỉnh hiển thị của item trong dropdown */
+.dropdown-table-item {
+  display: block;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-table-item:last-child {
+  border-bottom: none; /* Bỏ đường viền cuối cùng */
+}
+
+.dropdown-table-item:hover {
+  background-color: #f9f9f9;
+}
+
+/* Mũi tên chỉ lên trên */
+.table-dropdown::before {
+  content: '';
+  position: absolute;
+  bottom: -8px; /* Đưa mũi tên xuống dưới */
+  left: 20px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: #ddd transparent transparent transparent; /* Tạo mũi tên tam giác */
+}
+
+.table-dropdown::after {
+  content: '';
+  position: absolute;
+  bottom: -7px; /* Đưa mũi tên xuống dưới */
+  left: 20px;
+  border-width: 7px;
+  border-style: solid;
+  border-color: white transparent transparent transparent; /* Mũi tên bên trong */
 }

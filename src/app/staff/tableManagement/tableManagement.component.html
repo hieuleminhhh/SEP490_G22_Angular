@@ -6,7 +6,8 @@
         <li>
           <a (click)="setView('table-layout')">QUẢN LÝ BÀN </a>
           <ul>
-            <li><a [class.active]="currentView === 'table-layout'" (click)="setView('table-layout')">Sơ đồ bàn</a></li>
+            <li><a [class.active]="currentView === 'table-layout'" (click)="setView('table-layout')"
+                (click)="getTableData()">Sơ đồ bàn</a></li>
             <li><a [class.active]="currentView === 'booking-request'" (click)="setView('booking-request')"
                 (click)="getReservation()">Yêu cầu đặt
                 bàn</a></li>
@@ -16,7 +17,6 @@
             <li><a [class.active]="currentView === 'booking-history'" (click)="setView('booking-history')"
                 (click)="getReservationList()">Lịch sử đặt
                 bàn</a></li>
-
           </ul>
         </li>
       </ul>
@@ -99,20 +99,19 @@
               <div class="row">
                 <div class="col-md-3" style="display: flex;justify-content: center;align-items: center;"
                   *ngIf="reservation.tableOfReservation && reservation.tableOfReservation.length > 1">
-                  <span class="number-table">{{ reservation.tableOfReservation[0].tableId }}</span>
+                  <span class="number-table">{{ reservation.tableOfReservation[0].lable }}</span>
                   <span style="font-weight: bold;font-size: 24px;cursor: pointer;" (click)="tableDropdown()">...</span>
                   <!-- Dropdown -->
                   <div *ngIf="showDropdown"
                     style="position: absolute; z-index: 1;margin-left: 180px;background-color: white;border: 1px solid black;  display: flex;justify-content: center;">
                     <div *ngFor="let table of reservation.tableOfReservation.slice(1); let i = index">
-                      <span class="number-table">{{ table.tableId }}</span>
+                      <span class="number-table">{{ table.lable }}</span>
                     </div>
                   </div>
                 </div>
-
                 <div class="col-md-3" style="display: flex;justify-content: center;align-items: center;"
                   *ngIf="reservation.tableOfReservation && reservation.tableOfReservation.length === 1">
-                  <span class="number-table">{{ reservation.tableOfReservation[0].tableId }}</span>
+                  <span class="number-table">{{ reservation.tableOfReservation[0].lable }}</span>
                 </div>
 
                 <div class="col-md-3" style="display: flex;justify-content: center;align-items: center;"
@@ -146,7 +145,7 @@
                   <div class="dropdown" style="position: relative;display: inline-block;">
                     <button class="icon" (click)="toggleDropdown(i)">...</button>
                     <div class="dropdown-content" [class.show]="reservation.isDropdownOpen">
-                      <a (click)="openPopup(reservation.reservationId)">Xếp bàn</a>
+                      <a (click)="openPopup(reservation.reservationId,reservation.reservationTime )">Xếp bàn</a>
                       <a (click)="deleteTable(reservation.reservationId, reservation.tableOfReservation)">Thay đổi
                         bàn</a>
                       <a (click)="updateStatusReservation(reservation.reservationId)">Hủy đặt bàn</a>
@@ -202,6 +201,24 @@
             </div>
             <div class="modal-body">
               <div class="row">
+                <div class="table-status-container">
+                  <p>Xếp bàn cho {{guestNumber}} người:
+                    <span *ngIf="getSelectedTableNames().length > 0">
+                      Bàn: {{ getSelectedTableNames().join(', ') }}
+                    </span>
+                    <span *ngIf="getSelectedTableNames().length === 0">
+                      Chưa chọn bàn
+                    </span>
+                  </p>
+                  <div class="checkbox-container">
+                    <label *ngIf="ishas===false">
+                      <i class="fas fa-times-circle" style="color: red;"></i> <span style="color: red;">Chưa đủ</span>
+                    </label>
+                    <label *ngIf="ishas===true">
+                      <i class="fas fa-check-circle" style="color: green;"></i> <span style="color: green;">Đã đủ</span>
+                    </label>
+                  </div>
+                </div>
                 <div class="col-md-3" style="display: flex; justify-content: center; align-items: center;">
                   <select id="floor" name="floor" [(ngModel)]="selectedFloor"
                     (change)="getTableOFFloorEmpty(selectedFloor)" class="floor-select">
@@ -213,29 +230,14 @@
                 <div class="col-md-7">
                   <div class="card" style="max-height: 400px; overflow: auto;">
                     <div class="table-grid">
-                      <div class="table" *ngFor="let table of tableEmpty"
-                        [ngClass]="{'status-in-use': table.status !== 0}" (click)="toggleTableSelection(table)">
+                      <div class="table" *ngFor="let table of tableEmpty" (click)="toggleTableSelection(table)">
                         {{ table.lable }}<br>
                         <span class="icon-sl">
                           <i class="fas fa-chair"></i>{{ table.capacity }}
                         </span>
                         <span class="icon-table" style="left: 170px;"
-                          *ngIf="table.status === 0 && selectedTableIds.includes(table.tableId)">&#10004;</span>
-                        <span *ngIf="table.reservationTimes && table.reservationTimes.length > 0" class="icon-reserved"
-                          (click)="toggleDropdownTable($event, table)">
-                          <i class="fas fa-calendar-alt"></i>
-                        </span>
-                        <div *ngIf="table.showDropdown" class="dropdown-table">
-                          <ul>
-                            <li *ngFor="let time of table.reservationTimes">{{ getTimeOnly(time) }}
-                              <hr>
-                            </li>
-                          </ul>
-                        </div>
+                          *ngIf="selectedTableIds.includes(table.tableId)">&#10004;</span>
                         <hr>
-                        <span [ngClass]="{'text-in-use': table.status !== 0}">
-                          {{ table.status === 0 ? 'Bàn trống' : 'Đang sử dụng' }}
-                        </span>
                       </div>
                     </div>
                     <div *ngIf="dataTable.length < 1" style="height: 100px;">

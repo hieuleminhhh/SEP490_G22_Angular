@@ -40,6 +40,8 @@ export class TableManagementComponent implements OnInit {
   dataReservation: any;
   reservationTimeSelected: string | undefined;
   reserId: number | undefined;
+  guestNumber: number = 0;
+  totalCapacity: number = 0;
 
 
   tabs: string[] = ['Tất cả', '', 'Chưa nhận bàn', 'Đã nhận bàn', 'Đã hoàn thành', 'Đã hủy'];
@@ -58,6 +60,7 @@ export class TableManagementComponent implements OnInit {
   currentReservationId: number | undefined;
   errorMessage: string = '';
   errorMessages: { [key: number]: string } = {};
+  showDropdowns: { [key: number]: boolean } = {};
   constructor(private tableService: TableService, private reservationService: ReservationService, private router: Router) { }
 
   ngOnInit(): void {
@@ -158,18 +161,45 @@ export class TableManagementComponent implements OnInit {
     button.classList.remove('button-normal');
     button.classList.add('button-clicked');
   }
-  toggleTableSelection(table: any) {
-    // Chỉ cho phép thay đổi selection nếu status là 0
-    if (table.status === 0) {
-      const index = this.selectedTableIds.indexOf(table.tableId);
-      if (index > -1) {
-        this.selectedTableIds.splice(index, 1);
-      } else {
+  ishas: boolean = false;
+  toggleTableSelection(table: any): void {
+    const tableIdIndex = this.selectedTableIds.indexOf(table.tableId);
+
+    if (this.guestNumber < table.capacity) {
+      if (tableIdIndex === -1) {
+        if (this.selectedTableIds.length > 0) {
+          this.selectedTableIds = [];
+          this.totalCapacity = 0;
+        }
         this.selectedTableIds.push(table.tableId);
+        this.totalCapacity = table.capacity;
+        this.ishas = true;
+      } else {
+        this.selectedTableIds.splice(tableIdIndex, 1);
+        this.totalCapacity = 0;
+        this.ishas = false;
+      }
+    } else {
+      if (tableIdIndex === -1) {
+        const potentialTotalCapacity = this.totalCapacity + table.capacity;
+        if (potentialTotalCapacity >= this.guestNumber) {
+          if (this.guestNumber > this.totalCapacity) {
+            this.selectedTableIds.push(table.tableId);
+            this.totalCapacity += table.capacity;
+            this.ishas = true;
+          }
+        } else {
+          this.selectedTableIds.push(table.tableId);
+          this.totalCapacity += table.capacity;
+        }
+      } else {
+        this.selectedTableIds.splice(tableIdIndex, 1);
+        this.totalCapacity -= table.capacity;
+        this.ishas = false;
       }
     }
-    console.log(this.selectedTableIds);
   }
+
 
   toggleDropdownTable(event: Event, table: any) {
     event.stopPropagation();
@@ -276,12 +306,13 @@ export class TableManagementComponent implements OnInit {
   }
 
 
-  openPopup(reserId: number) {
+  openPopup(reserId: number, time: any) {
     const modal = document.getElementById('updateTimeModal');
     if (modal) {
       modal.classList.add('show');
       modal.style.display = 'block';
     }
+    this.getTableDataEmpty(time);
     this.selectedTable = 'all';
     this.selectedFloor = 1;
     this.reserId = reserId;
@@ -293,6 +324,8 @@ export class TableManagementComponent implements OnInit {
           console.error('reservationTime không phải là một chuỗi:', response.reservationTime);
         }
         console.log(this.reservationTimeSelected);
+        console.log(response);
+
         const { currentDayReservationTables, allTables } = response;
         this.originalDataTable = allTables.map(table => {
           const reservedTables = currentDayReservationTables.filter(t => t.tableId === table.tableId);
@@ -312,6 +345,16 @@ export class TableManagementComponent implements OnInit {
         console.log(response);
         console.log(this.dataTable);
         this.filterTablesByFloorAndStatus(this.selectedTable);
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+    this.reservationService.getReservation(reserId).subscribe(
+      response => {
+        this.guestNumber = response.data.guestNumber;
+        console.log(this.guestNumber);
+
       },
       error => {
         console.error('Error:', error);
@@ -747,10 +790,10 @@ export class TableManagementComponent implements OnInit {
   //   );
   // }
   tableEmpty: any;
-  getTableDataEmpty(date:string): void {
+  getTableDataEmpty(date: string): void {
     this.reservationService.getTable(date).subscribe(
       response => {
-        this.tableEmpty=response;
+        this.tableEmpty = response;
         console.log(this.tableEmpty);
       },
       error => {
@@ -758,6 +801,17 @@ export class TableManagementComponent implements OnInit {
       }
     );
   }
+
+  getSelectedTableNames(): string[] {
+    // Kiểm tra nếu tableEmpty tồn tại và là một mảng
+    if (Array.isArray(this.tableEmpty)) {
+      return this.tableEmpty
+        .filter(table => this.selectedTableIds.includes(table.tableId))
+        .map(table => table.lable); // Assuming 'lable' is the table name
+    }
+    return []; // Trả về mảng rỗng nếu tableEmpty không tồn tại
+  }
+
 
 }
 

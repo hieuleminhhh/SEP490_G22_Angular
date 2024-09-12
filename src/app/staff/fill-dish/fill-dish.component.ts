@@ -286,7 +286,7 @@ export class FillDishComponent implements OnInit {
       status: 7
     };
     const request2 = {
-      accountId: aId
+      staffId: aId
     }
     console.log(aId);
 
