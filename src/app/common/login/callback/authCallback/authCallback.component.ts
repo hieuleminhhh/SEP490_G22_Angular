@@ -123,7 +123,7 @@ export class AuthCallbackComponent implements OnInit {
         console.log('Google account registered:', registerResponse);
   
         // Store token and profile data in localStorage
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', registerResponse.token);
         localStorage.setItem('accountId', registerResponse.accountId.toString());
   
         // Handle user roles and navigate accordingly

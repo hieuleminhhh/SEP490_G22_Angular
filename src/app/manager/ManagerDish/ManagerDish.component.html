@@ -268,7 +268,7 @@
                 </tr>
               </thead>
               <tbody>
-                <ng-container *ngFor="let list of dishes">
+                <ng-container *ngFor="let list of dishesetting">
                   <tr *ngFor="let dish of list.items; let i = index;">
                     <td>
                       <input class="form-check-input" type="checkbox" [id]="'selectDish' + i"

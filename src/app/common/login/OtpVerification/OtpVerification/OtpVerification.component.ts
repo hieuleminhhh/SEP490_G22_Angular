@@ -51,7 +51,7 @@ export class OtpVerificationComponent implements OnInit {
         console.log('Google account registered:', registerResponse);
 
         // Store token and profile data in localStorage
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', registerResponse.token);
         localStorage.setItem('accountId', registerResponse.accountId.toString());
 
         // Display success message and navigate after a delay
