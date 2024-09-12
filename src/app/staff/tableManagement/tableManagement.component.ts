@@ -42,7 +42,7 @@ export class TableManagementComponent implements OnInit {
   reserId: number | undefined;
 
 
-  tabs: string[] = ['Tất cả',  '', 'Chưa nhận bàn','Đã nhận bàn', 'Đã hoàn thành','Đã hủy'];
+  tabs: string[] = ['Tất cả', '', 'Chưa nhận bàn', 'Đã nhận bàn', 'Đã hoàn thành', 'Đã hủy'];
   selectedIndex: number = 0;
   searchTerm: string = '';
   searchTermSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -104,8 +104,9 @@ export class TableManagementComponent implements OnInit {
   getTableData(): void {
     this.tableService.getTables().subscribe(
       response => {
-        this.originalDataTable = response; // Lưu dữ liệu ban đầu
-        this.dataTable = [...this.originalDataTable];
+        // Lọc các bàn có status = 0 hoặc 1 và lưu vào originalDataTable
+        this.originalDataTable = response.filter((table: { status: number; }) => table.status === 0 || table.status === 1);
+        this.dataTable = [...this.originalDataTable]; // Gán lại cho dataTable từ originalDataTable
         this.filterTablesByFloorAndStatus(this.selectedTable);
       },
       error => {
@@ -113,6 +114,7 @@ export class TableManagementComponent implements OnInit {
       }
     );
   }
+
   filterTablesByFloorAndStatus(selectedTable: string): void {
     const currentFloor = this.selectedFloor;
     if (selectedTable === 'all') {
@@ -126,13 +128,17 @@ export class TableManagementComponent implements OnInit {
 
   getFloors(): number[] {
     const uniqueFloors = new Set<number>();
+
     if (Array.isArray(this.originalDataTable)) {
       this.originalDataTable.forEach(table => {
-        uniqueFloors.add(table.floor);
+        if (table.floor !== null && table.floor !== undefined) { // Kiểm tra giá trị null hoặc undefined
+          uniqueFloors.add(table.floor);
+        }
       });
     } else {
       console.error('originalDataTable is not an array:', this.originalDataTable);
     }
+
     return Array.from(uniqueFloors).sort((a, b) => a - b);
   }
 
@@ -729,4 +735,19 @@ export class TableManagementComponent implements OnInit {
     }
   }
 
+  getReservationed(date: string) {
+    this.reservationService.getReservationed(date).subscribe(
+      (response: any) => { // Sử dụng any
+        const filteredReservations = response.filter((reservation: any) => reservation.tableId !== null);
+        console.log(filteredReservations);
+      },
+      error => {
+        console.error('Error fetching reservations:', error);
+      }
+    );
+  }
+
+
+
 }
+
