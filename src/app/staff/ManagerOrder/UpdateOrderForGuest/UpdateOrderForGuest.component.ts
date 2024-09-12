@@ -560,15 +560,16 @@ getMaxQuantity(item: any): number {
   validateQuantity(index: number, orderId: number): void {
     const item = this.selectedItems[index];
     if (item) {
-      // Validate quantity within the specified range (1 to 100)
-      item.quantity = Math.max(1, Math.min(item.quantity, 100));
-
-      // Update the total price and recalculate the total amount
+      // Lấy số lượng tối đa từ hàm getMaxQuantity
+      const maxQuantity = this.getMaxQuantity(item);
+  
+      // Giới hạn số lượng trong khoảng từ 1 đến maxQuantity
+      item.quantity = Math.max(1, Math.min(item.quantity, maxQuantity)); 
+      
+      // Cập nhật giá tiền và tổng số lượng
       this.updateTotalPrice(index, orderId);
     }
   }
-
-
   async addItem(item: any) {
     // Find if the item already exists in selectedItems
     const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));

@@ -117,12 +117,12 @@ export class ManagerDishComponent implements OnInit {
   
   
   
-  
+  dishesetting: ListAllDishes[] = [];
   loadListDisheSetting(search: string = ''): void {
-    this.dishService.ListDishes(this.currentPage, this.pageSize, this.searchCategory, search).subscribe(
+    this.dishService.ListDishes(this.currentPage, 100, this.searchCategory, search).subscribe(
       (response: ListAllDishes) => {
         if (response && response.items) {
-          this.dishes = [response]; // Wrap response in an array
+          this.dishesetting = [response]; // Wrap response in an array
           const dishesItems = response.items; // Extract items from response
 
           // Initialize selectedDishes
@@ -453,8 +453,8 @@ selectedDishes: { [key: number]: boolean } = {};
 
 selectAll(event: any): void {
   const checked = event.target.checked;
-  if (this.dishes.length > 0) {
-    const dishesItems = this.dishes[0].items;
+  if (this.dishesetting.length > 0) {
+    const dishesItems = this.dishesetting[0].items;
     dishesItems.forEach(dish => this.selectedDishes[dish.dishId] = checked);
   }
 }
@@ -466,7 +466,7 @@ onDishSelectionChange(dishId: number, event: any): void {
 quantityToSet: any;
 applyQuantity(): void {
   // Iterate over dishes and update the quantity if the dish is selected
-  for (const list of this.dishes) {
+  for (const list of this.dishesetting) {
     for (const dish of list.items) {
       if (this.selectedDishes[dish.dishId]) {
         dish.quantityDish = this.quantityToSet;
@@ -493,7 +493,7 @@ validateQuantity(event: Event) {
   }
 }
 updateSelectedDishes() {
-  this.dishes.forEach(list => {
+  this.dishesetting.forEach(list => {
     list.items.forEach(dish => {
       const body={
         dishId:dish.dishId,
