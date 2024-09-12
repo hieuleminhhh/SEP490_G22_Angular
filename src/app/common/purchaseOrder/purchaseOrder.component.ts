@@ -46,9 +46,6 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
     }
   }
   showData(tab: string) {
-    if (tab === '6') {
-      tab = '2';  // Chuyển '6' về '2' để xử lý logic tương tự
-    }
     this.selectedTab = tab;
     this.filterOrdersByStatus(parseInt(tab));
   }
@@ -57,7 +54,14 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
   filterOrdersByStatus(status: number) {
     if (status === -1) {
       this.filteredOrders = this.orders;
-    } else {
+    }
+    else if(status === 2){
+      this.filteredOrders = this.orders.filter(order => order.status === 2 || order.status === 6);
+    }
+    else if(status === 5){
+      this.filteredOrders = this.orders.filter(order => order.status === 5 || order.status === 8);
+    }
+    else {
       this.filteredOrders = this.orders.filter(order => order.status === status);
     }
     console.log(status);

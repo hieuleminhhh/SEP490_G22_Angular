@@ -252,3 +252,16 @@ header {
 .pending .step-text h4 {
   color: gray;
 }
+/* Style for the title */
+.detail p {
+  font-size: 24px;         /* Increase the font size */
+  font-weight: bold;       /* Make the text bold */
+  color: #333;             /* Change the text color */
+  text-align: center;      /* Center the text */
+  margin: 20px 0;          /* Add margin to the top and bottom */
+}
+
+/* Optional additional styles */
+.detail p::before {
+  content: "🛒 ";          /* Add an icon before the title (optional) */
+}

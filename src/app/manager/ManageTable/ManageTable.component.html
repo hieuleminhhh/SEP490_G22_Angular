@@ -76,7 +76,7 @@
         </div>
         <div class="mb-3">
           <label for="lable" class="form-label">Tên bàn</label>
-          <input type="text" class="form-control" id="lable" [(ngModel)]="newTable" name="lable" required />
+          <input type="text" class="form-control" id="lable1" [(ngModel)]="newTable" name="lable" required />
           <div *ngIf="isTableNameInvalid" class="text-danger">Tên bàn không được để trống</div>
         </div>
         <div class="mb-3">
@@ -161,10 +161,16 @@
       <div class="modal-body">
         <form (ngSubmit)="submitForm()">
           <div class="mb-3">
-            <label for="lable" class="form-label">Tên bàn</label>
-            <input type="text" class="form-control" id="lable" [(ngModel)]="newTable" name="lable"
-              placeholder="Nhập tên bàn">
+            <label for="lable2" class="form-label">Tên bàn</label>
+            <input type="text" class="form-control" id="lable2" [(ngModel)]="lableTable" name="lable"
+              placeholder="Nhập tên bàn" (ngModelChange)="checkTableName()" required>
+            <div *ngIf="!lableTable || lableTable.trim() === ''" class="text-danger">{{ message }}</div>
+            <!-- Hiển thị thông điệp nếu trống -->
+            <div *ngIf="isNameDuplicate && lableTable && lableTable.trim() !== ''" class="text-danger">{{ message }}</div>
+            <!-- Hiển thị thông điệp nếu trùng lặp -->
           </div>
+
+
 
           <div class="mb-3">
             <label for="floorSelect" class="form-label">Tầng</label>

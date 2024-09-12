@@ -1,9 +1,12 @@
 <div style="height: auto; margin-bottom: 10px;">
   <div *ngIf="showTabs">
+    <div>
+      <p>Đơn mua hàng của bạn</p>
+    </div>
     <div class="tab-buttons">
       <button (click)="showData('-1')" [class.active]="selectedTab === '-1'" style="width: 100px;">Tất cả</button>
       <button (click)="showData('1')" [class.active]="selectedTab === '1'" style="width: 140px;">Đợi xác nhận</button>
-      <button (click)="showData('2')" [class.active]="selectedTab === '2' || selectedTab === '6'" style="width: 150px;">
+      <button (click)="showData('2')" [class.active]="selectedTab === '2'" style="width: 150px;">
         Đang chuẩn bị
       </button>
       <button (click)="showData('7')" [class.active]="selectedTab === '7'" style="width: 160px;">Đang giao hàng</button>
