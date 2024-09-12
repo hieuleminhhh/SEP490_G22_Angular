@@ -1,4 +1,4 @@
-<div style="height: auto; margin-bottom: 10px;">
+<div style="height: auto; margin-bottom: 10px;" *ngIf="orders.length > 0; else noOrdersTemplate">
   <div *ngIf="showTabs">
     <div class="detail">
       <p>Đơn mua hàng của bạn</p>
@@ -64,6 +64,16 @@
     </div>
   </div>
 </div>
+<ng-template #noOrdersTemplate>
+  <div class="no-orders-message">
+    <div class="icon-container">
+      <i class="fas fa-box-open no-orders-icon"></i> <!-- Thêm icon bằng Font Awesome -->
+    </div>
+    <p>Không có đơn hàng nào</p>
+  </div>
+</ng-template>
+
+
 <!-- Cancel Order Confirmation Modal -->
 <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
   <div class="modal-dialog">

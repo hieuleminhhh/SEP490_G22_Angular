@@ -131,7 +131,7 @@ export class TableManagementComponent implements OnInit {
 
     if (Array.isArray(this.originalDataTable)) {
       this.originalDataTable.forEach(table => {
-        if (table.floor !== null && table.floor !== undefined) { // Kiểm tra giá trị null hoặc undefined
+        if (table.status !== 2 && table.floor !== null && table.floor !== undefined) {
           uniqueFloors.add(table.floor);
         }
       });
@@ -735,19 +735,29 @@ export class TableManagementComponent implements OnInit {
     }
   }
 
-  getReservationed(date: string) {
-    this.reservationService.getReservationed(date).subscribe(
-      (response: any) => { // Sử dụng any
-        const filteredReservations = response.filter((reservation: any) => reservation.tableId !== null);
-        console.log(filteredReservations);
+  // getReservationed(date: string) {
+  //   this.reservationService.getReservationed(date).subscribe(
+  //     (response: any) => { // Sử dụng any
+  //       const filteredReservations = response.filter((reservation: any) => reservation.tableId !== null);
+  //       console.log(filteredReservations);
+  //     },
+  //     error => {
+  //       console.error('Error fetching reservations:', error);
+  //     }
+  //   );
+  // }
+  tableEmpty: any;
+  getTableDataEmpty(date:string): void {
+    this.reservationService.getTable(date).subscribe(
+      response => {
+        this.tableEmpty=response;
+        console.log(this.tableEmpty);
       },
       error => {
-        console.error('Error fetching reservations:', error);
+        console.error('Error:', error);
       }
     );
   }
-
-
 
 }
 

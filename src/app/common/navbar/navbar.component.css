@@ -199,68 +199,98 @@ hr {
 }
 /* Dropdown container */
 .dropdown {
-  position: relative; /* Để dropdown-menu có thể hiển thị chính xác */
+  position: relative; /* Để dropdown-menu hiển thị chính xác */
 }
 
 /* Dropdown menu */
 .dropdown-menu {
   position: absolute;
+  top: 110%; /* Để cách một khoảng nhỏ dưới icon user */
+  right: 0;
   background-color: white; /* Màu nền của menu */
-  border: 1px solid #e0e0e0; /* Đường viền của menu */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Đổ bóng */
-  z-index: 1000; /* Đảm bảo menu nằm trên các phần tử khác */
+  border-radius: 8px; /* Bo góc menu */
+  border: 1px solid #e0e0e0; /* Đường viền */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Đổ bóng tinh tế */
+  z-index: 2000; /* Đảm bảo menu nằm trên các phần tử khác */
   opacity: 0; /* Ẩn menu ban đầu */
-  transition: opacity 0.3s ease, transform 0.3s ease; /* Hiệu ứng chuyển tiếp */
-  transform: translateY(-10px); /* Di chuyển menu lên trên */
+  visibility: hidden; /* Ngăn không cho menu xuất hiện khi ẩn */
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; /* Hiệu ứng mượt */
+  transform: translateY(-10px); /* Di chuyển menu lên trên nhẹ */
   pointer-events: none; /* Ngăn sự kiện chuột khi ẩn */
+  padding: 10px; /* Khoảng cách giữa các item */
+  min-width: 200px; /* Đảm bảo menu có kích thước tối thiểu */
 }
 
-/* Hiển thị menu khi hover */
-.dropdown:hover .dropdown-menu,
+/* Hiển thị menu khi dropdownOpen */
 .dropdown-menu.show {
   opacity: 1; /* Hiển thị menu */
-  transform: translateY(0); /* Di chuyển menu về vị trí ban đầu */
+  visibility: visible; /* Cho phép menu hiển thị */
+  transform: translateY(0); /* Menu trở lại vị trí ban đầu */
   pointer-events: auto; /* Cho phép sự kiện chuột khi hiển thị */
 }
 
 /* Item trong dropdown menu */
-.notification-item, .dropdown-item {
-  padding: 5px 10px; /* Giảm khoảng cách trong item */
-  line-height: 1.2; /* Giảm chiều cao dòng để các item ngắn hơn */
+.dropdown-item {
+  padding: 8px 12px; /* Khoảng cách giữa nội dung và viền */
+  font-size: 1rem;
   color: #333; /* Màu chữ */
   text-decoration: none; /* Bỏ gạch chân */
-  cursor: pointer; /* Con trỏ chuột */
+  display: block;
+  transition: background-color 0.2s ease, color 0.2s ease; /* Hiệu ứng hover */
 }
 
 /* Hover effect cho item */
-.notification-item:hover, .dropdown-item:hover {
+.dropdown-item:hover {
   background-color: #f0f0f0; /* Màu nền khi hover */
+  color: #007bff; /* Màu chữ khi hover */
 }
 
-/* Nút "Xem tất cả" */
-.view-all-btn {
-  display: block; /* Chuyển đổi thành block để có toàn bộ chiều rộng */
-  padding: 5px 10px; /* Giảm khoảng cách */
-  text-align: center; /* Canh giữa chữ */
-  color: #007bff; /* Màu chữ */
-  text-decoration: none; /* Bỏ gạch chân */
-  font-weight: bold; /* Chữ đậm */
+/* Nút "Đăng xuất" */
+.nav-item .nav-link {
+  display: block;
+  padding: 8px 12px;
+  color: #333;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Hover effect cho nút "Xem tất cả" */
-.view-all-btn:hover {
-  background-color: #e9ecef; /* Màu nền khi hover */
+/* Hover effect cho nút "Đăng xuất" */
+.nav-item .nav-link:hover {
+  background-color: #ffdddd; /* Màu nền khi hover nút đăng xuất */
+  color: #ff4b4b; /* Màu chữ khi hover nút đăng xuất */
 }
 
 /* Tách biệt giữa các item */
 .li-detail {
-  padding: 0; /* Bỏ padding cho item */
-  margin: 0; /* Bỏ margin cho item */
+  padding: 0;
+  margin: 0;
 }
 
 .li-detail hr {
-  margin: 5px 0; /* Khoảng cách giữa các item */
-  border: 0; /* Bỏ viền */
-  height: 1px; /* Độ cao của đường */
-  background-color: #e0e0e0; /* Màu đường */
+  margin: 10px 0;
+  border: 0;
+  height: 1px;
+  background-color: #e0e0e0;
+}
+
+/* Avatar icon style */
+.user-avatar {
+  color: #007bff; /* Màu xanh dương cho icon */
+  transition: color 0.2s ease; /* Hiệu ứng chuyển đổi màu */
+}
+
+.user-avatar:hover {
+  color: #0056b3; /* Đậm hơn khi hover */
+}
+
+/* Tên người dùng */
+.user-name {
+  color: #333;
+  font-weight: bold;
+  transition: color 0.2s ease; /* Hiệu ứng hover */
+}
+
+.user-name:hover {
+  color: #007bff; /* Đổi màu khi hover */
 }
