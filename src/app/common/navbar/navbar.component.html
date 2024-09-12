@@ -38,23 +38,25 @@
       <ng-template #loggedInTemplate>
         <div class="user-info d-flex align-items-center ms-3" id="utk">
           <i class="fas fa-user-circle user-avatar" (click)="toggleDropdown()" style="font-size: 1.5rem;"></i>
-          <span class="user-name ms-2" (click)="toggleDropdown()" style="font-size: 1.2rem;">{{ account?.username
-            }}</span>
+          <span class="user-name ms-2" (click)="toggleDropdown()" style="font-size: 1.2rem; cursor: pointer;">
+            {{ account?.username }}
+          </span>
 
           <div class="dropdown-menu-container">
             <ul class="dropdown-menu" [class.show]="dropdownOpen">
-              <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">Xem
-                  thông tin</a></li>
+              <li class="li-detail" style="width: 170px; cursor: pointer;">
+                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal" >Xem thông tin</a>
+              </li>
               <hr>
-              <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal"
-                  data-bs-target="#changePasswordModal">Đổi mật khẩu</a></li>
+              <li class="li-detail" style="width: 170px;cursor: pointer;">
+                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Đổi mật khẩu</a>
+              </li>
               <hr>
-              <li class="li-detail"><a class="dropdown-item" (click)="viewOrder()">Xem đơn
-                  hàng</a></li>
+              <li class="li-detail" style="width: 170px;cursor: pointer;">
+                <a class="dropdown-item" (click)="viewOrder()">Xem đơn hàng</a>
+              </li>
               <hr>
-              <li class="li-detail"><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paymentModal">Ví
-                  tiền</a></li>
-              <li class="nav-item">
+              <li class="nav-item" style="width: 170px;cursor: pointer;">
                 <a class="nav-link" (click)="logout()">
                   <i class="fas fa-sign-out-alt"></i> Đăng xuất
                 </a>
@@ -63,6 +65,7 @@
           </div>
         </div>
       </ng-template>
+
     </ul>
 
   </nav>

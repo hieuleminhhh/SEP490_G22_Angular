@@ -228,3 +228,48 @@ button:hover {
 .detail p::before {
   content: "🛒 ";          /* Add an icon before the title (optional) */
 }
+.no-orders-message {
+  text-align: center;
+  margin: 20px auto;
+  height: 600px;
+  width: 1000px;
+  border: 2px dashed #ccc;  /* Khung với đường viền gạch ngang (dashed) */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f9f9f9;  /* Màu nền nhẹ để làm nổi bật */
+  border-radius: 10px;  /* Bo tròn các góc */
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Icon styling */
+.no-orders-icon {
+  font-size: 60px;
+  color: #ff6347; /* Màu sắc cho icon */
+  margin-bottom: 10px;
+  animation: bounce 2s infinite; /* Thêm hiệu ứng nhảy (bounce) cho icon */
+}
+
+/* Fade-in effect */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Bounce effect for the icon */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+}

@@ -37,10 +37,6 @@ body {
    margin: 0 auto;
  }
 
-
-
-
-
  .content-wrap {
    position: relative;
    padding-top: 30px;
@@ -51,7 +47,7 @@ body {
    position: fixed;
    top: 70px;
    left: 0;
-   z-index: 8999;
+   z-index: 1500;
    width: 100%;
    padding-top: 10px;
    padding-bottom: 10px;
