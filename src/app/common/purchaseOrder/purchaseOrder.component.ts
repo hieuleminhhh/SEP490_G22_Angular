@@ -1,3 +1,4 @@
+import { ReservationService } from './../../../service/reservation.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -27,11 +28,14 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
   cancelationReason: string = 'Không còn nhu cầu';
   orderCancelled: boolean = false;
   choiceOrder: any;
+  choiceReser:any;
+  cancelBy: string = 'Người mua';
   constructor(
     private purchaseOrderService: PurchaseOrderService,
     private route: ActivatedRoute,
     private http: HttpClient,
-    private router: Router, private cookingService: CookingService, private paymentService: PaymentService
+    private router: Router, private cookingService: CookingService, private paymentService: PaymentService,
+    private reservationService: ReservationService
   ) { }
 
   ngOnInit() {
@@ -55,10 +59,10 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
     if (status === -1) {
       this.filteredOrders = this.orders;
     }
-    else if(status === 2){
+    else if (status === 2) {
       this.filteredOrders = this.orders.filter(order => order.status === 2 || order.status === 6);
     }
-    else if(status === 5){
+    else if (status === 5) {
       this.filteredOrders = this.orders.filter(order => order.status === 5 || order.status === 8);
     }
     else {
@@ -92,6 +96,7 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
         console.log('Order cancelled:', response);
         this.orderCancelled = true;
         this.updateCancelResion(orderId);
+        this.updateStatusReservation(this.choiceReser);
         window.location.reload();
       },
       error => {
@@ -102,12 +107,37 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
 
   updateCancelResion(orderId: number) {
     const request = {
-      cancelationReason: this.cancelationReason
+      cancelationReason: this.cancelationReason,
+      cancelBy: this.cancelBy
     };
 
     this.paymentService.updateResionCancle(orderId, request).subscribe(
       response => {
         console.log(response);
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
+
+  updateStatusReservation(id: number) {
+    this.reservationService.updateStatusReservation(id, 5).subscribe(
+      response => {
+        console.log(response);
+
+        const request = {
+          reasonCancel: this.cancelationReason,
+          cancelBy: this.cancelBy
+        };
+        this.reservationService.updatereasonCancel(id, request).subscribe(
+          response => {
+            console.log(response);
+          },
+          error => {
+            console.error('Error:', error);
+          }
+        );
       },
       error => {
         console.error('Error:', error);
@@ -133,7 +163,8 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
-  choiceOrderCancel(orderId: number) {
+  choiceOrderCancel(orderId: number, reserId:number) {
     this.choiceOrder = orderId;
+    this.choiceReser = reserId;
   }
 }
