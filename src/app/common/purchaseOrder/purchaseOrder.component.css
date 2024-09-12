@@ -216,7 +216,7 @@ button:hover {
   color: white; /* Màu chữ trắng */
 }
 /* Style for the title */
-div p {
+.detail p {
   font-size: 24px;         /* Increase the font size */
   font-weight: bold;       /* Make the text bold */
   color: #333;             /* Change the text color */
@@ -225,6 +225,6 @@ div p {
 }
 
 /* Optional additional styles */
-div p::before {
+.detail p::before {
   content: "🛒 ";          /* Add an icon before the title (optional) */
 }
