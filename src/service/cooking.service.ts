@@ -55,7 +55,7 @@ export class CookingService {
   }
 
   getListShip(status: number, accountId: number): Observable<any> {
-    const url = `https://localhost:7188/api/orders/orders/status/${status}/account/${accountId}`;
+    const url = `https://localhost:7188/api/orders/orders/status/${status}/staff/${accountId}`;
     return this.http.get(url, this.getHttpOptions());
   }
 

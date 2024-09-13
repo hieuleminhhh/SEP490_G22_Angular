@@ -184,4 +184,13 @@ export class ReservationService {
     });
     return this.http.get<TableReservationResponse>(url, { headers });
   }
+
+  getTable(date: string): Observable<TableReservationResponse> {
+    const url = `https://localhost:7188/api/Tables/available-tables?reservationTime=${date}`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get<TableReservationResponse>(url, { headers });
+  }
 }

@@ -94,7 +94,7 @@ export class OrderDetailComponent implements OnInit {
         return index <= 2
       case 7:
         if (this.deposits === 0) {
-          return index === 0 || index === 2;
+          return index === 0 || index === 2 || index === 3;
         }
         return index <= 3;
       case 4:

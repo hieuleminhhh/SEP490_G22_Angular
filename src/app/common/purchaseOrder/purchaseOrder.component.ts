@@ -127,8 +127,7 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
         console.log(response);
 
         const request = {
-          reasonCancel: this.cancelationReason,
-          cancelBy: this.cancelBy
+          reasonCancel: this.cancelationReason
         };
         this.reservationService.updatereasonCancel(id, request).subscribe(
           response => {
