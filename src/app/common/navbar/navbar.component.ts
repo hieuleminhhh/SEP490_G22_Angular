@@ -4,6 +4,8 @@ import { CartService } from '../../../service/cart.service';
 import { AccountService } from '../../../service/account.service';
 import { CommonModule, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { NotificationService } from '../../../service/notification.service';
+import { DataService } from '../../../service/dataservice.service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,23 +17,16 @@ import { FormsModule } from '@angular/forms';
 export class NavbarComponent implements OnInit {
 
   itemCount: number = 0;
-  accountId: number | null = null;
+  accountId: any;
   account: any = {};
   currentPassword: string = '';
   newPassword: string = '';
   confirmPassword: string = '';
   showNotifications = false;
-  notifications: any[] = [
-    { message: 'Notification 1' },
-    { message: 'Notification 2' },
-    { message: 'Notification 3' },
-    { message: 'Notification 4' },
-    { message: 'Notification 5' },
-    { message: 'Notification 6' }
-  ];
-  itemCountNoti = this.notifications.length;
+  notifications: any[] = [];
+  itemCountNoti:number=0;
 
-  constructor(private cartService: CartService, private accountService: AccountService) { }
+  constructor(private cartService: CartService,private dataService: DataService, private accountService: AccountService, private notificationService: NotificationService) { }
 
   ngOnInit(): void {
     this.cartService.getItemCount().subscribe(count => {
@@ -41,9 +36,13 @@ export class NavbarComponent implements OnInit {
     this.accountId = accountIdString ? Number(accountIdString) : null;
     if (this.accountId) {
       this.getAccountDetails(this.accountId);
+      this.getNotificationById(this.accountId);
     } else {
       console.error('Account ID is not available');
     }
+    // this.dataService.currentVariable.subscribe((newValue) => {
+    //   this.itemCountNoti = newValue;
+    // });
   }
   getAccountDetails(accountId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
@@ -56,6 +55,19 @@ export class NavbarComponent implements OnInit {
       }
     );
   }
+  getNotificationById(accountId: number): void {
+    this.notificationService.getNotificationById(accountId).subscribe(
+      response => {
+        this.notifications = response.filter((notification: { isView: boolean; }) => notification.isView === false);
+        const unseenNotifications = this.notifications.filter(notification => notification.isView === false);
+        this.itemCountNoti = unseenNotifications.length;
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
+
   dropdownOpen = false;
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -115,6 +127,9 @@ export class NavbarComponent implements OnInit {
   viewOrder() {
     window.location.href = '/purchase';
   }
+  viewDetails(){
+    window.location.href = '/notification';
+  }
 
   changeProfile() {
     if (this.accountId) {
@@ -135,4 +150,6 @@ export class NavbarComponent implements OnInit {
   toggleNotifications() {
     this.showNotifications = !this.showNotifications;
   }
+
+
 }

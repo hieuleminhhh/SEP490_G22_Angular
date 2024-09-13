@@ -1,3 +1,49 @@
-<p>
-  notification works!
-</p>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thông Báo</title>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Danh Sách Thông Báo</h1>
+    <ul class="notification-list">
+      <li *ngFor="let notification of filteredData" class="notification-item" (click)="viewDetails(notification)">
+        <div class="notification-content">
+          <p class="notification-description"[innerHTML]="getShortDescription(notification.description)" ></p>
+          <span class="notification-time">{{ notification.time | date:'dd/MM/yyyy - HH:mm'}}</span>
+        </div>
+        <span *ngIf="notification.isView===false" class="unread-dot"></span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="pagination" *ngIf="totalPages > 0">
+    <button (click)="onPreviousPage()" [disabled]="currentPage === 1">
+      <i class="fas fa-arrow-left"></i> <!-- Icon mũi tên trái -->
+    </button>
+
+    <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1" max="{{ totalPages }}">
+
+    <span>of {{ totalPages }}</span>
+
+    <button (click)="onNextPage()" [disabled]="currentPage === totalPages">
+      <i class="fas fa-arrow-right"></i> <!-- Icon mũi tên phải -->
+    </button>
+  </div>
+  <!-- Modal để hiển thị chi tiết thông báo -->
+  <div class="modal" [ngClass]="{'show': showModal}">
+    <div class="modal-content">
+      <span class="close" (click)="closeModal()">&times;</span>
+      <h2>Chi Tiết Thông Báo</h2><br>
+      <p><strong>Nội dung:</strong></p>
+      <p [innerHTML]="getFormattedDescription(selectedNotification?.description)"></p>
+      <span>{{ selectedNotification?.time | date:'dd/MM/yyyy - HH:mm' }}</span>
+    </div>
+  </div>
+
+</body>
+</html>
