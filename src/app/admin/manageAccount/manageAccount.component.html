@@ -39,6 +39,7 @@
               <th>Mật khẩu</th>
               <th>Chức năng</th>
               <th>Hoạt động</th>
+              <th>##</th>
             </tr>
           </thead>
           <tbody>
@@ -74,6 +75,12 @@
                   class="ms-2"
                 />
               </td>
+              <td>
+                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateRoleModal">
+                  Cập nhật
+                </button>
+              </td>
+           
             </tr>
           </tbody>
         </table>
@@ -82,7 +89,6 @@
   </div>
 </div>
 
-<!-- Add Account Modal -->
 <!-- Add Account Modal -->
 <div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -201,3 +207,32 @@
     <i class="fas fa-arrow-right"></i> <!-- Icon mũi tên phải -->
   </button>
 </div>
+<!-- Update Account Modal -->
+<div class="modal fade" id="updateRoleModal" tabindex="-1" aria-labelledby="updateRoleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateRoleModalLabel">Cập nhật vai trò tài khoản</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+       <div class="mb-3">
+          <label for="updateRole" class="form-label">Vai trò</label>
+          <select class="form-select" id="updateRole" formControlName="role">
+            <option value="Manager">Manager</option>
+            <option value="Cashier">Cashier</option>
+            <option value="Chef">Chef</option>
+            <option value="OrderStaff">OrderStaff</option>
+            <option value="Ship">Ship</option>
+          </select>
+         
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary">Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
