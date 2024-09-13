@@ -852,7 +852,7 @@ export class ManagerOrderComponent implements OnInit {
               this.orderService.sendEmail(customerEmail, subject, body).subscribe(
                 emailSentResponse => {
                   console.log('Email sent successfully:', emailSentResponse);
-                  // window.location.reload();
+                  window.location.reload();
                 },
                 emailError => {
                   console.error('Error sending email:', emailError);

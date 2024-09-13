@@ -359,14 +359,22 @@ export class UpdateOrderForGuestComponent implements OnInit {
     });
 }
 
-  increaseQuantity(index: number, orderId: number): void {
-    const item = this.selectedItems[index];
-    if (item) {
+increaseQuantity(index: number, orderId: number): void {
+  const item = this.selectedItems[index];
+  if (item) {
+    const maxQuantity = this.getMaxQuantity(item);
+    
+    // Check if the current quantity is already at the maximum
+    if (item.quantity < maxQuantity) {
       item.quantity++;
       this.updateTotalPrice(index, orderId);
       this.addOrUpdateNewlyAddedItem(item);
+    } else {
+      console.warn(`Cannot increase quantity for item ${item.dishId || item.comboId}. Maximum quantity is ${maxQuantity}.`);
     }
   }
+}
+
 
 
   decreaseQuantity(index: number, orderId: number): void {

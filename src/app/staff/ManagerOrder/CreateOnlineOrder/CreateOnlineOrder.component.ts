@@ -927,9 +927,10 @@ clearErrorMessageAfterTimeout() {
       const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : totalAmount;
       const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - totalAmount : 0;
       let status = 0;
-      if (paymentMethod === 3) {
+      if (paymentMethod === 0 || paymentMethod === 1) {
         status = 1;
       }
+      
       const updateData = {
         status: 6,
         paymentTime: new Date().toISOString(),

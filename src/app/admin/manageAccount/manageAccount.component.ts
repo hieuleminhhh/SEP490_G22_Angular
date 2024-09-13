@@ -177,4 +177,5 @@ export class ManageAccountComponent implements OnInit {
       console.log('Form is invalid');
     }
   }
+ 
 }
