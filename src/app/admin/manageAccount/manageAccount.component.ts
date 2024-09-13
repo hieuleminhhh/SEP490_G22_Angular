@@ -177,5 +177,22 @@ export class ManageAccountComponent implements OnInit {
       console.log('Form is invalid');
     }
   }
- 
+  selectedRole: string = '';
+  openUpdateRoleModal(account: GetAccountDTO) {
+    this.selectedAccount = account;
+    this.selectedRole = account.role; // Pre-select the current role
+  }
+  saveRoleChange() {
+    if (this.selectedAccount) {
+      this.accountService.updateAccountRole(this.selectedAccount.accountId, this.selectedRole).subscribe(
+        response => {
+          console.log('Role updated successfully', response);
+          globalThis.window.location.reload();
+        },
+        error => {
+          console.error('Error updating role', error);
+        }
+      );
+    }
+  }
 }
