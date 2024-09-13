@@ -658,3 +658,29 @@ body {
   font-weight: bold; /* Đậm chữ */
   color: #28a745; /* Màu xanh lá cho số tiền */
 }
+.status-button {
+  background-color: #f0f0f0; /* Light gray background */
+  border: 1px solid #ccc; /* Light gray border */
+  color: #333; /* Dark gray text */
+  padding: 10px 15px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.status-button:hover {
+  background-color: #e0e0e0; /* Darker gray on hover */
+}
+
+.status-button.active {
+  background-color: #007bff; /* Blue background for active button */
+  color: white; /* White text for active button */
+  border-color: #007bff; /* Match border color with background */
+}
+
+.status-button:disabled {
+  background-color: #ccc; /* Gray background for disabled state */
+  color: #999; /* Lighter text color */
+  cursor: not-allowed; /* Not allowed cursor */
+}
