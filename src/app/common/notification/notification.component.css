@@ -1,0 +1,216 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 20px;
+  height: 750px;
+}
+/* Container chính */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Tiêu đề danh sách */
+h1 {
+  font-size: 28px;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+/* Danh sách thông báo */
+.notification-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Thiết kế chung cho notification-item */
+.notification-item {
+  position: relative; /* Cần position relative để định vị chấm tròn */
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  padding: 15px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Chấm tròn đỏ cho thông báo chưa xem */
+.unread-dot {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 12px;
+  height: 12px;
+  background-color: red;
+  border-radius: 50%;
+  content: '';
+}
+
+/* Hiệu ứng hover */
+.notification-item:hover {
+  background-color: #f1f1f1;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Nội dung thông báo */
+.notification-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Mô tả thông báo */
+.notification-description {
+  font-size: 16px;
+  color: #333;
+  margin: 0 0 10px;
+  font-weight: 500;
+}
+
+/* Thời gian thông báo */
+.notification-time {
+  font-size: 14px;
+  color: #888;
+  text-align: right;
+}
+
+/* Hiệu ứng trên thiết bị di động */
+@media (max-width: 600px) {
+  .notification-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .notification-time {
+    text-align: left;
+    margin-top: 10px;
+  }
+}
+
+/* Thiết kế modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Tạo hiệu ứng mờ đen nền */
+  justify-content: center;
+  align-items: center;
+}
+
+/* Khi modal mở */
+.modal.show {
+  display: flex;
+}
+
+/* Nội dung modal */
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 500px;
+  max-width: 90%;
+  position: relative;
+  text-align: left;
+  font-family: Arial, sans-serif;
+}
+
+/* Nút đóng modal */
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+}
+
+.close:hover {
+  color: #ff0000; /* Đổi màu nút đóng khi hover */
+}
+
+/* Tiêu đề modal */
+h2 {
+  font-size: 22px;
+  color: #333;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+/* Đoạn văn nội dung */
+p {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Thời gian thông báo */
+span {
+  font-size: 14px;
+  color: #888;
+}
+
+/* Hiệu ứng khi mở modal */
+@keyframes modalOpen {
+  from { opacity: 0; transform: translateY(-50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal.show .modal-content {
+  animation: modalOpen 0.3s ease;
+}
+
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination button,
+.pagination input[type="number"],
+.pagination span {
+  margin: 0 5px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button {
+  background-color: #f0f0f0;
+  width: 81px;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pagination input[type="number"] {
+  width: 50px;
+  text-align: center;
+}
+
+.pagination span {
+  font-weight: bold;
+}
+

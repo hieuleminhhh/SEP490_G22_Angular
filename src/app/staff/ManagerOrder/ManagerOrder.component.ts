@@ -17,6 +17,8 @@ import { Table } from '../../../models/table.model';
 import { AccountService } from '../../../service/account.service';
 import { HeaderOrderStaffComponent } from "./HeaderOrderStaff/HeaderOrderStaff.component";
 import { SettingService } from '../../../service/setting.service';
+import { NotificationService } from '../../../service/notification.service';
+import { DataService } from '../../../service/dataservice.service';
 
 @Component({
   selector: 'app-ManagerOrder',
@@ -76,6 +78,8 @@ export class ManagerOrderComponent implements OnInit {
   totalQuantity: number = 0;
   cancelationReason: string = '';
   depositOrder: any;
+  accountGuest: any;
+
   constructor(
     private orderService: ManagerOrderService,
     private orderDetailService: ManagerOrderDetailService,
@@ -83,7 +87,8 @@ export class ManagerOrderComponent implements OnInit {
     private route: ActivatedRoute,
     private invoiceService: InvoiceService,
     private accountService: AccountService,
-    private settingService: SettingService
+    private settingService: SettingService, private notificationService: NotificationService,
+    private dataService: DataService
   ) { }
 
   ngOnInit() {
@@ -165,26 +170,16 @@ export class ManagerOrderComponent implements OnInit {
         let totalQuantity = 0;
 
         orderDetail.orderDetails.forEach((detail) => {
-          console.log('Dishes Served:', detail.dishesServed);
-          console.log('Quantity:', detail.quantity);
-
           totalDishesServed += detail.dishesServed; // No need for parseInt
           totalQuantity += detail.quantity; // No need for parseInt
         });
-
-        console.log('Total Dishes Served:', totalDishesServed);
-        console.log('Total Quantity:', totalQuantity);
-
-        // Store totalDishesServed and totalQuantity for use in the template
         this.dishesServed = totalDishesServed;
         this.totalQuantity = totalQuantity;
 
         console.log('Fetched order detail:', this.orderDetail);
-
-        console.log(this.orderDetail.deposits);
+        this.accountGuest = orderDetail.accountId;
+        console.log(this.accountGuest);
         this.depositOrder = this.orderDetail.deposits;
-        console.log('Tables:', this.tables);
-        console.log('Table ID:', this.tableId); // Logging the tableId
       },
       (error) => {
         console.error('Error fetching order detail:', error);
@@ -437,9 +432,9 @@ export class ManagerOrderComponent implements OnInit {
 
     // Log thông tin hóa đơn
     console.log({
-        customerName,
-        phone,
-        address
+      customerName,
+      phone,
+      address
     });
 
     // Tiến hành in
@@ -447,29 +442,29 @@ export class ManagerOrderComponent implements OnInit {
 
     // Kiểm tra nếu modalBody không null
     if (modalBody) {
-        // Lưu nội dung của modalBody (sau khi xóa input)
-        const modalContent = modalBody.innerHTML;
+      // Lưu nội dung của modalBody (sau khi xóa input)
+      const modalContent = modalBody.innerHTML;
 
-        // Xóa các thẻ div chứa input trong modal-body2
-        const inputDivs = modalBody.querySelectorAll('div.mb-3'); // Tìm tất cả các div có class mb-3
-        inputDivs.forEach(div => {
-            const input = div.querySelector('input'); // Kiểm tra có input trong div không
-            if (input) {
-                div.remove(); // Xóa thẻ div chứa input
-            }
-        });
+      // Xóa các thẻ div chứa input trong modal-body2
+      const inputDivs = modalBody.querySelectorAll('div.mb-3'); // Tìm tất cả các div có class mb-3
+      inputDivs.forEach(div => {
+        const input = div.querySelector('input'); // Kiểm tra có input trong div không
+        if (input) {
+          div.remove(); // Xóa thẻ div chứa input
+        }
+      });
 
-        // Cập nhật lại nội dung của modalContent sau khi xóa input
-        const updatedModalContent = modalBody.innerHTML; // Lấy nội dung đã cập nhật
+      // Cập nhật lại nội dung của modalContent sau khi xóa input
+      const updatedModalContent = modalBody.innerHTML; // Lấy nội dung đã cập nhật
 
-        // Mở cửa sổ in và chèn nội dung
-        const printWindow = window.open('', '', 'height=600,width=800');
-        if (printWindow) {
-            printWindow.document.write('<html><head><title>In hóa đơn</title>');
-            printWindow.document.write('</head><body>');
+      // Mở cửa sổ in và chèn nội dung
+      const printWindow = window.open('', '', 'height=600,width=800');
+      if (printWindow) {
+        printWindow.document.write('<html><head><title>In hóa đơn</title>');
+        printWindow.document.write('</head><body>');
 
-            // Thêm header
-            printWindow.document.write(`
+        // Thêm header
+        printWindow.document.write(`
               <div class="header">
                 <h1>Eating House</h1>
                 <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
@@ -479,8 +474,8 @@ export class ManagerOrderComponent implements OnInit {
               </div>
             `);
 
-            // Thêm nội dung chính của hóa đơn với thông tin khách hàng
-            printWindow.document.write(`
+        // Thêm nội dung chính của hóa đơn với thông tin khách hàng
+        printWindow.document.write(`
               <div class="invoice-details">
                 <p><strong>Tên khách hàng:</strong> ${customerName}</p>
                 <p><strong>Số điện thoại:</strong> ${phone}</p>
@@ -490,26 +485,26 @@ export class ManagerOrderComponent implements OnInit {
               ${updatedModalContent} <!-- Chèn nội dung đã được chỉnh sửa -->
             `);
 
-            // Thêm footer
-            printWindow.document.write(`
+        // Thêm footer
+        printWindow.document.write(`
               <hr>
               <div class="footer">
                 Cảm ơn quý khách và hẹn gặp lại!
               </div>
             `);
 
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.focus();
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.focus();
 
-            // In tài liệu
-            printWindow.print();
-            printWindow.close();
-        }
+        // In tài liệu
+        printWindow.print();
+        printWindow.close();
+      }
     } else {
-        console.error('Không tìm thấy modal-body2.');
+      console.error('Không tìm thấy modal-body2.');
     }
-}
+  }
 
 
 
@@ -717,7 +712,7 @@ export class ManagerOrderComponent implements OnInit {
 
   updateStatusReservation(id: number) {
     const data = {
-      orderId:id,
+      orderId: id,
       status: 4
     }
     this.invoiceService.updateOStatusReser(data).subscribe(
@@ -815,7 +810,7 @@ export class ManagerOrderComponent implements OnInit {
   acceptOrder(orderId: number | undefined): void {
     if (orderId) {
       this.loadListOrderDetails(orderId);
-  
+
       // Define the common data object
       const commonData = {
         paymentAmount: 0,
@@ -825,29 +820,29 @@ export class ManagerOrderComponent implements OnInit {
         returnAmount: 0,
         description: "string"
       };
-  
+
       // Determine payment methods based on depositOrder
       const paymentData = {
         ...commonData,
         paymentMethods: this.depositOrder > 0 ? 1 : 2
       };
-  
+
       // Accept the order
       this.orderService.AcceptOrderWaiting(orderId, paymentData).subscribe(
         response => {
           console.log('Order accepted successfully:', response);
-          
+
           // Call sendOrderEmail to get the email address
           this.orderService.sendOrderEmail(orderId).subscribe(
             emailResponse => {
               // Extract email address
               const customerEmail = emailResponse.email;
               console.log(customerEmail); // Adjust based on your response structure
-  
+
               // Define email content
               const subject = 'Order Confirmation';
               const body = 'Your order has been accepted and is being processed.';
-  
+
               // Send the email
               this.orderService.sendEmail(customerEmail, subject, body).subscribe(
                 emailSentResponse => {
@@ -873,8 +868,27 @@ export class ManagerOrderComponent implements OnInit {
       );
     }
   }
-  
 
+  createNotification(orderId:number) {
+    const body = {
+      description: "Chúng tôi xin chân thành cảm ơn Quý Khách đã đặt hàng tại Eating House. Chúng tôi rất vui mừng thông báo rằng đơn đặt hàng của Quý Khách đã được chấp nhận và đang được xử lý.Chúng tôi sẽ cố gắng giao hàng đúng thời gian và đảm bảo rằng Quý Khách sẽ hài lòng với những món ăn mà chúng tôi đã chuẩn bị. Nếu có bất kỳ câu hỏi nào hoặc cần thay đổi đơn hàng, xin vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã chọn Eating House. Chúng tôi rất mong được phục vụ Quý Khách!",
+      accountId: this.accountGuest,
+      orderId: orderId,
+      type: 0
+    }
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+       console.log(response);
+       this.callFunctionInB();
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
+  callFunctionInB() {
+    this.dataService.triggerFunction();
+  }
   getAccountDetails(accountId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
       response => {
@@ -909,7 +923,7 @@ export class ManagerOrderComponent implements OnInit {
     this.updateOInvoice(invoiceId, paymentAmount, returnAmount);
     window.location.reload(); // Reloads the current page
   }
-remoney:any;
+  remoney: any;
   updateOInvoice(invoiceId: number, paymentAmount: number, returnAmount: number) {
     const data = {
       invoiceId: invoiceId,
@@ -933,7 +947,7 @@ remoney:any;
         this.settings = response;
         console.log(response);
         this.QRUrl = this.settings[0].qrcode;
-        console.log('URL Logo',this.QRUrl);
+        console.log('URL Logo', this.QRUrl);
       },
       error => {
         console.error('Error:', error);

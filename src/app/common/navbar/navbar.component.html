@@ -14,10 +14,14 @@
           <span class="item-count">{{ itemCountNoti }}</span>
           <i class="fas fa-bell cart-icon"></i>
         </a>
+
         <div class="dropdown-menu" [class.show]="showNotifications && notifications.length > 0">
           <ul>
             <li *ngFor="let notification of notifications | slice:0:5" class="notification-item">
-              {{ notification }}
+              <div class="notification-content" (click)="viewDetails()" >
+                <p class="notification-description" style="height: 35px;">{{ notification.description }}</p>
+                <span class="notification-time" style="height: 25px;">{{ notification.time | date:'dd/MM/yyyy - HH:mm' }}</span>
+              </div>
             </li>
           </ul>
           <a routerLink="/notification" class="view-all-btn">Xem tất cả</a>
@@ -45,7 +49,7 @@
           <div class="dropdown-menu-container">
             <ul class="dropdown-menu" [class.show]="dropdownOpen">
               <li class="li-detail" style="width: 170px; cursor: pointer;">
-                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal" >Xem thông tin</a>
+                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">Xem thông tin</a>
               </li>
               <hr>
               <li class="li-detail" style="width: 170px;cursor: pointer;">
@@ -140,19 +144,19 @@
         </div>
 
         <!-- Always show these fields -->
-       <!-- Hide this when currentPassword is not null -->
-<!-- Show new password and confirm password when currentPassword is not null -->
-<div *ngIf="currentPassword === null" class="form-group">
-  <label for="newPassword">Nhập mật khẩu:</label>
-  <input type="password" id="newPassword" class="form-control" placeholder="Nhập mật khẩu mới"
-    [(ngModel)]="newPassword" name="newPassword" required>
-</div>
+        <!-- Hide this when currentPassword is not null -->
+        <!-- Show new password and confirm password when currentPassword is not null -->
+        <div *ngIf="currentPassword === null" class="form-group">
+          <label for="newPassword">Nhập mật khẩu:</label>
+          <input type="password" id="newPassword" class="form-control" placeholder="Nhập mật khẩu mới"
+            [(ngModel)]="newPassword" name="newPassword" required>
+        </div>
 
-<div *ngIf="currentPassword === null" class="form-group">
-  <label for="confirmNewPassword">Xác nhận mật khẩu:</label>
-  <input type="password" id="confirmNewPassword" class="form-control" placeholder="Xác nhận mật khẩu mới"
-    [(ngModel)]="confirmPassword" name="confirmPassword" required>
-</div>
+        <div *ngIf="currentPassword === null" class="form-group">
+          <label for="confirmNewPassword">Xác nhận mật khẩu:</label>
+          <input type="password" id="confirmNewPassword" class="form-control" placeholder="Xác nhận mật khẩu mới"
+            [(ngModel)]="confirmPassword" name="confirmPassword" required>
+        </div>
 
 
       </div>

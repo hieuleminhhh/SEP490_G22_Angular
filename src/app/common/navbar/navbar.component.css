@@ -294,3 +294,103 @@ hr {
 .user-name:hover {
   color: #007bff; /* Đổi màu khi hover */
 }
+/* Dropdown menu styling */
+.dropdown-menu {
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  width: 320px; /* Set a fixed width for the dropdown */
+  padding: 10px 0;
+  z-index: 1000;
+  max-height: 600px; /* Optional: Limit the height */
+  overflow-y: auto; /* Allow scroll if content exceeds max height */
+  display: none; /* Hide by default */
+}
+
+.dropdown-menu.show {
+  display: block; /* Show dropdown when class 'show' is added */
+}
+
+/* Notification list styling */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.notification-item:last-child {
+  border-bottom: none; /* Remove border for the last item */
+}
+
+/* Notification content styling */
+.notification-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  cursor: pointer;
+  padding: 10px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Thêm hiệu ứng mượt khi hover */
+}
+
+/* Hiệu ứng khi di chuột vào .notification-content */
+.notification-content:hover {
+  background-color: #f0f8ff; /* Màu nền sáng lên khi hover */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Tạo đổ bóng nhẹ */
+}
+
+/* Định dạng cho thời gian */
+.notification-time {
+  font-size: 12px;
+  color: #888;
+  margin-top: 5px;
+  align-self: flex-end;
+}
+
+/* Định dạng cho từng item trong dropdown */
+.notification-item {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+.notification-description {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Truncate long text */
+}
+
+.notification-time {
+  font-size: 12px;
+  color: #888;
+  margin-top: 5px;
+  align-self: flex-end;
+}
+
+/* View all button styling */
+.view-all-btn {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+  color: #007bff;
+  text-decoration: none;
+  background-color: #f1f1f1;
+  border-radius: 0 0 8px 8px;
+}
+
+.view-all-btn:hover {
+  background-color: #e0e0e0;
+}

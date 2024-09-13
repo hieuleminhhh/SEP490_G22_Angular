@@ -29,6 +29,7 @@ export interface ListOrderDetail{
 }
 export interface ListOrderDetailByOrder{
   orderId:number;
+  accountId:number;
   orderDate:Date;
   status:number;
   recevingOrder:Date;
@@ -52,7 +53,7 @@ export interface ListOrderDetailByOrder{
   taxcode:string;
   cancelationReason:string;
   orderDetails:ListOrderDetail[];
-  tables: Table[]; 
+  tables: Table[];
 }
 export interface AddOrderDetail{
   unitPrice: number;
