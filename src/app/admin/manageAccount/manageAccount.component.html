@@ -73,11 +73,18 @@
                   [checked]="account.isActive"
                   (change)="toggleActiveStatus(account)"
                   class="ms-2"
+                  [disabled]="account.role === 'Admin'"
                 />
               </td>
               <td>
-                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateRoleModal">
-                  Cập nhật
+                <button 
+                  class="btn btn-sm btn-primary" 
+                  (click)="openUpdateRoleModal(account)" 
+                  data-bs-toggle="modal" 
+                  data-bs-target="#updateRoleModal"
+                  [disabled]="account.role === 'Admin'" 
+                >
+                  Cập nhật vai trò
                 </button>
               </td>
            
@@ -207,7 +214,7 @@
     <i class="fas fa-arrow-right"></i> <!-- Icon mũi tên phải -->
   </button>
 </div>
-<!-- Update Account Modal -->
+<!-- Update Role Modal -->
 <div class="modal fade" id="updateRoleModal" tabindex="-1" aria-labelledby="updateRoleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -216,23 +223,23 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-       <div class="mb-3">
+        <div class="mb-3">
           <label for="updateRole" class="form-label">Vai trò</label>
-          <select class="form-select" id="updateRole" formControlName="role">
+          <select class="form-select" id="updateRole" [(ngModel)]="selectedRole">
             <option value="Manager">Manager</option>
             <option value="Cashier">Cashier</option>
             <option value="Chef">Chef</option>
             <option value="OrderStaff">OrderStaff</option>
             <option value="Ship">Ship</option>
           </select>
-         
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        <button type="button" class="btn btn-primary">Lưu thay đổi</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="saveRoleChange()">Lưu thay đổi</button>
       </div>
     </div>
   </div>
 </div>
+
  

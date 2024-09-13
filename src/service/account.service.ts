@@ -148,5 +148,17 @@ export class AccountService {
       })
     );
   }
+  updateAccountRole(accountId: number, role: string): Observable<any> {
+    const url = `${this.apiUrl}/Account/${accountId}/role`;
+    const body = { role };
+  
+    return this.http.put(url, body, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      }),
+      responseType: 'text' as 'json'  // Explicitly expect a text response
+    });
+  }
+  
   
 }
