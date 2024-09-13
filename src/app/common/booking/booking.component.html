@@ -1,4 +1,3 @@
-
 <div class="dish">
   <table class="cart" *ngIf="cartItems && cartItems.length > 0; else noItems">
     <thead>
@@ -65,9 +64,11 @@
   <h2>Đặt Bàn</h2>
   <form #reservationForm="ngForm" (ngSubmit)="submitForm(reservationForm)">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="form-group">
-          <label for="name">Tên người đặt (*)</label>
+          <label for="email">
+            Tên người đặt <span style="color: red;">*</span>
+          </label>
           <input type="text" id="name" name="consigneeName" placeholder="Nhập tên" [(ngModel)]="consigneeName" required
             #name="ngModel">
           <div *ngIf="name.invalid && (name.dirty || name.touched || formSubmitted)">
@@ -75,9 +76,11 @@
           </div>
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="form-group">
-          <label for="phone">Số điện thoại (*)</label>
+          <label for="email">
+            Số điện thoại <span style="color: red;">*</span>
+          </label>
           <input type="tel" id="phone" name="guestPhone" placeholder="Nhập số điện thoại" [(ngModel)]="guestPhone"
             required pattern="^0\d{9,10}$" #phone="ngModel">
           <div *ngIf="phone.invalid && (phone.dirty || phone.touched || formSubmitted)">
@@ -90,19 +93,41 @@
           </div>
         </div>
       </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label for="email">
+            Email <span style="color: red;">*</span>
+          </label>
+          <input type="text" id="email" name="email" placeholder="Nhập email của bạn" [(ngModel)]="emailGuest" required
+            email pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$" #email="ngModel">
+
+          <div *ngIf="email.invalid && (email.dirty || email.touched || formSubmitted)">
+            <small class="text-danger" *ngIf="email.errors?.['required']">
+              Vui lòng nhập địa chỉ email!
+            </small>
+            <small class="text-danger" *ngIf="email.errors?.['pattern']">
+              Địa chỉ email không hợp lệ!
+            </small>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="row">
       <div class="col-md-4">
         <div class="form-group">
-          <label for="date">Ngày (*)</label>
+          <label for="email">
+            Ngày<span style="color: red;">*</span>
+          </label>
           <input id="date" type="date" name="date" [(ngModel)]="reservation.date" [min]="minDate" [max]="maxDate"
             (change)="updateTimes()" style="width: 100%;height: 40px;">
         </div>
       </div>
       <div class="col-md-4">
         <div class="form-group">
-          <label for="time">Giờ (*)</label>
+          <label for="email">
+            Giờ<span style="color: red;">*</span>
+          </label>
           <select id="time" name="time" [(ngModel)]="reservation.time" required #time="ngModel">
             <option value="">Chọn</option>
             <option *ngFor="let time of availableTimes" [value]="time">{{ time }}</option>
@@ -117,7 +142,9 @@
       </div>
       <div class="col-md-4">
         <div class="form-group">
-          <label for="people">Số người (*)</label>
+          <label for="email">
+            Số người<span style="color: red;">*</span>
+          </label>
           <input type="number" id="people" name="guestNumber" min="1" [(ngModel)]="reservation.people" value="2"
             required #people="ngModel">
           <div *ngIf="people.invalid && (people.dirty || people.touched || formSubmitted)">
@@ -127,7 +154,9 @@
       </div>
     </div>
     <div class="form-group">
-      <label for="notes">Ghi chú</label>
+      <label for="email">
+        Ghi chú<span style="color: red;">*</span>
+      </label>
       <textarea id="notes" name="note" placeholder="Ghi chú" [(ngModel)]="note"></textarea>
     </div>
     <div *ngIf="message" class="error-message">

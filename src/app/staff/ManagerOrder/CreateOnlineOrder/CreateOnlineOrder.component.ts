@@ -239,26 +239,26 @@ export class CreateOnlineOrderComponent implements OnInit {
   }
   validateQuantity(index: number): void {
     const item = this.selectedItems[index];
-    
+
     // Determine the maximum quantity based on whether the item is a dish or a combo
     const maxQuantity = this.getMaxQuantity(item);
-    
+
     // Ensure the quantity is at least 1
     if (item.quantity < 1) {
       item.quantity = 1;
-    } 
+    }
     // Ensure the quantity doesn't exceed the available quantity
     else if (item.quantity > maxQuantity) {
       item.quantity = maxQuantity;
     }
-  
+
     // Update the total price after validating the quantity
     item.totalPrice = item.quantity * item.unitPrice;
-  
+
     // Recalculate the total amount after changes
     this.calculateAndSetTotalAmount();
   }
-  
+
   getMaxQuantity(item: any): number {
     // Check if the item is a combo or a dish
     if (item.hasOwnProperty('quantityCombo')) {
@@ -271,13 +271,13 @@ export class CreateOnlineOrderComponent implements OnInit {
     // Default to a high number if quantity properties are not found
     return Number.MAX_SAFE_INTEGER;
   }
-  
+
   errorMessage: string = '';
 
   addItem(item: any) {
   // Determine whether the item is a dish or a combo
   const isCombo = item.hasOwnProperty('quantityCombo');
-  
+
   // Use the appropriate quantity property based on whether it's a dish or combo
   const availableQuantity = isCombo ? item.quantityCombo : item.quantityDish;
 
@@ -382,11 +382,12 @@ clearErrorMessageAfterTimeout() {
       note: item.note
     }));
 
+
     // Calculate total amount and set various properties
     const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
     let receivingTime: string = '';
-    if (this.receivingDate && this.receivingTime) {
-      receivingTime = this.formatDateTime(this.receivingDate, this.receivingTime);
+    if (this.date && this.time) {
+      receivingTime = this.formatDateTime(this.date, this.time);
     } else {
       const currentTime = new Date();
       currentTime.setHours(currentTime.getHours() + 1);
@@ -411,6 +412,8 @@ clearErrorMessageAfterTimeout() {
       paymentStatus: 0,
       accountId: this.accountId
     };
+
+    console.log(this.addNew);
 
     // Log order details for debugging
     console.log('Order Details:', orderDetails);

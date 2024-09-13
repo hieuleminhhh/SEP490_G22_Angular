@@ -21,6 +21,7 @@ export class BookingComponent implements OnInit {
   reservation = {
     name: '',
     phone: '',
+    email:'',
     date: 'today',
     time: '',
     people: 2,
@@ -34,6 +35,7 @@ export class BookingComponent implements OnInit {
   consigneeName: string = '';
   guestPhone: string = '';
   note: string = '';
+  emailGuest:string = '';
   availableTimes: string[] = [];
   formSubmitted = false;
   cartItems: Dish[] = [];
@@ -51,6 +53,7 @@ export class BookingComponent implements OnInit {
     this.reservation = {
       name: '',
       phone: '',
+      email:'',
       date: this.formatDate(today),
       time: '',
       people: 2,
@@ -164,7 +167,7 @@ export class BookingComponent implements OnInit {
       const request = {
         accountId:this.accountId,
         guestPhone: this.guestPhone,
-        email: '',
+        email: this.emailGuest,
         guestAddress: '',
         consigneeName: this.consigneeName,
         reservationTime: dateTime,
