@@ -129,24 +129,19 @@ export class UpdateOfflineOrderComponent implements OnInit {
   increaseQuantity(index: number): void {
     const item = this.selectedItems[index];
     if (item) {
-      // Lấy số lượng tối đa từ hàm getMaxQuantity
       const maxQuantity = this.getMaxQuantity(item);
-  
-      // Lấy số lượng hiện tại từ currentQuantities
-      const currentQuantity = this.getCurrentQuantity(item);
-      const totalQuantity = item.quantity + currentQuantity; // Tổng số lượng dự kiến (bao gồm giỏ hàng và database)
-  
-      // Kiểm tra nếu tổng số lượng dự kiến nhỏ hơn số lượng tối đa
-      if (totalQuantity < maxQuantity) {
+      
+      // Check if the current quantity is already at the maximum
+      if (item.quantity < maxQuantity) {
         item.quantity++;
         this.updateTotalPrice(index);
         this.addOrUpdateNewlyAddedItem(item);
       } else {
-        console.warn('Số lượng đã đạt tới giới hạn tối đa:', maxQuantity);
-        // Có thể hiển thị thông báo cho người dùng biết
+        console.warn(`Cannot increase quantity for item ${item.dishId || item.comboId}. Maximum quantity is ${maxQuantity}.`);
       }
     }
   }
+  
   
   // Method to decrease item quantity
   decreaseQuantity(index: number, orderId: number): void {
