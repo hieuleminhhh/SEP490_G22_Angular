@@ -10,7 +10,7 @@ export class DataService {
   currentMessage = this.messageSource.asObservable();
   currentVariable = this.variableSource.asObservable();
 
-  private notify = new Subject<void>(); // Subject để phát sự kiện
+  private notify = new BehaviorSubject<number | null>(null); // BehaviorSubject với giá trị mặc định null
   notify$ = this.notify.asObservable(); // Observable để subscribe
 
   constructor() {}
@@ -23,7 +23,7 @@ export class DataService {
     this.variableSource.next(newValue);
   }
 
-  triggerFunction() {
-    this.notify.next(); // Phát sự kiện
+  triggerFunction(data: number) {
+    this.notify.next(data); // Phát sự kiện với giá trị number
   }
 }

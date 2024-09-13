@@ -14,7 +14,7 @@ import { DataService } from '../../../service/dataservice.service';
 })
 export class NotificationComponent implements OnInit {
 
-  constructor(private notificationService: NotificationService,private dataService: DataService) { }
+  constructor(private notificationService: NotificationService, private dataService: DataService) { }
   accountId: any;
   currentPage = 1; // Trang hiện tại
   itemsPerPage = 5; // Số bản ghi trên mỗi trang
@@ -32,8 +32,11 @@ export class NotificationComponent implements OnInit {
     } else {
       console.error('Account ID is not available');
     }
-    this.dataService.notify$.subscribe(() => {
-      this.getNotificationById(this.accountId);
+    this.dataService.notify$.subscribe((id: number | null) => {
+      if (id) { // Kiểm tra id có khác null không
+        console.log('Received accountId from Component A:', id); // Debug log
+        this.getNotificationById(id); // Gọi lại getNotificationById với accountId nhận được
+      }
     });
   }
 
@@ -106,6 +109,26 @@ export class NotificationComponent implements OnInit {
     this.updateVariable();
   }
   updateVariable() {
-    this.dataService.changeVariable(this.count-1);
+    this.dataService.changeVariable(this.count - 1);
   }
+  getShortDescription(description: string): string {
+    const sentences = description.split('.');
+    if (sentences.length > 2) {
+      return sentences.slice(0, 2).join('.<br>') + '.';
+    }
+    return description;
+  }
+  getFormattedDescription(description: string | undefined): string {
+    if (!description) {
+      return '';
+    }
+    const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
+    let descriptionWithPlaceholders = description.replace(emailRegex, (email) => email.replace(/\./g, '[dot]'));
+    const sentences = descriptionWithPlaceholders.split('.').filter(sentence => sentence.trim().length > 0);
+    let formattedDescription = sentences.join('.<br><br>') + '.';
+    formattedDescription = formattedDescription.replace(/\[dot\]/g, '.');
+
+    return formattedDescription;
+  }
+
 }

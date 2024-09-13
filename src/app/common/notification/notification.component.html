@@ -13,13 +13,14 @@
     <ul class="notification-list">
       <li *ngFor="let notification of filteredData" class="notification-item" (click)="viewDetails(notification)">
         <div class="notification-content">
-          <p class="notification-description">{{ notification.description }}</p>
+          <p class="notification-description"[innerHTML]="getShortDescription(notification.description)" ></p>
           <span class="notification-time">{{ notification.time | date:'dd/MM/yyyy - HH:mm'}}</span>
         </div>
         <span *ngIf="notification.isView===false" class="unread-dot"></span>
       </li>
     </ul>
   </div>
+
   <div class="pagination" *ngIf="totalPages > 0">
     <button (click)="onPreviousPage()" [disabled]="currentPage === 1">
       <i class="fas fa-arrow-left"></i> <!-- Icon mũi tên trái -->
@@ -39,7 +40,7 @@
       <span class="close" (click)="closeModal()">&times;</span>
       <h2>Chi Tiết Thông Báo</h2><br>
       <p><strong>Nội dung:</strong></p>
-      <p>{{ selectedNotification?.description }}</p>
+      <p [innerHTML]="getFormattedDescription(selectedNotification?.description)"></p>
       <span>{{ selectedNotification?.time | date:'dd/MM/yyyy - HH:mm' }}</span>
     </div>
   </div>

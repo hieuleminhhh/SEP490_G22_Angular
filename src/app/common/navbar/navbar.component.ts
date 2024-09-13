@@ -40,12 +40,9 @@ export class NavbarComponent implements OnInit {
     } else {
       console.error('Account ID is not available');
     }
-    this.dataService.currentVariable.subscribe((newValue) => {
-      this.itemCountNoti = newValue;
-    });
-    this.dataService.notify$.subscribe(() => {
-      this.getNotificationById(this.accountId);
-    });
+    // this.dataService.currentVariable.subscribe((newValue) => {
+    //   this.itemCountNoti = newValue;
+    // });
   }
   getAccountDetails(accountId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
