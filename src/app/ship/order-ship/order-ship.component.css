@@ -330,3 +330,23 @@ body {
   font-weight: bold;
   color: #dc3545; /* Màu chữ cho lý do hủy */
 }
+.no-orders-container {
+  text-align: center;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  margin-top: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.no-orders-icon {
+  font-size: 50px;
+  color: #ff6b6b;
+  margin-bottom: 10px;
+}
+
+.no-orders-text {
+  font-size: 18px;
+  color: #333;
+  font-weight: bold;
+}

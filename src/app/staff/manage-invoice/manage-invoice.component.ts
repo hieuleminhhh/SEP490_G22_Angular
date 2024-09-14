@@ -7,6 +7,7 @@ import { InvoiceService } from '../../../service/invoice.service';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 import { CookingService } from '../../../service/cooking.service';
 import { ExportService } from '../../../service/export.service';
+import { NotificationService } from '../../../service/notification.service';
 
 interface OrderDetail {
   orderDetailId: any;
@@ -67,8 +68,7 @@ export class ManageInvoiceComponent implements OnInit {
   orders: any;
   accountId: any;
 
-
-  constructor(private invoiceService: InvoiceService, private cookingService: CookingService, private exportService: ExportService) { }
+  constructor(private invoiceService: InvoiceService, private notificationService: NotificationService, private cookingService: CookingService, private exportService: ExportService) { }
   @ViewChild('collectAllModal') collectAllModal!: ElementRef;
   ngOnInit() {
     const today = new Date();
@@ -270,7 +270,7 @@ export class ManageInvoiceComponent implements OnInit {
   }
 
 
-  updateOrderStatus(id: number): void {
+  updateOrderStatus(id: number, accountId:number): void {
     const request = {
       status: 8
     }
@@ -285,6 +285,9 @@ export class ManageInvoiceComponent implements OnInit {
 
         this.invoiceService.updateStaffId(body).subscribe(
           response => {
+            console.log(response);
+            this.createNotification(id,accountId);
+            this.getOrdersCancel();
           },
           error => {
             console.error('Error:', error);
@@ -294,6 +297,24 @@ export class ManageInvoiceComponent implements OnInit {
       },
       error => {
         console.error('Error:', error);
+      }
+    );
+  }
+
+  createNotification(orderId: number, accountId: number) {
+    const body = {
+      description: `Kính gửi Quý Khách. Chúng tôi xin thông báo rằng đơn hàng của Quý Khách tại Eating House với mã đơn hàng ${orderId} đã được hoàn tiền thành công. Số tiền sẽ được hoàn lại qua phương thức thanh toán mà Quý Khách đã sử dụng khi đặt hàng. Xin vui lòng kiểm tra tài khoản của mình để xác nhận giao dịch. Chúng tôi thành thật xin lỗi vì bất kỳ sự bất tiện nào mà điều này có thể đã gây ra. Nếu Quý Khách có bất kỳ thắc mắc nào liên quan đến việc hoàn tiền, vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã tin tưởng và sử dụng dịch vụ của Eating House. Chúng tôi hy vọng sẽ có cơ hội được phục vụ Quý Khách trong tương lai!`,
+      accountId: accountId,
+      orderId: orderId,
+      type: 1
+    }
+
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
       }
     );
   }

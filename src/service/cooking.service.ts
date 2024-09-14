@@ -64,4 +64,8 @@ export class CookingService {
     return this.http.get(url, this.getHttpOptions());
   }
 
+  updatecancelReason(orderId: number, body: any): Observable<any> {
+    const url = `https://localhost:7188/api/orders/CancelOrderReason/${orderId}`;
+    return this.http.put(url, body, this.getHttpOptions());
+  }
 }

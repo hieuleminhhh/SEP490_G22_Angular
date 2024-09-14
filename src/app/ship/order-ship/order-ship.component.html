@@ -5,8 +5,8 @@
       <div class="card-header">
         <button class="title-btn">Đơn giao hàng của tôi</button>
       </div>
-      <div class="card-body">
-        <h5 *ngIf="deliveryOrders.length > 0">Thông tin đơn giao hàng:</h5>
+      <div class="card-body" *ngIf="deliveryOrders.length > 0">
+        <h5>Thông tin đơn giao hàng:</h5>
         <table class="order-table">
           <thead>
             <tr>
@@ -48,6 +48,11 @@
             </ng-container>
           </tbody>
         </table>
+      </div>
+      <!-- Thông báo khi không có đơn hàng -->
+      <div *ngIf="deliveryOrders.length === 0" class="no-orders-container">
+        <i class="fas fa-box-open no-orders-icon"></i>
+        <p class="no-orders-text">Không có đơn hàng nào</p>
       </div>
     </div>
   </main>
@@ -171,7 +176,15 @@
             orderShipper?.discountedPrice)| currencyFormat}}</span>
         </p>
       </div>
-
+      <!-- Thêm trường nhập lý do hủy -->
+      <div class="form-group" style="padding: 10px;">
+        <label for="cancelReason">Lý do hủy đơn hàng:</label>
+        <textarea id="cancelReason" class="form-control" [(ngModel)]="cancelationReason" rows="3"
+          placeholder="Nhập lý do hủy đơn hàng"></textarea>
+      </div>
+      <div *ngIf="errorMessage" class="alert alert-danger mt-2">
+        {{errorMessage}}
+      </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
         <button type="button" class="btn btn-danger" (click)="cancelOrder(orderShipper)">Xác nhận hủy</button>
