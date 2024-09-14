@@ -7,6 +7,7 @@ import { InvoiceService } from '../../../service/invoice.service';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 import { CookingService } from '../../../service/cooking.service';
 import { ExportService } from '../../../service/export.service';
+import { NotificationService } from '../../../service/notification.service';
 
 interface OrderDetail {
   orderDetailId: any;
@@ -56,6 +57,7 @@ export class ManageInvoiceComponent implements OnInit {
   selectedItem: any;
 
   filteredOrders: any[] = [];
+  filteredOrdersCancel: any[] = [];
   selectedEmployee: string = '';
   employees: any[] = [];
 
@@ -64,8 +66,9 @@ export class ManageInvoiceComponent implements OnInit {
   dateNow: string = '';
   selectedEmployeeName: string = '';
   orders: any;
+  accountId: any;
 
-  constructor(private invoiceService: InvoiceService, private cookingService: CookingService, private exportService: ExportService) { }
+  constructor(private invoiceService: InvoiceService, private notificationService: NotificationService, private cookingService: CookingService, private exportService: ExportService) { }
   @ViewChild('collectAllModal') collectAllModal!: ElementRef;
   ngOnInit() {
     const today = new Date();
@@ -77,6 +80,10 @@ export class ManageInvoiceComponent implements OnInit {
     this.getOrdersShip();
     this.getOrdersStatic();
     this.getEmployees();
+    const accountIdString = localStorage.getItem('accountId');
+    this.accountId = accountIdString ? Number(accountIdString) : null;
+    this.selectedStatus = 'unpaid';
+    this.selectedStatusFun = 'unrefun';
   }
   selectTab(tab: string) {
     this.selectedTab = tab;
@@ -114,20 +121,40 @@ export class ManageInvoiceComponent implements OnInit {
     this.invoiceService.getCancelOrder().subscribe(
       response => {
         this.orderCancel = response;
+        this.filteredOrdersCancel = [...this.orderCancel]; // Make a copy of orderCancel
         console.log(response);
+        console.log(this.selectedStatusFun);
+
+        this.filterOrdersByStatus();
 
       },
       error => {
         console.error('Error:', error);
-
       }
     );
   }
+
+  selectedStatusFun: string | null = null;
+  filterOrdersByStatus(): void {
+    if (this.selectedStatusFun === 'refun') {
+      this.filteredOrdersCancel = this.orderCancel.filter(  // Filter the original orderCancel array
+        (order: { status: number }) => order.status === 8
+      );
+    } else if (this.selectedStatusFun === 'unrefun') {
+      this.filteredOrdersCancel = this.orderCancel.filter(
+        (order: { status: number }) => order.status === 5
+      );
+    }
+
+    console.log("Filtered Orders by Status:", this.filteredOrdersCancel);
+  }
+
+
   getOrdersShip(): void {
     this.invoiceService.getOrderShip().subscribe(
       response => {
         this.orderShip = response;
-        this.filteredOrders = this.orderShip;
+        this.filterOrders();
         console.log(this.orderShip);
       },
       error => {
@@ -135,17 +162,29 @@ export class ManageInvoiceComponent implements OnInit {
       }
     );
   }
+  selectedStatus: string | null = null;
+  filterOrders(): void {
+    console.log("Selected Employee ID:", this.selectedEmployee);
+    this.filteredOrders = this.orderShip;
 
-  filterOrdersByEmployee(): void {
-    console.log("Selected Employee ID:", this.selectedEmployee); // Kiểm tra giá trị đã chọn
     if (this.selectedEmployee) {
-      // Lọc các đơn hàng theo nhân viên được chọn
-      this.filteredOrders = this.orderShip.filter((order: { accountId: number; }) => order.accountId === Number(this.selectedEmployee));
-      console.log("Filtered Orders:", this.filteredOrders); // Kiểm tra danh sách đã lọc
-    } else {
-      // Nếu không có nhân viên nào được chọn, hiển thị tất cả các đơn hàng
-      this.filteredOrders = this.orderShip;
+      this.filteredOrders = this.filteredOrders.filter(
+        (order: { staffId: number }) => order.staffId === Number(this.selectedEmployee)
+      );
     }
+
+    if (this.selectedStatus) {
+      if (this.selectedStatus === 'paid') {
+        this.filteredOrders = this.filteredOrders.filter(
+          (order: { paymentStatus: number }) => order.paymentStatus === 1
+        );
+      } else if (this.selectedStatus === 'unpaid') {
+        this.filteredOrders = this.filteredOrders.filter(
+          (order: { paymentStatus: number }) => order.paymentStatus === 0
+        );
+      }
+    }
+    console.log("Filtered Orders:", this.filteredOrders);
   }
 
   totalAmountDue(): number {
@@ -204,8 +243,8 @@ export class ManageInvoiceComponent implements OnInit {
 
     Promise.all(updatePromises)
       .then(() => {
-        this.closeModal(); // Đóng modal sau khi cập nhật xong
-        window.location.reload(); // Làm mới trang sau khi thu tiền
+        this.closeModal();
+        window.location.reload();
       })
       .catch(error => {
         console.error('Error collecting payments:', error);
@@ -214,14 +253,15 @@ export class ManageInvoiceComponent implements OnInit {
 
   update(id: number, totalPaid: number): void {
     const request = {
-      paymentAmount: totalPaid
+      paymentAmount: totalPaid,
+      collectedBy: this.accountId
     };
 
     this.invoiceService.updatePayment(id, request).subscribe(
       response => {
-        // Cập nhật trạng thái đơn hàng trong danh sách mà không cần tải lại trang
         this.filteredOrders = this.filteredOrders.filter(order => order.orderId !== id);
         console.log(`Đơn hàng ${id} đã được thu tiền.`);
+        this.getOrdersShip();
       },
       error => {
         console.error('Error:', error);
@@ -230,17 +270,51 @@ export class ManageInvoiceComponent implements OnInit {
   }
 
 
-  updateOrderStatus(id: number): void {
+  updateOrderStatus(id: number, accountId:number): void {
     const request = {
       status: 8
     }
     this.invoiceService.updateOrderStatus(id, request).subscribe(
       response => {
         console.log(response, request);
-        window.location.reload();
+        const body = {
+          orderId: id,
+          staffId: this.accountId
+        }
+        console.log(body);
+
+        this.invoiceService.updateStaffId(body).subscribe(
+          response => {
+            console.log(response);
+            this.createNotification(id,accountId);
+            this.getOrdersCancel();
+          },
+          error => {
+            console.error('Error:', error);
+          }
+        );
+        this.getOrdersCancel();
       },
       error => {
         console.error('Error:', error);
+      }
+    );
+  }
+
+  createNotification(orderId: number, accountId: number) {
+    const body = {
+      description: `Kính gửi Quý Khách. Chúng tôi xin thông báo rằng đơn hàng của Quý Khách tại Eating House với mã đơn hàng ${orderId} đã được hoàn tiền thành công. Số tiền sẽ được hoàn lại qua phương thức thanh toán mà Quý Khách đã sử dụng khi đặt hàng. Xin vui lòng kiểm tra tài khoản của mình để xác nhận giao dịch. Chúng tôi thành thật xin lỗi vì bất kỳ sự bất tiện nào mà điều này có thể đã gây ra. Nếu Quý Khách có bất kỳ thắc mắc nào liên quan đến việc hoàn tiền, vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã tin tưởng và sử dụng dịch vụ của Eating House. Chúng tôi hy vọng sẽ có cơ hội được phục vụ Quý Khách trong tương lai!`,
+      accountId: accountId,
+      orderId: orderId,
+      type: 1
+    }
+
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
       }
     );
   }
@@ -278,60 +352,60 @@ export class ManageInvoiceComponent implements OnInit {
 
   getOrderExport(): void {
     this.invoiceService.getOrderExport(this.data.orderIds).subscribe(
-        response => {
-            const flattenedData = this.flattenOrderData(response);
-            console.log(flattenedData); // Kiểm tra dữ liệu đã bao gồm orderDetail chưa
-            this.exportService.exportToExcel(flattenedData, 'orders');
-        },
-        error => {
-            console.error('Error:', error);
-        }
+      response => {
+        const flattenedData = this.flattenOrderData(response);
+        console.log(flattenedData); // Kiểm tra dữ liệu đã bao gồm orderDetail chưa
+        this.exportService.exportToExcel(flattenedData, 'orders');
+      },
+      error => {
+        console.error('Error:', error);
+      }
     );
-}
+  }
 
   flattenOrderData(orders: any[]): any[] {
     const flattenedData: any[] = [];
 
     orders.forEach(order => {
-        const orderInfo = {
-            orderId: order.orderId,
-            orderDate: this.formatDateTime(order.orderDate),
-            status: "Hoàn thành",
-            recevingOrder: this.formatDateTime(order.recevingOrder),
-            totalAmount: order.totalAmount,
-            guestPhone: order.guestPhone,
-            deposits: order.deposits,
-            note: order.note,
-            cancelationReason: order.cancelationReason,
-            invoiceId: order.invoice?.invoiceId,
-            paymentTime: this.formatDateTime(order.invoice?.paymentTime),
-            paymentAmount: order.invoice?.paymentAmount,
-            taxcode: order.invoice?.taxcode,
-            paymentStatus: order.invoice?.paymentStatus,
-            customerName: order.invoice?.customerName,
-            invoicePhone: order.invoice?.phone,
-            invoiceAddress: order.invoice?.address,
-            addressId: order.address?.addressId,
-            guestAddress: order.address?.guestAddress,
-            consigneeName: order.address?.consigneeName,
-            guestEmail: order.guest?.email,
-        };
+      const orderInfo = {
+        orderId: order.orderId,
+        orderDate: this.formatDateTime(order.orderDate),
+        status: "Hoàn thành",
+        recevingOrder: this.formatDateTime(order.recevingOrder),
+        totalAmount: order.totalAmount,
+        guestPhone: order.guestPhone,
+        deposits: order.deposits,
+        note: order.note,
+        cancelationReason: order.cancelationReason,
+        invoiceId: order.invoice?.invoiceId,
+        paymentTime: this.formatDateTime(order.invoice?.paymentTime),
+        paymentAmount: order.invoice?.paymentAmount,
+        taxcode: order.invoice?.taxcode,
+        paymentStatus: order.invoice?.paymentStatus,
+        customerName: order.invoice?.customerName,
+        invoicePhone: order.invoice?.phone,
+        invoiceAddress: order.invoice?.address,
+        addressId: order.address?.addressId,
+        guestAddress: order.address?.guestAddress,
+        consigneeName: order.address?.consigneeName,
+        guestEmail: order.guest?.email,
+      };
 
-        // Lặp qua từng chi tiết đơn hàng và kết hợp với thông tin đơn hàng
-        order.orderDetails.forEach((detail: { orderDetailId: any; dishName: string; unitPrice: number; quantity: number; dishesServed: any; }) => {
-            flattenedData.push({
-                ...orderInfo, // Gộp thông tin đơn hàng
-                orderDetailId: detail.orderDetailId,
-                dishName: detail.dishName,
-                unitPrice: detail.unitPrice,
-                quantity: detail.quantity,
-                dishesServed: detail.dishesServed
-            });
+      // Lặp qua từng chi tiết đơn hàng và kết hợp với thông tin đơn hàng
+      order.orderDetails.forEach((detail: { orderDetailId: any; dishName: string; unitPrice: number; quantity: number; dishesServed: any; }) => {
+        flattenedData.push({
+          ...orderInfo, // Gộp thông tin đơn hàng
+          orderDetailId: detail.orderDetailId,
+          dishName: detail.dishName,
+          unitPrice: detail.unitPrice,
+          quantity: detail.quantity,
+          dishesServed: detail.dishesServed
         });
+      });
     });
 
     return flattenedData;
-}
+  }
 
   formatDateTime(dateString: string): string {
     return new Date(dateString).toLocaleString('vi-VN', {

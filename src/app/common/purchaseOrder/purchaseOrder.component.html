@@ -55,7 +55,7 @@
               <button class="btn btn-primary btn-sm" (click)="reorder(order.orderId)"
                 *ngIf="order.status === 4 || order.status === 5">Mua Lại</button>
               <button class="btn btn-danger btn-sm" data-bs-target="#cancelOrderModal" data-bs-toggle="modal"
-              (click)="choiceOrderCancel(order.orderId, order.reservation.reservationId)"
+              (click)="choiceOrderCancel(order.orderId, order?.reservation?.reservationId)"
                 *ngIf="order.status === 1 || order.status === 2 || order.status === 6">Hủy đơn</button>
             </div>
           </div>
@@ -120,7 +120,7 @@
           Đóng
         </button>
         <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal"
-          (click)="cancelOrder(choiceOrder)">
+          (click)="cancelOrder()">
           Xác nhận
         </button>
       </div>

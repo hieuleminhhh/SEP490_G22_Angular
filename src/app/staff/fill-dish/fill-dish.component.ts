@@ -289,11 +289,8 @@ export class FillDishComponent implements OnInit {
       staffId: aId
     }
     console.log(aId);
-
     this.selectedOrders.forEach(order => {
-      // Gọi API để cập nhật accountId cho đơn hàng
       this.cookingService.updateAccountForOrder(order.orderId, request2).pipe(
-        // Khi cập nhật accountId thành công, cập nhật trạng thái đơn hàng lên 7
         switchMap(response => {
           console.log(`Order ${order.orderId} account updated successfully`, response);
           return this.cookingService.updateOrderStatus(order.orderId, request1);
@@ -309,11 +306,7 @@ export class FillDishComponent implements OnInit {
 
     });
   }
-
-
-
   assignShipButtonClick(order: any) {
-
     this.cookingService.updateOrderStatus(order.orderId, status).subscribe(
       response => {
         console.log('Order status updated:', response);
@@ -348,28 +341,18 @@ export class FillDishComponent implements OnInit {
   printOrder(): void {
     const modalElement = document.getElementById('invoiceModal');
     if (modalElement) {
-      // Create a copy of the modal to work with
       const printElement = modalElement.cloneNode(true) as HTMLElement;
-
-      // Remove unnecessary elements from the copy
       const headerToRemove = printElement.querySelector('.text-center.mb-3');
       if (headerToRemove) headerToRemove.remove();
-
-      // Remove all elements with class 'card-header d-flex justify-content-center'
       const cardHeaders = printElement.querySelectorAll('.card-header.d-flex.justify-content-center');
       cardHeaders.forEach(header => header.remove());
-
-      // Remove all buttons inside 'card-header' elements
       const buttonsToRemove = printElement.querySelectorAll('button');
       buttonsToRemove.forEach(button => button.remove());
 
       let printContents = printElement.innerHTML;
-
-      // Open a new window for printing
       const printWindow = window.open('', '', 'width=100mm,height=150mm');
 
       if (printWindow) {
-        // Write the content to the new window
         printWindow.document.write('<html><head><title>Print Order</title>');
         printWindow.document.write(`
                 <style>
@@ -493,8 +476,6 @@ export class FillDishComponent implements OnInit {
                     Cảm ơn quý khách và hẹn gặp lại!
                 </div>
             `);
-
-        // Close the document and trigger print
         printWindow.document.write('</body></html>');
         printWindow.document.close();
         printWindow.print();
@@ -512,8 +493,8 @@ export class FillDishComponent implements OnInit {
   GetAccountById(accountId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
       (data) => {
-        this.accountShip = data; // Correctly assign the API response to accountShip
-        console.log('API Response:', this.accountShip); // Log the entire response to check its structure
+        this.accountShip = data;
+        console.log('API Response:', this.accountShip);
       },
       (error) => {
         console.error('Error fetching:', error);

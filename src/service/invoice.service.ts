@@ -103,4 +103,9 @@ export class InvoiceService {
     return this.http.put(url, body, this.getHttpOptions());
   }
 
+  updateStaffId(data: any): Observable<any> {
+    const url = `https://localhost:7188/api/orders/update-staff`;
+    return this.http.put<any>(url, data, this.getHttpOptions());
+  }
+
 }

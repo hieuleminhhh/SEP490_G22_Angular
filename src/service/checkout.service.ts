@@ -36,4 +36,11 @@ export class CheckoutService {
     return this.http.get<any>(url);
   }
 
+  getRemainingItems(order: any): Observable<any> {
+    const url = `https://localhost:7188/api/Cart/GetRemainingItems`;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    return this.http.post<any>(url, JSON.stringify(order), { headers });
+  }
 }

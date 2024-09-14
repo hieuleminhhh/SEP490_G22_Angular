@@ -316,3 +316,28 @@ input[type="radio"] {
 .dive{
   font-size: 20px;
 }
+.quantity-input {
+  width: 60px;
+  padding: 5px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.quantity-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+/* Ẩn dấu lên xuống trên tất cả input số */
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+  appearance: none; /* Chrome, Safari, Edge */
+}
+
+/* Ẩn các dấu lên xuống trên tất cả các trình duyệt */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
