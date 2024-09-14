@@ -66,6 +66,11 @@
           <span class="text-muted">Về thực đơn</span>
         </div>
       </div>
+      <div *ngIf="messages.length > 0" class="alert alert-warning">
+        <div *ngFor="let msg of messages">
+          {{ msg }}
+        </div>
+      </div>
     </div>
 
     <div class="col-md-4 summary">

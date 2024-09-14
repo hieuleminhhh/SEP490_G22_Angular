@@ -19,6 +19,7 @@ export class CartComponent implements OnInit, OnDestroy {
   cartItems: Dish[] = [];
   itemQuantityMap: { [key: string]: number } = {};
   itemCount: number = 0;
+  maxValue: number = 1000;
 
   private cartSubscription!: Subscription;
   private itemCountSubscription!: Subscription;
@@ -95,6 +96,32 @@ export class CartComponent implements OnInit, OnDestroy {
     item.quantity++;
     this.cartService.updateCart(this.cartItems);
   }
+  validateInput(item: any, maxValue: number) {
+    const value = parseInt(item.quantity, 10);
+    if (isNaN(value) || value < 1) {
+      item.quantity = 1;
+    } else if (value > maxValue) {
+      item.quantity = maxValue;
+    }
+  }
+
+  preventDelete(event: KeyboardEvent, currentQuantity: number) {
+    if (currentQuantity <= 1 && (event.key === 'Backspace' || event.key === 'Delete')) {
+      event.preventDefault();
+    }
+    if (currentQuantity >= this.maxValue) {
+      if (event.key !== 'Backspace' && event.key !== 'Delete') {
+        event.preventDefault();
+      }
+      return;
+    }
+    const validKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Tab'];
+    if (validKeys.indexOf(event.key) !== -1 || /^[0-9]$/.test(event.key)) {
+      return;
+    }
+    event.preventDefault();
+  }
+
 
   removeItem(item: any) {
     if (item.hasOwnProperty('dishId')) {
