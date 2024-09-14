@@ -97,17 +97,22 @@
           <section class="payment-section" *ngIf="selectedTab === 'refund'">
             <div>
               <button class="status-button" [ngClass]="{'active': selectedStatusFun === 'unrefun'}"
-                (click)="filterOrdersByStatus('unrefun')" selected>
+                (click)="selectedStatusFun = 'unrefun'; filterOrdersByStatus()" selected>
                 Đơn hàng chưa hoàn tiền
               </button>
               <button class="status-button" [ngClass]="{'active': selectedStatusFun === 'refun'}"
-                (click)="filterOrdersByStatus('refun')">
+              (click)="selectedStatusFun = 'refun'; filterOrdersByStatus()">
                 Đơn hàng đã hoàn tiền
               </button>
             </div>
 
             <br>
-            <table class="order-table">
+             <!-- Kiểm tra xem có đơn hàng không -->
+             <div *ngIf="filteredOrdersCancel.length === 0" class="no-orders-message">
+              <p>Không có đơn hàng nào.</p>
+            </div>
+
+            <table class="order-table" *ngIf="filteredOrdersCancel.length > 0">
               <thead>
                 <tr>
                   <th>Mã đơn hàng</th>
@@ -118,11 +123,12 @@
                   <th>Lý do hủy</th>
                   <th *ngIf="selectedStatusFun ==='unrefun'">Tổng tiền phải hoàn trả</th>
                   <th *ngIf="selectedStatusFun ==='refun'">Tổng tiền đã hoàn trả</th>
+                  <th *ngIf="selectedStatusFun ==='refun'"> Nhân viên hoàn tiền</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody class="scrollable-tbody">
-                <ng-container *ngFor="let order of filteredOrders">
+                <ng-container *ngFor="let order of filteredOrdersCancel">
                   <tr>
                     <td>{{order.orderId}}</td>
                     <td>{{order.consigneeName}}</td>
@@ -131,13 +137,19 @@
                     <td>{{ order.status === 8?'Đã hoàn tiền':'Đã hủy'}}</td>
                     <td> {{order.cancelationReason}}</td>
                     <td>{{ (order.deposits > 0 ? order.deposits : order.totalAmount) | currencyFormat }}</td>
-                    <td>
+                    <td *ngIf="selectedStatusFun ==='unrefun'">
                       <button class="action-button view-button" (click)="showDetails(order.orderId)">
                         <i class="fas fa-eye"></i>
                       </button>
                       <button class="action-button complete-button" data-bs-toggle="modal"
                         data-bs-target="#confirmationModal" (click)="getOrderCancel(order)">
                         Xác nhận hoàn tiền
+                      </button>
+                    </td>
+                    <td *ngIf="selectedStatusFun ==='refun'"> {{order.collectedFirstName}} {{order.collectedLastName}}</td>
+                    <td *ngIf="selectedStatusFun ==='refun'">
+                      <button class="action-button view-button" (click)="showDetails(order.orderId)">
+                        <i class="fas fa-eye"></i>
                       </button>
                     </td>
                   </tr>

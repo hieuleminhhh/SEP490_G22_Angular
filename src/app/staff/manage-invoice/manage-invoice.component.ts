@@ -56,6 +56,7 @@ export class ManageInvoiceComponent implements OnInit {
   selectedItem: any;
 
   filteredOrders: any[] = [];
+  filteredOrdersCancel: any[] = [];
   selectedEmployee: string = '';
   employees: any[] = [];
 
@@ -65,7 +66,7 @@ export class ManageInvoiceComponent implements OnInit {
   selectedEmployeeName: string = '';
   orders: any;
   accountId: any;
-  selectedStatusFun: string | null = null;
+
 
   constructor(private invoiceService: InvoiceService, private cookingService: CookingService, private exportService: ExportService) { }
   @ViewChild('collectAllModal') collectAllModal!: ElementRef;
@@ -120,30 +121,35 @@ export class ManageInvoiceComponent implements OnInit {
     this.invoiceService.getCancelOrder().subscribe(
       response => {
         this.orderCancel = response;
+        this.filteredOrdersCancel = [...this.orderCancel]; // Make a copy of orderCancel
         console.log(response);
-        if (this.selectedStatusFun) {
-          this.filterOrdersByStatus(this.selectedStatusFun);
-        } else {
-          console.log("No status selected.");
-        }
+        console.log(this.selectedStatusFun);
+
+        this.filterOrdersByStatus();
+
       },
       error => {
         console.error('Error:', error);
       }
     );
   }
-  filterOrdersByStatus(status: string | null = ''): void {
-    this.selectedStatus = status;
-    if (status === 'unrefun') {
-      this.filteredOrders = this.orderCancel.filter((order: { status: number; }) => order.status === 5);
-    } else if (status === 'refun') {
-      this.filteredOrders = this.orderCancel.filter((order: { status: number; }) => order.status === 8);
-    } else {
-      this.filteredOrders = this.orderCancel;
+
+  selectedStatusFun: string | null = null;
+  filterOrdersByStatus(): void {
+    if (this.selectedStatusFun === 'refun') {
+      this.filteredOrdersCancel = this.orderCancel.filter(  // Filter the original orderCancel array
+        (order: { status: number }) => order.status === 8
+      );
+    } else if (this.selectedStatusFun === 'unrefun') {
+      this.filteredOrdersCancel = this.orderCancel.filter(
+        (order: { status: number }) => order.status === 5
+      );
     }
 
-    console.log("Filtered Orders by Status:", this.filteredOrders);
+    console.log("Filtered Orders by Status:", this.filteredOrdersCancel);
   }
+
+
   getOrdersShip(): void {
     this.invoiceService.getOrderShip().subscribe(
       response => {
@@ -178,7 +184,6 @@ export class ManageInvoiceComponent implements OnInit {
         );
       }
     }
-
     console.log("Filtered Orders:", this.filteredOrders);
   }
 
@@ -276,6 +281,8 @@ export class ManageInvoiceComponent implements OnInit {
           orderId: id,
           staffId: this.accountId
         }
+        console.log(body);
+
         this.invoiceService.updateStaffId(body).subscribe(
           response => {
           },

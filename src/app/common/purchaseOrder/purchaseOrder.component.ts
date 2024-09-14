@@ -88,14 +88,15 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
       console.error('Order not found or orderDetails is not an array');
     }
   }
-  cancelOrder(orderId: number) {
+  cancelOrder() {
+console.log(this.choiceOrder);
 
-    const url = `https://localhost:7188/api/orders/${orderId}/cancel`;
+    const url = `https://localhost:7188/api/orders/${this.choiceOrder}/cancel`;
     this.http.put(url, {}).subscribe(
       response => {
         console.log('Order cancelled:', response);
         this.orderCancelled = true;
-        this.updateCancelResion(orderId);
+        this.updateCancelResion(this.choiceOrder);
         this.updateStatusReservation(this.choiceReser);
         window.location.reload();
       },
@@ -165,5 +166,7 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
   choiceOrderCancel(orderId: number, reserId:number) {
     this.choiceOrder = orderId;
     this.choiceReser = reserId;
+    console.log(this.choiceOrder);
+
   }
 }
