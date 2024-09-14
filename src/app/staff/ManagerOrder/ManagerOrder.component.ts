@@ -19,6 +19,7 @@ import { HeaderOrderStaffComponent } from "./HeaderOrderStaff/HeaderOrderStaff.c
 import { SettingService } from '../../../service/setting.service';
 import { NotificationService } from '../../../service/notification.service';
 import { DataService } from '../../../service/dataservice.service';
+import { PaymentService } from '../../../service/payment.service';
 
 @Component({
   selector: 'app-ManagerOrder',
@@ -88,7 +89,7 @@ export class ManagerOrderComponent implements OnInit {
     private invoiceService: InvoiceService,
     private accountService: AccountService,
     private settingService: SettingService, private notificationService: NotificationService,
-    private dataService: DataService
+    private dataService: DataService, private paymentService: PaymentService
   ) { }
 
   ngOnInit() {
@@ -584,7 +585,8 @@ export class ManagerOrderComponent implements OnInit {
 
         this.orderService.CancelOrder(orderId, cancelationData).subscribe(
           response => {
-            this.createNotification(orderId,2);
+            this.createNotification(orderId, 2);
+            this.updateCancelResion(orderId);
             window.location.reload();
             console.log('Invoice status updated successfully:', response);
           },
@@ -600,6 +602,20 @@ export class ManagerOrderComponent implements OnInit {
     }
   }
 
+  updateCancelResion(orderId: number) {
+    const request = {
+      cancelationReason: this.cancelationReason,
+      cancelBy: 'Nhân viên quán ăn'
+    };
+    this.paymentService.updateResionCancle(orderId, request).subscribe(
+      (response) => {
+        console.log(response);
+      },
+      (error) => {
+        console.error('Error:', error);
+      }
+    );
+  }
 
   getDiscountOrderAmount(): number {
     if (this.orderDetail?.totalAmount && this.orderDetail?.discountPercent) {
@@ -832,7 +848,7 @@ export class ManagerOrderComponent implements OnInit {
       this.orderService.AcceptOrderWaiting(orderId, paymentData).subscribe(
         response => {
           console.log('Order accepted successfully:', response);
-          this.createNotification(orderId,1);
+          this.createNotification(orderId, 1);
           // Call sendOrderEmail to get the email address
           this.orderService.sendOrderEmail(orderId).subscribe(
             emailResponse => {
@@ -872,9 +888,9 @@ export class ManagerOrderComponent implements OnInit {
 
   createNotification(orderId: number, check: number) {
     let description;
-    if(check===1){
-     description = "Chúng tôi xin chân thành cảm ơn Quý Khách đã đặt hàng tại Eating House. Chúng tôi rất vui mừng thông báo rằng đơn đặt hàng của Quý Khách đã được chấp nhận và đang được xử lý.Chúng tôi sẽ cố gắng giao hàng đúng thời gian và đảm bảo rằng Quý Khách sẽ hài lòng với những món ăn mà chúng tôi đã chuẩn bị. Nếu có bất kỳ câu hỏi nào hoặc cần thay đổi đơn hàng, xin vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã chọn Eating House. Chúng tôi rất mong được phục vụ Quý Khách!"
-    }else if(check===2){
+    if (check === 1) {
+      description = "Chúng tôi xin chân thành cảm ơn Quý Khách đã đặt hàng tại Eating House. Chúng tôi rất vui mừng thông báo rằng đơn đặt hàng của Quý Khách đã được chấp nhận và đang được xử lý.Chúng tôi sẽ cố gắng giao hàng đúng thời gian và đảm bảo rằng Quý Khách sẽ hài lòng với những món ăn mà chúng tôi đã chuẩn bị. Nếu có bất kỳ câu hỏi nào hoặc cần thay đổi đơn hàng, xin vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã chọn Eating House. Chúng tôi rất mong được phục vụ Quý Khách!"
+    } else if (check === 2) {
       description = `Kính gửi Quý Khách. Chúng tôi rất tiếc phải thông báo rằng đơn đặt hàng của Quý Khách tại Eating House với mã đơn hàng ${orderId} đã bị hủy. Lý do hủy đơn hàng: ${this.cancelationReason}. Chúng tôi thành thật xin lỗi về sự bất tiện này và mong rằng Quý Khách sẽ thông cảm. Chúng tôi luôn cố gắng cải thiện dịch vụ của mình để mang đến cho Quý Khách những trải nghiệm tốt nhất. Nếu Quý Khách cần thêm thông tin hoặc muốn đặt lại đơn hàng, vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã hiểu và đồng hành cùng Eating House. `;
     }
     const body = {
