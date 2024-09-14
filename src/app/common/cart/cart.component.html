@@ -16,16 +16,16 @@
               <!-- Đây là vị trí của tiêu đề Quantity -->
               <div class="row">
                 <div class="col-2"></div>
-                <div class="col">
+                <div class="col-3">
                   <h5><b>Đồ ăn</b></h5>
                 </div>
-                <div class="col">
+                <div class="col-2">
                   <h5><b>Đơn giá</b></h5>
                 </div>
-                <div class="col">
+                <div class="col-2">
                   <h5><b>Số lượng</b></h5>
                 </div>
-                <div class="col">
+                <div class="col-2">
                   <h5><b>Tổng tiền</b></h5>
                 </div>
               </div>
@@ -37,22 +37,27 @@
                     <img class="img-fluid" [src]="item.imageUrl" alt="Item Image"
                       style="max-width: 100%; height: 56px;">
                   </div>
-                  <div class="col" style="font-size: 18px;">
+                  <div class="col-3" style="font-size: 18px;">
                     <div>{{ item.itemName||item.nameCombo }}</div>
                   </div>
-                  <div class="col">
+                  <div class="col-2">
                     <div>{{ item.discountedPrice || item.price | currencyFormat}}</div>
                   </div>
-                  <div class="col">
+
+                  <div class="col-2">
                     <a (click)="decreaseQuantity(item)" class="icon">
                       <i class="fas fa-minus"></i>
                     </a>
-                    <span>{{ item.quantity }}</span>
+                    <input type="number" [(ngModel)]="item.quantity" class="quantity-input" [min]="1" [max]="maxValue"
+                      (input)="validateInput(item, maxValue)" (keydown)="preventDelete($event, item.quantity)"
+                      pattern="[0-9]*" inputmode="numeric" style="appearance: none; -moz-appearance: textfield;"
+                      required />
+
                     <a (click)="increaseQuantity(item)" class="icon">
                       <i class="fas fa-plus"></i>
                     </a>
                   </div>
-                  <div class="col price-close" style="align-items:center;">
+                  <div class="col-2 price-close" style="align-items:center;">
                     <span class="price"> {{ getTotalPrice(item) | currencyFormat}}</span>
                     <span class="close" (click)="removeItem(item)">&#10005;</span>
                   </div>

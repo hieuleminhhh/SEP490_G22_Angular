@@ -39,13 +39,16 @@ export class CheckoutComponent implements OnInit {
   minDate: string; // Ngày nhận tối thiểu là ngày hiện tại
   maxDate: string; // Ngày nhận tối đa là ngày hiện tại + 7 ngày
   availableHours: string[] = [];
-
   discount: any;
   discountInvalid: any
   selectedDiscount: number | null = null;
   selectedDiscountDetails: any = null;
   selectedPromotion: boolean = false;
-  accountId: number=0;
+  accountId: number = 0;
+
+  comboIds: number[] = [];
+  dishIds: number[] = [];
+
 
   constructor(private cartService: CartService, private reservationService: ReservationService, private http: HttpClient, private router: Router, private route: ActivatedRoute, private checkoutService: CheckoutService) {
     const today = new Date();
@@ -206,7 +209,8 @@ export class CheckoutComponent implements OnInit {
     const inputElement = event.target as HTMLInputElement;
     this.selectedPaymentMethod = inputElement.value;
   }
-
+  public messages: string[] = [];
+  isValid: boolean = false;
   submitForm(): void {
     let receivingTime: string = '';
     if (this.date && this.time) {
@@ -215,17 +219,65 @@ export class CheckoutComponent implements OnInit {
       const currentTime = new Date();
       currentTime.setHours(currentTime.getHours() + 1);
       const year = currentTime.getFullYear();
-      const month = String(currentTime.getMonth() + 1).padStart(2, '0'); // Lưu ý tháng bắt đầu từ 0 nên cần cộng thêm 1
+      const month = String(currentTime.getMonth() + 1).padStart(2, '0');
       const day = String(currentTime.getDate()).padStart(2, '0');
 
-      // Định dạng ngày theo 'YYYY-MM-DD'
       const currentDate = `${year}-${month}-${day}`;
       const currentTimeStr = currentTime.toTimeString().split(' ')[0].substring(0, 5);
       console.log(currentDate);
       console.log(currentTime);
       receivingTime = this.formatDateTime(currentDate, currentTimeStr);
     }
+
     let deposits = 0;
+    const today = new Date();
+
+    if (this.date === this.formatDate(today)) {
+      const data = {
+        comboIds: this.cartItems.map(item => item.comboId).filter(id => id !== undefined),
+        dishIds: this.cartItems.map(item => item.dishId).filter(id => id !== undefined)
+      };
+      console.log(data);
+
+      this.checkoutService.getRemainingItems(data).subscribe(response => {
+        this.messages = []; // Đặt lại messages
+        for (const combo of response.combos) {
+          const itemInCart = this.cartItems.find(item => item.comboId === combo.comboId);
+          if (itemInCart && combo.quantityRemaining < itemInCart.quantity) {
+            this.messages.push(`Không đủ số lượng món ăn: ${combo.name}. Số lượng yêu cầu: ${itemInCart.quantity}, Số lượng còn lại: ${combo.quantityRemaining}`);
+            this.isValid = true;
+          }
+        }
+        for (const dish of response.dishes) {
+          const itemInCart = this.cartItems.find(item => item.dishId === dish.dishId);
+          if (itemInCart && dish.quantityRemaining < itemInCart.quantity) {
+            this.messages.push(`Không đủ số lượng món ăn: ${dish.name}. Số lượng yêu cầu: ${itemInCart.quantity}, Số lượng còn lại: ${dish.quantityRemaining}`);
+            this.isValid = true;
+          }
+        }
+
+        if (this.messages.length > 0) {
+          console.log("Có lỗi trong số lượng món ăn.");
+          console.log(this.messages);
+          return; // Dừng hàm nếu có thông báo
+        } else {
+          console.log("Tất cả món ăn đều đủ số lượng.");
+        }
+
+        // Tiếp tục với phần mã xử lý đặt hàng nếu không có lỗi
+        this.processOrder(receivingTime, deposits); // Gọi hàm xử lý đơn hàng ở đây
+
+      }, error => {
+        console.error('Error during payment initiation', error);
+      });
+
+      return; // Dừng hàm ở đây nếu không muốn chạy mã phía dưới
+    }
+
+    // Nếu không phải ngày hôm nay, không làm gì thêm
+  }
+
+  processOrder(receivingTime: string, deposits: number): void {
     if (this.selectedService === 'service1') {
       if (this.selectedPaymentMethod === 'banking') {
         deposits = this.getTotalCartPrice();
@@ -255,7 +307,6 @@ export class CheckoutComponent implements OnInit {
       console.log(request);
       this.checkoutService.submitOrder(request).subscribe({
         next: response => {
-          console.log(request);
           console.log('Order submitted successfully', response);
           this.cartService.clearCart();
           sessionStorage.removeItem('cartItems');
@@ -264,14 +315,11 @@ export class CheckoutComponent implements OnInit {
           } else {
             this.router.navigate(['/payment'], { queryParams: { guestPhone: this.guestPhone } });
           }
-
         },
         error: error => {
           if (error.error instanceof ErrorEvent) {
-            // Lỗi client-side hoặc mạng
             console.error('An error occurred:', error.error.message);
           } else {
-            // Lỗi server-side
             console.error(`Backend returned code ${error.status}, ` +
               `body was: ${JSON.stringify(error.error)}`);
           }
@@ -325,6 +373,7 @@ export class CheckoutComponent implements OnInit {
       });
     }
   }
+
 
   checkVnPay(guestPhone: string) {
     sessionStorage.setItem('guestPhone', guestPhone);
