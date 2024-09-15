@@ -266,7 +266,7 @@ export class CheckoutComponent implements OnInit {
         console.log(this.messages.length);
 
         // Tiếp tục với phần mã xử lý đặt hàng nếu không có lỗi
-        // Gọi hàm xử lý đơn hàng ở đây
+        this.processOrder(receivingTime, deposits);// Gọi hàm xử lý đơn hàng ở đây
 
       }, error => {
         console.error('Error during payment initiation', error);
