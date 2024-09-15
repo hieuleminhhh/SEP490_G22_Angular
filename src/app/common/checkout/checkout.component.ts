@@ -263,15 +263,18 @@ export class CheckoutComponent implements OnInit {
         } else {
           console.log("Tất cả món ăn đều đủ số lượng.");
         }
+        console.log(this.messages.length);
 
         // Tiếp tục với phần mã xử lý đặt hàng nếu không có lỗi
-        this.processOrder(receivingTime, deposits); // Gọi hàm xử lý đơn hàng ở đây
+        // Gọi hàm xử lý đơn hàng ở đây
 
       }, error => {
         console.error('Error during payment initiation', error);
       });
 
       return; // Dừng hàm ở đây nếu không muốn chạy mã phía dưới
+    } else {
+      this.processOrder(receivingTime, deposits);
     }
 
     // Nếu không phải ngày hôm nay, không làm gì thêm
