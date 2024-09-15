@@ -21,6 +21,7 @@ export class PaymentComponent implements OnInit {
   guestPhone: string | null = null;
   cancelationReason: string = 'Không còn nhu cầu';
   cancelBy: string = 'Người mua';
+  check:boolean=false;
 
   constructor(private route: ActivatedRoute, private paymentService: PaymentService, private http: HttpClient, private router: Router, private checkoutService: CheckoutService) { } // Inject Router
 
@@ -39,7 +40,9 @@ export class PaymentComponent implements OnInit {
         response => {
           this.data = response;
           console.log(this.data);
-          console.log('Checkout success:', response);
+          if(this.data.status===5){
+            this.check=true;
+          }
           resolve();
         },
         error => {

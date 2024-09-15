@@ -23,13 +23,13 @@ import { TableService } from '../../../service/table.service';
   ]
 })
 export class ManageTableComponent implements OnInit {
-  selectedFloor = 1;
+  selectedFloor: string = '';
   dataTable: any;
   originalDataTable: Table[] = [];
   selectedTable: string = 'all';
   capacity: number = 1;
   newFloor: any;
-  floors: number[] = [];
+  floors: string[] = [];
   errorMessage: string = '';
   newTable: string = '';
   capacityError: string | null = null;
@@ -41,13 +41,13 @@ export class ManageTableComponent implements OnInit {
   isTableNameInvalid: boolean = false;
   isDetail: boolean = false;
   isEditing: boolean = false;
-  newSelectedFloor: number | null = null;
+  newSelectedFloor: string = '';
   waitingTables: any[] = [];
   isWaitingTableView: boolean = false;
   isFloorInvalid: boolean = false;
-  allTable:any;
+  allTable: any;
   isNameDuplicate: boolean = false;
-  lableTable:string='';
+  lableTable: string = '';
   message: string = '';
 
   @ViewChild('addFloorModal') addFloorModal!: ElementRef;
@@ -62,7 +62,6 @@ export class ManageTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.getTableData();
-
   }
 
   getTableData(): void {
@@ -70,6 +69,7 @@ export class ManageTableComponent implements OnInit {
       response => {
         this.originalDataTable = response;
         this.allTable = response;
+        this.selectedFloor = this.allTable[0].floor;
         this.dataTable = [...this.originalDataTable];
         this.filterTablesByFloorAndStatus(this.selectedTable);
         const tableIds = this.originalDataTable.map(table => table.tableId);
@@ -92,8 +92,8 @@ export class ManageTableComponent implements OnInit {
     }
   }
 
-  getFloors(): number[] {
-    const uniqueFloors = new Set<number>();
+  getFloors(): string[] {
+    const uniqueFloors = new Set<string>();
 
     if (Array.isArray(this.originalDataTable)) {
       this.originalDataTable.forEach(table => {
@@ -105,11 +105,12 @@ export class ManageTableComponent implements OnInit {
       console.error('originalDataTable is not an array:', this.originalDataTable);
     }
 
-    return Array.from(uniqueFloors).sort((a, b) => a - b);
+    return Array.from(uniqueFloors).sort(); // Sắp xếp chuỗi thay vì số
   }
 
 
-  getTableOFFloor(floor: number) {
+
+  getTableOFFloor(floor: string) {
     this.selectedFloor = floor;
     this.isWaitingTableView = false;
     this.filterTablesByFloorAndStatus(this.selectedTable);
@@ -137,6 +138,8 @@ export class ManageTableComponent implements OnInit {
         floor: this.selectedFloor,
         lable: this.lableTable
       };
+      console.log(newTableData);
+
       this.tableService.createTables(newTableData).subscribe(
         response => {
           console.log('Bàn đã được thêm thành công:', response);
@@ -149,12 +152,19 @@ export class ManageTableComponent implements OnInit {
         }
       );
     } else {
-      console.error('Thông tin bàn không hợp lệ.');
+      console.error('Thông tin phòng/bàn không hợp lệ.');
     }
   }
 
   submitNewFloor(): void {
-    if (this.newFloor && !this.floors.includes(this.newFloor)) {
+    if (!this.newFloor) {
+      this.errorMessage = 'Khu vực không được để trống!';
+      setTimeout(() => {
+        this.errorMessage = '';
+      }, 3000);
+      return;
+    }
+    if (!this.floors.includes(this.newFloor)) {
       this.floors.push(this.newFloor);
       this.selectedFloor = this.newFloor;
       this.newFloor = null;
@@ -165,12 +175,14 @@ export class ManageTableComponent implements OnInit {
       } else {
         this.openManageTablesModal();
       }
-    } else if (this.floors.includes(this.newFloor)) {
-      this.errorMessage = 'Tầng đã tồn tại!';
     } else {
-      this.errorMessage = 'Vui lòng nhập một số hợp lệ!';
+      this.errorMessage = 'Khu vực đã tồn tại!';
+      setTimeout(() => {
+        this.errorMessage = '';
+      }, 3000);
     }
   }
+
 
   openManageTablesModal() {
     const modal = this.manageTablesModal.nativeElement;
@@ -254,7 +266,7 @@ export class ManageTableComponent implements OnInit {
     console.log(this.isDetail);
 
   }
-
+  statusValid: number | undefined;
   openTableDetails(): void {
     const modal = this.tableDetailsModal.nativeElement;
     if (modal) {
@@ -265,6 +277,10 @@ export class ManageTableComponent implements OnInit {
       backdrop.className = 'modal-backdrop fade show';
       document.body.appendChild(backdrop);
     }
+    if (this.statusValid === undefined) {
+      this.statusValid = this.tableDetail?.status;
+    }
+
   }
 
   closeTableDetailsModal(): void {
@@ -281,7 +297,7 @@ export class ManageTableComponent implements OnInit {
       response => {
         console.log(response);
         this.tableDetail = response;
-        this.selectedFloor=this.tableDetail.floor;
+        this.selectedFloor = this.tableDetail.floor;
         this.newTable = this.tableDetail.lable;
         this.capacity = this.tableDetail.capacity;
         this.openTableDetails();
@@ -353,16 +369,23 @@ export class ManageTableComponent implements OnInit {
       this.tableDetail.status = 2;
     }
   }
-
+  messageUpdateValid: string = '';
   editTable(table: any): void {
     this.validateTableName();
     this.validateFloor();
-    if (this.isTableNameInvalid && this.isFloorInvalid) {
-      console.error('Tên bàn không được để trống');
+    if (this.isTableNameInvalid || this.isFloorInvalid || this.capacity < 1) {
+      console.error('Tên phòng/bàn không được để trống');
       return;
     }
-    this.tableToEdit = table;
-    this.openConfirmEditModal();
+    if (table.lable !== this.newTable || table.floor !== this.selectedFloor || table.capacity !== this.capacity || table.status !== this.statusValid) {
+      this.tableToEdit = table;
+      this.openConfirmEditModal();
+    } else {
+      this.messageUpdateValid = 'Không có chỉnh sửa gì ở trên';
+      setTimeout(() => {
+        this.messageUpdateValid = '';
+      }, 3000);
+    }
   }
 
   openConfirmEditModal(): void {
@@ -404,7 +427,7 @@ export class ManageTableComponent implements OnInit {
     this.isTableNameInvalid = !this.newTable || this.newTable.trim() === '';
   }
   validateFloor() {
-    this.isFloorInvalid = this.selectedFloor===null;
+    this.isFloorInvalid = this.selectedFloor === null;
   }
 
   updateTable(tableDetail: any): void {
@@ -433,6 +456,8 @@ export class ManageTableComponent implements OnInit {
     this.tableService.getTablesEmpty().subscribe(
       response => {
         this.waitingTables = response;
+        console.log(this.waitingTables);
+
         this.isWaitingTableView = true;
       },
       error => {
@@ -462,7 +487,7 @@ export class ManageTableComponent implements OnInit {
       this.removeExistingBackdrop();
     }
     this.isEditing = false;
-    this.newSelectedFloor = null;
+    this.newSelectedFloor = '';
   }
 
   toggleEdit(): void {
@@ -513,7 +538,7 @@ export class ManageTableComponent implements OnInit {
       }
     );
   }
-  getAvailableFloors(): number[] {
+  getAvailableFloors(): string[] {
     return this.floors.filter(floor => floor !== this.selectedFloor);
   }
   deleteFloor(): void {

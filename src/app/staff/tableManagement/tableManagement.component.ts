@@ -35,7 +35,7 @@ export class TableManagementComponent implements OnInit {
   reservationDetail: any;
   showDropdown = false;
   selectedTable: string = 'all';
-  selectedFloor = 1;
+  selectedFloor:string='';
   selectedTableIds: number[] = [];
   dataReservation: any;
   reservationTimeSelected: string | undefined;
@@ -129,12 +129,12 @@ export class TableManagementComponent implements OnInit {
     }
   }
 
-  getFloors(): number[] {
-    const uniqueFloors = new Set<number>();
+  getFloors(): string[] {
+    const uniqueFloors = new Set<string>();
 
     if (Array.isArray(this.originalDataTable)) {
       this.originalDataTable.forEach(table => {
-        if (table.status !== 2 && table.floor !== null && table.floor !== undefined) {
+        if (table.floor !== null && table.floor !== undefined) { // Kiểm tra giá trị null hoặc undefined
           uniqueFloors.add(table.floor);
         }
       });
@@ -142,18 +142,17 @@ export class TableManagementComponent implements OnInit {
       console.error('originalDataTable is not an array:', this.originalDataTable);
     }
 
-    return Array.from(uniqueFloors).sort((a, b) => a - b);
+    return Array.from(uniqueFloors).sort(); // Sắp xếp chuỗi thay vì số
   }
 
-  getTableOFFloor(floor: number) {
+  getTableOFFloor(floor: string) {
     this.selectedFloor = floor;
     this.filterTablesByFloorAndStatus(this.selectedTable);
   }
-
   //=================================================================================================================================
 
   getTableOFFloorEmpty(floor: any): void {
-    this.selectedFloor = parseInt(floor, 10);
+    // this.selectedFloor = parseInt(floor, 10);
     this.dataTable = this.originalDataTable.filter(table => table.floor === this.selectedFloor);
   }
   onClickButton(event: MouseEvent) {
@@ -314,7 +313,7 @@ export class TableManagementComponent implements OnInit {
     }
     this.getTableDataEmpty(time);
     this.selectedTable = 'all';
-    this.selectedFloor = 1;
+    this.selectedFloor = '';
     this.reserId = reserId;
     this.reservationService.getTableReservation(this.reserId).subscribe(
       response => {
@@ -368,7 +367,7 @@ export class TableManagementComponent implements OnInit {
       modal.classList.remove('show');
       modal.style.display = 'none';
     }
-    this.selectedFloor = 1;
+    this.selectedFloor = '';
     this.selectedTable = 'all';
     this.filterTablesByFloorAndStatus(this.selectedTable);
   }

@@ -38,7 +38,7 @@
       </div>
       <div class="col-md-8">
         <div class="card">
-          <div class="success-message" *ngIf="!orderCancelled">
+          <div class="success-message" *ngIf="check===false">
             <div class="row">
               <div class="col-md-12">
                 <h4 class="text-center"><b>Đặt hàng thành công !!!</b></h4>
@@ -48,14 +48,13 @@
               </div>
             </div>
           </div>
-          <!-- <div class="success-message" *ngIf="orderCancelled"></div>
+          <div class="success-message" *ngIf="check===true">
             <div class="row">
               <div class="col-md-12">
                 <h4 class="text-center"><b>Hủy đơn hàng thành công !!!</b></h4>
               </div>
             </div>
-          </div> -->
-
+          </div>
           <div class="col-md-12 cart">
             <div>
               <div class="cart-container">
@@ -119,9 +118,9 @@
             </div>
             <div class="back-to-shop">
               <a routerLink="/menu" routerLinkActive="active"><i class="fas fa-arrow-left"></i>Thực đơn</a>
-              <button *ngIf="!orderCancelled" class="btn btn-danger" data-bs-target="#cancelOrderModal"
+              <button *ngIf="check===false" class="btn btn-danger" data-bs-target="#cancelOrderModal"
                 data-bs-toggle="modal">Hủy đơn hàng</button>
-              <button *ngIf="orderCancelled" class="btn btn-primary" (click)="reorder()">Mua lại</button>
+              <button *ngIf="check===true" class="btn btn-primary" (click)="reorder()" style="background-color: green;">Mua lại</button>
             </div>
           </div>
         </div>

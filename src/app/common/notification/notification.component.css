@@ -214,3 +214,37 @@ span {
   font-weight: bold;
 }
 
+/* Phần thông báo khi không có thông báo */
+.no-notifications {
+  display: flex;
+  flex-direction: column; /* Sắp xếp theo chiều dọc */
+  justify-content: center; /* Canh giữa theo chiều dọc */
+  align-items: center; /* Canh giữa theo chiều ngang */
+  text-align: center; /* Căn văn bản giữa */
+  height: 300px; /* Chiều cao của container */
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-top: 20px;
+  height: 600px;
+}
+
+.no-notifications p {
+  font-size: 1.5rem;
+  color: #888;
+  margin-top: 10px;
+}
+
+/* Icon cho phần không có thông báo */
+.no-notifications .icon {
+  font-size: 4rem;
+  color: #ff5b5b;
+  margin-bottom: 20px;
+}
+
+/* Hiệu ứng hover cho icon */
+.no-notifications .icon:hover {
+  color: #007bff;
+  transition: color 0.3s ease;
+}
+

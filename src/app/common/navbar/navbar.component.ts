@@ -10,7 +10,7 @@ import { DataService } from '../../../service/dataservice.service';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, NgIf,FormsModule,CommonModule],
+  imports: [RouterLink, RouterLinkActive, NgIf, FormsModule, CommonModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
@@ -24,9 +24,9 @@ export class NavbarComponent implements OnInit {
   confirmPassword: string = '';
   showNotifications = false;
   notifications: any[] = [];
-  itemCountNoti:number=0;
+  itemCountNoti: number = 0;
 
-  constructor(private cartService: CartService,private dataService: DataService, private accountService: AccountService, private notificationService: NotificationService) { }
+  constructor(private cartService: CartService, private dataService: DataService, private accountService: AccountService, private notificationService: NotificationService) { }
 
   ngOnInit(): void {
     this.cartService.getItemCount().subscribe(count => {
@@ -40,9 +40,9 @@ export class NavbarComponent implements OnInit {
     } else {
       console.error('Account ID is not available');
     }
-    // this.dataService.currentVariable.subscribe((newValue) => {
-    //   this.itemCountNoti = newValue;
-    // });
+    this.dataService.currentVariable.subscribe((newValue) => {
+      this.itemCountNoti = newValue;
+    });
   }
   getAccountDetails(accountId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
@@ -83,51 +83,42 @@ export class NavbarComponent implements OnInit {
   successMessage: string = '';
   cupass: string = '';
   changePassword() {
-    // Check if new password matches confirm password
     if (this.newPassword !== this.confirmPassword) {
       this.errorMessage = 'Mật khẩu không khớp, vui lòng kiểm tra lại.';
-      this.successMessage = ''; // Clear success message
+      this.successMessage = '';
       return;
     }
-
-    // Prepare password data for the API call
     const passwordData = {
-      currentPassword: this.cupass, // Use cupass if currentPassword is null
+      currentPassword: this.cupass,
       newPassword: this.newPassword,
       confirmPassword: this.confirmPassword
     };
-
-    // Call the API to change password
     this.accountService.changePassword(this.accountId ?? 0, passwordData)
-  .subscribe({
-      next: (response) => {
-        console.log('Password changed successfully:', response);
-        this.successMessage = 'Đổi mật khẩu thành công.';
-        this.errorMessage = ''; // Clear error message on success
-
-        // Display success message for 3 seconds before reloading
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
-
-        // Reset form fields
-        this.newPassword = '';
-        this.confirmPassword = '';
-        this.dropdownOpen = false; // Close dropdown after password change
-      },
-      error: (error) => {
-        console.error('Password change failed:', error);
-        this.errorMessage = 'Đổi mật khẩu không thành công, vui lòng kiểm tra thông tin.';
-        this.successMessage = ''; // Clear success message
-      }
-    });
+      .subscribe({
+        next: (response) => {
+          console.log('Password changed successfully:', response);
+          this.successMessage = 'Đổi mật khẩu thành công.';
+          this.errorMessage = '';
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+          this.newPassword = '';
+          this.confirmPassword = '';
+          this.dropdownOpen = false;
+        },
+        error: (error) => {
+          console.error('Password change failed:', error);
+          this.errorMessage = 'Đổi mật khẩu không thành công, vui lòng kiểm tra thông tin.';
+          this.successMessage = '';
+        }
+      });
   }
 
 
   viewOrder() {
     window.location.href = '/purchase';
   }
-  viewDetails(){
+  viewDetails() {
     window.location.href = '/notification';
   }
 
@@ -136,7 +127,6 @@ export class NavbarComponent implements OnInit {
       this.accountService.changeProfile(this.accountId, this.account).subscribe({
         next: (updatedAccount) => {
           console.log('Profile updated successfully:', updatedAccount);
-          // Reload the page
           window.location.reload();
         },
         error: (error) => {

@@ -10,9 +10,9 @@
     <ul class="right-menu">
       <li *ngIf="accountId" (mouseenter)="showNotifications = true" (mouseleave)="showNotifications = false"
         class="dropdown">
-        <a routerLink="/notification" routerLinkActive="active" class="cart-link">
-          <span class="item-count">{{ itemCountNoti }}</span>
-          <i class="fas fa-bell cart-icon"></i>
+        <a routerLink="/notification" routerLinkActive="active" class="cart-link-noti">
+          <span class="item-count-noti" [ngClass]="{'active': itemCountNoti > 0}"></span>
+          <i class='far fa-bell' style='font-size:26px'></i>
         </a>
 
         <div class="dropdown-menu" [class.show]="showNotifications && notifications.length > 0">
