@@ -8,6 +8,6 @@ export interface Table {
   tableId: number;
   status: number;
   capacity: number;
-  floor: number;
+  floor: string;
   reservationTime: string | null;
 }
