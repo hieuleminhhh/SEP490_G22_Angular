@@ -1,17 +1,19 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, OnInit } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableService } from '../../../service/table.service';
 import { FormsModule } from '@angular/forms';
 import moment from 'moment';
 import { ReservationService } from '../../../service/reservation.service';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { BehaviorSubject, of } from 'rxjs';
-import { debounceTime, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
+import { catchError, debounceTime, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { Table, TableReservationResponse } from '../../../models/table.model';
+import { Table, TableReservationResponse, Tables } from '../../../models/table.model';
 import { DatePipe } from '@angular/common';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 import { HeaderOrderStaffComponent } from '../ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component';
+import { MatDialog } from '@angular/material/dialog';
+import { AccountService } from '../../../service/account.service';
 
 
 @Component({
@@ -61,7 +63,21 @@ export class TableManagementComponent implements OnInit {
   errorMessage: string = '';
   errorMessages: { [key: number]: string } = {};
   showDropdowns: { [key: number]: boolean } = {};
-  constructor(private tableService: TableService, private reservationService: ReservationService, private router: Router) { }
+
+  allTable: any;
+  accountId: any;
+  accountName: string = '';
+  showCancelModal: boolean = false;
+  cancelReason: string = '';
+  cancelMessage: string | null = null;
+  showAcceptModal: boolean = false;
+  isModalVisible: boolean = false;
+  onConfirmCallback: () => void = () => { };
+  modalMessage: any;
+  guestInfo: any;
+
+  constructor(private tableService: TableService, private dialog: MatDialog, private reservationService: ReservationService,
+    private router: Router, private accountService: AccountService) { }
 
   ngOnInit(): void {
     const today = new Date();
@@ -73,7 +89,13 @@ export class TableManagementComponent implements OnInit {
     this.searchTermSubject.pipe(debounceTime(300)).subscribe(searchTerm => {
       this.getSearchList();
     });
-
+    const accountIdString = localStorage.getItem('accountId');
+    this.accountId = accountIdString ? Number(accountIdString) : null;
+    if (this.accountId) {
+      this.getAccountData();
+    } else {
+      console.error('Account ID is not available');
+    }
   }
 
   formatDate(date: Date): string {
@@ -90,8 +112,14 @@ export class TableManagementComponent implements OnInit {
       reservation.isDropdownOpen = (i === index) ? !reservation.isDropdownOpen : false;
     });
   }
-  tableDropdown() {
-    this.showDropdown = !this.showDropdown;
+  @ViewChild('tableModal') tableModal!: TemplateRef<any>;
+  showModals: boolean[] = [];
+  openTableModal(index: number): void {
+    this.showModals[index] = true;
+  }
+
+  closeTableModal(index: number): void {
+    this.showModals[index] = false;
   }
 
   @HostListener('document:click', ['$event'])
@@ -108,10 +136,10 @@ export class TableManagementComponent implements OnInit {
   getTableData(): void {
     this.tableService.getTables().subscribe(
       response => {
-        // Lọc các bàn có status = 0 hoặc 1 và lưu vào originalDataTable
+        this.allTable = response.filter((table: { status: number; }) => table.status === 0 || table.status === 1);
         this.originalDataTable = response.filter((table: { status: number; }) => table.status === 0 || table.status === 1);
         this.selectedFloor = this.originalDataTable[0].floor;
-        this.dataTable = [...this.originalDataTable]; // Gán lại cho dataTable từ originalDataTable
+        this.dataTable = [...this.originalDataTable];
         this.filterTablesByFloorAndStatus(this.selectedTable);
       },
       error => {
@@ -162,7 +190,7 @@ export class TableManagementComponent implements OnInit {
   ishas: boolean = false;
   toggleTableSelection(table: any): void {
     const tableIdIndex = this.selectedTableIds.indexOf(table.tableId);
-    if (this.guestNumber < table.capacity) {
+    if (this.guestNumber <= table.capacity) {
       if (tableIdIndex === -1) {
         if (this.selectedTableIds.length > 0) {
           this.selectedTableIds = [];
@@ -262,13 +290,43 @@ export class TableManagementComponent implements OnInit {
     this.totalItems = this.dataReservationAccept.length;
   }
 
-  updateStatusReservation(id: number): void {
+  getAccountData(): void {
+    this.accountService.getAccountById(this.accountId).subscribe(
+      response => {
+        this.accountName = response.firstName + response.lastName;
+        console.log(this.accountName);
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
+
+  updateStatusReservation(id: number, cancelReason: string): void {
     this.reservationService.updateStatusReservation(id, 5).subscribe(
       response => {
-        this.getTableData();
-        this.getReservation();
-        this.getReservationData();
-        this.getReservationId(id);
+        const body = {
+          reasonCancel: cancelReason,
+          cancelBy: this.accountName
+        }
+        console.log(body);
+
+        this.reservationService.updatereasonCancel(id, body).subscribe(
+          response => {
+            console.log(response);
+
+            this.getTableData();
+            this.getReservation();
+            this.getReservationData();
+            this.getReservationId(id);
+          },
+          error => {
+            console.error('Lỗi khi cập nhật trạng thái:', error);
+            if (error.error && error.error.errors) {
+              console.error('Lỗi xác thực:', error.error.errors);
+            }
+          }
+        );
       },
       error => {
         console.error('Lỗi khi cập nhật trạng thái:', error);
@@ -277,6 +335,44 @@ export class TableManagementComponent implements OnInit {
         }
       }
     );
+  }
+
+  openCancelModal(reservationId: number): void {
+    this.currentReservationId = reservationId;
+    this.showCancelModal = true;
+    this.cancelMessage = null;
+    console.log(reservationId);
+  }
+
+  closeCancelModal(): void {
+    this.showCancelModal = false;
+    this.cancelReason = '';
+    this.currentReservationId = undefined;
+    this.cancelMessage = null;
+  }
+
+  openAcceptModal(reservationId: number): void {
+    this.currentReservationId = reservationId;
+    this.showAcceptModal = true;
+  }
+
+  closeAcceptModal(): void {
+    this.showAcceptModal = false;
+    this.currentReservationId = undefined;
+  }
+  confirmAccept(): void {
+    if (this.currentReservationId) {
+      this.updateStatusReservationById(this.currentReservationId, 2);
+      this.closeAcceptModal();
+    }
+  }
+  confirmCancel(): void {
+    if (this.currentReservationId && this.cancelReason.trim()) {
+      this.updateStatusReservation(this.currentReservationId, this.cancelReason);
+      this.closeCancelModal();
+    } else {
+      this.errorMessage = 'Vui lòng nhập lý do hủy';
+    }
   }
 
   getReservationId(id: any) {
@@ -370,12 +466,20 @@ export class TableManagementComponent implements OnInit {
     this.ishas = false;
     this.totalCapacity = 0;
   }
-
+  validMessage: string = '';
   openConfirmSaveModal() {
-    const confirmModal = document.getElementById('confirmSaveModal');
-    if (confirmModal) {
-      confirmModal.classList.add('show');
-      confirmModal.style.display = 'block';
+    if (this.ishas === true) {
+      const confirmModal = document.getElementById('confirmSaveModal');
+      if (confirmModal) {
+        confirmModal.classList.add('show');
+        confirmModal.style.display = 'block';
+      }
+    } else {
+      this.validMessage = 'Chưa xếp đủ bàn cho số lượng khách';
+      setTimeout(() => {
+        this.validMessage = '';
+      }, 3000);
+
     }
   }
 
@@ -444,85 +548,80 @@ export class TableManagementComponent implements OnInit {
       }
     );
   }
-  isModalVisible: boolean = false;
-  onConfirmCallback: () => void = () => { };
-  modalMessage:any;
-  checkAndConfirmReservation(
-    id: number,
-    status: number,
-    orderId: number | null,
-    reserTime: string,
-    tableOfReservation: any,
-    index: number
-  ): void {
+  checkAndConfirmReservation(id: number, status: number, orderId: number | null, reserTime: string, tableOfReservation: any, index: number): void {
+    this.guestInfo = this.dataReservationAccept[index];
     const now = new Date();
     const reservationTime = new Date(reserTime);
     const timeDifference = reservationTime.getTime() - now.getTime();
     const timeDifferenceInHours = timeDifference / (1000 * 60 * 60);
-
-    if (timeDifferenceInHours > 1) {
-      this.onConfirmCallback = () => {
-        this.updateReservationById(id, status, orderId, reserTime, tableOfReservation, index);
-      };
-      this.modalMessage = `Thời gian còn lại: ${Math.floor(timeDifferenceInHours)} giờ và ${Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60))} phút.`;
-      this.openModal();
-    } else {
+    this.onConfirmCallback = () => {
       this.updateReservationById(id, status, orderId, reserTime, tableOfReservation, index);
+    };
+    if (timeDifferenceInHours > 0) {
+      this.modalMessage = `Còn ${Math.floor(timeDifferenceInHours)} giờ ${Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60))} phút mới đến giờ nhận bàn.`;
     }
+    this.openModal();
   }
-
-
   openModal(): void {
     this.isModalVisible = true;
   }
-
   closeModal(): void {
     this.isModalVisible = false;
   }
-
   confirmReservation(): void {
     this.onConfirmCallback(); // Execute the stored callback
-    this.closeModal();
+    if (this.messageerrorTable) {
+      this.closeModal();
+    }
   }
-
   cancelReservation(): void {
     this.closeModal();
   }
-
+  messageerrorTable: string = '';
   updateReservationById(id: number, status: number, orderId: number | null, reserTime: string, tableOfReservation: any, index: number): void {
-
     if (tableOfReservation && tableOfReservation.length > 0) {
-      for (let i = 0; i < tableOfReservation.length; i++) {
-        const table = tableOfReservation[i];
+      const statusChecks: Observable<Tables>[] = tableOfReservation.map((table: { tableId: any; }) => {
         const tableId = table.tableId;
-
-        // Gọi hàm checkTableStatus với tableId
-        this.checkTableStatus(tableId);
-
-        // Kiểm tra nếu this.status khác 0 thì dừng vòng lặp
-        if (this.status !== 0) {
-          console.log("Stopping the loop as status is not 0.");
-          break; // Dừng vòng lặp
+        return this.checkTableStatus(tableId);
+      });
+      forkJoin(statusChecks).subscribe((results: Tables[]) => {
+        const tablesInUse: string[] = [];
+        for (let i = 0; i < results.length; i++) {
+          const result = results[i];
+          if (result.status !== 0) {
+            console.log("Stopping the loop as status is not 0.");
+            tablesInUse.push(result.lable);
+          }
         }
-      }
+        if (tablesInUse.length > 0) {
+          this.messageerrorTable = `Không thể nhận bàn vì ${tablesInUse.join(', ')} đang sử dụng.`;
+          setTimeout(() => {
+            this.messageerrorTable = '';
+          }, 3000);
+          return;
+        }
+        this.performReservationUpdate(id, status, orderId, reserTime, index);
+      }, error => {
+        console.error('Lỗi khi kiểm tra trạng thái bàn:', error);
+      });
     } else {
       console.log("No tables to check.");
+      return;
     }
 
+  }
+  performReservationUpdate(id: number, status: number, orderId: number | null, reserTime: string, index: number): void {
     const date: string = reserTime.split('T')[0];
     if (this.status === 0 && date === this.dateString) {
       this.reservationService.updateStatusReservation(id, status).pipe(
         switchMap(response => {
-          // Update table status
           return this.reservationService.updateStatusTable(id, 1);
         }),
         switchMap(response => {
-          // If orderId is provided, update the order status
           if (orderId !== null) {
             const status = { status: 3 };
             return this.tableService.updateOrderStatus(orderId, status).pipe(
               switchMap(response => {
-                // Create table order if orderId is provided
                 const tableIds = this.findTableIdsByReservationId(id);
                 const request = {
                   orderId: orderId,
@@ -532,7 +631,6 @@ export class TableManagementComponent implements OnInit {
               })
             );
           }
-          // If no orderId, just return an observable of null
           return of(null);
         })
       ).subscribe(
@@ -549,18 +647,16 @@ export class TableManagementComponent implements OnInit {
           } else {
             console.error('Thông tin lỗi:', error.message);
           }
-          // Cập nhật thông báo lỗi cụ thể với chỉ số
           this.errorMessages[index] = 'Lỗi cập nhật trạng thái cho đặt chỗ ' + id + ': ' + (error.message || 'Có lỗi xảy ra');
         }
       );
     } else {
-      this.errorMessages[index] = 'Không thể nhận bàn nhận bàn cho đặt chỗ '; // Thêm thông báo lỗi cụ thể với chỉ số
+      this.errorMessages[index] = 'Không thể nhận bàn nhận bàn cho đặt chỗ ';
       setTimeout(() => {
-        this.errorMessages[index] = ''; // Xóa thông báo
+        this.errorMessages[index] = '';
       }, 3000);
     }
   }
-
 
   updateErrorMessage(index: number, message: string) {
     this.errorMessages[index] = message;
@@ -575,12 +671,24 @@ export class TableManagementComponent implements OnInit {
   }
 
   updateStatusReservationById(id: number, status: number): void {
-    this.reservationService.updateStatusReservation(id, status).pipe(
-      switchMap(response => {
-        return this.reservationService.updateStatusTable(id, 1);
-      })
-    ).subscribe(
+    this.reservationService.updateStatusReservation(id, status).subscribe(
       response => {
+        const body={
+          reservationId:id,
+          acceptBy: this.accountId
+        }
+        console.log(body);
+
+        this.reservationService.updateAcceptBy(body).subscribe(
+          response => {
+          },
+          error => {
+            console.error('Lỗi khi cập nhật trạng thái:', error);
+            if (error.error && error.error.errors) {
+              console.error('Lỗi xác thực:', error.error.errors);
+            }
+          }
+        );
         this.getTableData();
         this.getReservation();
         this.getReservationData();
@@ -607,8 +715,6 @@ export class TableManagementComponent implements OnInit {
 
   getReservationList(): void {
     const status = this.selectedIndex > 0 ? this.selectedIndex : undefined;
-    console.log(status);
-
     this.reservationService.getReservationList(status).subscribe(
       response => {
         this.dataReservation = this.filterDataByStatus(response, this.selectedIndex);
@@ -620,7 +726,6 @@ export class TableManagementComponent implements OnInit {
       }
     );
   }
-
 
   filterDataByStatus(data: any[], status: number): any[] {
     if (status === undefined || status === 0) {
@@ -655,10 +760,10 @@ export class TableManagementComponent implements OnInit {
   }
   formatTables(tables: any[]): string {
     if (!tables || tables.length === 0) {
-      return 'Trống';
+      return 'Chưa xếp bàn';
     }
     const grouped = this.groupTablesByFloor(tables);
-    return grouped.map(group => `Tầng ${group.floor}, bàn ${group.tableRange}`).join('<br>');
+    return grouped.map(group => `${group.floor}, bàn ${group.tableRange}`).join('<br>');
   }
 
   getStatusLabel(status: number): { label: string, class: string } {
@@ -788,17 +893,12 @@ export class TableManagementComponent implements OnInit {
   //==================================================================================================================================
 
   status: number = 0;
-  checkTableStatus(id: number): void {
-    this.tableService.getTablesById(id).subscribe(
-      response => {
-        this.status = response.status;
-        console.log(id);
-
-
-      },
-      error => {
-
-      }
+  checkTableStatus(id: number): Observable<Tables> {
+    return this.tableService.getTablesById(id).pipe(
+      catchError(error => {
+        console.error('Lỗi khi lấy trạng thái bàn:', error);
+        return of({ tableId: id, status: -1, capacity: 0, floor: '', lable: '' });
+      })
     );
   }
 
@@ -849,8 +949,8 @@ export class TableManagementComponent implements OnInit {
 
   }
   getSelectedTableNames(): string[] {
-    if (Array.isArray(this.tableEmpty)) {
-      return this.tableEmpty
+    if (Array.isArray(this.allTable)) {
+      return this.allTable
         .filter(table => this.selectedTableIds.includes(table.tableId))
         .map(table => table.lable);
     }
