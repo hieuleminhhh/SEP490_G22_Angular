@@ -292,3 +292,26 @@ button:active {
 .modal-body strong {
   margin-right: 10px; /* Khoảng cách giữa tiêu đề và nội dung */
 }
+
+
+.no-tables-message {
+  text-align: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  font-size: 20px;
+  color: #495057;
+  border: 1px solid #ced4da;
+  margin: 20px 0;
+  font-weight: 500;
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.no-tables-message:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+  color: #343a40;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}

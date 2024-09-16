@@ -118,7 +118,6 @@ nav ul li a {
   font-size: 24px; /* Thay đổi kích thước icon ở đây */
 }
 
-
 .item-count {
   position: absolute;
   top: -10px; /* Điều chỉnh vị trí lên trên */
@@ -128,6 +127,38 @@ nav ul li a {
   padding: 2px 12px; /* Khoảng cách bên trong */
   font-size: 16px; /* Kích thước chữ */
 }
+
+/* CSS cho biểu tượng chuông với viền đen và nền trắng như trong ảnh */
+.cart-link-noti {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+}
+
+/* Hiệu ứng hover */
+.cart-link-noti:hover .cart-icon {
+  background-color: #f0f0f0; /* Khi hover, nền sẽ đổi sang màu xám nhạt */
+}
+
+/* CSS cho dấu đỏ hiển thị khi có thông báo */
+.item-count-noti {
+  position: absolute;
+  top: 15px;
+  left: 25px;
+  background-color: red;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 6px 6px;
+  border-radius: 50%; /* Tạo dấu đỏ hình tròn */
+  display: none; /* Mặc định ẩn */
+}
+
+/* Hiển thị dấu đỏ khi itemCountNoti > 0 */
+.item-count-noti.active {
+  display: inline-block;
+}
+
 .menu {
   display: flex;
   justify-content: center;

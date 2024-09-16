@@ -35,7 +35,7 @@ export class TableManagementComponent implements OnInit {
   reservationDetail: any;
   showDropdown = false;
   selectedTable: string = 'all';
-  selectedFloor = 1;
+  selectedFloor: string = '';
   selectedTableIds: number[] = [];
   dataReservation: any;
   reservationTimeSelected: string | undefined;
@@ -73,6 +73,7 @@ export class TableManagementComponent implements OnInit {
     this.searchTermSubject.pipe(debounceTime(300)).subscribe(searchTerm => {
       this.getSearchList();
     });
+
   }
 
   formatDate(date: Date): string {
@@ -109,6 +110,7 @@ export class TableManagementComponent implements OnInit {
       response => {
         // Lọc các bàn có status = 0 hoặc 1 và lưu vào originalDataTable
         this.originalDataTable = response.filter((table: { status: number; }) => table.status === 0 || table.status === 1);
+        this.selectedFloor = this.originalDataTable[0].floor;
         this.dataTable = [...this.originalDataTable]; // Gán lại cho dataTable từ originalDataTable
         this.filterTablesByFloorAndStatus(this.selectedTable);
       },
@@ -129,12 +131,12 @@ export class TableManagementComponent implements OnInit {
     }
   }
 
-  getFloors(): number[] {
-    const uniqueFloors = new Set<number>();
+  getFloors(): string[] {
+    const uniqueFloors = new Set<string>();
 
     if (Array.isArray(this.originalDataTable)) {
       this.originalDataTable.forEach(table => {
-        if (table.status !== 2 && table.floor !== null && table.floor !== undefined) {
+        if (table.floor !== null && table.floor !== undefined) { // Kiểm tra giá trị null hoặc undefined
           uniqueFloors.add(table.floor);
         }
       });
@@ -142,20 +144,16 @@ export class TableManagementComponent implements OnInit {
       console.error('originalDataTable is not an array:', this.originalDataTable);
     }
 
-    return Array.from(uniqueFloors).sort((a, b) => a - b);
+    return Array.from(uniqueFloors).sort(); // Sắp xếp chuỗi thay vì số
   }
 
-  getTableOFFloor(floor: number) {
+  getTableOFFloor(floor: string) {
     this.selectedFloor = floor;
     this.filterTablesByFloorAndStatus(this.selectedTable);
   }
-
   //=================================================================================================================================
 
-  getTableOFFloorEmpty(floor: any): void {
-    this.selectedFloor = parseInt(floor, 10);
-    this.dataTable = this.originalDataTable.filter(table => table.floor === this.selectedFloor);
-  }
+
   onClickButton(event: MouseEvent) {
     const button = event.target as HTMLButtonElement;
     button.classList.remove('button-normal');
@@ -164,7 +162,6 @@ export class TableManagementComponent implements OnInit {
   ishas: boolean = false;
   toggleTableSelection(table: any): void {
     const tableIdIndex = this.selectedTableIds.indexOf(table.tableId);
-
     if (this.guestNumber < table.capacity) {
       if (tableIdIndex === -1) {
         if (this.selectedTableIds.length > 0) {
@@ -181,7 +178,9 @@ export class TableManagementComponent implements OnInit {
       }
     } else {
       if (tableIdIndex === -1) {
+        console.log('181');
         const potentialTotalCapacity = this.totalCapacity + table.capacity;
+        console.log(potentialTotalCapacity);
         if (potentialTotalCapacity >= this.guestNumber) {
           if (this.guestNumber > this.totalCapacity) {
             this.selectedTableIds.push(table.tableId);
@@ -193,6 +192,7 @@ export class TableManagementComponent implements OnInit {
           this.totalCapacity += table.capacity;
         }
       } else {
+        console.log('194');
         this.selectedTableIds.splice(tableIdIndex, 1);
         this.totalCapacity -= table.capacity;
         this.ishas = false;
@@ -307,14 +307,17 @@ export class TableManagementComponent implements OnInit {
 
 
   openPopup(reserId: number, time: any) {
+
+    console.log(time);
+    this.reservationTimeSelected = time;
     const modal = document.getElementById('updateTimeModal');
     if (modal) {
       modal.classList.add('show');
       modal.style.display = 'block';
     }
-    this.getTableDataEmpty(time);
     this.selectedTable = 'all';
-    this.selectedFloor = 1;
+    this.selectedFloor = this.dataTable[0].floor;
+    this.getTableOFFloorEmpty(this.selectedFloor, time);
     this.reserId = reserId;
     this.reservationService.getTableReservation(this.reserId).subscribe(
       response => {
@@ -323,9 +326,6 @@ export class TableManagementComponent implements OnInit {
         } else {
           console.error('reservationTime không phải là một chuỗi:', response.reservationTime);
         }
-        console.log(this.reservationTimeSelected);
-        console.log(response);
-
         const { currentDayReservationTables, allTables } = response;
         this.originalDataTable = allTables.map(table => {
           const reservedTables = currentDayReservationTables.filter(t => t.tableId === table.tableId);
@@ -342,8 +342,6 @@ export class TableManagementComponent implements OnInit {
         });
 
         this.dataTable = [...this.originalDataTable];
-        console.log(response);
-        console.log(this.dataTable);
         this.filterTablesByFloorAndStatus(this.selectedTable);
       },
       error => {
@@ -353,24 +351,26 @@ export class TableManagementComponent implements OnInit {
     this.reservationService.getReservation(reserId).subscribe(
       response => {
         this.guestNumber = response.data.guestNumber;
-        console.log(this.guestNumber);
-
       },
       error => {
         console.error('Error:', error);
       }
     );
+    console.log(this.selectedTableIds);
+
   }
   closePopup() {
-    // Đóng modal
     const modal = document.getElementById('updateTimeModal');
     if (modal) {
       modal.classList.remove('show');
       modal.style.display = 'none';
     }
-    this.selectedFloor = 1;
     this.selectedTable = 'all';
     this.filterTablesByFloorAndStatus(this.selectedTable);
+    this.selectedFloor = this.dataTable[0].floor;
+    this.selectedTableIds = [];
+    this.ishas = false;
+    this.totalCapacity = 0;
   }
 
   openConfirmSaveModal() {
@@ -446,7 +446,50 @@ export class TableManagementComponent implements OnInit {
       }
     );
   }
+  isModalVisible: boolean = false;
+  onConfirmCallback: () => void = () => { };
+  modalMessage:any;
+  checkAndConfirmReservation(
+    id: number,
+    status: number,
+    orderId: number | null,
+    reserTime: string,
+    tableOfReservation: any,
+    index: number
+  ): void {
+    const now = new Date();
+    const reservationTime = new Date(reserTime);
+    const timeDifference = reservationTime.getTime() - now.getTime();
+    const timeDifferenceInHours = timeDifference / (1000 * 60 * 60);
 
+    if (timeDifferenceInHours > 1) {
+      this.onConfirmCallback = () => {
+        this.updateReservationById(id, status, orderId, reserTime, tableOfReservation, index);
+      };
+      this.modalMessage = `Thời gian còn lại: ${Math.floor(timeDifferenceInHours)} giờ và ${Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60))} phút.`;
+      this.openModal();
+    } else {
+      this.updateReservationById(id, status, orderId, reserTime, tableOfReservation, index);
+    }
+  }
+
+
+  openModal(): void {
+    this.isModalVisible = true;
+  }
+
+  closeModal(): void {
+    this.isModalVisible = false;
+  }
+
+  confirmReservation(): void {
+    this.onConfirmCallback(); // Execute the stored callback
+    this.closeModal();
+  }
+
+  cancelReservation(): void {
+    this.closeModal();
+  }
 
   updateReservationById(id: number, status: number, orderId: number | null, reserTime: string, tableOfReservation: any, index: number): void {
 
@@ -794,22 +837,24 @@ export class TableManagementComponent implements OnInit {
     this.reservationService.getTable(date).subscribe(
       response => {
         this.tableEmpty = response;
-        console.log(this.tableEmpty);
+        this.tableEmpty = this.tableEmpty.filter((table: { floor: string; }) => table.floor === this.selectedFloor);
       },
       error => {
         console.error('Error:', error);
       }
     );
   }
-
+  getTableOFFloorEmpty(floor: any, time: any): void {
+    this.getTableDataEmpty(time);
+    this.selectedFloor = floor;
+  }
   getSelectedTableNames(): string[] {
-    // Kiểm tra nếu tableEmpty tồn tại và là một mảng
     if (Array.isArray(this.tableEmpty)) {
       return this.tableEmpty
         .filter(table => this.selectedTableIds.includes(table.tableId))
-        .map(table => table.lable); // Assuming 'lable' is the table name
+        .map(table => table.lable);
     }
-    return []; // Trả về mảng rỗng nếu tableEmpty không tồn tại
+    return [];
   }
 
 

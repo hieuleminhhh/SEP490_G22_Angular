@@ -10,6 +10,14 @@
 <body>
   <div class="container">
     <h1>Danh Sách Thông Báo</h1>
+
+    <div *ngIf="filteredData.length === 0" class="no-notifications">
+      <div class="icon">
+        <i class="fas fa-bell-slash"></i>
+      </div>
+      <p>Hiện tại không có thông báo nào.</p>
+    </div>
+
     <ul class="notification-list">
       <li *ngFor="let notification of filteredData" class="notification-item" (click)="viewDetails(notification)">
         <div class="notification-content">
