@@ -159,6 +159,15 @@ export class AccountService {
       responseType: 'text' as 'json'  // Explicitly expect a text response
     });
   }
+  forgotPassword(email: string): Observable<any> {
+    const url = `${this.apiUrl}/Account/ForgotPassword`;
+    const body = { email };
   
+    return this.http.post<any>(url, body, httpOptions).pipe(
+      tap(response => {
+        console.log('Forgot password request sent:', response);
+      })
+    );
+  }
   
 }

@@ -40,6 +40,8 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     private route: ActivatedRoute, private dialog: MatDialog, private discountService: DiscountService, private checkoutService: CheckoutService,
     private settingService: SettingService) { }
   @ViewChild('formModal') formModal!: ElementRef;
+  @ViewChild('checkDishModal') checkDishModal!: ElementRef;
+
   dishes: ListAllDishes[] = [];
   combo: ListAllCombo[] = [];
   addresses: Address[] = [];
@@ -114,7 +116,6 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.loadListDishes();
     this.loadListCombo();
     this.loadAddresses();
-    const today = new Date();
     this.selectedAddress = "Khách lẻ"
     this.selectCategory('Món chính');
     this.LoadActiveDiscounts();
@@ -125,6 +126,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     this.paymentMethod = '0';
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
+    const today = new Date();
     this.date = this.formatDate(today);
     this.minDate = this.formatDate(today);
     const maxDate = new Date();
@@ -283,7 +285,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     }, 2000);  // 5000 milliseconds = 5 seconds
   }
   increaseQuantity(index: number): void {
-    if (this.selectedItems[index].quantity < 100) {
+    if (this.selectedItems[index].quantity < 1000) {
       this.selectedItems[index].quantity++;
       this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
       this.validateQuantity(index);
@@ -303,15 +305,14 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     const item = this.selectedItems[index];
     
     // Determine the maximum quantity based on whether the item is a dish or a combo
-    const maxQuantity = this.getMaxQuantity(item);
     
     // Ensure the quantity is at least 1
     if (item.quantity < 1) {
       item.quantity = 1;
     } 
     // Ensure the quantity doesn't exceed the available quantity
-    else if (item.quantity > maxQuantity) {
-      item.quantity = maxQuantity;
+    else if (item.quantity > 1000) {
+      item.quantity = 1000;
     }
   
     // Update the total price after validating the quantity
@@ -979,5 +980,117 @@ export class CreateTakeAwayOrderComponent implements OnInit {
         console.error('Error:', error);
       }
     );
+  }   
+  messages: string[] = [];
+  isValid: boolean = false;
+  // Thêm thuộc tính trong component
+  checkDish(): void{
+      this.messages = [];
+    let receivingTime: string = '';
+    if (this.date && this.time) {
+      receivingTime = this.formatDateTime(this.date, this.time);
+    } else {
+      const currentTime = new Date();
+      currentTime.setHours(currentTime.getHours() + 1);
+      const year = currentTime.getFullYear();
+      const month = String(currentTime.getMonth() + 1).padStart(2, '0');
+      const day = String(currentTime.getDate()).padStart(2, '0');
+
+      const currentDate = `${year}-${month}-${day}`;
+      const currentTimeStr = currentTime.toTimeString().split(' ')[0].substring(0, 5);
+      console.log(currentDate);
+      console.log(currentTime);
+      receivingTime = this.formatDateTime(currentDate, currentTimeStr);
+    }
+
+    let deposits = 0;
+    const today = new Date();
+
+    if (this.date === this.formatDate(today)) {
+      const data = {
+        comboIds: this.selectedItems.map(item => item.comboId).filter(id => id !== undefined),
+        dishIds: this.selectedItems.map(item => item.dishId).filter(id => id !== undefined)
+      };
+      console.log(data);
+
+      this.checkoutService.getRemainingItems(data).subscribe(response => {
+        this.messages = []; // Đặt lại messages
+        for (const combo of response.combos) {
+          const itemInCart = this.selectedItems.find(item => item.comboId === combo.comboId);
+          if (itemInCart && combo.quantityRemaining < itemInCart.quantity) {
+            this.messages.push(`Không đủ số lượng món ăn: ${combo.name}. Số lượng yêu cầu: ${itemInCart.quantity}, Số lượng còn lại: ${combo.quantityRemaining}`);
+            this.isValid = true;
+          }
+        }
+        for (const dish of response.dishes) {
+          const itemInCart = this.selectedItems.find(item => item.dishId === dish.dishId);
+          if (itemInCart && dish.quantityRemaining < itemInCart.quantity) {
+            this.messages.push(`Không đủ số lượng món ăn: ${dish.name}. Số lượng yêu cầu: ${itemInCart.quantity}, Số lượng còn lại: ${dish.quantityRemaining}`);
+            this.isValid = true;
+          }
+        }
+
+        if (this.messages.length > 0) {
+          console.log("Có lỗi trong số lượng món ăn.");
+          console.log(this.messages);
+
+          return; // Dừng hàm nếu có thông báo
+        } else {
+          console.log("Tất cả món ăn đều đủ số lượng.");
+          const paymentModalButton = document.getElementById('paymentModalButton');
+                if (paymentModalButton) {
+                    paymentModalButton.click();
+                }
+        }
+        console.log(this.messages.length);
+        // Tiếp tục với phần mã xử lý đặt hàng nếu không có lỗi
+
+
+      }, error => {
+        console.error('Error during payment initiation', error);
+      });
+
+      return; // Dừng hàm ở đây nếu không muốn chạy mã phía dưới
+    } else {
+    }
+
+  }
+  showMessagesForDuration(duration: number): void {
+    setTimeout(() => {
+        this.messages = []; // Ẩn thông báo sau khoảng thời gian
+    }, duration);
+}
+  resetDatetime(): void{
+    if(this.ischecked === false){
+      const today = new Date();
+      this.date = this.formatDate(today);
+      this.updateTimes();
+    }
+  }
+  showModal(): void {
+    this.checkDishModal.nativeElement.classList.remove('show');
+    this.checkDishModal.nativeElement.style.display = 'none';
+    document.body.classList.remove('modal-open');
+    const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
+    modalBackdrop?.parentNode?.removeChild(modalBackdrop);
+  }
+  
+  closesModal(): void {
+    const modal = this.checkDishModal.nativeElement;
+    if (modal) {
+      // Hide the modal
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      
+      // Remove the backdrop if it exists
+      this.removeExistingBackdrop();
+    }
+  }
+  
+  // Utility function to remove existing backdrop
+  removeExistingBackdrop(): void {
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => document.body.removeChild(backdrop));
   }
 }
