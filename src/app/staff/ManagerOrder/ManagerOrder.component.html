@@ -328,37 +328,38 @@
                   <!-- Online guest -->
                   <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 1">
                     <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
-                      data-bs-target="#acceptOrderModal">
+                      data-bs-target="#acceptOrderModal"  *ngIf="account?.role === 'OrderStaff'">
                       Chấp nhận đơn hàng
                     </button>
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
-                      data-bs-toggle="modal">Hủy đơn</button>
+                    *ngIf="account?.role === 'OrderStaff'" data-bs-toggle="modal">Hủy đơn</button>
                   </ng-container>
                   <!-- Online staff -->
+
                   <ng-container
                     *ngIf="orderDetail?.type === 2 && (orderDetail?.status === 2 || orderDetail?.status === 6)">
                     <!-- <button type="button" class="btn btn-success me-2" data-bs-target="#paymentModalOnline"
                       data-bs-toggle="modal" *ngIf="!orderDetail?.invoiceId">Thanh toán</button> -->
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
-                      data-bs-toggle="modal">Hủy đơn</button>
+                      data-bs-toggle="modal" *ngIf="account?.role === 'OrderStaff'">Hủy đơn</button>
                   </ng-container>
 
                   <!-- Mang ve -->
                   <ng-container *ngIf="orderDetail?.type === 1 && orderDetail?.status === 2">
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
-                      data-bs-toggle="modal">Hủy đơn</button>
+                      data-bs-toggle="modal" *ngIf="account?.role === 'OrderStaff' || account?.role === 'Cashier'">Hủy đơn</button>
                   </ng-container>
 
                   <!-- Tai quan -->
                   <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && orderDetail?.deposits === 0 && orderDetail?.paymentStatus == 0 &&
                   dishesServed !== totalQuantity ">
                     <button type="button" class="btn btn-success me-2" data-bs-toggle="modal"
-                      data-bs-target="#prepaymentModalOffline">Thanh toán trước</button>
+                      data-bs-target="#prepaymentModalOffline" *ngIf="account?.role === 'Cashier'">Thanh toán trước</button>
                   </ng-container>
                   <ng-container
                     *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && dishesServed === 0 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2)">
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
-                      data-bs-toggle="modal">Hủy đơn</button>
+                      data-bs-toggle="modal" *ngIf="account?.role === 'OrderStaff' || account?.role === 'Cashier'">Hủy đơn</button>
                   </ng-container>
 
                   <ng-container *ngIf="(orderDetail?.type === 4 || orderDetail?.type === 3) && orderDetail?.status === 3 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2) &&
@@ -366,7 +367,7 @@
                     <!-- &&
           dishesServed === totalQuantity -->
                     <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
-                      data-bs-target="#paymentModalOffline">Hoàn thành</button>
+                      data-bs-target="#paymentModalOffline"  *ngIf="account?.role === 'Cashier'">Hoàn thành</button>
                   </ng-container>
                 </div>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>

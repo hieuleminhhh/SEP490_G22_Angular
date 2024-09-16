@@ -69,7 +69,7 @@ export class LoginComponent implements OnInit {
         window.location.href = '/managerdish';
         break;
       case 'OrderStaff':
-        window.location.href = '/listTable';
+        window.location.href = '/managerorder';
         break;
       case 'Ship':
         window.location.href ='/shipping';
