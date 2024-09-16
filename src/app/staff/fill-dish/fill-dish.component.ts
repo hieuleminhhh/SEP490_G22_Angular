@@ -7,13 +7,14 @@ import { switchMap } from 'rxjs';
 import { HeaderOrderStaffComponent } from "../ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 import { DateFormatPipe } from '../../common/material/dateFormat/dateFormat.component';
 import { AccountService } from '../../../service/account.service';
+import { SidebarOrderComponent } from "../SidebarOrder/SidebarOrder.component";
 
 @Component({
   selector: 'app-fill-dish',
   standalone: true,
   templateUrl: './fill-dish.component.html',
   styleUrls: ['./fill-dish.component.css'],
-  imports: [CommonModule, FormsModule, CurrencyFormatPipe, HeaderOrderStaffComponent, DateFormatPipe]
+  imports: [CommonModule, FormsModule, CurrencyFormatPipe, HeaderOrderStaffComponent, DateFormatPipe, SidebarOrderComponent]
 })
 export class FillDishComponent implements OnInit {
 

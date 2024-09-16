@@ -106,6 +106,11 @@ export class ManagerOrderComponent implements OnInit {
     this.dateTo = this.formatDate(today);
     this.dateNow = this.formatDate(today);
     this.getInfo();
+    if (this.accountId) {
+      this.getAccountDetails(this.accountId);
+    } else {
+      console.error('Account ID is not available');
+    }
   }
 
   setDefaultDates() {
