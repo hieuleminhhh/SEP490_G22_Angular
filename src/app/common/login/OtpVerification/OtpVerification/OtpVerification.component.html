@@ -1,20 +1,25 @@
 <!-- otp-verification.component.html -->
-<div class="otp-verification">
-  <h2>OTP Verification</h2>
-  <form (ngSubmit)="onSubmit()">
-    <label for="otp">Enter OTP:</label>
-    <input 
-      type="text" 
-      id="otp" 
-      [(ngModel)]="userOtp" 
-      name="otp" 
-      required 
-      placeholder="Enter the OTP sent to your email"
-    />
-    <button type="submit">Verify OTP</button>
-  </form>
+<div class="container mt-5">
+  <div class="card p-4 shadow">
+    <h2 class="text-center mb-4">OTP Verification</h2>
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="otp">Mời bạn nhập mã xác thực:</label>
+        <input 
+          type="text" 
+          id="otp" 
+          [(ngModel)]="userOtp" 
+          name="otp" 
+          class="form-control" 
+          required 
+          placeholder="Nhập OTP được gửi đến email của bạn"
+        />
+      </div>
+      <button type="submit" class="btn btn-primary btn-block mt-3">Xác thực</button>
+    </form>
 
-  <p *ngIf="verificationMessage" [ngClass]="{'success': isSuccess, 'error': !isSuccess}">
-    {{ verificationMessage }}
-  </p>
+    <p *ngIf="verificationMessage" [ngClass]="{'alert alert-success': isSuccess, 'alert alert-danger': !isSuccess}" class="mt-3">
+      {{ verificationMessage }}
+    </p>
+  </div>
 </div>

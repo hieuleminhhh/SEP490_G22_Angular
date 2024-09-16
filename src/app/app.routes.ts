@@ -37,6 +37,7 @@ import { ManageTableComponent } from './manager/ManageTable/ManageTable.componen
 import { NotificationComponent } from './common/notification/notification.component';
 import { SignupComponent } from './common/signup/signup/signup.component';
 import { OtpVerificationComponent } from './common/login/OtpVerification/OtpVerification/OtpVerification.component';
+import { ForgetPasswordComponent } from './common/login/forgetPass/forgetPassword/forgetPassword.component';
 
 
 export const routes: Routes = [
@@ -77,5 +78,6 @@ export const routes: Routes = [
     {'path': 'notification', component: NotificationComponent},
     {'path': 'signup', component: SignupComponent},
     {'path': 'otp-verification', component: OtpVerificationComponent},
-
+    {'path': 'forgot-password', component: ForgetPasswordComponent},
 ];
+
