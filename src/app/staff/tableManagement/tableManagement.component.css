@@ -547,11 +547,10 @@ summary {
 
 .close {
   color: black; /* Màu chữ của nút đóng */
-  background-color: red;
   position: absolute; /* Đặt vị trí tuyệt đối */
   right: 40px; /* Khoảng cách từ phía phải */
   font-weight: bold;
-  height: 20px;
+  font-size: 28px;
 }
 .close:hover,
 .close:focus {
