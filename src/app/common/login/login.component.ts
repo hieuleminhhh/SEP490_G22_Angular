@@ -69,7 +69,7 @@ export class LoginComponent implements OnInit {
         window.location.href = '/managerdish';
         break;
       case 'OrderStaff':
-        window.location.href = '/listTable';
+        window.location.href = '/managerorder';
         break;
       case 'Ship':
         window.location.href ='/shipping';
@@ -104,5 +104,7 @@ export class LoginComponent implements OnInit {
   navigateToRegister() {
     this.router.navigate(['/signup']); 
   }
-  
+  navigateToForgotPassword(){
+    this.router.navigate(['/forgot-password']);
+  }
 }

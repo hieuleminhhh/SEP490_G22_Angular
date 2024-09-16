@@ -13,4 +13,24 @@
   .error {
     color: red;
   }
-  
+  /* Add your custom styles here */
+.otp-verification {
+  max-width: 400px;
+  margin: auto;
+}
+
+.card {
+  border-radius: 10px;
+}
+
+.form-control {
+  border-radius: 5px;
+}
+
+.btn {
+  border-radius: 5px;
+}
+
+.alert {
+  border-radius: 5px;
+}

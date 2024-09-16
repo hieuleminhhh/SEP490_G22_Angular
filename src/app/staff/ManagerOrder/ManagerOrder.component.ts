@@ -106,6 +106,11 @@ export class ManagerOrderComponent implements OnInit {
     this.dateTo = this.formatDate(today);
     this.dateNow = this.formatDate(today);
     this.getInfo();
+    if (this.accountId) {
+      this.getAccountDetails(this.accountId);
+    } else {
+      console.error('Account ID is not available');
+    }
   }
 
   setDefaultDates() {
@@ -574,33 +579,50 @@ export class ManagerOrderComponent implements OnInit {
   //   }
   // }
 
-  CancelOrderReason(orderId: number | undefined) {
+  async CancelOrderReason(orderId: number | undefined) { 
     if (orderId !== undefined) {
       const cancelationReason = this.cancelationReason;
-
+  
       if (cancelationReason) {
         const cancelationData = {
           cancelationReason: cancelationReason
         };
-
-        this.orderService.CancelOrder(orderId, cancelationData).subscribe(
-          response => {
-            this.createNotification(orderId, 2);
-            this.updateCancelResion(orderId);
-            window.location.reload();
-            console.log('Invoice status updated successfully:', response);
-          },
-          error => {
-            console.error('Error updating invoice status:', error);
-          }
-        );
+  
+        try {
+          const response = await this.orderService.CancelOrder(orderId, cancelationData).toPromise();
+          this.createNotification(orderId, 2);
+          this.updateCancelResion(orderId);
+          console.log('Invoice status updated successfully:', response);
+  
+          // Gọi sendOrderEmail để lấy địa chỉ email của khách hàng
+          const emailResponse = await this.orderService.sendOrderEmail(orderId).toPromise();
+          const customerEmail = emailResponse.email;
+  
+          // Gửi email thông báo (chạy không đồng bộ, không chờ đợi)
+          this.orderService.sendEmail(customerEmail, 'Thông báo từ Eating House', `Xin chào quý khách, rất tiếc đơn hàng của bạn đã bị hủy. Lý do: ${cancelationReason}. Cảm ơn bạn đã tin tưởng và lựa chọn Eating House!`)
+            .subscribe(
+              emailSentResponse => {
+                console.log('Email thông báo hủy đơn hàng đã được gửi thành công:', emailSentResponse);
+              },
+              emailError => {
+                console.error('Lỗi khi gửi email thông báo hủy đơn hàng:', emailError);
+              }
+            );
+  
+          // Không cần chờ gửi email, reload ngay lập tức
+          window.location.reload();
+        } catch (error) {
+          console.error('Lỗi khi xử lý hủy đơn hàng:', error);
+        }
       } else {
-        console.error('Cancelation reason is required');
+        console.error('Lý do hủy đơn hàng là bắt buộc');
       }
     } else {
-      console.error('Order ID is undefined');
+      console.error('Order ID không xác định');
     }
   }
+  
+
 
   updateCancelResion(orderId: number) {
     const request = {
@@ -824,11 +846,11 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Order ID is undefined');
     }
   }
-  acceptOrder(orderId: number | undefined): void {
+  async acceptOrder(orderId: number | undefined): Promise<void> {
     if (orderId) {
       this.loadListOrderDetails(orderId);
-
-      // Define the common data object
+  
+      // Định nghĩa common data object
       const commonData = {
         paymentAmount: 0,
         taxcode: "string",
@@ -837,54 +859,44 @@ export class ManagerOrderComponent implements OnInit {
         returnAmount: 0,
         description: "string"
       };
-
-      // Determine payment methods based on depositOrder
+  
+      // Xác định phương thức thanh toán dựa trên depositOrder
       const paymentData = {
         ...commonData,
         paymentMethods: this.depositOrder > 0 ? 1 : 2
       };
-
-      // Accept the order
-      this.orderService.AcceptOrderWaiting(orderId, paymentData).subscribe(
-        response => {
-          console.log('Order accepted successfully:', response);
-          this.createNotification(orderId, 1);
-          // Call sendOrderEmail to get the email address
-          this.orderService.sendOrderEmail(orderId).subscribe(
-            emailResponse => {
-              // Extract email address
-              const customerEmail = emailResponse.email;
-              console.log(customerEmail); // Adjust based on your response structure
-
-              // Define email content
-              const subject = 'Order Confirmation';
-              const body = 'Your order has been accepted and is being processed.';
-
-              // Send the email
-              this.orderService.sendEmail(customerEmail, subject, body).subscribe(
-                emailSentResponse => {
-                  console.log('Email sent successfully:', emailSentResponse);
-                  window.location.reload();
-                },
-                emailError => {
-                  console.error('Error sending email:', emailError);
-                  // Handle error when sending email
-                }
-              );
+  
+      try {
+        // Chấp nhận đơn hàng
+        const response = await this.orderService.AcceptOrderWaiting(orderId, paymentData).toPromise();
+        console.log('Order accepted successfully:', response);
+        this.createNotification(orderId, 1);
+  
+        // Gọi sendOrderEmail để lấy địa chỉ email của khách hàng
+        const emailResponse = await this.orderService.sendOrderEmail(orderId).toPromise();
+        const customerEmail = emailResponse.email;
+        console.log(customerEmail); // Điều chỉnh dựa trên cấu trúc phản hồi
+  
+        // Gửi email thông báo (thực hiện không đồng bộ, không chờ đợi)
+        this.orderService.sendEmail(customerEmail, 'Thông báo từ Eating House', 'Xin chào quý khách, đơn hàng của bạn đã được chấp nhận và đang trong quá trình xử lý. Cảm ơn bạn đã tin tưởng và lựa chọn Eating House!')
+          .subscribe(
+            emailSentResponse => {
+              console.log('Email sent successfully:', emailSentResponse);
             },
             emailError => {
-              console.error('Error fetching email address:', emailError);
-              // Handle error when fetching email address
+              console.error('Error sending email:', emailError);
             }
           );
-        },
-        error => {
-          console.error('Error accepting order:', error);
-          // Handle error when accepting the order
-        }
-      );
+  
+        // Không cần chờ đợi việc gửi email, reload trang ngay lập tức
+        window.location.reload();
+      } catch (error) {
+        console.error('Error accepting order:', error);
+        // Xử lý lỗi khi chấp nhận đơn hàng
+      }
     }
   }
+  
 
   createNotification(orderId: number, check: number) {
     let description;

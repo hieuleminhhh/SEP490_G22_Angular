@@ -46,10 +46,10 @@ export class ViewTableOrderComponent implements OnInit {
     this.accountId = accountIdString ? Number(accountIdString) : null;
 
     console.log('31', this.accountId);
-
+    this.getTableData();
     if (this.accountId) {
       this.getAccountDetails(this.accountId);
-      this.getTableData();
+
     } else {
       console.error('Account ID is not available');
     }
@@ -106,8 +106,6 @@ export class ViewTableOrderComponent implements OnInit {
         this.account = response;
         console.log('Account details:', this.account);
         console.log('Account role:', this.account.role);
-        this.showSidebar = this.account.role !== 'OrderStaff';
-
       },
       error => {
         console.error('Error fetching account details:', error);

@@ -68,52 +68,36 @@ export class AuthCallbackComponent implements OnInit {
   //     }
   //   });
   // }
-  private handleGoogleCallback(): void {
-    this.route.queryParams.subscribe(params => {
-      const code = params['code'];
-
-      if (code) {
-        this.accountService.googleLogin(code).subscribe(
-          token => {
-            this.accountService.getGoogleUserProfile(token).subscribe(
-              profile => {
-                const email = profile.email;
-
-                // Step 1: Send OTP to the user's email
-                this.accountService.sendOtp(email).subscribe(
-                  otpResponse => {
-                    const generatedOtp = otpResponse.otp; // Capture the OTP from the response
-                    console.log('OTP sent successfully to:', email, 'Generated OTP:', generatedOtp);
-
-                    // If OTP is undefined, bypass OTP verification and proceed
-                    if (generatedOtp === undefined) {
-                      console.warn('Generated OTP is undefined. Skipping OTP verification.');
-                      this.proceedToRegisterGoogleAccount(token, email);
-                    } else {
-                      // Step 2: Redirect to OTP verification page
-                      this.router.navigate(['/otp-verification'], {
-                        queryParams: { token, email, otp: generatedOtp }
-                      });
-                    }
-                  },
-                  otpError => {
-                    console.error('Error sending OTP', otpError);
-                  }
-                );
-              },
-              error => {
-                console.error('Error fetching user profile', error);
-              }
-            );
-          },
-          error => {
-            console.error('Error logging in', error);
-          }
-        );
-      } else {
-        console.warn('No authorization code found in URL');
+  async handleGoogleCallback(): Promise<void> {
+    const params = this.route.snapshot.queryParams; // Access query params synchronously
+    const code = params['code'];
+  
+    if (code) {
+      try {
+        const token = await this.accountService.googleLogin(code).toPromise();
+        const profile = await this.accountService.getGoogleUserProfile(token).toPromise();
+        const email = profile.email;
+  
+        // Step 1: Send OTP to the user's email
+        const otpResponse = await this.accountService.sendOtp(email).toPromise();
+        const generatedOtp = otpResponse.otp; // Capture the OTP from the response
+        console.log('OTP sent successfully to:', email, 'Generated OTP:', generatedOtp);
+  
+        // Step 2: Redirect to OTP verification page
+        if (generatedOtp === undefined) {
+          console.warn('Generated OTP is undefined. Skipping OTP verification.');
+          this.proceedToRegisterGoogleAccount(token, email);
+        } else {
+          this.router.navigate(['/otp-verification'], {
+            queryParams: { token, email, otp: generatedOtp }
+          });
+        }
+      } catch (error) {
+        console.error('Error occurred:', error);
       }
-    });
+    } else {
+      console.warn('No authorization code found in URL');
+    }
   }
   
   private proceedToRegisterGoogleAccount(token: string, email: string): void {

@@ -36,11 +36,11 @@ export class OtpVerificationComponent implements OnInit {
 
   onSubmit(): void {
     if (this.userOtp === this.generatedOtp) {
-      this.verificationMessage = 'OTP is correct.';
+      this.verificationMessage = 'Xác nhận thành công.';
       this.isSuccess = true;
       this.proceedToRegisterGoogleAccount(this.token, this.email);
     } else {
-      this.verificationMessage = 'Mã xác thực không đúng vui lòng thử lại';
+      this.verificationMessage = 'Mã xác nhận không chính xác, vui lòng thử lại !!!';
       this.isSuccess = false;
     }
   }
@@ -73,7 +73,7 @@ export class OtpVerificationComponent implements OnInit {
     // Wait for 3 seconds before redirecting
     setTimeout(() => {
       this.handleUserRole(role);
-    }, 3000); // 3000 milliseconds = 3 seconds
+    }, 1000); 
   }
 
 

@@ -1,11 +1,11 @@
 <ul class="nav flex-column">
-  <li class="nav-item mb-3">
+  <li class="nav-item mb-3" *ngIf="account?.role !== 'OrderStaff'"> <!-- Thêm điều kiện kiểm tra role -->
     <a class="nav-link d-flex align-items-center" [routerLink]="['/invoice']" routerLinkActive="active">
       <i class="fas fa-file-invoice me-2"></i> <!-- Font Awesome icon for invoice -->
       Thống kê
     </a>
   </li>
-  <li class="nav-item mb-3">
+  <li class="nav-item mb-3" >
     <a class="nav-link d-flex align-items-center" [routerLink]="['/managerorder']" routerLinkActive="active">
       <i class="fas fa-box me-2"></i> <!-- Font Awesome icon for orders -->
       Đơn hàng
@@ -22,22 +22,28 @@
     </a>
     <div class="collapse mt-2" id="orderMenu" [ngClass]="{'show': isOrderMenuActive()}">
       <ul class="nav flex-column ms-3">
-        <li class="nav-item mb-3">
+        <li class="nav-item mb-3"  *ngIf="account?.role === 'OrderStaff'">
           <a class="nav-link d-flex align-items-center" [routerLink]="['/listTable']" routerLinkActive="active">
             <i class="fas fa-utensils me-2"></i> <!-- Font Awesome icon -->
             Tại chỗ
           </a>
         </li>
-        <li class="nav-item mb-3">
+        <li class="nav-item mb-3" *ngIf="account?.role === 'OrderStaff' || account?.role === 'Cashier'">
           <a class="nav-link d-flex align-items-center" [routerLink]="['/createTakeaway']" routerLinkActive="active">
             <i class="fas fa-walking me-2"></i> <!-- Font Awesome icon -->
             Mang về
           </a>
-        </li>
-        <li class="nav-item mb-3">
+        </li>        
+        <li class="nav-item mb-3"  *ngIf="account?.role === 'OrderStaff'">
           <a class="nav-link d-flex align-items-center" [routerLink]="['/createOnline']" routerLinkActive="active">
             <i class="fas fa-globe me-2"></i> <!-- Font Awesome icon -->
             Trực tuyến
+          </a>
+        </li>
+        <li class="nav-item mb-3"  *ngIf="account?.role === 'OrderStaff'">
+          <a class="nav-link d-flex align-items-center" [routerLink]="['/fillDish']" routerLinkActive="active">
+            <i class="fas fa-utensils me-2"></i> <!-- Font Awesome icon -->
+            Lên món
           </a>
         </li>
       </ul>

@@ -578,3 +578,9 @@ input.rounded-input {
   text-align: center;
   border-radius: 5px;
 }
+.modal {
+  display: none; /* Mặc định không hiển thị */
+}
+.modal.show {
+  display: block; /* Hiển thị khi modal được kích hoạt */
+}

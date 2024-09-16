@@ -11,7 +11,7 @@
     <input type="password" [(ngModel)]="password" class="form-control" name="password" required>
     
     <button class="btn btn-lg btn-primary btn-block" type="submit">Đăng nhập</button>
-    
+
     <!-- Login with Google button with margin-top for spacing -->
     <button 
       class="btn btn-light d-flex align-items-center justify-content-center mx-auto mt-3" 
@@ -40,6 +40,16 @@
       {{ errorMessage }}
     </div>
   </form>
+
+  <div class="text-center mt-3">
+    <button 
+      class="btn btn-link" 
+      (click)="navigateToForgotPassword()" 
+      style="padding: 0; font-size: 14px;">
+      Quên mật khẩu?
+    </button>
+  </div>
+
    <!-- Registration link -->
    <div class="text-center mt-3">
     <span>Bạn chưa có tài khoản?</span>
