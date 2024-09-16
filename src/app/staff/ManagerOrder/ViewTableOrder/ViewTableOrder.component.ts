@@ -25,7 +25,7 @@ export class ViewTableOrderComponent implements OnInit {
   tables: any[] = [];
   originalDataTable: any[] = [];
   currentView: string = 'table-layout';
-  selectedFloor = 1;
+  selectedFloor: string = '';
   selectedTable: string = 'all';
   dataTable: any;
   accountId: number | null = null;
@@ -58,6 +58,7 @@ export class ViewTableOrderComponent implements OnInit {
     this.tableService.getTables().subscribe(
       response => {
         this.originalDataTable = response; // Lưu dữ liệu ban đầu
+        this.selectedFloor = this.originalDataTable[0].floor;
         this.dataTable = [...this.originalDataTable];
         this.filterTablesByFloorAndStatus(this.selectedTable);
       },
@@ -66,22 +67,26 @@ export class ViewTableOrderComponent implements OnInit {
       }
     );
   }
-  getFloors(): number[] {
-    const uniqueFloors = new Set<number>();
-    this.originalDataTable.forEach(table => {
-      uniqueFloors.add(table.floor);
-    });
-    return Array.from(uniqueFloors).sort((a, b) => a - b);
+  getFloors(): string[] {
+    const uniqueFloors = new Set<string>();
+
+    if (Array.isArray(this.originalDataTable)) {
+      this.originalDataTable.forEach(table => {
+        if (table.floor !== null && table.floor !== undefined) { // Kiểm tra giá trị null hoặc undefined
+          uniqueFloors.add(table.floor);
+        }
+      });
+    } else {
+      console.error('originalDataTable is not an array:', this.originalDataTable);
+    }
+
+    return Array.from(uniqueFloors).sort(); // Sắp xếp chuỗi thay vì số
   }
-  getTableOFFloor(floor: number) {
+  getTableOFFloor(floor: string) {
     this.selectedFloor = floor;
     this.filterTablesByFloorAndStatus(this.selectedTable);
   }
 
-  getTableOFFloorEmpty(floor: any): void {
-    this.selectedFloor = parseInt(floor, 10);
-    this.dataTable = this.originalDataTable.filter(table => table.floor === this.selectedFloor && table.status === 0);
-  }
   filterTablesByFloorAndStatus(selectedTable: string): void {
     const currentFloor = this.selectedFloor;
     if (selectedTable === 'all') {
@@ -93,8 +98,8 @@ export class ViewTableOrderComponent implements OnInit {
     }
   }
   navigateToOrder(tableId: number, status: number): void {
-    this.loadOrderIdByTable(tableId ,status);
-}
+    this.loadOrderIdByTable(tableId, status);
+  }
   getAccountDetails(accountId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
       response => {
@@ -132,7 +137,7 @@ export class ViewTableOrderComponent implements OnInit {
         // Điều hướng dựa trên orderId và status
         if (status === 0) {
           this.router.navigate(['/createOffline'], { queryParams: { tableId, orderId: this.orderId } });
-        }else if (status === 1 && this.orderId !== null) {
+        } else if (status === 1 && this.orderId !== null) {
           this.router.navigate(['/updateOffline'], { queryParams: { tableId } });
         } else if (status === 1 && this.orderId === null) {
           this.router.navigate(['/createOffline'], { queryParams: { tableId, orderId: this.orderId } });
@@ -172,5 +177,5 @@ export class ViewTableOrderComponent implements OnInit {
       console.error('No tables selected');
     }
   }
-  
+
 }
