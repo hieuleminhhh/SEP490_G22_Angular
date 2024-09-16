@@ -212,8 +212,6 @@ export class TableManagementComponent implements OnInit {
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
   }
-
-
   //================================================================================================================
   getReservationData(): void {
     const params = {
@@ -847,6 +845,8 @@ export class TableManagementComponent implements OnInit {
   getTableOFFloorEmpty(floor: any, time: any): void {
     this.getTableDataEmpty(time);
     this.selectedFloor = floor;
+    console.log(this.getSelectedTableNames());
+
   }
   getSelectedTableNames(): string[] {
     if (Array.isArray(this.tableEmpty)) {

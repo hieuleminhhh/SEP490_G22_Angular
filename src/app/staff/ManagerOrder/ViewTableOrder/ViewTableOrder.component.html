@@ -28,7 +28,7 @@
               <div class="table-layout-buttons">
                 <button *ngFor="let floor of getFloors()" (click)="getTableOFFloor(floor)"
                   [class.active]="selectedFloor === floor" class="floor-button">
-                  Tầng {{ floor }}
+                   {{ floor }}
                 </button>
               </div>
             </div>
