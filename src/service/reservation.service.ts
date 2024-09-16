@@ -104,14 +104,21 @@ export class ReservationService {
     });
     return this.http.put(url, payload, { headers });
   }
-  updatereasonCancel(reservationId: number, status: any): Observable<any> {
+  updatereasonCancel(reservationId: number, cancelData: any): Observable<any> {
     const url = `https://localhost:7188/api/Reservations/${reservationId}/reason-cancel`;
-    const payload = { status: status };
     const token = this.authService.getToken();
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    return this.http.put(url, payload, { headers });
+    return this.http.put(url, cancelData, { headers });
+  }
+  updateAcceptBy( body: any): Observable<any> {
+    const url = `https://localhost:7188/api/Reservations/UpdateReservationAcceptBy`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.put(url, body, { headers });
   }
 
   updateStatusTable(reservationId: number, status: any): Observable<any> {
@@ -167,7 +174,7 @@ export class ReservationService {
     return this.http.put(url, status, { headers });
   }
 
-  checkValidTable(reservationTime: string, number:number): Observable<any> {
+  checkValidTable(reservationTime: string, number: number): Observable<any> {
     const url = `https://localhost:7188/api/Reservations/checkAvailability?reservationTime=${reservationTime}&guestNumber=${number}`;
     const token = this.authService.getToken();
     const headers = new HttpHeaders({
