@@ -62,6 +62,7 @@ export class PaymentComponent implements OnInit {
           console.log('Order cancelled:', response);
           this.orderCancelled = true;
           this.updateCancelResion();
+          window.location.reload();
         },
         error => {
           console.error('Error during order cancellation:', error);

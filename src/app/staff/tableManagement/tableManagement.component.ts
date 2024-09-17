@@ -75,6 +75,8 @@ export class TableManagementComponent implements OnInit {
   onConfirmCallback: () => void = () => { };
   modalMessage: any;
   guestInfo: any;
+  messageerrorTable: string = '';
+  isClose:boolean=false;
 
   constructor(private tableService: TableService, private dialog: MatDialog, private reservationService: ReservationService,
     private router: Router, private accountService: AccountService) { }
@@ -341,7 +343,6 @@ export class TableManagementComponent implements OnInit {
     this.currentReservationId = reservationId;
     this.showCancelModal = true;
     this.cancelMessage = null;
-    console.log(reservationId);
   }
 
   closeCancelModal(): void {
@@ -569,15 +570,14 @@ export class TableManagementComponent implements OnInit {
     this.isModalVisible = false;
   }
   confirmReservation(): void {
-    this.onConfirmCallback(); // Execute the stored callback
-    if (this.messageerrorTable) {
+    this.onConfirmCallback();
+    if (this.isClose===true) {
       this.closeModal();
     }
   }
   cancelReservation(): void {
     this.closeModal();
   }
-  messageerrorTable: string = '';
   updateReservationById(id: number, status: number, orderId: number | null, reserTime: string, tableOfReservation: any, index: number): void {
     if (tableOfReservation && tableOfReservation.length > 0) {
       const statusChecks: Observable<Tables>[] = tableOfReservation.map((table: { tableId: any; }) => {
@@ -595,9 +595,11 @@ export class TableManagementComponent implements OnInit {
         }
         if (tablesInUse.length > 0) {
           this.messageerrorTable = `Không thể nhận bàn vì ${tablesInUse.join(', ')} đang sử dụng.`;
+          this.isClose=true;
           setTimeout(() => {
             this.messageerrorTable = '';
           }, 3000);
+          console.log(this.messageerrorTable);
           return;
         }
         this.performReservationUpdate(id, status, orderId, reserTime, index);
@@ -608,7 +610,6 @@ export class TableManagementComponent implements OnInit {
       console.log("No tables to check.");
       return;
     }
-
   }
   performReservationUpdate(id: number, status: number, orderId: number | null, reserTime: string, index: number): void {
     const date: string = reserTime.split('T')[0];
@@ -673,8 +674,8 @@ export class TableManagementComponent implements OnInit {
   updateStatusReservationById(id: number, status: number): void {
     this.reservationService.updateStatusReservation(id, status).subscribe(
       response => {
-        const body={
-          reservationId:id,
+        const body = {
+          reservationId: id,
           acceptBy: this.accountId
         }
         console.log(body);

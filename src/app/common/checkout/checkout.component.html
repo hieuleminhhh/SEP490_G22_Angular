@@ -92,7 +92,7 @@
             </div>
             <div class="form-group">
               <label for="phone">Số điện thoại<span class="required">*</span></label>
-              <input id="phone" name="guestPhone" class="form-control form-control-sm" placeholder="Điền số điện thoại"
+              <input id="phone1" name="guestPhone" class="form-control form-control-sm" placeholder="Điền số điện thoại"
                 required [(ngModel)]="guestPhone" required pattern="^0\d{9,10}$" #phone="ngModel">
               <div *ngIf="phone.invalid && (phone.dirty || phone.touched )">
                 <small class="text-danger" *ngIf="phone.errors?.['pattern']">
@@ -108,8 +108,8 @@
             <div class="form-group" *ngIf="selectedService === 'service1'">
               <label *ngIf="selectedService === 'service1'" for="address">Địa chỉ nhận hàng<span
                   class="required">*</span></label>
-              <input id="address" name="address" class="form-control form-control-sm" placeholder="Điền địa chỉ của bạn"
-                required [(ngModel)]="address" #addressField="ngModel">
+              <input id="address1" name="address" class="form-control form-control-sm"
+                placeholder="Điền địa chỉ của bạn" required [(ngModel)]="address" #addressField="ngModel">
               <div
                 *ngIf="addressField.invalid && (addressField.dirty || addressField.touched) && selectedService === 'service1'"
                 class="text-danger">
@@ -119,13 +119,23 @@
 
             <div class="form-group" *ngIf="selectedService === 'service2'">
               <label *ngIf="selectedService === 'service2'" for="address">Địa chỉ của bạn</label>
-              <input id="address" name="address" class="form-control form-control-sm" placeholder="Điền địa chỉ của bạn"
-                [(ngModel)]="address">
+              <input id="address2" name="address" class="form-control form-control-sm"
+                placeholder="Điền địa chỉ của bạn" [(ngModel)]="address">
             </div>
             <div class="form-group">
-              <label for="email">Email<span class="required"></span></label>
-              <input id="email" name="email" class="form-control form-control-sm" placeholder="Điền email của bạn"
-                [(ngModel)]="email">
+              <label for="email">Email<span class="required">*</span></label>
+              <input type="text" id="email1" name="email" class="form-control form-control-sm"
+                placeholder="Nhập email của bạn" [(ngModel)]="emailGuest" required email
+                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" #email="ngModel">
+
+              <div *ngIf="email.invalid && (email.dirty || email.touched)">
+                <small class="text-danger" *ngIf="email.errors?.['required']">
+                  Vui lòng nhập địa chỉ email!
+                </small>
+                <small class="text-danger" *ngIf="email.errors?.['pattern']">
+                  Địa chỉ email không hợp lệ!
+                </small>
+              </div>
             </div>
           </div>
           <div class="form-group">

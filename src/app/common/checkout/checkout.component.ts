@@ -32,6 +32,7 @@ export class CheckoutComponent implements OnInit {
   consigneeName: string = '';
   guestPhone: string = '';
   email: string = '';
+  emailGuest:string = '';
   address: string = '';
   note: string = '';
   people: number | undefined;
@@ -58,9 +59,6 @@ export class CheckoutComponent implements OnInit {
     maxDate.setDate(today.getDate() + 7);
     this.maxDate = this.formatDate(maxDate);
     this.generateAvailableHours();
-    console.log(today);
-    console.log(this.date);
-    console.log(this.time);
   }
 
   ngOnInit() {
@@ -69,7 +67,6 @@ export class CheckoutComponent implements OnInit {
     const accountIdString = localStorage.getItem('accountId');
     if (cartItemsString) {
       this.cartItems = JSON.parse(cartItemsString);
-      console.log(this.cartItems);
     }
     if (accountIdString) {
       this.accountId = JSON.parse(accountIdString);
@@ -288,7 +285,7 @@ export class CheckoutComponent implements OnInit {
       const request = {
         accountId: this.accountId,
         guestPhone: this.guestPhone,
-        email: this.email,
+        email: this.emailGuest,
         addressId: 0,
         guestAddress: this.address,
         consigneeName: this.consigneeName,
@@ -333,7 +330,7 @@ export class CheckoutComponent implements OnInit {
     if (this.selectedService === 'service2') {
       const request = {
         guestPhone: this.guestPhone,
-        email: '',
+        email: this.emailGuest,
         guestAddress: '',
         consigneeName: this.consigneeName,
         reservationTime: receivingTime,

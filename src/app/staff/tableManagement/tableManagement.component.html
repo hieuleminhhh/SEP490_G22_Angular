@@ -219,7 +219,7 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content" style="overflow: auto;">
             <div class="modal-header">
-              <h5 class="modal-title" id="updateTimeModalLabel">Đăng ký bàn</h5>
+              <h5 class="modal-title" id="updateTimeModalLabel" >Đăng ký bàn</h5>
               <div class="text-center text-white flex-fill" style="font-size: 18px;">
                 {{ reservationTimeSelected | date: 'dd/MM/yyyy - HH:mm' }}
               </div>
@@ -266,8 +266,8 @@
                           *ngIf="selectedTableIds.includes(table.tableId)">&#10004;</span>
                       </div>
                     </div>
-                    <div *ngIf="dataTable.length < 1" style="height: 100px;">
-                      <p>Khu vực này không có phòng/bàn trống</p>
+                    <div *ngIf="tableEmpty?.length < 1" style="height: 100px;">
+                      <p>Khu vực này không còn phòng/bàn trống</p>
                     </div>
                   </div>
                 </div>
