@@ -1042,6 +1042,10 @@ export class CreateTakeAwayOrderComponent implements OnInit {
 
       return; // Dừng hàm ở đây nếu không muốn chạy mã phía dưới
     } else {
+      const paymentModalButton = document.getElementById('paymentModalButton');
+  if (paymentModalButton) {
+    paymentModalButton.click();
+  }
     }
 
   }
