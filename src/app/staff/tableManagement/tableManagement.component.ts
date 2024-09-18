@@ -61,7 +61,7 @@ export class TableManagementComponent implements OnInit {
   dateString: string = '';
   currentReservationId: number | undefined;
   errorMessage: string = '';
-  errorMessages: { [key: number]: string } = {};
+  errorMessages: string = '';
   showDropdowns: { [key: number]: boolean } = {};
 
   allTable: any;
@@ -365,9 +365,7 @@ export class TableManagementComponent implements OnInit {
     if (this.currentReservationId) {
       const reservation = this.dataReservationPending.find((reservation: { reservationId: any }) => reservation.reservationId === this.currentReservationId);
       this.updateStatusReservationById(this.currentReservationId, 2, reservation?.reservationTime, reservation?.guestNumber);
-      if(this.message !==''){
-        this.closeAcceptModal();
-      }
+
     }
   }
   confirmCancel(): void {
@@ -574,9 +572,6 @@ export class TableManagementComponent implements OnInit {
   }
   confirmReservation(): void {
     this.onConfirmCallback();
-    if (this.isClose === true) {
-      this.closeModal();
-    }
   }
   cancelReservation(): void {
     this.closeModal();
@@ -640,30 +635,28 @@ export class TableManagementComponent implements OnInit {
       ).subscribe(
         response => {
           console.log('Phản hồi từ API:', response);
+
+          this.closeModal();
+
           this.getTableData();
           this.getReservation();
           this.getReservationData();
         },
         error => {
           console.error('Lỗi khi cập nhật trạng thái:', error);
-          if (error.error && error.error.errors) {
-            console.error('Lỗi xác thực:', error.error.errors);
-          } else {
-            console.error('Thông tin lỗi:', error.message);
-          }
-          this.errorMessages[index] = 'Lỗi cập nhật trạng thái cho đặt chỗ ' + id + ': ' + (error.message || 'Có lỗi xảy ra');
         }
       );
     } else {
-      this.errorMessages[index] = 'Không thể nhận bàn nhận bàn cho đặt chỗ ';
+      this.errorMessages = 'Không thể nhận bàn nhận bàn vì chưa đến ngày nhận bàn ';
+      this.isClose = true;
       setTimeout(() => {
-        this.errorMessages[index] = '';
+        this.errorMessages = '';
       }, 3000);
     }
   }
 
   updateErrorMessage(index: number, message: string) {
-    this.errorMessages[index] = message;
+    this.errorMessages = message;
   }
 
   findTableIdsByReservationId(reservationId: number): number[] {
@@ -709,12 +702,14 @@ export class TableManagementComponent implements OnInit {
               }
             }
           );
+          this.closeAcceptModal();
         } else {
           this.message = response.message;
           setTimeout(() => {
             this.message = '';
           }, 3000);
         }
+        console.log(this.message);
       },
       error: error => {
         console.error('An error occurred:', error.error.message);
