@@ -294,8 +294,7 @@
                   <ng-container *ngFor="let list of dishes">
                     <div class="col-lg-4 col-md-6 mb-4" *ngFor="let dish of list.items">
                       <div class="card h-100 shadow-sm dish-card"
-                        [ngClass]="{'out-of-stock': dish.quantityDish === 0 || dish.quantityDish === null}"
-                        (click)="dish.quantityDish > 0 ? addItem(dish) : null">
+                        (click)="addItem(dish)">
                         <div class="image-container">
                           <img class="card-img-top" [src]="dish.imageUrl" alt="Dish image">
                         </div>
@@ -316,8 +315,7 @@
                           <div class="remaining-quantity mt-3">
                             <span *ngIf="dish.quantityDish > 0" class="text-muted">Còn lại: {{ dish.quantityDish }}
                               món</span>
-                            <span *ngIf="dish.quantityDish === 0 || dish.quantityDish === null" class="text-danger">Hết
-                              hàng</span>
+                           
                           </div>
                         </div>
                       </div>
@@ -333,7 +331,6 @@
                     <div class="col-lg-4 col-md-6 mb-4" *ngFor="let cb of list.items">
                       <!-- Conditionally add 'out-of-stock' class based on quantityCombo -->
                       <div class="card h-100"
-                        [ngClass]="{'out-of-stock': cb.quantityCombo === 0 || cb.quantityCombo === null}"
                         (click)="addItem(cb)">
                         <div class="image-container">
                           <img class="card-img-top" [src]="cb.imageUrl" alt="Combo image">
@@ -347,8 +344,7 @@
                           <div class="remaining-quantity mt-3">
                             <span *ngIf="cb.quantityCombo > 0" class="text-muted">Còn lại: {{ cb.quantityCombo }}
                               món</span>
-                            <span *ngIf="cb.quantityCombo === 0 || cb.quantityCombo === null" class="text-danger">Hết
-                              hàng</span>
+                           
                           </div>
                         </div>
                       </div>

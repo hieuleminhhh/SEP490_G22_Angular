@@ -565,22 +565,3 @@ input.rounded-input {
   position: relative;
 }
 
-.out-of-stock .image-container::after {
-  content: "Hết hàng";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(255, 0, 0, 0.7);
-  color: white;
-  padding: 10px;
-  font-size: 18px;
-  text-align: center;
-  border-radius: 5px;
-}
-.modal {
-  display: none; /* Mặc định không hiển thị */
-}
-.modal.show {
-  display: block; /* Hiển thị khi modal được kích hoạt */
-}
