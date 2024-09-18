@@ -60,8 +60,8 @@
                       <td>
                         <ul>
                           <li *ngFor="let dish of combo.dishes">
-                            {{ dish.itemName }}
-                          </li>
+                            {{ dish.itemName }} x {{ dish.quantityDish}} Món
+                          </li>                         
                         </ul>
                       </td>
                       <td>
@@ -138,15 +138,55 @@
               <img [src]="imageUrl" alt="Hình ảnh đã chọn" class="img-fluid" style="max-width: 100px; height: auto;">
             </div>
             <div *ngIf="addErrors.imageError" class="alert alert-danger">{{ addErrors.imageError }}</div>
-
           </div>
+
           <div class="mb-3">
             <label class="form-label">Món ăn</label>
-            <select #dishesSelect class="form-select" multiple [(ngModel)]="selectedDishes" name="selectedDishes">
-              <option *ngFor="let dish of allDishes" [value]="dish.dishId">{{ dish.itemName }}</option>              
+            <input 
+              type="text" 
+              class="form-control" 
+              id="searchDish" 
+              placeholder="Tìm món ăn" 
+              [(ngModel)]="searchText" 
+              (ngModelChange)="filterDishes()"  
+              name="searchText"
+            />
+          
+            <select 
+              #dishesSelect 
+              class="form-select" 
+              multiple 
+              [(ngModel)]="selectedDishes" 
+              name="selectedDishes"
+            >
+              <option 
+                *ngFor="let dish of filteredDishes" 
+                [ngValue]="{dishId: dish.dishId, quantityDish: 1}"
+              >
+                {{ dish.itemName }}
+              </option>
             </select>
-            <div *ngIf="addErrors.dishError" class="alert alert-danger">{{ addErrors.dishError }}</div>
+          
+            <div *ngIf="addErrors.dishError" class="alert alert-danger">
+              {{ addErrors.dishError }}
+            </div>
           </div>
+          
+          <!-- Section for entering quantities for selected dishes -->
+          <div *ngIf="selectedDishes.length > 0">
+            <h5>Nhập số lượng</h5>
+            <div *ngFor="let selectedDish of selectedDishes; let i = index">
+              <label>{{ getDishName(selectedDish.dishId) }}</label>
+              <input 
+                type="number" 
+                [(ngModel)]="selectedDishes[i].quantityDish" 
+                [name]="'quantityDish' + i" 
+                min="1"
+              />
+            </div>
+          </div>
+          
+          
           <div class="mb-3">
             <label for="isActive" class="form-label">Hoạt động</label>
             <input type="checkbox" id="isActive" [(ngModel)]="addNew.isActive" name="isActive">
@@ -195,12 +235,36 @@
             <img *ngIf="updatedCombo.imageUrl" [src]="updatedCombo.imageUrl"  class="img-thumbnail small-img-thumbnail" alt="Ảnh">
             </div>
             <div class="mb-3">
-              <label class="form-label">Tên món ăn</label>
-              <select #dishesSelect class="form-select" multiple [(ngModel)]="selectedDishes" name="selectedDishes">
-                  <option *ngFor="let dish of allDishes" [ngValue]="dish.dishId">{{ dish.itemName }}</option>
+              <label class="form-label">Món ăn</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="searchDish" 
+                placeholder="Tìm món ăn" 
+                [(ngModel)]="searchText" 
+                (ngModelChange)="filterDishes()"  
+                name="searchText"
+              />
+            
+              <select 
+                #dishesSelect 
+                class="form-select" 
+                multiple 
+                [(ngModel)]="selectedDishes" 
+                name="selectedDishes"
+              >
+                <option 
+                  *ngFor="let dish of filteredDishes" 
+                  [ngValue]="{dishId: dish.dishId, quantityDish: 1}"
+                >
+                  {{ dish.itemName }}
+                </option>
               </select>
-              <div *ngIf="updateErrors.dishError" class="alert alert-danger">{{ updateErrors.dishError }}</div>
-          </div>          
+            
+              <div *ngIf="addErrors.dishError" class="alert alert-danger">
+                {{ addErrors.dishError }}
+              </div>
+            </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -211,7 +275,7 @@
     </div>
   </div>
   
-  <!-- Setting Combo Modal -->
+ <!-- Setting Combo Modal -->
 <div class="modal fade" #settingComboModal id="settingComboModal" tabindex="-1" aria-labelledby="settingComboModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -219,7 +283,7 @@
         <h5 class="modal-title" id="settingComboModalLabel">Cấu hình combo</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body modal-body-scroll">
         <div class="mb-3">
           <!-- Input for Quantity -->
           <label for="selectQuantity" class="form-label">Nhập số lượng:</label>
@@ -242,7 +306,6 @@
         </div>
         
         <form #comboForm="ngForm">
-
           <div class="form-check">
             <!-- Select All Checkbox -->
             <input class="form-check-input" type="checkbox" id="selectAllCombos" (change)="selectAll($event)">
@@ -279,7 +342,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-        <button type="button" class="btn btn-primary"  (click)="updateSelectedCombos()">Cập nhật</button>
+        <button type="button" class="btn btn-primary" (click)="updateSelectedCombos()">Cập nhật</button>
       </div>
     </div>
   </div>

@@ -47,13 +47,13 @@ export class ManagerComboService {
     return this.http.get<Dish[]>(url, this.getHttpOptions());
   }
 
-  getComboById(comboId: number): Observable<UpdateCombo> {
+  getComboById(comboId: number): Observable<any> {
     const url = `${this.apiUrl}/Combo/GetComboById/${comboId}`;
-    return this.http.get<UpdateCombo>(url, this.getHttpOptions());
+    return this.http.get<any>(url, this.getHttpOptions());
   }
 
-  AddNewCombo(newCombo: AddNewCombo): Observable<AddNewCombo> {
-    return this.http.post<AddNewCombo>(`${this.apiUrl}/Combo/CreateComboWithDishes`, newCombo, this.getHttpOptions())
+  AddNewCombo(newCombo: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/Combo/CreateComboWithDishes`, newCombo, this.getHttpOptions())
       .pipe(
         catchError((error: any) => {
           console.error('An error occurred:', error);
@@ -62,9 +62,9 @@ export class ManagerComboService {
       );
   }
 
-  UpdateCombo(upDateCombo: UpdateCombo): Observable<UpdateCombo> {
+  UpdateCombo(upDateCombo: any): Observable<any> {
     const url = `${this.apiUrl}/Combo/UpdateComboWithDishes/${upDateCombo.comboId}`;
-    return this.http.put<UpdateCombo>(url, upDateCombo, this.getHttpOptions());
+    return this.http.put<any>(url, upDateCombo, this.getHttpOptions());
   }
 
   UploadImage(image: File): Observable<{ imageUrl: string }> {

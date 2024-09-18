@@ -1,0 +1,18 @@
+
+<div class="container">
+  <h2 class="text-center">Xác minh OTP</h2>
+
+  <form (ngSubmit)="verifyOtp()">
+    <div class="form-group">
+      <label for="otp">Nhập mã OTP:</label>
+      <input type="text" id="otp" [(ngModel)]="otpNhap" name="otp" class="form-control" required />
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+    <button type="submit" class="btn btn-primary btn-block">Xác minh</button>
+  </form>
+</div>

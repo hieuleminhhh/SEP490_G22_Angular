@@ -228,15 +228,14 @@
 </div>
 
 <!-- Setting Dish Modal -->
-<div class="modal fade" #settingDishModal id="settingDishModal" tabindex="-1" aria-labelledby="settingDishModalLabel"
-  aria-hidden="true">
+<div class="modal fade" #settingDishModal id="settingDishModal" tabindex="-1" aria-labelledby="settingDishModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="settingDishModalLabel">Cấu hình món ăn</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body modal-body-scroll">
         <div class="mb-3">
           <!-- Input for Quantity -->
           <label for="selectQuantity" class="form-label">Nhập số lượng:</label>
@@ -247,16 +246,12 @@
           </button>
         </div>
 
-
         <form #dishForm="ngForm">
-
-
           <div class="form-check">
             <!-- Select All Checkbox -->
             <input class="form-check-input" type="checkbox" id="selectAllDishes" (change)="selectAll($event)">
             <label class="form-check-label" for="selectAllDishes">Chọn tất cả</label>
           </div>
-
 
           <div class="table-responsive">
             <table class="table table-bordered">
@@ -282,7 +277,6 @@
                   </tr>
                 </ng-container>
               </tbody>
-
             </table>
           </div>
         </form>
@@ -294,6 +288,7 @@
     </div>
   </div>
 </div>
+
 
 <!-- Confirm Delete Modal -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
