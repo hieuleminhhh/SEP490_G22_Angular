@@ -542,6 +542,12 @@ confirmDelete(): void {
   if (this.dishIdToDelete !== null) {
     this.deleteDish(this.dishIdToDelete);
     this.successMessage = 'Xóa món ăn thành công';
+
+    // Clear the success message after 2 seconds
+    setTimeout(() => {
+      this.successMessage = '';
+    }, 2000);
   }
 }
+
 }

@@ -40,13 +40,19 @@
             Trực tuyến
           </a>
         </li>
-        <li class="nav-item mb-3"  *ngIf="account?.role === 'OrderStaff'">
-          <a class="nav-link d-flex align-items-center" [routerLink]="['/fillDish']" routerLinkActive="active">
-            <i class="fas fa-utensils me-2"></i> <!-- Font Awesome icon -->
-            Lên món
-          </a>
-        </li>
+       
       </ul>
     </div>
+    <li class="nav-item mb-3"  *ngIf="account?.role === 'OrderStaff'">
+      <a class="nav-link d-flex align-items-center" [routerLink]="['/fillDish']" routerLinkActive="active">
+        <i class="fas fa-box me-2"></i> <!-- Font Awesome icon for orders -->
+        Lên món
+      </a>
   </li>
+  <li class="nav-item mb-3"  *ngIf="account?.role === 'Cashier'">
+    <a class="nav-link d-flex align-items-center" [routerLink]="['/tableManagement']" routerLinkActive="active">
+      <i class="fas fa-box me-2"></i> <!-- Font Awesome icon for orders -->
+      Đặt bàn
+    </a>
+</li>
 </ul>

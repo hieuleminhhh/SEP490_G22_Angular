@@ -253,32 +253,22 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
   
     if (index !== -1) {
-      // If the item already exists, check if we can still increase its quantity
-      if (this.selectedItems[index].quantity < availableQuantity) {
-        // Increase its quantity and update the total price if the quantity is less than available stock
-        this.selectedItems[index].quantity++;
-        this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
-      } else {
-        // Show a message if the quantity exceeds the available stock
-        this.errorMessage = 'Không thể thêm món này nữa, số lượng đã đạt giới hạn.';
-        this.clearErrorMessageAfterTimeout();
-      }
+      // If the item already exists, simply increase its quantity and update the total price
+      this.selectedItems[index].quantity++;
+      this.selectedItems[index].totalPrice = this.selectedItems[index].quantity * this.selectedItems[index].unitPrice;
     } else {
       // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
       const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
   
-      // Only add if there is at least 1 item available in stock
-      if (availableQuantity > 0) {
-        this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
-      } else {
-        this.errorMessage = 'Món này đã hết hàng.';
-        this.clearErrorMessageAfterTimeout();
-      }
+      // Directly add the item without checking for availableQuantity
+      this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
     }
   
     // Recalculate totalAmount and totalAmountAfterDiscount after adding the item
     this.calculateAndSetTotalAmount();
   }
+  
+  
   clearErrorMessageAfterTimeout() {
     setTimeout(() => {
       this.errorMessage = '';  // Clear the message after 5 seconds
@@ -1052,6 +1042,10 @@ export class CreateTakeAwayOrderComponent implements OnInit {
 
       return; // Dừng hàm ở đây nếu không muốn chạy mã phía dưới
     } else {
+      const paymentModalButton = document.getElementById('paymentModalButton');
+  if (paymentModalButton) {
+    paymentModalButton.click();
+  }
     }
 
   }
