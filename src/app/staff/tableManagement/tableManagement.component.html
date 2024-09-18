@@ -79,17 +79,40 @@
               <hr>{{ table.status === 0 ? 'Bàn trống' : 'Đang sử dụng' }}
               <span class="icon-sl"><i class="fas fa-chair"></i>{{ table.capacity }}</span>
               <span class="icon-table" *ngIf="table.status === 1">&#10004;</span>
+              <span class="calendar-icon" *ngIf="table.tableReservations.length >0"
+                (click)="openModalSchedule(table.tableReservations)">
+                <i class="fas fa-calendar-alt"></i></span>
             </div>
           </div>
         </div>
       </div>
     </section>
+    <div class="reservation-modal-detail" *ngIf="isModalVisible">
+      <div class="modal-content-detail">
+        <span class="close-detail" (click)="closeModal()">&times;</span>
+        <h2>Thông tin đặt bàn</h2><br>
+        <div *ngIf="selectedReservations.length > 0; else noReservations">
+          <ul class="reservation-list">
+            <li *ngFor="let reservation of selectedReservations" class="reservation-item">
+              <p><strong>Khách hàng:</strong> {{ reservation?.consigneeName }}</p>
+              <p><strong>Thời gian nhận bàn:</strong> {{ reservation?.reservationTime | date:'dd/MM/yyyy - HH:mm' }}</p>
+              <p><strong>Số lượng khách:</strong> {{ reservation?.guestNumber }}</p>
+              <hr />
+            </li>
+          </ul>
+        </div>
+        <ng-template #noReservations>
+          <p>No reservations found.</p>
+        </ng-template>
+      </div>
+    </div>
 
     <section *ngIf="currentView === 'booking-schedule'">
       <div class="container">
         <div class="card">
           <div class="reservation-grid">
-            <div class="reservation" *ngFor="let reservation of dataReservationAccept; let i = index">
+            <div class="reservation" *ngFor="let reservation of dataReservationAccept; let i = index"
+              [ngClass]="getReservationClass(reservation.reservationTime)">
               <div class="row">
                 <div class="cell">
                   <span class="data">{{reservation.consigneeName}} - {{reservation.guestPhone}}</span>
@@ -151,10 +174,14 @@
                     <button class="icon" (click)="toggleDropdown(i)">...</button>
                     <div class="dropdown-content" [class.show]="reservation.isDropdownOpen">
                       <a *ngIf="reservation.tableOfReservation.length===0"
-                        (click)="openPopup(reservation.reservationId,reservation.reservationTime )">Xếp bàn</a>
-                      <a *ngIf="reservation.tableOfReservation.length>0"
-                        (click)="deleteTable(reservation.reservationId, reservation.tableOfReservation)">Thay đổi
+                        (click)="openPopup(reservation.reservationId,reservation.reservationTime,reservation.tableOfReservation )">Xếp
                         bàn</a>
+                      <a *ngIf="reservation.tableOfReservation.length>0"
+                        (click)="openPopup(reservation.reservationId,reservation.reservationTime,reservation.tableOfReservation)">Thay
+                        đổi
+                        bàn</a>
+                      <a *ngIf="reservation.tableOfReservation.length>0"
+                        (click)="getReservationById(reservation.reservationId)">Chi tiết</a>
                       <a (click)="openCancelModal(reservation.reservationId)">Hủy đặt bàn</a>
                     </div>
                   </div>
@@ -207,8 +234,8 @@
           {{ messageerrorTable }}
         </div>
         <div *ngIf="errorMessages" class="alert alert-danger" style="max-width: 500px;">
-                  {{ errorMessages }}
-                </div>
+          {{ errorMessages }}
+        </div>
         <div class="reservation-modal-footer">
           <button (click)="confirmReservation()">Xác nhận</button>
           <button (click)="cancelReservation()">Hủy</button>
@@ -220,7 +247,7 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content" style="overflow: auto;">
             <div class="modal-header">
-              <h5 class="modal-title" id="updateTimeModalLabel" >Đăng ký bàn</h5>
+              <h5 class="modal-title" id="updateTimeModalLabel">Đăng ký bàn</h5>
               <div class="text-center text-white flex-fill" style="font-size: 18px;">
                 {{ reservationTimeSelected | date: 'dd/MM/yyyy - HH:mm' }}
               </div>
@@ -230,23 +257,32 @@
             <div class="modal-body">
               <div class="row">
                 <div class="table-status-container">
-                  <p>Xếp bàn cho {{guestNumber}} người:
-                    <span *ngIf="getSelectedTableNames().length > 0">
-                      Đã chọn: {{ getSelectedTableNames().join(', ') }}
+                  <div>Xếp bàn cho {{guestNumber}} người:</div>
+
+                  <div class="selected-tables-container" *ngIf="getSelectedTableNames().length > 0">
+                    <span>Đã chọn:</span>
+                    <span *ngFor="let table of getSelectedTableNames(); let i = index" class="table-label">
+                      {{ table }}
+                      <span (click)="removeTable(i)" class="remove-button">&times;</span>
                     </span>
-                    <span *ngIf="getSelectedTableNames().length === 0">
-                      Chưa chọn phòng/bàn
-                    </span>
-                  </p>
+                  </div>
+
+                  <span *ngIf="getSelectedTableNames().length === 0">
+                    Chưa chọn phòng/bàn
+                  </span>
+
                   <div class="checkbox-container">
-                    <label *ngIf="ishas===false">
-                      <i class="fas fa-times-circle" style="color: red;"></i> <span style="color: red;">Chưa đủ</span>
+                    <label *ngIf="ishas === false">
+                      <i class="fas fa-times-circle" style="color: red;"></i>
+                      <span style="color: red;">Chưa đủ</span>
                     </label>
-                    <label *ngIf="ishas===true">
-                      <i class="fas fa-check-circle" style="color: green;"></i> <span style="color: green;">Đã đủ</span>
+                    <label *ngIf="ishas === true">
+                      <i class="fas fa-check-circle" style="color: green;"></i>
+                      <span style="color: green;">Đã đủ</span>
                     </label>
                   </div>
                 </div>
+
                 <div class="col-md-3" style="display: flex; justify-content: center; align-items: center;">
                   <select id="floor" name="floor" [(ngModel)]="selectedFloor"
                     (change)="getTableOFFloorEmpty(selectedFloor,reservationTimeSelected)" class="floor-select">
@@ -267,7 +303,7 @@
                           *ngIf="selectedTableIds.includes(table.tableId)">&#10004;</span>
                       </div>
                     </div>
-                    <div *ngIf="tableEmpty?.length < 1" style="height: 100px;">
+                    <div *ngIf="tableEmpty.length < 1" style="height: 100px;">
                       <p>Khu vực này không còn phòng/bàn trống</p>
                     </div>
                   </div>
@@ -335,6 +371,11 @@
     <div class="reservation-accept-modal" *ngIf="showAcceptModal">
       <div class="reservation-accept-modal-content">
         <h2>Xác nhận chấp nhận đặt bàn</h2><br>
+        <div class="reservation-detail">
+          <p><strong>Khách hàng:</strong> {{ detailRes?.consigneeName }}</p>
+          <p><strong>Thời gian nhận bàn:</strong> {{ detailRes?.reservationTime | date:'dd/MM/yyyy - HH:mm' }}</p>
+          <p><strong>Số lượng khách:</strong> {{ detailRes?.guestNumber }}</p>
+        </div>
         <div *ngIf="message" class="error-message">
           {{ message }}
         </div>
@@ -378,7 +419,7 @@
                         (click)="getReservationById(reservation.reservationId)">Chi tiết</button>
                     </td>
                     <td><button type="button" class="btn btn-primary btn-sm" style="background-color: green;"
-                        (click)="openAcceptModal(reservation.reservationId)">Nhận đơn</button></td>
+                        (click)="openAcceptModal(reservation)">Nhận đơn</button></td>
                     <td>
                       <button type="button" class="btn btn-primary btn-sm" style="background-color: red;"
                         (click)="openCancelModal(reservation.reservationId)">Hủy đơn</button>
@@ -426,11 +467,9 @@
             </div>
           </details>
           <details>
-            <summary>Bàn và khu vực</summary>
+            <summary>Phòng/Bàn và khu vực</summary>
             <div class="row" *ngIf="reservationDetail?.data.tableOfReservation.length > 0">
-              <p>Khu vực<span>: {{ reservationDetail?.data.tableOfReservation[0]?.floor }}</span></p>
-              <p>Bàn<span>:{{ reservationDetail?.data.tableOfReservation[0]?.tableId }}</span></p>
-              <p>Loại bàn<span>:{{ reservationDetail?.data.tableOfReservation[0]?.capacity }} người</span></p>
+              <div [innerHTML]="formatTables(reservationDetail?.data.tableOfReservation)"></div>
             </div>
           </details>
           <details>

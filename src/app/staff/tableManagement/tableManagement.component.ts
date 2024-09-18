@@ -33,7 +33,7 @@ export class TableManagementComponent implements OnInit {
   dataReservationAccept: any;
   dataReservationToday: any;
   selectedTime: string = 'today';
-  dataReservationPending: any;
+  dataReservationPending: any[] = [];
   reservationDetail: any;
   showDropdown = false;
   selectedTable: string = 'all';
@@ -77,7 +77,7 @@ export class TableManagementComponent implements OnInit {
   guestInfo: any;
   messageerrorTable: string = '';
   isClose: boolean = false;
-
+  private socket!: WebSocket;
   constructor(private tableService: TableService, private dialog: MatDialog, private reservationService: ReservationService,
     private router: Router, private accountService: AccountService) { }
 
@@ -95,9 +95,25 @@ export class TableManagementComponent implements OnInit {
     this.accountId = accountIdString ? Number(accountIdString) : null;
     if (this.accountId) {
       this.getAccountData();
-    } else {
-      console.error('Account ID is not available');
     }
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+    };
+    this.socket.onmessage = (event) => {
+      try {
+        const reservation = JSON.parse(event.data);
+        if (reservation && typeof reservation === 'object') {
+          this.dataReservationPending.push(reservation);
+        }
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
+      }
+    };
+
+    this.socket.onclose = () => {
+    };
+    this.socket.onerror = (error) => {
+    };
   }
 
   formatDate(date: Date): string {
@@ -107,6 +123,7 @@ export class TableManagementComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
   setView(view: string) {
+    this.currentPage = 1;
     this.currentView = view;
   }
   toggleDropdown(index: number): void {
@@ -139,6 +156,7 @@ export class TableManagementComponent implements OnInit {
     this.tableService.getTables().subscribe(
       response => {
         this.allTable = response.filter((table: { status: number; }) => table.status === 0 || table.status === 1);
+        console.log(this.allTable);
         this.originalDataTable = response.filter((table: { status: number; }) => table.status === 0 || table.status === 1);
         this.selectedFloor = this.originalDataTable[0].floor;
         this.dataTable = [...this.originalDataTable];
@@ -181,6 +199,17 @@ export class TableManagementComponent implements OnInit {
     this.selectedFloor = floor;
     this.filterTablesByFloorAndStatus(this.selectedTable);
   }
+
+  selectedReservations: any[] = [];
+  openModalSchedule(reservations: any[]) {
+    this.selectedReservations = reservations; // Set reservations for the modal
+    this.isModalVisible = true; // Show modal
+  }
+
+  // Function to close the modal
+  closeModalSchedule() {
+    this.isModalVisible = false; // Hide modal
+  }
   //=================================================================================================================================
 
 
@@ -208,9 +237,7 @@ export class TableManagementComponent implements OnInit {
       }
     } else {
       if (tableIdIndex === -1) {
-        console.log('181');
         const potentialTotalCapacity = this.totalCapacity + table.capacity;
-        console.log(potentialTotalCapacity);
         if (potentialTotalCapacity >= this.guestNumber) {
           if (this.guestNumber > this.totalCapacity) {
             this.selectedTableIds.push(table.tableId);
@@ -221,11 +248,12 @@ export class TableManagementComponent implements OnInit {
           this.selectedTableIds.push(table.tableId);
           this.totalCapacity += table.capacity;
         }
+        console.log(this.totalCapacity);
       } else {
-        console.log('194');
         this.selectedTableIds.splice(tableIdIndex, 1);
         this.totalCapacity -= table.capacity;
         this.ishas = false;
+        console.log(this.totalCapacity);
       }
     }
   }
@@ -290,6 +318,7 @@ export class TableManagementComponent implements OnInit {
       this.dataReservationAccept = this.dataReservationToday.filter((order: { quantity: number }) => order.quantity > 0);
     }
     this.totalItems = this.dataReservationAccept.length;
+    this.paginateData();
   }
 
   getAccountData(): void {
@@ -351,9 +380,10 @@ export class TableManagementComponent implements OnInit {
     this.currentReservationId = undefined;
     this.cancelMessage = null;
   }
-
-  openAcceptModal(reservationId: number): void {
-    this.currentReservationId = reservationId;
+  detailRes: any;
+  openAcceptModal(reservation: any): void {
+    this.detailRes = reservation;
+    this.currentReservationId = reservation.reservationId;
     this.showAcceptModal = true;
   }
 
@@ -402,9 +432,7 @@ export class TableManagementComponent implements OnInit {
   }
 
 
-  openPopup(reserId: number, time: any) {
-
-    console.log(time);
+  openPopup(reserId: number, time: any, tableOfReservation: any) {
     this.reservationTimeSelected = time;
     const modal = document.getElementById('updateTimeModal');
     if (modal) {
@@ -413,37 +441,10 @@ export class TableManagementComponent implements OnInit {
     }
     this.selectedTable = 'all';
     this.selectedFloor = this.dataTable[0].floor;
-    this.getTableOFFloorEmpty(this.selectedFloor, time);
-    this.reserId = reserId;
-    this.reservationService.getTableReservation(this.reserId).subscribe(
-      response => {
-        if (typeof response.reservationTime === 'string') {
-          this.reservationTimeSelected = response.reservationTime;
-        } else {
-          console.error('reservationTime không phải là một chuỗi:', response.reservationTime);
-        }
-        const { currentDayReservationTables, allTables } = response;
-        this.originalDataTable = allTables.map(table => {
-          const reservedTables = currentDayReservationTables.filter(t => t.tableId === table.tableId);
-          const reservationTimes = reservedTables.map(t => t.reservationTime);
-          reservationTimes.sort((a, b) => {
-            const dateA = a ? new Date(a) : null;
-            const dateB = b ? new Date(b) : null;
-            if (!dateA || !dateB) {
-              return 0;
-            }
-            return dateA.getTime() - dateB.getTime();
-          });
-          return { ...table, reservationTimes: reservationTimes };
-        });
 
-        this.dataTable = [...this.originalDataTable];
-        this.filterTablesByFloorAndStatus(this.selectedTable);
-      },
-      error => {
-        console.error('Error:', error);
-      }
-    );
+    this.reserId = reserId;
+    this.tableOfReservation = tableOfReservation;
+    this.getTableOFFloorEmpty(this.selectedFloor, time);
     this.reservationService.getReservation(reserId).subscribe(
       response => {
         this.guestNumber = response.data.guestNumber;
@@ -452,9 +453,22 @@ export class TableManagementComponent implements OnInit {
         console.error('Error:', error);
       }
     );
-    console.log(this.selectedTableIds);
-
+    if (tableOfReservation.length < 1) {
+      console.log(this.selectedTableIds);
+    } else {
+      tableOfReservation.forEach((reservation: { tableId: any; }) => {
+        const tableId = reservation.tableId;
+        if (!this.selectedTableIds.includes(tableId)) {
+          this.selectedTableIds.push(tableId);
+        }
+      });
+      this.totalCapacity = this.tableOfReservation.reduce((total: number, reservation: { capacity: number }) => {
+        return total + reservation.capacity;
+      }, 0);
+      this.ishas = true;
+    }
   }
+
   closePopup() {
     const modal = document.getElementById('updateTimeModal');
     if (modal) {
@@ -467,6 +481,7 @@ export class TableManagementComponent implements OnInit {
     this.selectedTableIds = [];
     this.ishas = false;
     this.totalCapacity = 0;
+    this.getReservationData();
   }
   validMessage: string = '';
   openConfirmSaveModal() {
@@ -491,7 +506,7 @@ export class TableManagementComponent implements OnInit {
       confirmModal.classList.remove('show');
       confirmModal.style.display = 'none';
     }
-    this.selectedTableIds = [];
+
   }
 
   confirmSave() {
@@ -500,20 +515,40 @@ export class TableManagementComponent implements OnInit {
       tableIds: this.selectedTableIds
     }
     console.log(request);
-    this.tableService.createTableReservation(request).subscribe({
-      next: response => {
-        console.log(response);
-        this.getReservationData();
-      },
-      error: error => {
-        if (error.error instanceof ErrorEvent) {
-          console.error('An error occurred:', error.error.message);
-        } else {
-          console.error(`Backend returned code ${error.status}, ` +
-            `body was: ${JSON.stringify(error.error)}`);
+    console.log(this.tableOfReservation.length);
+
+    if (this.tableOfReservation.length > 0) {
+      this.reservationService.updateTableReservation(request).subscribe({
+        next: response => {
+          console.log(response);
+          this.getReservationData();
+        },
+        error: error => {
+          if (error.error instanceof ErrorEvent) {
+            console.error('An error occurred:', error.error.message);
+          } else {
+            console.error(`Backend returned code ${error.status}, ` +
+              `body was: ${JSON.stringify(error.error)}`);
+          }
         }
-      }
-    });
+      });
+    } else {
+      this.tableService.createTableReservation(request).subscribe({
+        next: response => {
+          console.log(response);
+          this.getReservationData();
+        },
+        error: error => {
+          if (error.error instanceof ErrorEvent) {
+            console.error('An error occurred:', error.error.message);
+          } else {
+            console.error(`Backend returned code ${error.status}, ` +
+              `body was: ${JSON.stringify(error.error)}`);
+          }
+        }
+      });
+    }
+
     this.closeConfirmSaveModal();
     this.closePopup();
   }
@@ -635,9 +670,7 @@ export class TableManagementComponent implements OnInit {
       ).subscribe(
         response => {
           console.log('Phản hồi từ API:', response);
-
           this.closeModal();
-
           this.getTableData();
           this.getReservation();
           this.getReservationData();
@@ -755,7 +788,7 @@ export class TableManagementComponent implements OnInit {
       if (!acc[table.floor]) {
         acc[table.floor] = [];
       }
-      acc[table.floor].push(table.tableId);
+      acc[table.floor].push(table.lable);
       return acc;
     }, {});
 
@@ -779,7 +812,7 @@ export class TableManagementComponent implements OnInit {
       return 'Chưa xếp bàn';
     }
     const grouped = this.groupTablesByFloor(tables);
-    return grouped.map(group => `${group.floor}, bàn ${group.tableRange}`).join('<br>');
+    return grouped.map(group => `Khu vực: ${group.floor} gồm ${group.tableRange}`).join('<br>');
   }
 
   getStatusLabel(status: number): { label: string, class: string } {
@@ -862,6 +895,9 @@ export class TableManagementComponent implements OnInit {
       }
     }
     else if (this.currentView === 'booking-schedule') {
+      console.log(startIndex);
+      console.log(endIndex);
+      console.log(this.totalItems);
       if (this.dataReservationAccept) {
         this.dataReservationAccept = this.dataReservationAccept.slice(startIndex, endIndex);
       }
@@ -935,23 +971,17 @@ export class TableManagementComponent implements OnInit {
     }
   }
 
-  // getReservationed(date: string) {
-  //   this.reservationService.getReservationed(date).subscribe(
-  //     (response: any) => { // Sử dụng any
-  //       const filteredReservations = response.filter((reservation: any) => reservation.tableId !== null);
-  //       console.log(filteredReservations);
-  //     },
-  //     error => {
-  //       console.error('Error fetching reservations:', error);
-  //     }
-  //   );
-  // }
-  tableEmpty: any;
+  tableEmpty: any[] = [];
+  tableOfReservation: any;
   getTableDataEmpty(date: string): void {
     this.reservationService.getTable(date).subscribe(
       response => {
-        this.tableEmpty = response;
-        this.tableEmpty = this.tableEmpty.filter((table: { floor: string; }) => table.floor === this.selectedFloor);
+        if (Array.isArray(response)) {
+          const newTables = response.filter((table: { floor: string; }) => table.floor === this.selectedFloor);
+          this.tableEmpty = [...this.tableEmpty, ...newTables];
+        } else {
+          console.error('Error: Expected an array of tables');
+        }
       },
       error => {
         console.error('Error:', error);
@@ -959,11 +989,26 @@ export class TableManagementComponent implements OnInit {
     );
   }
   getTableOFFloorEmpty(floor: any, time: any): void {
-    this.getTableDataEmpty(time);
     this.selectedFloor = floor;
-    console.log(this.getSelectedTableNames());
-
+    this.tableEmpty = [];
+    this.getTableDataEmpty(time);
+    if (this.tableOfReservation && this.tableOfReservation.length > 0) {
+      this.tableOfReservation.forEach((reservation: { tableId: any; tableName: any; capacity: any; floor: any; lable: any; }) => {
+        const table = {
+          tableId: reservation.tableId,
+          capacity: reservation.capacity,
+          floor: reservation.floor,
+          lable: reservation.lable
+        };
+        if (!this.tableEmpty.some(t => t.tableId === table.tableId)) {
+          this.tableEmpty.push(table);
+        }
+      });
+    }
+    this.tableEmpty = this.tableEmpty.filter((table: { floor: any; }) => table.floor === this.selectedFloor);
+    this.tableEmpty.sort((a: { tableId: number }, b: { tableId: number }) => a.tableId - b.tableId);
   }
+
   getSelectedTableNames(): string[] {
     if (Array.isArray(this.allTable)) {
       return this.allTable
@@ -972,7 +1017,34 @@ export class TableManagementComponent implements OnInit {
     }
     return [];
   }
+  removeTable(index: number): void {
 
+    const tableName = this.getSelectedTableNames()[index];
+    const tableToRemove = this.allTable.find((table: { lable: string; }) => table.lable === tableName);
+    if (tableToRemove) {
+      // Remove the table ID from selectedTableIds
+      this.selectedTableIds = this.selectedTableIds.filter(id => id !== tableToRemove.tableId);
+      this.ishas = false;
+      this.totalCapacity -= tableToRemove.capacity;
+    }
+  }
 
+  getReservationClass(reservationTime: Date): string {
+    const now = new Date();
+    const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000); // Thời gian hiện tại + 1 giờ
+
+    // Điều kiện 1: reservationTime đã qua => màu xám
+    if (new Date(reservationTime) < now) {
+      return 'reservation-gray';
+    }
+
+    // Điều kiện 2: reservationTime lớn hơn time now và <= 1 giờ => màu đỏ
+    if (new Date(reservationTime) <= oneHourLater) {
+      return 'reservation-red';
+    }
+
+    // Điều kiện 3: reservationTime lớn hơn 1 giờ so với hiện tại => không làm gì
+    return '';
+  }
 }
 

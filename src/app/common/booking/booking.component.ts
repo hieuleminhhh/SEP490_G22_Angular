@@ -47,6 +47,7 @@ export class BookingComponent implements OnInit {
   public messages: string[] = [];
   isValidDish: boolean = false;
   maxValue: number = 1000;
+  private socket!: WebSocket;
 
   constructor(private reservationService: ReservationService, private router: Router, public dialog: MatDialog, private checkoutService: CheckoutService) {
     const today = new Date();
@@ -65,7 +66,7 @@ export class BookingComponent implements OnInit {
     };
     this.generateAvailableHours();
   }
-
+  private reservationQueue: any[] = [];
 
   ngOnInit(): void {
     this.updateTimes();
@@ -77,12 +78,32 @@ export class BookingComponent implements OnInit {
     if (accountIdString) {
       this.accountId = JSON.parse(accountIdString);
     }
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift()); // Gửi yêu cầu từ hàng đợi
+      }
+    };
+
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
   }
+
   ngOnDestroy() {
     if (this.cartSubscription) {
       this.cartSubscription.unsubscribe();
     }
+    if (this.socket) {
+      this.socket.close();
+    }
   }
+
   generateAvailableHours() {
     this.availableHours = [];
     for (let hour = 9; hour <= 21; hour++) {
@@ -92,9 +113,19 @@ export class BookingComponent implements OnInit {
       }
     }
   }
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Gửi yêu cầu đặt bàn khi WebSocket đã mở
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message);
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
+    }
+  }
+
 
   formatDate(date: Date): string {
-    // Hàm chuyển đổi định dạng ngày thành chuỗi "YYYY-MM-DD"
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
@@ -152,7 +183,8 @@ export class BookingComponent implements OnInit {
     this.reservationService.checkValidTable(reservationTime, number).subscribe({
       next: response => {
         this.isValid = response.canReserve;
-        if (this.isValid === true) {
+
+        if (this.isValid) {
           sessionStorage.setItem('request', JSON.stringify(this.currentRequest));
           sessionStorage.setItem('cart', JSON.stringify(this.cartItems));
 
@@ -162,6 +194,7 @@ export class BookingComponent implements OnInit {
             this.reservationService.createResevetion(this.currentRequest).subscribe({
               next: response => {
                 console.log('Order submitted successfully', response);
+                this.makeReservation(this.currentRequest); // Gọi phương thức gửi yêu cầu đặt bàn
                 this.reservationService.clearCart();
                 this.router.navigate(['/paymentReservation']);
               },
@@ -184,12 +217,10 @@ export class BookingComponent implements OnInit {
       },
       error: error => {
         console.error('An error occurred:', error.error.message);
-        this.message = 'Có lỗi xảy ra khi kiểm tra bàn, vui lòng thử lại.';  // Thông báo lỗi
+        this.message = 'Có lỗi xảy ra khi kiểm tra bàn, vui lòng thử lại.'; // Thông báo lỗi
       }
     });
   }
-
-
   submitForm(form: any) {
     this.formSubmitted = true;
     if (form.valid) {
@@ -226,7 +257,7 @@ export class BookingComponent implements OnInit {
           comboIds: this.cartItems.map(item => item.comboId).filter(id => id !== undefined),
           dishIds: this.cartItems.map(item => item.dishId).filter(id => id !== undefined)
         };
-        if(data.comboIds.length>0 || data.dishIds.length>0){
+        if (data.comboIds.length > 0 || data.dishIds.length > 0) {
           this.checkoutService.getRemainingItems(data).subscribe(response => {
             this.messages = []; // Đặt lại messages
             for (const combo of response.combos) {
