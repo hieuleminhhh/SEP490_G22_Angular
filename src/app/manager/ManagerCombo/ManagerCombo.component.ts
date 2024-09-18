@@ -431,7 +431,7 @@ export class ManagerComboComponent implements OnInit {
       fileInput.value = '';
     }
   }
-  quantityToSet: number = 1;
+  quantityToSet: any;
 applyQuantity(): void {
   // Iterate over dishes and update the quantity if the dish is selected
   for (const list of this.combosetting) {
@@ -516,7 +516,11 @@ setComboIdForDeletion(comboId: number): void {
 confirmDeleteCombo(): void {
   if (this.comboIdToDelete !== null) {
     this.deleteCombo(this.comboIdToDelete);
-    this.successMessage = 'Xóa món combo thành công';
+    this.successMessage = 'Xóa combo thành công';
+     // Clear the success message after 2 seconds
+     setTimeout(() => {
+      this.successMessage = '';
+    }, 2000);
   }
 }
 }
