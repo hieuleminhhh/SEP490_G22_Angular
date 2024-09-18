@@ -25,14 +25,19 @@ export interface ManagerCombo {
   quantityCombo: number;
   dishes: ManagerDish[]
 }
-export interface UpdateCombo{
-  comboId:number;
-  nameCombo:string;
-  price: number | null | undefined;
-  note:string;
+export interface DishInCombo {
+  dishId: number;
+  quantityDish: number;
+}
+
+export interface UpdateCombo {
+  comboId: number;
+  nameCombo: string;
+  price: number | null;
+  note: string;
   imageUrl: string | null;
-  message: string,
-  dishIds: number[] | null | undefined;
+  message: string;
+  dishes: DishInCombo[] | null; 
 }
 export interface AddNewCombo{
   nameCombo:string;
@@ -41,5 +46,5 @@ export interface AddNewCombo{
   imageUrl: string | null;
   isActive: boolean;
   message: string,
-  dishIds: number[] | null | undefined;
+  dishes: DishInCombo[] | null; 
 }

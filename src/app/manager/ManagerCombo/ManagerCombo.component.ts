@@ -5,10 +5,11 @@ import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../Header/Header.component';
 import { SideBarComponent } from '../SideBar/SideBar.component';
 import { ManagerComboService } from '../../../service/managercombo.service';
-import { AddNewCombo, ListAllCombo, ManagerCombo, UpdateCombo } from '../../../models/combo.model';
+import { AddNewCombo, DishInCombo, ListAllCombo, ManagerCombo, UpdateCombo } from '../../../models/combo.model';
 import { AddNewDish, Dish, ManagerDish } from '../../../models/dish.model';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
+import { ManagerDishService } from '../../../service/managerdish.service';
 
 @Component({
   selector: 'app-ManagerCombo',
@@ -23,7 +24,7 @@ export class ManagerComboComponent implements OnInit {
   @ViewChild('dishesSelect') dishesSelect!: ElementRef;
   combo: ListAllCombo[] = [];
   allDishes: Dish[] = [];
-  selectedDishes: number[] = [];
+  selectedDishes: { dishId: number; quantityDish: number }[] = []; 
   imageUrl: string = '';
   search: string = '';
   currentPage: number = 1;
@@ -56,24 +57,26 @@ export class ManagerComboComponent implements OnInit {
     imageUrl: '',
     isActive: true,
     message: '',
-    dishIds: [],
+    dishes: null,
   };
 
   updatedCombo: UpdateCombo = {
     comboId: 0,
     nameCombo: '',
-    price: null as number | null,
-    note : '',
+    price: null,
+    note: '',
     imageUrl: '',
     message: '',
-    dishIds: [],
+    dishes: null  // or you can initialize it with an empty array: []
   };
-  constructor(private comboService: ManagerComboService, private cdr: ChangeDetectorRef) { }
+  
+  constructor(private comboService: ManagerComboService, private cdr: ChangeDetectorRef, private dishService: ManagerDishService) { }
 
   ngOnInit() {
     this.loadListCombo();
     this.loadAllDishes();
     this.loadListComboSetting();
+    this.filteredDishes = this.allDishes;
   }
   isComboInOrderMap: { [key: number]: boolean } = {};
   loadListCombo(search: string = ''): void {
@@ -137,28 +140,33 @@ export class ManagerComboComponent implements OnInit {
       }
     );
   }
-  loadAllDishes(): void {
-    this.comboService.getAllDishes().subscribe(
-      (dishes: Dish[]) => {
-        this.allDishes = dishes;
-      },
-      (error) => {
-        console.error('Error fetching dishes:', error);
-      }
-    );
-  }
-  isComboInOrder: boolean = false;
+ 
+
+  isComboInOrder: boolean = false; // Biến kiểm tra combo có trong đơn hàng hay không
   getComboById(comboId: number): void {
-    // Fetch the combo details
     this.comboService.getComboById(comboId).subscribe(
-      (combo: UpdateCombo) => {
+      (combo: any) => {
         this.updatedCombo = combo;
   
-        // After fetching the combo, check if it is in any order
+        // Populate the selected dishes array with dish IDs from the combo
+        if (combo.dishes) {
+          this.selectedDishes = combo.dishes.map((dish: Dish) => dish.dishId);
+        } else {
+          this.selectedDishes = [];
+        }
+  
+     
+  
+        // Check if combo is in order details
         this.comboService.checkComboInOrderDetails(comboId).subscribe(
           (isInOrder: boolean) => {
-            // If the combo is in an order, disable the name field
             this.isComboInOrder = isInOrder;
+            if (this.isComboInOrder) {
+              console.log(`Combo ID ${comboId} is in an order. Disabling name field.`);
+              // Perform any additional logic if necessary
+            } else {
+              console.log(`Combo ID ${comboId} is not in any order.`);
+            }
           },
           (error) => {
             console.error('Error checking if combo is in order details:', error);
@@ -170,6 +178,23 @@ export class ManagerComboComponent implements OnInit {
       }
     );
   }
+  
+  loadAllDishes(): void {
+    this.comboService.getAllDishes().subscribe(
+      (dishes: Dish[]) => {
+        this.allDishes = dishes;
+        
+        // Đảm bảo filteredDishes cũng chứa toàn bộ món ăn sau khi tải xong
+        this.filteredDishes = this.allDishes;
+  
+        console.log('Dishes loaded:', this.allDishes);
+      },
+      (error) => {
+        console.error('Error fetching dishes:', error);
+      }
+    );
+  }
+  
   
   updateTotalPagesArray(totalPages: number): void {
     this.totalPagesArray = Array(totalPages).fill(0).map((x, i) => i + 1);
@@ -252,25 +277,26 @@ export class ManagerComboComponent implements OnInit {
       console.error('No file selected.');
     }
   }
-  updateCombo(selectedDishes: number[]): void {
+  updateCombo(selectedDishes: { dishId: number; quantityDish: number }[]): void {
     console.log('Selected dishes:', selectedDishes);
-    this.updatedCombo.dishIds = selectedDishes;
     if (this.selectedUpdateFile) {
       this.comboService.UploadImage(this.selectedUpdateFile).subscribe(
         (response) => {
           console.log('Image uploaded successfully:', response);
           this.updatedCombo.imageUrl = response.imageUrl;
-          this.saveUpdatedCombo();
+          this.saveUpdatedCombo(selectedDishes); // Save the updated combo with the dishes
         },
         (error) => {
           console.error('Error uploading image:', error);
         }
       );
     } else {
-      this.saveUpdatedCombo();
+      this.saveUpdatedCombo(selectedDishes); // Directly save the updated combo if no image change
     }
   }
-  saveUpdatedCombo(): void {
+  
+  saveUpdatedCombo(selectedDishes: { dishId: number; quantityDish: number }[]): void {
+    this.updatedCombo.dishes = selectedDishes;
     this.comboService.UpdateCombo(this.updatedCombo).subscribe(
       (response) => {
         console.log('Combo updated successfully:', response.nameCombo);
@@ -311,70 +337,70 @@ export class ManagerComboComponent implements OnInit {
       }
     );
   }
-
-  createCombo(selectedDishes: number[]): void {
-    console.log('Selected dishes:', selectedDishes);
-    this.addNew.dishIds = selectedDishes;
-    this.addErrorMessage = '';
-    if (this.selectedFile) {
-      this.comboService.UploadImage(this.selectedFile).subscribe(
-        (response) => {
-          console.log('Image uploaded successfully:', response);
-          this.addNew.imageUrl = response.imageUrl;
-          this.saveCombo();
-        },
-        (error) => {
-          console.error('Error uploading image:', error);
-          this.addErrorMessage = 'Error uploading image. Please try again later.';
-        }
-      );
-    } else {
-      this.saveCombo();
-    }
-  }
-
-
-  saveCombo(): void {
-    this.comboService.AddNewCombo(this.addNew).subscribe(
+createCombo(selectedDishes: { dishId: number; quantityDish: number }[]): void {
+  console.log('Selected dishes:', selectedDishes);
+  console.log('Selected dishes before saving:', selectedDishes); 
+  this.addErrorMessage = '';
+  if (this.selectedFile) {
+    this.comboService.UploadImage(this.selectedFile).subscribe(
       (response) => {
-        console.log('Combo created successfully:', response);
-        this.addComboModal.nativeElement.classList.remove('show');
-        this.addComboModal.nativeElement.style.display = 'none';
-        document.body.classList.remove('modal-open');
-        const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
-        modalBackdrop?.parentNode?.removeChild(modalBackdrop);
-        this.successMessage = response.message;
-        setTimeout(() => { this.successMessage = ''; }, 5000);
-        this.loadListCombo();
-        this.resetForm();
+        console.log('Image uploaded successfully:', response);
+        this.addNew.imageUrl = response.imageUrl;
+        this.saveCombo(selectedDishes); // Pass selectedDishes here
       },
       (error) => {
-        console.error('Error creating combo:', error);
-        this.clearAddErrors();
-        if (error.error) {
-          const fieldErrors = error.error;
-          if (fieldErrors['nameCombo']) {
-            this.addErrors.nameComboError = fieldErrors['nameCombo'];
-          }
-          if (fieldErrors['price']) {
-            this.addErrors.priceError = fieldErrors['price'];
-          }
-          if (fieldErrors['note']) {
-            this.addErrors.noteError = fieldErrors['note'];
-          }
-          if (fieldErrors['imageUrl']) {
-            this.addErrors.imageError = fieldErrors['imageUrl'];
-          }
-          if (fieldErrors['dish']) {
-            this.addErrors.dishError = fieldErrors['dish'];
-          }
-        } else {
-          this.addErrorMessage = 'An error occurred. Please try again later.';
-        }
+        console.error('Error uploading image:', error);
+        this.addErrorMessage = 'Error uploading image. Please try again later.';
       }
     );
+  } else {
+    this.saveCombo(selectedDishes); // Pass selectedDishes here
   }
+}
 
+saveCombo(selectedDishes: { dishId: number; quantityDish: number }[]): void {
+  this.addNew.dishes = selectedDishes; 
+  this.comboService.AddNewCombo(this.addNew).subscribe(
+    (response) => {
+      console.log('Combo created successfully:', response);
+      this.addComboModal.nativeElement.classList.remove('show');
+      this.addComboModal.nativeElement.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
+      modalBackdrop?.parentNode?.removeChild(modalBackdrop);
+      this.successMessage = response.message;
+      setTimeout(() => { this.successMessage = ''; }, 5000);
+      this.loadListCombo();
+      this.resetForm();
+    },
+    (error) => {
+      console.error('Error creating combo:', error);
+      this.clearAddErrors();
+      if (error.error) {
+        const fieldErrors = error.error;
+        if (fieldErrors['nameCombo']) {
+          this.addErrors.nameComboError = fieldErrors['nameCombo'];
+        }
+        if (fieldErrors['price']) {
+          this.addErrors.priceError = fieldErrors['price'];
+        }
+        if (fieldErrors['note']) {
+          this.addErrors.noteError = fieldErrors['note'];
+        }
+        if (fieldErrors['imageUrl']) {
+          this.addErrors.imageError = fieldErrors['imageUrl'];
+        }
+        if (fieldErrors['dish']) {
+          this.addErrors.dishError = fieldErrors['dish'];
+        }
+      } else {
+        this.addErrorMessage = 'An error occurred. Please try again later.';
+      }
+    }
+  );
+}
+
+  
 
   clearAddErrors(): void {
     this.addErrors = {
@@ -402,7 +428,7 @@ export class ManagerComboComponent implements OnInit {
       imageUrl: '',
       isActive: true,
       message: '',
-      dishIds: [],
+      dishes: null,
     };
     this.imageUrl = '';
     this.clearAddErrors();
@@ -420,7 +446,7 @@ export class ManagerComboComponent implements OnInit {
       imageUrl: '',
       isActive: true,
       message: '',
-      dishIds: [],
+      dishes: null,
     };
     this.imageUrl = '';
     this.clearUpdateErrors();
@@ -523,4 +549,25 @@ confirmDeleteCombo(): void {
     }, 2000);
   }
 }
+
+getDishName(dishId: number): string {
+  const dish = this.allDishes.find(d => d.dishId === dishId);
+  return dish ? dish.itemName : 'Unknown Dish';
+}
+searchText: string = ''; // Assuming allDishes is an array of dish objects.
+  filteredDishes: any[] = [];  // To store the filtered dishes.
+  filterDishes() {
+    const search = this.searchText.toLowerCase().trim();
+  
+    // Nếu không có từ khóa tìm kiếm, hiển thị toàn bộ món ăn
+    if (!search) {
+      this.filteredDishes = this.allDishes;
+    } else {
+      // Nếu có từ khóa tìm kiếm, lọc danh sách món ăn
+      this.filteredDishes = this.allDishes.filter(dish => 
+        dish.itemName.toLowerCase().includes(search)
+      );
+    }
+  }
+  
 }

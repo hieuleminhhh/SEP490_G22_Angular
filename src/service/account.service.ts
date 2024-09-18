@@ -169,5 +169,38 @@ export class AccountService {
       })
     );
   }
+  register(body: any): Observable<any> { 
+    const url = `${this.apiUrl}/Account/register`;
+  
+    return this.http.post<any>(url, body, httpOptions).pipe(
+      tap(response => {
+        console.log('Account registered:', response);
+      })
+    );
+  }
+  verifyAccount(body: any): Observable<any> {
+    const url = `${this.apiUrl}/Account/verify`;
+    return this.http.post<any>(url, body, httpOptions).pipe(
+      tap(response => {
+        console.log('Account verification response:', response);
+      })
+    );
+  }
+  private userData: any = {};
+  setData(data: any) {
+    this.userData = data;
+  }
+
+  getData() {
+    return this.userData;
+  }
+  private otpReceived: string | null = null;
+  setOtp(otp: string) {
+    this.otpReceived = otp;
+  }
+
+  getOtp() {
+    return this.otpReceived;
+  }
   
 }
