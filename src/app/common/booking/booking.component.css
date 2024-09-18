@@ -299,3 +299,44 @@ tr:hover {
   color: red;
   margin-top: 10px;
 }
+.quantity-input {
+  width: 80px !important; /* Adjust the width as needed */
+  padding: 5px !important;
+  font-size: 16px !important;
+  border: 1px solid #ccc !important; /* Border color */
+  border-radius: 5px !important; /* Rounded corners */
+  text-align: center !important; /* Center the text */
+  background-color: #f9f9f9 !important; /* Background color */
+  outline: none !important;
+  transition: border-color 0.3s ease !important;
+}
+
+/* Remove arrows from number input in Chrome, Safari, Edge, and Opera */
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Remove arrows from number input in Firefox */
+.quantity-input[type="number"] {
+  -moz-appearance: textfield !important;
+}
+
+/* Hover effect */
+.quantity-input:hover {
+  border-color: #999; /* Change border color on hover */
+}
+
+/* Focus effect */
+.quantity-input:focus {
+  border-color: #007bff; /* Blue border on focus */
+  background-color: #fff; /* White background on focus */
+}
+
+/* Disable the input if needed */
+.quantity-input:disabled {
+  background-color: #e9ecef; /* Gray background for disabled input */
+  cursor: not-allowed;
+  opacity: 0.7;
+}

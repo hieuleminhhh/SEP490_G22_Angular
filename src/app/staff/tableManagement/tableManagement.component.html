@@ -167,9 +167,7 @@
                     Khách nhận bàn
                   </span>
                 </div>
-                <div *ngIf="errorMessages[i]" class="alert alert-danger" style="max-width: 500px;">
-                  {{ errorMessages[i] }}
-                </div>
+
               </div>
             </div>
           </div>
@@ -208,6 +206,9 @@
         <div *ngIf="messageerrorTable" class="alert alert-danger" style="color: red; margin-top: 10px;">
           {{ messageerrorTable }}
         </div>
+        <div *ngIf="errorMessages" class="alert alert-danger" style="max-width: 500px;">
+                  {{ errorMessages }}
+                </div>
         <div class="reservation-modal-footer">
           <button (click)="confirmReservation()">Xác nhận</button>
           <button (click)="cancelReservation()">Hủy</button>
@@ -333,7 +334,10 @@
     <!-- Confirm Accept Modal -->
     <div class="reservation-accept-modal" *ngIf="showAcceptModal">
       <div class="reservation-accept-modal-content">
-        <h2>Xác nhận chấp nhận đặt bàn</h2>
+        <h2>Xác nhận chấp nhận đặt bàn</h2><br>
+        <div *ngIf="message" class="error-message">
+          {{ message }}
+        </div>
         <div style="margin-top: 20px;">
           <button class="confirm-button" (click)="confirmAccept()">Xác nhận</button>
           <button class="cancel-button" (click)="closeAcceptModal()">Đóng</button>

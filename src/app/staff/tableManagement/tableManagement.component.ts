@@ -61,7 +61,7 @@ export class TableManagementComponent implements OnInit {
   dateString: string = '';
   currentReservationId: number | undefined;
   errorMessage: string = '';
-  errorMessages: { [key: number]: string } = {};
+  errorMessages: string = '';
   showDropdowns: { [key: number]: boolean } = {};
 
   allTable: any;
@@ -76,7 +76,7 @@ export class TableManagementComponent implements OnInit {
   modalMessage: any;
   guestInfo: any;
   messageerrorTable: string = '';
-  isClose:boolean=false;
+  isClose: boolean = false;
 
   constructor(private tableService: TableService, private dialog: MatDialog, private reservationService: ReservationService,
     private router: Router, private accountService: AccountService) { }
@@ -363,8 +363,9 @@ export class TableManagementComponent implements OnInit {
   }
   confirmAccept(): void {
     if (this.currentReservationId) {
-      this.updateStatusReservationById(this.currentReservationId, 2);
-      this.closeAcceptModal();
+      const reservation = this.dataReservationPending.find((reservation: { reservationId: any }) => reservation.reservationId === this.currentReservationId);
+      this.updateStatusReservationById(this.currentReservationId, 2, reservation?.reservationTime, reservation?.guestNumber);
+
     }
   }
   confirmCancel(): void {
@@ -571,9 +572,6 @@ export class TableManagementComponent implements OnInit {
   }
   confirmReservation(): void {
     this.onConfirmCallback();
-    if (this.isClose===true) {
-      this.closeModal();
-    }
   }
   cancelReservation(): void {
     this.closeModal();
@@ -595,7 +593,7 @@ export class TableManagementComponent implements OnInit {
         }
         if (tablesInUse.length > 0) {
           this.messageerrorTable = `Không thể nhận bàn vì ${tablesInUse.join(', ')} đang sử dụng.`;
-          this.isClose=true;
+          this.isClose = true;
           setTimeout(() => {
             this.messageerrorTable = '';
           }, 3000);
@@ -637,30 +635,28 @@ export class TableManagementComponent implements OnInit {
       ).subscribe(
         response => {
           console.log('Phản hồi từ API:', response);
+
+          this.closeModal();
+
           this.getTableData();
           this.getReservation();
           this.getReservationData();
         },
         error => {
           console.error('Lỗi khi cập nhật trạng thái:', error);
-          if (error.error && error.error.errors) {
-            console.error('Lỗi xác thực:', error.error.errors);
-          } else {
-            console.error('Thông tin lỗi:', error.message);
-          }
-          this.errorMessages[index] = 'Lỗi cập nhật trạng thái cho đặt chỗ ' + id + ': ' + (error.message || 'Có lỗi xảy ra');
         }
       );
     } else {
-      this.errorMessages[index] = 'Không thể nhận bàn nhận bàn cho đặt chỗ ';
+      this.errorMessages = 'Không thể nhận bàn nhận bàn vì chưa đến ngày nhận bàn ';
+      this.isClose = true;
       setTimeout(() => {
-        this.errorMessages[index] = '';
+        this.errorMessages = '';
       }, 3000);
     }
   }
 
   updateErrorMessage(index: number, message: string) {
-    this.errorMessages[index] = message;
+    this.errorMessages = message;
   }
 
   findTableIdsByReservationId(reservationId: number): number[] {
@@ -670,37 +666,56 @@ export class TableManagementComponent implements OnInit {
     }
     return [];
   }
-
-  updateStatusReservationById(id: number, status: number): void {
-    this.reservationService.updateStatusReservation(id, status).subscribe(
-      response => {
-        const body = {
-          reservationId: id,
-          acceptBy: this.accountId
-        }
-        console.log(body);
-
-        this.reservationService.updateAcceptBy(body).subscribe(
-          response => {
-          },
-          error => {
-            console.error('Lỗi khi cập nhật trạng thái:', error);
-            if (error.error && error.error.errors) {
-              console.error('Lỗi xác thực:', error.error.errors);
+  isValid: boolean = false;
+  message: string = '';
+  updateStatusReservationById(id: number, status: number, reservationTime: string, number: number): void {
+    this.reservationService.checkValidTable(reservationTime, number).subscribe({
+      next: response => {
+        this.isValid = response.canReserve;
+        console.log(response);
+        if (this.isValid === true) {
+          this.reservationService.updateStatusReservation(id, status).subscribe(
+            response => {
+              const body = {
+                reservationId: id,
+                acceptBy: this.accountId
+              }
+              this.reservationService.updateAcceptBy(body).subscribe(
+                response => {
+                  console.log(response);
+                },
+                error => {
+                  console.error('Lỗi khi cập nhật trạng thái:', error);
+                  if (error.error && error.error.errors) {
+                    console.error('Lỗi xác thực:', error.error.errors);
+                  }
+                }
+              );
+              this.getTableData();
+              this.getReservation();
+              this.getReservationData();
+            },
+            error => {
+              console.error('Lỗi khi cập nhật trạng thái:', error);
+              if (error.error && error.error.errors) {
+                console.error('Lỗi xác thực:', error.error.errors);
+              }
             }
-          }
-        );
-        this.getTableData();
-        this.getReservation();
-        this.getReservationData();
-      },
-      error => {
-        console.error('Lỗi khi cập nhật trạng thái:', error);
-        if (error.error && error.error.errors) {
-          console.error('Lỗi xác thực:', error.error.errors);
+          );
+          this.closeAcceptModal();
+        } else {
+          this.message = response.message;
+          setTimeout(() => {
+            this.message = '';
+          }, 3000);
         }
+        console.log(this.message);
+      },
+      error: error => {
+        console.error('An error occurred:', error.error.message);
+        this.message = 'Có lỗi xảy ra khi kiểm tra bàn, vui lòng thử lại.';  // Thông báo lỗi
       }
-    );
+    });
   }
 
   //=================================================================================================================
