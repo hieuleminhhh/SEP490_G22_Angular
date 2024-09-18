@@ -38,6 +38,7 @@ import { NotificationComponent } from './common/notification/notification.compon
 import { SignupComponent } from './common/signup/signup/signup.component';
 import { OtpVerificationComponent } from './common/login/OtpVerification/OtpVerification/OtpVerification.component';
 import { ForgetPasswordComponent } from './common/login/forgetPass/forgetPassword/forgetPassword.component';
+import { VerifyOtpSignupComponent } from './common/signup/signup/verifyOtpSignup/verifyOtpSignup.component';
 
 
 export const routes: Routes = [
@@ -55,7 +56,7 @@ export const routes: Routes = [
     {'path': 'purchase', component:PurchaseOrderComponent},
     {'path': 'checkout', component:CheckoutComponent},
     {'path': 'orderDetail/:id', component:OrderDetailComponent},
-    {'path': 'tableManagement', component:TableManagementComponent},
+    {'path': 'tableManagement', component:TableManagementComponent, canActivate: [AuthGuard]},
     {'path': 'managerorder', component:ManagerOrderComponent, canActivate: [AuthGuard]},
     {'path': 'paymentReservation', component:PaymentReservationComponent},
     {'path': 'createTakeaway', component:CreateTakeAwayOrderComponent, canActivate: [AuthGuard]},
@@ -65,19 +66,20 @@ export const routes: Routes = [
     {'path': 'createOffline', component:CreateOfflineOrderComponent, canActivate: [AuthGuard]},
     {'path': 'updateOffline' , component:UpdateOfflineOrderComponent, canActivate: [AuthGuard]},
     {'path': 'paymentSuccess' , component:PaymentSuccessComponent},
-    {'path': 'fillDish' , component:FillDishComponent},
+    {'path': 'fillDish' , component:FillDishComponent, canActivate: [AuthGuard]},
     {'path': 'manageDiscount' , component:ManageDiscountComponent, canActivate: [AuthGuard]},
     {'path': 'updateOrder/:orderId' , component: UpdateOrderForGuestComponent},
     {'path': 'setting' , component: SettingComponent, canActivate: [AuthGuard]},
     {'path': 'manageAccount', component: ManageAccountComponent, canActivate: [AuthGuard]},
     {'path': 'shipping', component: OrderShipComponent},
-    {'path': 'invoice', component: ManageInvoiceComponent},
-    {'path': 'manageNew', component: ManageNewComponent},
+    {'path': 'invoice', component: ManageInvoiceComponent, canActivate: [AuthGuard]},
+    {'path': 'manageNew', component: ManageNewComponent, canActivate: [AuthGuard]},
     {'path': 'auth/callback', component: AuthCallbackComponent},
     {'path': 'manageTable', component: ManageTableComponent},
     {'path': 'notification', component: NotificationComponent},
     {'path': 'signup', component: SignupComponent},
     {'path': 'otp-verification', component: OtpVerificationComponent},
     {'path': 'forgot-password', component: ForgetPasswordComponent},
+    {'path': 'verifyOTPsignin', component: VerifyOtpSignupComponent}
 ];
 

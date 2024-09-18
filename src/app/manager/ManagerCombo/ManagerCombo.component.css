@@ -53,3 +53,7 @@
 .btn-custom-brown:hover {
   background-color: #6F3E02; /* Darker brown for hover effect */
 }
+.modal-body-scroll {
+  max-height: 60vh; /* Adjust as needed */
+  overflow-y: auto;
+}

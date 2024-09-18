@@ -33,6 +33,16 @@ export class ManagerDishService {
     const url = `${this.apiUrl}/Dish/ListDishes`;
     return this.http.get<ListAllDishes>(url, { params, ...this.getHttpOptions() });
   }
+  ListAllDishes(page: number = 1, pageSize: number = 100, searchCategory: string = '', search: string = ''): Observable<ListAllDishes> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString())
+      .set('search', search ? search.toString() : '')
+      .set('searchCategory', searchCategory ? searchCategory.toString() : '');
+
+    const url = `${this.apiUrl}/Dish/ListDishes`;
+    return this.http.get<ListAllDishes>(url, { params, ...this.getHttpOptions() });
+  }
   ListDishesActive(page: number = 1, pageSize: number = 10, searchCategory: string = '', search: string = ''): Observable<ListAllDishes> {
     let params = new HttpParams()
       .set('page', page.toString())
