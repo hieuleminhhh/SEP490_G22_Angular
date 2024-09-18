@@ -9,6 +9,7 @@ import { ReservationService } from '../../../service/reservation.service';
 import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MenuComponent } from '../menu/menu.component';
+import { CheckoutService } from '../../../service/checkout.service';
 
 @Component({
   selector: 'app-booking',
@@ -21,7 +22,7 @@ export class BookingComponent implements OnInit {
   reservation = {
     name: '',
     phone: '',
-    email:'',
+    email: '',
     date: 'today',
     time: '',
     people: 2,
@@ -35,16 +36,19 @@ export class BookingComponent implements OnInit {
   consigneeName: string = '';
   guestPhone: string = '';
   note: string = '';
-  emailGuest:string = '';
+  emailGuest: string = '';
   availableTimes: string[] = [];
   formSubmitted = false;
   cartItems: Dish[] = [];
   isValid: boolean = false;
   currentRequest: any;
   message: string = '';
-  accountId: number=0;
+  accountId: number = 0;
+  public messages: string[] = [];
+  isValidDish: boolean = false;
+  maxValue: number = 1000;
 
-  constructor(private reservationService: ReservationService, private router: Router, public dialog: MatDialog) {
+  constructor(private reservationService: ReservationService, private router: Router, public dialog: MatDialog, private checkoutService: CheckoutService) {
     const today = new Date();
     this.minDate = this.formatDate(today);
     const maxDate = new Date();
@@ -53,7 +57,7 @@ export class BookingComponent implements OnInit {
     this.reservation = {
       name: '',
       phone: '',
-      email:'',
+      email: '',
       date: this.formatDate(today),
       time: '',
       people: 2,
@@ -115,7 +119,31 @@ export class BookingComponent implements OnInit {
       }
     }
   }
+  validateInput(item: any, maxValue: number) {
+    const value = parseInt(item.quantity, 10);
+    if (isNaN(value) || value < 1) {
+      item.quantity = 1;
+    } else if (value > maxValue) {
+      item.quantity = maxValue;
+    }
+  }
 
+  preventDelete(event: KeyboardEvent, currentQuantity: number) {
+    if (currentQuantity <= 1 && (event.key === 'Backspace' || event.key === 'Delete')) {
+      event.preventDefault();
+    }
+    if (currentQuantity >= this.maxValue) {
+      if (event.key !== 'Backspace' && event.key !== 'Delete') {
+        event.preventDefault();
+      }
+      return;
+    }
+    const validKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Tab'];
+    if (validKeys.indexOf(event.key) !== -1 || /^[0-9]$/.test(event.key)) {
+      return;
+    }
+    event.preventDefault();
+  }
   addTimeOption(hour: number, minute: number): void {
     const formattedTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
     this.availableTimes.push(formattedTime);
@@ -148,7 +176,10 @@ export class BookingComponent implements OnInit {
             });
           }
         } else {
-          this.message = response.message;  // Thông báo lỗi
+          this.message = response.message;
+          setTimeout(() => {
+            this.message = '';
+          }, 3000);
         }
       },
       error: error => {
@@ -165,7 +196,7 @@ export class BookingComponent implements OnInit {
       let dateTime = this.formatDateTime(this.reservation.date, this.reservation.time);
 
       const request = {
-        accountId:this.accountId,
+        accountId: this.accountId,
         guestPhone: this.guestPhone,
         email: this.emailGuest,
         guestAddress: '',
@@ -187,13 +218,51 @@ export class BookingComponent implements OnInit {
           orderTime: new Date().toISOString()
         }))
       };
-
-      // Lưu request hiện tại để sử dụng sau khi kiểm tra bàn hợp lệ
       this.currentRequest = request;
-      console.log(request);
+      const today = new Date();
 
-      // Gọi kiểm tra bàn hợp lệ trước khi thực hiện tiếp
-      this.checkTable(request.reservationTime, request.guestNumber);
+      if (this.reservation.date === this.formatDate(today)) {
+        const data = {
+          comboIds: this.cartItems.map(item => item.comboId).filter(id => id !== undefined),
+          dishIds: this.cartItems.map(item => item.dishId).filter(id => id !== undefined)
+        };
+        if(data.comboIds.length>0 || data.dishIds.length>0){
+          this.checkoutService.getRemainingItems(data).subscribe(response => {
+            this.messages = []; // Đặt lại messages
+            for (const combo of response.combos) {
+              const itemInCart = this.cartItems.find(item => item.comboId === combo.comboId);
+              if (itemInCart && combo.quantityRemaining < itemInCart.quantity) {
+                this.messages.push(`Không đủ số lượng món ăn: ${combo.name}. Số lượng yêu cầu: ${itemInCart.quantity}, Số lượng còn lại: ${combo.quantityRemaining}`);
+                this.isValidDish = true;
+              }
+            }
+            for (const dish of response.dishes) {
+              const itemInCart = this.cartItems.find(item => item.dishId === dish.dishId);
+              if (itemInCart && dish.quantityRemaining < itemInCart.quantity) {
+                this.messages.push(`Không đủ số lượng món ăn: ${dish.name}. Số lượng yêu cầu: ${itemInCart.quantity}, Số lượng còn lại: ${dish.quantityRemaining}`);
+                this.isValidDish = true;
+              }
+            }
+
+            if (this.messages.length > 0) {
+              setTimeout(() => {
+                this.messages = [];
+              }, 3000);
+              return;
+            }
+            this.checkTable(request.reservationTime, request.guestNumber);
+          }, error => {
+            console.error('Error during payment initiation', error);
+          });
+          return;
+        }
+        else {
+          this.checkTable(request.reservationTime, request.guestNumber);
+        }
+      }
+      else {
+        this.checkTable(request.reservationTime, request.guestNumber);
+      }
     }
   }
 

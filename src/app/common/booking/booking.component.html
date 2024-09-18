@@ -19,7 +19,10 @@
           <a (click)="decreaseQuantity(item)" class="icon" style="cursor: pointer;">
             <i class="fas fa-minus" style="color: black; font-size: 10px;"></i>
           </a>
-          <span>{{ item.quantity }}</span>
+          <input type="number" [(ngModel)]="item.quantity" class="quantity-input" [min]="1" [max]="maxValue"
+                      (input)="validateInput(item, maxValue)" (keydown)="preventDelete($event, item.quantity)"
+                      pattern="[0-9]*" inputmode="numeric" style="appearance: none; -moz-appearance: textfield;"
+                      required />
           <a (click)="increaseQuantity(item)" class="icon" style="cursor: pointer;">
             <i class="fas fa-plus" style="color: black; font-size: 10px;"></i>
           </a>
@@ -135,7 +138,7 @@
           <div *ngIf="availableTimes.length<1">
             <small class="text-danger">Đã hết giờ đặt bàn ngày hôm nay!</small>
           </div>
-          <div *ngIf="time.invalid && (time.dirty || time.touched || formSubmitted)">
+          <div *ngIf="time.invalid && (time.dirty || time.touched || formSubmitted) && availableTimes.length>1">
             <small class="text-danger">Vui lòng chọn giờ ăn!</small>
           </div>
         </div>
@@ -161,6 +164,11 @@
     </div>
     <div *ngIf="message" class="error-message">
       {{ message }}
+    </div>
+    <div *ngIf="messages.length > 0" class="alert alert-warning">
+      <div *ngFor="let msg of messages">
+        {{ msg }}
+      </div>
     </div>
     <button type="submit">Đặt bàn</button>
   </form>

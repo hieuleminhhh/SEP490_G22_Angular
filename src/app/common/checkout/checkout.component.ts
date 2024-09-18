@@ -51,7 +51,8 @@ export class CheckoutComponent implements OnInit {
   dishIds: number[] = [];
 
 
-  constructor(private cartService: CartService, private reservationService: ReservationService, private http: HttpClient, private router: Router, private route: ActivatedRoute, private checkoutService: CheckoutService) {
+  constructor(private cartService: CartService, private reservationService: ReservationService, private http: HttpClient, private router: Router,
+     private route: ActivatedRoute, private checkoutService: CheckoutService) {
     const today = new Date();
     this.date = this.formatDate(today);
     this.minDate = this.formatDate(today);
@@ -273,8 +274,6 @@ export class CheckoutComponent implements OnInit {
     } else {
       this.processOrder(receivingTime, deposits);
     }
-
-    // Nếu không phải ngày hôm nay, không làm gì thêm
   }
 
   processOrder(receivingTime: string, deposits: number): void {
