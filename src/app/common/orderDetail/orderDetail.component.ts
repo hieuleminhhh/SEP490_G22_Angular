@@ -33,6 +33,7 @@ export class OrderDetailComponent implements OnInit {
   cancelationReason: string = 'Không còn nhu cầu';
   orderCancelled: boolean = false;
   cancelBy: string = 'Người mua';
+  private socket!: WebSocket;
   constructor(
     private route: ActivatedRoute,
     private purchaseOrderService: PurchaseOrderService,
@@ -44,6 +45,21 @@ export class OrderDetailComponent implements OnInit {
     this.orderId = this.route.snapshot.paramMap.get('id');
     console.log(this.orderId);
     this.getOrderDetail();
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+    };
+    this.socket.onmessage = (event) => {
+      const reservation = JSON.parse(event.data);
+      try {
+        this.getOrderDetail();
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
+      }
+    };
+    this.socket.onclose = () => {
+    };
+    this.socket.onerror = (error) => {
+    };
   }
 
   getOrderDetail() {

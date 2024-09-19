@@ -6,6 +6,7 @@ import { CheckoutService } from '../../../service/checkout.service';
 import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
 import { FormsModule } from '@angular/forms';
 import { PaymentService } from '../../../service/payment.service';
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
   selector: 'app-payment',
@@ -21,9 +22,12 @@ export class PaymentComponent implements OnInit {
   guestPhone: string | null = null;
   cancelationReason: string = 'Không còn nhu cầu';
   cancelBy: string = 'Người mua';
-  check:boolean=false;
+  check: boolean = false;
+  private socket!: WebSocket;
+  private reservationQueue: any[] = [];
 
-  constructor(private route: ActivatedRoute, private paymentService: PaymentService, private http: HttpClient, private router: Router, private checkoutService: CheckoutService) { } // Inject Router
+  constructor(private route: ActivatedRoute, private paymentService: PaymentService,
+    private notificationService: NotificationService, private http: HttpClient, private router: Router, private checkoutService: CheckoutService) { } // Inject Router
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -31,6 +35,19 @@ export class PaymentComponent implements OnInit {
       this.guestPhone = params['guestPhone'];
       this.checkoutSuccess();
     });
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift()); // Gửi yêu cầu từ hàng đợi
+      }
+    };
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
   }
 
   checkoutSuccess(): Promise<void> {
@@ -40,8 +57,8 @@ export class PaymentComponent implements OnInit {
         response => {
           this.data = response;
           console.log(this.data);
-          if(this.data.status===5){
-            this.check=true;
+          if (this.data.status === 5) {
+            this.check = true;
           }
           resolve();
         },
@@ -62,6 +79,8 @@ export class PaymentComponent implements OnInit {
           console.log('Order cancelled:', response);
           this.orderCancelled = true;
           this.updateCancelResion();
+
+          this.createNotification(orderId, this.data.consigneeName);
           window.location.reload();
         },
         error => {
@@ -81,7 +100,7 @@ export class PaymentComponent implements OnInit {
   }
 
   updateCancelResion() {
-    const request ={
+    const request = {
       cancelationReason: this.cancelationReason,
       cancelBy: this.cancelBy
     };
@@ -91,14 +110,38 @@ export class PaymentComponent implements OnInit {
       response => {
 
         console.log(response);
-
       },
       error => {
         console.error('Error:', error);
       }
     );
   }
-
-
-
+  createNotification(orderId: number, customerName: string) {
+    let description = `Khách hàng ${customerName} đã hủy đơn ${orderId}! Lý do hủy: ${this.cancelationReason}. Vui lòng kiểm tra lại đơn hàng đơn hàng.`;
+    const body = {
+      description: description,
+      orderId: orderId,
+      type: 2
+    }
+    this.makeReservation(description);
+    console.log(body);
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Gửi yêu cầu đặt bàn khi WebSocket đã mở
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message);
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
+    }
+  }
 }

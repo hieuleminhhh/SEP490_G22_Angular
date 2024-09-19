@@ -11,6 +11,9 @@
       <!-- Main content -->
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <!-- Page Header -->
+        <div class="notification.truot" [ngClass]="{'show': showNotification}">
+          {{ notificationMessage }}
+        </div>
         <div class="container mt-5">
           <!-- <a href="javascript:history.back()" class="back-link">
             <i class="fas fa-arrow-left back-icon"></i>
