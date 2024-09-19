@@ -941,7 +941,7 @@ export class ManagerOrderComponent implements OnInit {
   }
   getTablesAsString(): string {
     if (this.orderDetail?.tables && this.orderDetail.tables.length > 0) {
-      return this.orderDetail.tables.map(table => table.tableId).join(', ');
+      return this.orderDetail.tables.map(table => table.lable).join(', ');
     }
     return '';
   }

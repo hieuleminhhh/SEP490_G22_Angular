@@ -37,7 +37,7 @@
               <div class="table-grid">
                 <div class="table" *ngFor="let table of dataTable" [class.in-use]="table.status === 0"
                   (click)="navigateToOrder(table.tableId, table.status)">
-                  <div class="table-id">{{ table.tableId }}</div>
+                  <div class="table-id">{{ table.lable }}</div>
                   <div class="table-status">{{ table.status === 0 ? 'Bàn trống' : 'Đang sử dụng' }}</div>
                   <div class="table-capacity">
                     <i class="fas fa-chair"></i>{{ table.capacity }}

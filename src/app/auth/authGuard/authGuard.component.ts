@@ -69,7 +69,9 @@ export class AuthGuard implements CanActivate {
         return true; 
       } 
     }
-    this.router.navigate(['/login']); 
+    localStorage.removeItem('token');
+    localStorage.removeItem('accountId');
+    window.location.href = '/login';
     return false;
   }
 }
