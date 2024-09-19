@@ -189,8 +189,8 @@
                   <div class="mb-3" *ngIf="orderDetail?.type === 4">
                     <span class="fw-bold">Thời gian vào:</span> {{ orderDetail.orderDate | dateFormat }}
                   </div>
-                  <div class="mb-3" *ngIf="orderDetail.recevingOrder && orderDetail?.type === 4">
-                    <span class="fw-bold">Thời gian ra:</span> {{ orderDetail.recevingOrder | dateFormat }}
+                  <div class="mb-3" *ngIf="orderDetail.paymentTime && (orderDetail?.type === 4 || orderDetail?.type === 3)">
+                    <span class="fw-bold">Thời gian ra:</span> {{ orderDetail.paymentTime| dateFormat }}
                   </div>
                   <div *ngIf="orderDetail.paymentMethods !== null && orderDetail.paymentMethods !== undefined"
                     class="mb-3">
@@ -299,7 +299,7 @@
                         <!-- Tại quan -->
                         <div
                           *ngIf="(orderDetail.type === 4 || orderDetail.type === 3) && orderDetail.deposits > 0 && orderDetail.status !== 4"
-                          class="badge bg-success ms-auto badge-circle">Đã trả trước 1 phần
+                          class="badge bg-success ms-auto badge-circle">Đã trả 1 phần
                         </div>
                         <div
                           *ngIf="(orderDetail.type === 4 || orderDetail.type === 3) && orderDetail.deposits === 0  && orderDetail.status !== 4"
