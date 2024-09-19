@@ -200,4 +200,13 @@ export class ReservationService {
     });
     return this.http.get<TableReservationResponse>(url, { headers });
   }
+
+  updateTableReservation( body:any): Observable<any> {
+    const url = `https://localhost:7188/api/TableReservation/update-reservation-tables`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.put(url, body, { headers });
+  }
 }
