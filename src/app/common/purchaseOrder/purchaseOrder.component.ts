@@ -24,12 +24,14 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
   orders: any[] = []; // Khai báo orders như một mảng
   filteredOrders: any[] = []; // Khai báo filteredOrders như một mảng
   subscriptions: Subscription[] = [];
-  accountId: number | null = null; // Khai báo accountId là null
+  accountId: any;
   cancelationReason: string = 'Không còn nhu cầu';
   orderCancelled: boolean = false;
   choiceOrder: any;
   choiceReser:any;
   cancelBy: string = 'Người mua';
+  private socket!: WebSocket;
+
   constructor(
     private purchaseOrderService: PurchaseOrderService,
     private route: ActivatedRoute,
@@ -48,6 +50,21 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
     } else {
       console.error('Account ID is not valid');
     }
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+    };
+    this.socket.onmessage = (event) => {
+      const reservation = JSON.parse(event.data);
+      try {
+        this.getOrdersPurchase(this.accountId);
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
+      }
+    };
+    this.socket.onclose = () => {
+    };
+    this.socket.onerror = (error) => {
+    };
   }
   showData(tab: string) {
     this.selectedTab = tab;

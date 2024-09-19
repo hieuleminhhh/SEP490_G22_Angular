@@ -25,8 +25,10 @@ export class NavbarComponent implements OnInit {
   showNotifications = false;
   notifications: any[] = [];
   itemCountNoti: number = 0;
+  private socket!: WebSocket;
 
-  constructor(private cartService: CartService, private dataService: DataService, private accountService: AccountService, private notificationService: NotificationService) { }
+  constructor(private cartService: CartService, private dataService: DataService,
+     private accountService: AccountService, private notificationService: NotificationService) { }
 
   ngOnInit(): void {
     this.cartService.getItemCount().subscribe(count => {
@@ -43,6 +45,21 @@ export class NavbarComponent implements OnInit {
     this.dataService.currentVariable.subscribe((newValue) => {
       this.itemCountNoti = newValue;
     });
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+    };
+    this.socket.onmessage = (event) => {
+      const reservation = JSON.parse(event.data);
+      try {
+        this.getNotificationById(this.accountId);
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
+      }
+    };
+    this.socket.onclose = () => {
+    };
+    this.socket.onerror = (error) => {
+    };
   }
   getAccountDetails(accountId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
@@ -137,9 +154,4 @@ export class NavbarComponent implements OnInit {
       console.error('No account ID provided');
     }
   }
-  toggleNotifications() {
-    this.showNotifications = !this.showNotifications;
-  }
-
-
 }

@@ -5,7 +5,12 @@ import { ReservationService } from '../../../service/reservation.service';
 import { Router } from '@angular/router';
 import { CheckoutService } from '../../../service/checkout.service';
 import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
-
+import { NotificationService } from '../../../service/notification.service';
+import { HttpClient } from '@angular/common/http';
+interface CheckoutResponse {
+  orderId: number;
+  // Các thuộc tính khác nếu có
+}
 @Component({
   selector: 'app-paymentReservation',
   standalone: true,
@@ -18,8 +23,10 @@ export class PaymentReservationComponent implements OnInit {
   data: any;
   cartItem: any;
   ispayment: boolean = false;
-  accountId: number=0;
-  constructor(private reservationService: ReservationService, private router: Router, private checkoutService: CheckoutService) {
+  accountId: number = 0;
+  private socket!: WebSocket;
+  private reservationQueue: any[] = [];
+  constructor(private reservationService: ReservationService, private http: HttpClient,private notificationService: NotificationService, private router: Router, private checkoutService: CheckoutService) {
 
   }
 
@@ -50,14 +57,59 @@ export class PaymentReservationComponent implements OnInit {
       sessionStorage.removeItem('cart');
       this.data = JSON.parse(request);
     }
-
     const accountIdString = localStorage.getItem('accountId');
     if (accountIdString) {
       this.accountId = JSON.parse(accountIdString);
     }
+
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift()); // Gửi yêu cầu từ hàng đợi
+      }
+    };
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
   }
+  createNotification(guestPhone: string, customerName: string) {
+    const url = `https://localhost:7188/api/Cart/checkoutsuccess/${guestPhone}`;
+    this.http.get<CheckoutResponse>(url).subscribe(
+      response => {
+        let description = `Khách hàng ${customerName} vừa đặt đơn mới! Vui lòng kiểm tra và xác nhận đơn hàng.`;
+        const body = {
+          description: description,
+          orderId: response.orderId,
+          type: 3
+        }
+        this.makeReservation(description);
+        console.log(body);
+        this.notificationService.createNotification(body).subscribe(
+          response => {
+            console.log(response);
+          },
+          error => {
+            console.error('Error fetching account details:', error);
+          }
+        );
+      }
+    )
 
-
+  }
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Gửi yêu cầu đặt bàn khi WebSocket đã mở
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message);
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
+    }
+  }
   getTotalPrice(item: any): number {
     const price = item.discountedPrice != null ? item.discountedPrice : item.price;
     return parseFloat((item.quantity * price).toFixed(2));
@@ -73,7 +125,7 @@ export class PaymentReservationComponent implements OnInit {
     const offset = localDateTime.getTimezoneOffset() * 60000; // offset in milliseconds
     const localISOTime = new Date(localDateTime.getTime() - offset).toISOString().slice(0, -1);
     const request = {
-      accountId:this.accountId,
+      accountId: this.accountId,
       guestPhone: this.data.guestPhone,
       email: '',
       guestAddress: '',
@@ -99,11 +151,12 @@ export class PaymentReservationComponent implements OnInit {
     this.reservationService.createResevetion(request).subscribe({
       next: response => {
         console.log('Order submitted successfully', response);
+        this.createNotification(this.data.guestPhone, this.data.consigneeName);
         this.reservationService.clearCart();
         sessionStorage.setItem('data', JSON.stringify(this.data));
         sessionStorage.setItem('cartItem', JSON.stringify(this.cartItem));
 
-        const requestForVnPay = { ...request, totalAmount: this.getTotalCartPrice() / 2};
+        const requestForVnPay = { ...request, totalAmount: this.getTotalCartPrice() / 2 };
         this.checkVnPay(requestForVnPay);
       },
       error: error => {
