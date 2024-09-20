@@ -125,7 +125,7 @@ export class BookingComponent implements OnInit {
   }
   generateAvailableHours() {
     this.availableHours = [];
-    for (let hour = 9; hour <= 21; hour++) {
+    for (let hour = 9; hour <= 23; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         const formattedHour = hour.toString().padStart(2, '0') + ':' + minute.toString().padStart(2, '0');
         this.availableHours.push(formattedHour);
