@@ -15,7 +15,7 @@ import { NotificationService } from '../../../../service/notification.service';
   imports: [MatToolbarModule, CommonModule, FormsModule, MatButtonModule]
 })
 export class HeaderOrderStaffComponent implements OnInit {
-  accountId: number | null = null;
+  accountId: any;
   constructor(private router: Router,
     private route: ActivatedRoute, private accountService: AccountService,
      private settingService: SettingService, private notificationService: NotificationService) { }
@@ -32,6 +32,7 @@ export class HeaderOrderStaffComponent implements OnInit {
   showNotifications = false;
   notifications: any[] = [];
   itemCountNoti: number = 0;
+  private socket!: WebSocket;
 
   ngOnInit() {
     const accountIdString = localStorage.getItem('accountId');
@@ -43,6 +44,21 @@ export class HeaderOrderStaffComponent implements OnInit {
       console.error('Account ID is not available');
     }
     this.getInfo();
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+    };
+    this.socket.onmessage = (event) => {
+      const reservation = JSON.parse(event.data);
+      try {
+        this.getNotificationByType(this.accountId);
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
+      }
+    };
+    this.socket.onclose = () => {
+    };
+    this.socket.onerror = (error) => {
+    };
   }
   viewDetails() {
     window.location.href = '/notification';
@@ -50,11 +66,13 @@ export class HeaderOrderStaffComponent implements OnInit {
   getNotificationByType(accountId: number): void {
     this.notificationService.getType(accountId).subscribe(
       response => {
-        this.notificationService.getNotificationByType(response.type).subscribe(
+        this.notificationService.getNotificationByType(response).subscribe(
           response => {
             this.notifications = response.filter((notification: { isView: boolean; }) => notification.isView === false);
             const unseenNotifications = this.notifications.filter(notification => notification.isView === false);
             this.itemCountNoti = unseenNotifications.length;
+            console.log(this.itemCountNoti);
+
           },
           error => {
             console.error('Error fetching account details:', error);

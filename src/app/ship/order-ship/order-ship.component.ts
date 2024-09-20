@@ -104,6 +104,8 @@ export class OrderShipComponent implements OnInit {
       return;
     }
     this.errorMessage = '';
+    this.createNotification(order.orderId, 2, order.accountId);
+    this.createNotification(order.orderId, 4, order.accountId);
     this.cookingService.updateOrderStatus(order.orderId, request).subscribe(
       response => {
         const body = {
@@ -112,8 +114,7 @@ export class OrderShipComponent implements OnInit {
         }
         this.cookingService.updatecancelReason(order.orderId, body).subscribe(
           response => {
-            this.createNotification(order.orderId, 2, order.accountId);
-            this.createNotification(order.orderId, 4, order.accountId);
+
           },
           error => {
             console.error('Error:', error);

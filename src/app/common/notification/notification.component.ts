@@ -4,7 +4,7 @@ import { NgIf, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { DataService } from '../../../service/dataservice.service';
-
+import { Location } from '@angular/common';
 @Component({
   selector: 'app-notification',
   standalone: true,
@@ -14,7 +14,7 @@ import { DataService } from '../../../service/dataservice.service';
 })
 export class NotificationComponent implements OnInit {
 
-  constructor(private notificationService: NotificationService, private dataService: DataService) { }
+  constructor(private notificationService: NotificationService, private dataService: DataService,private location: Location) { }
   accountId: any;
   currentPage = 1; // Trang hiện tại
   itemsPerPage = 5; // Số bản ghi trên mỗi trang
@@ -39,7 +39,9 @@ export class NotificationComponent implements OnInit {
       }
     });
   }
-
+  goBack() {
+    this.location.back();
+  }
   getNotificationById(accountId: number): void {
     this.notificationService.getNotificationById(accountId).subscribe(
       response => {
@@ -48,6 +50,27 @@ export class NotificationComponent implements OnInit {
         console.log(response);
         this.totalItems = response.length;
         this.paginateData();
+      },
+      error => {
+        this.getNotificationByType(accountId);
+      }
+    );
+  }
+  getNotificationByType(accountId: number): void {
+    this.notificationService.getType(accountId).subscribe(
+      response => {
+        this.notificationService.getNotificationByType(response).subscribe(
+          response => {
+            this.filteredData = response;
+            this.count = response.filter((notification: { isView: any; }) => !notification.isView).length;
+            console.log(response);
+            this.totalItems = response.length;
+            this.paginateData();
+          },
+          error => {
+            console.error('Error fetching account details:', error);
+          }
+        );
       },
       error => {
         console.error('Error fetching account details:', error);

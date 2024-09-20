@@ -336,10 +336,10 @@ export class ManageInvoiceComponent implements OnInit {
         }
         console.log(body);
 
+        this.createNotification(id, accountId, true);
         this.invoiceService.updateStaffId(body).subscribe(
           response => {
             console.log(response);
-            this.createNotification(id, accountId, true);
             this.getOrdersCancel();
             this.getOrdersShip();
             this.getOrdersStatic();
@@ -355,8 +355,6 @@ export class ManageInvoiceComponent implements OnInit {
       }
     );
   }
-
-
 
   showDetails(order: any) {
     console.log(order);

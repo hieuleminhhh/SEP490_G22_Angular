@@ -10,10 +10,6 @@
 
       <!-- Main content -->
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <!-- Page Header -->
-        <div class="notification.truot" [ngClass]="{'show': showNotification}">
-          {{ notificationMessage }}
-        </div>
         <div class="container mt-5">
           <!-- <a href="javascript:history.back()" class="back-link">
             <i class="fas fa-arrow-left back-icon"></i>
@@ -166,12 +162,16 @@
                       <span *ngSwitchCase="5">Hủy</span>
                       <span *ngSwitchCase="6">Đang chuẩn bị</span>
                       <span *ngSwitchCase="7">Đang giao hàng</span>
+                      <span *ngSwitchCase="8">Đã hoàn tiền</span>
                       <span *ngSwitchDefault>Chưa xác định</span>
                     </ng-container>
                   </div>
 
                   <div class="mb-3" *ngIf="orderDetail.cancelationReason">
                     <span class="fw-bold">Lý do hủy:</span> {{ orderDetail.cancelationReason}}
+                  </div>
+                  <div class="mb-3" *ngIf="orderDetail.cancelationReason">
+                    <span class="fw-bold">Thời gian hủy:</span> {{ orderDetail.cancelDate |dateFormat}}
                   </div>
                   <div class="mb-3">
                     <span class="fw-bold">Tên khách hàng:</span> {{ orderDetail.consigneeName || 'Khách lẻ' }}
@@ -195,6 +195,14 @@
                   <div class="mb-3" *ngIf="orderDetail.paymentTime && (orderDetail?.type === 4 || orderDetail?.type === 3)">
                     <span class="fw-bold">Thời gian ra:</span> {{ orderDetail.paymentTime| dateFormat }}
                   </div>
+                  <div class="mb-3"
+                    *ngIf="orderDetail.status===8">
+                    <span class="fw-bold">Người hoàn tiền:</span> {{orderDetail.staffFirstName}} {{orderDetail.staffLastName}}
+                  </div>
+                  <div class="mb-3"
+                  *ngIf="orderDetail.status===8">
+                  <span class="fw-bold">Thời gian hoàn tiền:</span> {{ orderDetail.refundDate | dateFormat }}
+                </div>
                   <div *ngIf="orderDetail.paymentMethods !== null && orderDetail.paymentMethods !== undefined"
                     class="mb-3">
                     <span class="fw-bold">Phương thức thanh toán: </span>
@@ -1063,6 +1071,20 @@
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="reloadPage()">Đóng</button>
           <button type="button" class="btn btn-primary" (click)="printInvoice()">In hóa đơn</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngFor="let message of notificationMessage; let i = index" class="modal-dialog-notification">
+    <div class="modal-content-notification">
+      <div class="modal-header-notification">
+        <h5 class="modal-title-notification">Thành công!</h5>
+        <button type="button" class="close" aria-label="Close" (click)="closeModal(i)">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body-notification">
+        {{ message }}
       </div>
     </div>
   </div>
