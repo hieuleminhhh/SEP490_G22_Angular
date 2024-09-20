@@ -30,7 +30,7 @@ export class NotificationService {
     return this.http.get(url);
   }
   getType(id: number): Observable<any> {
-    const url = `https://localhost:7188/api/Notifications/type/${id}`;
+    const url = `https://localhost:7188/api/Account/GetTypeNotificationByAccountId/${id}`;
     return this.http.get(url);
   }
 }

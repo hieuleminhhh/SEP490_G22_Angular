@@ -111,6 +111,7 @@
   font-size: 26px;
   color: #555;
   transition: color 0.3s ease;
+  cursor: pointer;
 }
 
 .noti-icon:hover {
@@ -128,6 +129,7 @@
   border-radius: 5px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   padding: 10px;
+  cursor: pointer;
 }
 
 .notification-list {
@@ -170,6 +172,7 @@
   color: #007bff;
   text-decoration: none;
   transition: color 0.3s ease;
+  cursor: pointer;
 }
 
 .view-all-btn:hover {
@@ -236,4 +239,21 @@
 
 .dropdown-item:hover {
   background-color: #f9f9f9;
+}
+/* CSS cho dấu đỏ hiển thị khi có thông báo */
+.item-count-noti {
+  position: absolute;
+  left: 15px;
+  background-color: red;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 6px 6px;
+  border-radius: 50%; /* Tạo dấu đỏ hình tròn */
+  display: none; /* Mặc định ẩn */
+}
+
+/* Hiển thị dấu đỏ khi itemCountNoti > 0 */
+.item-count-noti.active {
+  display: inline-block;
 }

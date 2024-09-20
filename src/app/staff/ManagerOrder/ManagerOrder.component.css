@@ -399,38 +399,58 @@
   }
 }
 
-.notification.truot {
+.modal-dialog-notification {
   position: fixed;
-  top: 20px;
-  right: -350px; /* Vị trí ban đầu ngoài màn hình */
+  top: 50%;
+  right: -100%; /* Ẩn modal ngoài khung hình ở bên phải */
+  transform: translateY(-50%);
   width: 300px;
-  padding: 15px 20px;
-  background-color: #4caf50; /* Màu nền */
-  color: white;
+  z-index: 1050;
+  transition: right 0.5s ease-in-out; /* Hiệu ứng trượt */
+}
+
+.modal-content-notification {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 9999;
-  font-size: 16px;
-  font-weight: bold;
-  transition: all 0.5s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.modal-header-notification {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  opacity: 0;
+  border-bottom: 1px solid #dee2e6;
 }
 
-.notification.truot.show {
-  right: 20px; /* Vị trí sau khi trượt vào màn hình */
-  opacity: 1;  /* Hiển thị hoàn toàn */
+.modal-title-notification {
+  font-size: 18px;
+  color: #28a745; /* Màu sắc thông báo thành công */
 }
-.notification.truot .close-btn {
+
+.close {
   background: none;
   border: none;
-  color: white;
-  font-size: 20px;
+  font-size: 24px;
   cursor: pointer;
 }
 
-.notification.truot .close-btn:hover {
-  color: #f44336; /* Thay đổi màu khi hover */
+.modal-body-notification {
+  padding: 15px 0;
+}
+
+/* Animation khi modal xuất hiện */
+.show-modal {
+  right: 20px; /* Vị trí cố định khi modal đã xuất hiện */
+}
+
+/* Hiển thị modal với một chút trễ */
+@keyframes slideIn {
+  0% {
+    right: -100%;
+  }
+  100% {
+    right: 20px;
+  }
 }

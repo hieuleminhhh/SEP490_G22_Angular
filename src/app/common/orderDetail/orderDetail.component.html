@@ -24,7 +24,7 @@
         <span *ngIf="orderDetail?.status === 5 || orderDetail?.status === 8 " style="color: red;">ĐÃ HỦY</span>
       </div>
     </header>
-    <div class="order-tracking" *ngIf="orderDetail?.status!==5 && orderDetail?.type===2">
+    <div class="order-tracking" *ngIf="orderDetail?.status!==5 && orderDetail?.status!==8 && orderDetail?.type===2">
       <div *ngFor="let step of steps; let i = index" class="order-step"
         [ngClass]="{'completed': isCompleted(i), 'pending': !isCompleted(i)}">
         <div class="step-icon">
@@ -32,7 +32,6 @@
         </div>
         <div class="step-text">
           <h4>{{ step.title }}</h4>
-
         </div>
       </div>
     </div>
@@ -95,10 +94,17 @@
           *ngIf="orderDetail?.status === 1 || orderDetail?.status === 2 || orderDetail?.status === 6">Hủy đơn</button>
       </div>
       <hr>
-      <div *ngIf="orderDetail?.status===5">
+      <div *ngIf="orderDetail?.status===5 || orderDetail?.status===8">
         <p style="color: red;">Hủy bởi: {{orderDetail?.cancelBy}}</p>
         <p style="color: red;">Lý do hủy: {{orderDetail?.cancelationReason}}</p>
       </div>
+      <div *ngIf=" orderDetail?.status===8">
+        <hr>
+        <p style="color: red;">Tình trạng đơn: Đã hoàn tiền</p>
+        <p style="color: red;">Người hoàn tiền: {{orderDetail?.staffFirstName}} {{orderDetail?.staffLastName}}</p>
+        <p style="color: red;">Ngày hoàn tiền: {{orderDetail?.refundDate | date:'dd/MM/yyyy - HH:mm'}}</p>
+      </div>
+
     </section>
   </div>
 </body>

@@ -247,4 +247,23 @@ span {
   color: #007bff;
   transition: color 0.3s ease;
 }
+.header {
+  display: flex;
+  align-items: center;
+}
 
+.back-icon {
+  font-size: 24px;
+  color: #007bff;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.back-icon:hover {
+  color: #0056b3;
+}
+
+h1 {
+  margin: 0 auto;
+  font-size: 30px;
+}

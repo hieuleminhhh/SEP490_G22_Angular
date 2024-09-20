@@ -82,7 +82,7 @@ export class ManagerOrderComponent implements OnInit {
   accountGuest: any;
   private socket!: WebSocket;
   showNotification: boolean = false;
-  notificationMessage: string = '';
+  notificationMessage:  string[] = [];
 
   constructor(
     private orderService: ManagerOrderService,
@@ -134,7 +134,7 @@ export class ManagerOrderComponent implements OnInit {
     };
   }
   showSlideNotification(message: string) {
-    this.notificationMessage = message;
+    this.notificationMessage.push(message);
     this.showNotification = true;
 
     // Hide the notification after 3 seconds
@@ -142,7 +142,9 @@ export class ManagerOrderComponent implements OnInit {
       this.showNotification = false;
     }, 6000);
   }
-
+  closeModal(index: number) {
+    this.notificationMessage = [];
+  }
   setDefaultDates() {
     const today = new Date();
     this.dateFrom = this.formatDate(today);
@@ -907,7 +909,21 @@ export class ManagerOrderComponent implements OnInit {
         const emailResponse = await this.orderService.sendOrderEmail(orderId).toPromise();
         const customerEmail = emailResponse.email;
         console.log(customerEmail); // Điều chỉnh dựa trên cấu trúc phản hồi
-
+        const body = {
+          orderId: orderId,
+          acceptBy: this.accountId
+        }
+        this.orderService.updateAcceptBy(body).subscribe(
+          response => {
+            console.log(response);
+          },
+          error => {
+            console.error('Lỗi khi cập nhật trạng thái:', error);
+            if (error.error && error.error.errors) {
+              console.error('Lỗi xác thực:', error.error.errors);
+            }
+          }
+        );
         // Gửi email thông báo (thực hiện không đồng bộ, không chờ đợi)
         this.orderService.sendEmail(customerEmail, 'Thông báo từ Eating House', 'Xin chào quý khách, đơn hàng của bạn đã được chấp nhận và đang trong quá trình xử lý. Cảm ơn bạn đã tin tưởng và lựa chọn Eating House!')
           .subscribe(
