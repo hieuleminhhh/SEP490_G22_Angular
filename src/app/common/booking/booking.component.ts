@@ -161,7 +161,7 @@ export class BookingComponent implements OnInit {
 
     this.availableTimes = [];
 
-    for (let hour = 9; hour <= 21; hour++) {
+    for (let hour = 9; hour <= 23; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         if (!isToday || (hour > currentHour || (hour === currentHour && minute >= currentMinute))) {
           this.addTimeOption(hour, minute);
