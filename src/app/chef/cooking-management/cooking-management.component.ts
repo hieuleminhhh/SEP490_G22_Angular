@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CookingService } from '../../../service/cooking.service';
 import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
   selector: 'app-cooking-management',
@@ -23,7 +24,9 @@ export class CookingManagementComponent implements OnInit {
   forms: { [key: number]: FormGroup } = {};
   selectedItem: any;
   ingredient: any;
-  constructor(private cookingService: CookingService, private fb: FormBuilder) { }
+  private socket!: WebSocket;
+  private reservationQueue: any[] = [];
+  constructor(private cookingService: CookingService, private notificationService: NotificationService, private fb: FormBuilder) { }
 
   ngOnInit(): void {
     const today = new Date();
@@ -31,6 +34,18 @@ export class CookingManagementComponent implements OnInit {
     this.dateTo = this.formatDate(today);
     this.dateNow = this.formatDate(today);
     this.getOrders('Current');
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift());
+      }
+    };
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
   }
 
   setView(view: string) {
@@ -50,7 +65,7 @@ export class CookingManagementComponent implements OnInit {
 
   getOrders(type: string): void {
     this.filteredOrders = [];
-    this.preOrder =[];
+    this.preOrder = [];
     this.cookingService.getOrders(type).subscribe(
       response => {
         this.order = response.data || [];
@@ -105,8 +120,10 @@ export class CookingManagementComponent implements OnInit {
 
     if (type === 1 || type === 2) {
       this.updateDishesServed(orderDetailId, dishesServed);
+
     } else {
       this.updateLocal(orderDetailId, dishesServed, itemNameOrComboName);
+      this.createNotification(1);
     }
     this.updateOrderQuantity(orderDetailId, dishesServed);
     this.filterOrders();
@@ -151,7 +168,6 @@ export class CookingManagementComponent implements OnInit {
     };
     this.cookingService.updateDishesServed(request).subscribe(
       response => {
-
       },
       error => {
         console.error('Error:', error);
@@ -208,8 +224,8 @@ export class CookingManagementComponent implements OnInit {
     return recevingOrderDate.getTime() >= (orderTimeDate.getTime() + oneHourInMilliseconds);
   }
 
-  showDetails(name:string, quantity:number) {
-    this.getIngredient(name,quantity);
+  showDetails(name: string, quantity: number) {
+    this.getIngredient(name, quantity);
   }
 
   closePopup() {
@@ -223,15 +239,49 @@ export class CookingManagementComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
-  getIngredient(name: string, quantity:number): void {
+  getIngredient(name: string, quantity: number): void {
     this.cookingService.getIngredient(name, quantity).subscribe(
       response => {
         this.ingredient = response;
-console.log(this.ingredient);
+        console.log(this.ingredient);
 
       },
       error => {
         console.error('Error:', error);
+      }
+    );
+  }
+
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Gửi yêu cầu đặt bàn khi WebSocket đã mở
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message);
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
+    }
+  }
+  createNotification(check: number) {
+    let description;
+    if (check === 1) {
+      description = `Có món ăn đã làm xong cho đơn tại quán ăn. Vui lòng kiểm tra và lên món`;
+    }
+    else if (check === 2) {
+      description = `Có đơn hàng đã xong . Vui lòng kiểm tra và trả đơn`;
+    }
+    const body = {
+      description: description,
+      type: 3
+    }
+    this.makeReservation(description);
+    console.log(body);
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
       }
     );
   }
