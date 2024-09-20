@@ -346,6 +346,7 @@ export class ManageInvoiceComponent implements OnInit {
           },
           error => {
             console.error('Error:', error);
+            this.selectTab('refund');
           }
         );
         this.getOrdersCancel();
@@ -354,6 +355,8 @@ export class ManageInvoiceComponent implements OnInit {
         console.error('Error:', error);
       }
     );
+    this.getOrdersCancel();
+
   }
 
   showDetails(order: any) {

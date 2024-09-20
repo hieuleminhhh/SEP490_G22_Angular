@@ -148,7 +148,7 @@
                       </button>
                     </td>
                     <td *ngIf="selectedStatusFun ==='refun'"> {{order.staffFirstName}} {{order.staffLastName}}</td>
-                    <td *ngIf="selectedStatusFun ==='refun'"> {{order.refundDate}}</td>
+                    <td *ngIf="selectedStatusFun ==='refun'"> {{order.refundDate | date:'dd/MM/yyyy - HH:mm'}}</td>
                     <td *ngIf="selectedStatusFun ==='refun'">
                       <button class="action-button view-button" (click)="showDetails(order.orderId)">
                         <i class="fas fa-eye"></i>
