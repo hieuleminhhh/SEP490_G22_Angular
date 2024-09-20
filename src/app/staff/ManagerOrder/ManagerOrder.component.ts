@@ -901,6 +901,7 @@ export class ManagerOrderComponent implements OnInit {
         const response = await this.orderService.AcceptOrderWaiting(orderId, paymentData).toPromise();
         console.log('Order accepted successfully:', response);
         this.createNotification(orderId, 1);
+        this.createNotification(orderId, 3);
 
         // Gọi sendOrderEmail để lấy địa chỉ email của khách hàng
         const emailResponse = await this.orderService.sendOrderEmail(orderId).toPromise();
@@ -930,17 +931,40 @@ export class ManagerOrderComponent implements OnInit {
 
   createNotification(orderId: number, check: number) {
     let description;
+    let body;
     if (check === 1) {
       description = "Chúng tôi xin chân thành cảm ơn Quý Khách đã đặt hàng tại Eating House. Chúng tôi rất vui mừng thông báo rằng đơn đặt hàng của Quý Khách đã được chấp nhận và đang được xử lý.Chúng tôi sẽ cố gắng giao hàng đúng thời gian và đảm bảo rằng Quý Khách sẽ hài lòng với những món ăn mà chúng tôi đã chuẩn bị. Nếu có bất kỳ câu hỏi nào hoặc cần thay đổi đơn hàng, xin vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã chọn Eating House. Chúng tôi rất mong được phục vụ Quý Khách!"
+      body = {
+        description: description,
+        accountId: this.accountGuest,
+        orderId: orderId,
+        type: 1
+      }
     } else if (check === 2) {
       description = `Kính gửi Quý Khách. Chúng tôi rất tiếc phải thông báo rằng đơn đặt hàng của Quý Khách tại Eating House với mã đơn hàng ${orderId} đã bị hủy. Lý do hủy đơn hàng: ${this.cancelationReason}. Chúng tôi thành thật xin lỗi về sự bất tiện này và mong rằng Quý Khách sẽ thông cảm. Chúng tôi luôn cố gắng cải thiện dịch vụ của mình để mang đến cho Quý Khách những trải nghiệm tốt nhất. Nếu Quý Khách cần thêm thông tin hoặc muốn đặt lại đơn hàng, vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã hiểu và đồng hành cùng Eating House. `;
+      body = {
+        description: description,
+        accountId: this.accountGuest,
+        orderId: orderId,
+        type: 1
+      }
+    }else if (check === 3) {
+      description = `Có đơn hàng mới. Vui lòng xem danh sách các món ăn để làm! `;
+      body = {
+        description: description,
+        orderId: orderId,
+        type: 4
+      }
     }
-    const body = {
-      description: description,
-      accountId: this.accountGuest,
-      orderId: orderId,
-      type: 1
+    else if (check === 4) {
+      description = `Đơn hàng ${orderId} đã giao hàng thất bại. Lý do ${this.cancelationReason} `;
+      body = {
+        description: description,
+        orderId: orderId,
+        type: 4
+      }
     }
+
 
     this.notificationService.createNotification(body).subscribe(
       response => {

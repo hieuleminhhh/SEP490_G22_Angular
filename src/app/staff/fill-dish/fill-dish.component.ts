@@ -8,6 +8,7 @@ import { HeaderOrderStaffComponent } from "../ManagerOrder/HeaderOrderStaff/Head
 import { DateFormatPipe } from '../../common/material/dateFormat/dateFormat.component';
 import { AccountService } from '../../../service/account.service';
 import { SidebarOrderComponent } from "../SidebarOrder/SidebarOrder.component";
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
   selector: 'app-fill-dish',
@@ -32,14 +33,37 @@ export class FillDishComponent implements OnInit {
   dataShipStaff: any;
   isAnyOrderSelected: boolean = false;
   isPrinted: boolean = false;
-  constructor(private cookingService: CookingService, private accountService: AccountService) { }
+  private socket!: WebSocket;
+  private reservationQueue: any[] = [];
+  constructor(private cookingService: CookingService, private notificationService: NotificationService, private accountService: AccountService) { }
 
   ngOnInit(): void {
     this.getCompletedDishesFromLocalStorage();
     this.getOrdersTakeaway();
     this.getShipStaff();
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift());
+      }
+    };
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
   }
-
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Gửi yêu cầu đặt bàn khi WebSocket đã mở
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message);
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
+    }
+  }
   getCompletedDishesFromLocalStorage(): void {
     const storedCompletedDishes = localStorage.getItem('completedDishes');
     if (storedCompletedDishes) {
@@ -299,6 +323,8 @@ export class FillDishComponent implements OnInit {
       ).subscribe(
         statusResponse => {
           console.log(`Order ${order.orderId} status updated to 7 successfully`, statusResponse);
+          this.createNotification(aId, order.orderId, 1);
+          this.createNotification(order.accountId, order.orderId, 2);
         },
         error => {
           console.error(`Error updating account or status for order ${order.orderId}:`, error);
@@ -306,6 +332,48 @@ export class FillDishComponent implements OnInit {
       );
 
     });
+  }
+  createNotification(accountId: number, orderId: number, check: number) {
+    let description;
+    let body;
+    const today = new Date();
+    const formattedDate = today.toLocaleString('vi-VN', {
+      weekday: 'long', // Thứ
+      year: 'numeric', // Năm
+      month: 'long', // Tháng
+      day: 'numeric', // Ngày
+      hour: 'numeric', // Giờ
+      minute: 'numeric', // Phút
+      second: 'numeric'  // Giây
+    });
+    if (check === 1) {
+      description = `Đơn hàng ${orderId} đã sẵn sàng để giao hàng. Vui lòng kiểm tra lại danh sách giao hàng của bạn.`;
+      body = {
+        description: description,
+        accountId: accountId,
+        orderId: orderId,
+        type: 1
+      }
+    } else if (check === 2) {
+      description = `Đơn hàng ${orderId} đã sẵn sàng để giao hàng đến bạn. Thời gian giao hàng: ${formattedDate}. Vui lòng theo dõi đơn hàng và đợi cuộc gọi của nhân viên của chúng tôi sẽ liên lạc đến bạn để nhận hàng..`;
+      body = {
+        description: description,
+        accountId: accountId,
+        orderId: orderId,
+        type: 1
+      }
+    }
+
+    this.makeReservation(description);
+    console.log(body);
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
   }
   assignShipButtonClick(order: any) {
     this.cookingService.updateOrderStatus(order.orderId, status).subscribe(

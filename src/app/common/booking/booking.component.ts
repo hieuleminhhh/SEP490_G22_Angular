@@ -53,8 +53,10 @@ export class BookingComponent implements OnInit {
   isValidDish: boolean = false;
   maxValue: number = 1000;
   private socket!: WebSocket;
+  private reservationQueue: any[] = [];
 
-  constructor(private reservationService: ReservationService, private http: HttpClient, private notificationService: NotificationService, private router: Router, public dialog: MatDialog, private checkoutService: CheckoutService) {
+  constructor(private reservationService: ReservationService, private http: HttpClient,
+     private notificationService: NotificationService, private router: Router, public dialog: MatDialog, private checkoutService: CheckoutService) {
     const today = new Date();
     this.minDate = this.formatDate(today);
     const maxDate = new Date();
@@ -71,7 +73,6 @@ export class BookingComponent implements OnInit {
     };
     this.generateAvailableHours();
   }
-  private reservationQueue: any[] = [];
 
   ngOnInit(): void {
     this.updateTimes();
