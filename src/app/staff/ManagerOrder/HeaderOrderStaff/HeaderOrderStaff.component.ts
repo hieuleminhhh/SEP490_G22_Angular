@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountService } from '../../../../service/account.service';
 import { SettingService } from '../../../../service/setting.service';
+import { NotificationService } from '../../../../service/notification.service';
 @Component({
   selector: 'app-HeaderOrderStaff',
   templateUrl: './HeaderOrderStaff.component.html',
@@ -14,9 +15,10 @@ import { SettingService } from '../../../../service/setting.service';
   imports: [MatToolbarModule, CommonModule, FormsModule, MatButtonModule]
 })
 export class HeaderOrderStaffComponent implements OnInit {
-  accountId: number | null = null;
+  accountId: any;
   constructor(private router: Router,
-    private route: ActivatedRoute, private accountService: AccountService, private settingService: SettingService) { }
+    private route: ActivatedRoute, private accountService: AccountService,
+     private settingService: SettingService, private notificationService: NotificationService) { }
   account: any = {};
   dropdownOpen = false;
   currentPassword: string = '';
@@ -26,15 +28,61 @@ export class HeaderOrderStaffComponent implements OnInit {
   successMessage: string = '';
   logoUrl: string = '';
   settings: any;
+
+  showNotifications = false;
+  notifications: any[] = [];
+  itemCountNoti: number = 0;
+  private socket!: WebSocket;
+
   ngOnInit() {
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
     if (this.accountId) {
       this.getAccountDetails(this.accountId);
+      this.getNotificationByType(this.accountId);
     } else {
       console.error('Account ID is not available');
     }
     this.getInfo();
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+    };
+    this.socket.onmessage = (event) => {
+      const reservation = JSON.parse(event.data);
+      try {
+        this.getNotificationByType(this.accountId);
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
+      }
+    };
+    this.socket.onclose = () => {
+    };
+    this.socket.onerror = (error) => {
+    };
+  }
+  viewDetails() {
+    window.location.href = '/notification';
+  }
+  getNotificationByType(accountId: number): void {
+    this.notificationService.getType(accountId).subscribe(
+      response => {
+        this.notificationService.getNotificationByType(response).subscribe(
+          response => {
+            this.notifications = response.filter((notification: { isView: boolean; }) => notification.isView === false);
+            const unseenNotifications = this.notifications.filter(notification => notification.isView === false);
+            this.itemCountNoti = unseenNotifications.length;
+            console.log(this.itemCountNoti);
+
+          },
+          error => {
+            console.error('Error fetching account details:', error);
+          }
+        );
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
   }
   logout() {
     localStorage.removeItem('token');

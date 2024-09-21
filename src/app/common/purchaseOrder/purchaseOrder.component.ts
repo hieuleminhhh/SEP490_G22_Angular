@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
 import { CookingService } from '../../../service/cooking.service';
 import { PaymentService } from '../../../service/payment.service';
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
   selector: 'app-purchaseOrder',
@@ -24,18 +25,21 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
   orders: any[] = []; // Khai báo orders như một mảng
   filteredOrders: any[] = []; // Khai báo filteredOrders như một mảng
   subscriptions: Subscription[] = [];
-  accountId: number | null = null; // Khai báo accountId là null
+  accountId: any;
   cancelationReason: string = 'Không còn nhu cầu';
   orderCancelled: boolean = false;
   choiceOrder: any;
-  choiceReser:any;
+  choiceReser: any;
   cancelBy: string = 'Người mua';
+  private socket!: WebSocket;
+  private reservationQueue: any[] = [];
+
   constructor(
     private purchaseOrderService: PurchaseOrderService,
     private route: ActivatedRoute,
     private http: HttpClient,
     private router: Router, private cookingService: CookingService, private paymentService: PaymentService,
-    private reservationService: ReservationService
+    private reservationService: ReservationService, private notificationService: NotificationService
   ) { }
 
   ngOnInit() {
@@ -48,6 +52,24 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
     } else {
       console.error('Account ID is not valid');
     }
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift());
+      }
+    };
+    this.socket.onmessage = (event) => {
+      const reservation = JSON.parse(event.data);
+      try {
+        this.getOrdersPurchase(this.accountId);
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
+      }
+    };
+    this.socket.onclose = () => {
+    };
+    this.socket.onerror = (error) => {
+    };
   }
   showData(tab: string) {
     this.selectedTab = tab;
@@ -89,7 +111,7 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
     }
   }
   cancelOrder() {
-console.log(this.choiceOrder);
+    console.log(this.choiceOrder);
 
     const url = `https://localhost:7188/api/orders/${this.choiceOrder}/cancel`;
     this.http.put(url, {}).subscribe(
@@ -98,6 +120,7 @@ console.log(this.choiceOrder);
         this.orderCancelled = true;
         this.updateCancelResion(this.choiceOrder);
         this.updateStatusReservation(this.choiceReser);
+        this.createNotification(this.choiceOrder);
         window.location.reload();
       },
       error => {
@@ -163,10 +186,38 @@ console.log(this.choiceOrder);
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
-  choiceOrderCancel(orderId: number, reserId:number) {
+  choiceOrderCancel(orderId: number, reserId: number) {
     this.choiceOrder = orderId;
     this.choiceReser = reserId;
     console.log(this.choiceOrder);
 
+  }
+  createNotification(orderId: number) {
+    let description = `Khách hàng đã hủy đơn ${orderId}! Lý do hủy: ${this.cancelationReason}. Vui lòng kiểm tra lại đơn hàng đơn hàng.`;
+    const body = {
+      description: description,
+      orderId: orderId,
+      type: 2
+    }
+    this.makeReservation(description);
+    console.log(body);
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Gửi yêu cầu đặt bàn khi WebSocket đã mở
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message);
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
+    }
   }
 }

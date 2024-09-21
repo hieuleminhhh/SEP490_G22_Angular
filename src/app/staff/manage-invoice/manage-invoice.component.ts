@@ -67,6 +67,8 @@ export class ManageInvoiceComponent implements OnInit {
   selectedEmployeeName: string = '';
   orders: any;
   accountId: any;
+  private reservationQueue: any[] = [];
+  private socket!: WebSocket;
 
   constructor(private invoiceService: InvoiceService, private notificationService: NotificationService, private cookingService: CookingService, private exportService: ExportService) { }
   @ViewChild('collectAllModal') collectAllModal!: ElementRef;
@@ -84,6 +86,54 @@ export class ManageInvoiceComponent implements OnInit {
     this.accountId = accountIdString ? Number(accountIdString) : null;
     this.selectedStatus = 'unpaid';
     this.selectedStatusFun = 'unrefun';
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift());
+      }
+    };
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+  }
+  createNotification(orderId: number, accountId: number, check: boolean) {
+    let description;
+    if (check === true) {
+       description = `Kính gửi Quý Khách. Chúng tôi xin thông báo rằng đơn hàng của Quý Khách tại Eating House với mã đơn hàng ${orderId} đã được hoàn tiền thành công. Số tiền sẽ được hoàn lại qua phương thức thanh toán mà Quý Khách đã sử dụng khi đặt hàng. Xin vui lòng kiểm tra tài khoản của mình để xác nhận giao dịch. Chúng tôi thành thật xin lỗi vì bất kỳ sự bất tiện nào mà điều này có thể đã gây ra. Nếu Quý Khách có bất kỳ thắc mắc nào liên quan đến việc hoàn tiền, vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã tin tưởng và sử dụng dịch vụ của Eating House. Chúng tôi hy vọng sẽ có cơ hội được phục vụ Quý Khách trong tương lai!`;
+    }else{
+      description = `Đã nhận tiền giao hàng cho đơn hàng ${orderId}`;
+    }
+    const body = {
+      description: description,
+      accountId: accountId,
+      orderId: orderId,
+      type: 1
+    }
+    console.log(body);
+
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+        this.makeReservation(body.description);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
+
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Gửi yêu cầu đặt bàn khi WebSocket đã mở
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message);
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
+    }
   }
   selectTab(tab: string) {
     this.selectedTab = tab;
@@ -236,7 +286,7 @@ export class ManageInvoiceComponent implements OnInit {
   collectAllPayments(): void {
     const updatePromises = this.filteredOrders.map(order =>
       new Promise<void>((resolve, reject) => {
-        this.update(order.orderId, order.totalPaid);
+        this.update(order.orderId, order.totalPaid, this.orderShipper.staffId);
         resolve(); // Hoàn tất promise ngay lập tức (có thể thêm logic kiểm tra ở đây)
       })
     );
@@ -251,7 +301,7 @@ export class ManageInvoiceComponent implements OnInit {
       });
   }
 
-  update(id: number, totalPaid: number): void {
+  update(id: number, totalPaid: number, staffId:number): void {
     const request = {
       paymentAmount: totalPaid,
       collectedBy: this.accountId
@@ -261,7 +311,10 @@ export class ManageInvoiceComponent implements OnInit {
       response => {
         this.filteredOrders = this.filteredOrders.filter(order => order.orderId !== id);
         console.log(`Đơn hàng ${id} đã được thu tiền.`);
+        this.createNotification(id, staffId, false);
+        this.getOrdersCancel();
         this.getOrdersShip();
+        this.getOrdersStatic();
       },
       error => {
         console.error('Error:', error);
@@ -270,7 +323,7 @@ export class ManageInvoiceComponent implements OnInit {
   }
 
 
-  updateOrderStatus(id: number, accountId:number): void {
+  updateOrderStatus(id: number, accountId: number): void {
     const request = {
       status: 8
     }
@@ -283,14 +336,17 @@ export class ManageInvoiceComponent implements OnInit {
         }
         console.log(body);
 
+        this.createNotification(id, accountId, true);
         this.invoiceService.updateStaffId(body).subscribe(
           response => {
             console.log(response);
-            this.createNotification(id,accountId);
             this.getOrdersCancel();
+            this.getOrdersShip();
+            this.getOrdersStatic();
           },
           error => {
             console.error('Error:', error);
+            this.selectTab('refund');
           }
         );
         this.getOrdersCancel();
@@ -299,24 +355,8 @@ export class ManageInvoiceComponent implements OnInit {
         console.error('Error:', error);
       }
     );
-  }
+    this.getOrdersCancel();
 
-  createNotification(orderId: number, accountId: number) {
-    const body = {
-      description: `Kính gửi Quý Khách. Chúng tôi xin thông báo rằng đơn hàng của Quý Khách tại Eating House với mã đơn hàng ${orderId} đã được hoàn tiền thành công. Số tiền sẽ được hoàn lại qua phương thức thanh toán mà Quý Khách đã sử dụng khi đặt hàng. Xin vui lòng kiểm tra tài khoản của mình để xác nhận giao dịch. Chúng tôi thành thật xin lỗi vì bất kỳ sự bất tiện nào mà điều này có thể đã gây ra. Nếu Quý Khách có bất kỳ thắc mắc nào liên quan đến việc hoàn tiền, vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã tin tưởng và sử dụng dịch vụ của Eating House. Chúng tôi hy vọng sẽ có cơ hội được phục vụ Quý Khách trong tương lai!`,
-      accountId: accountId,
-      orderId: orderId,
-      type: 1
-    }
-
-    this.notificationService.createNotification(body).subscribe(
-      response => {
-        console.log(response);
-      },
-      error => {
-        console.error('Error fetching account details:', error);
-      }
-    );
   }
 
   showDetails(order: any) {

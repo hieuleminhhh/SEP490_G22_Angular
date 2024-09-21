@@ -10,7 +10,12 @@ import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.co
 import { MatDialog } from '@angular/material/dialog';
 import { MenuComponent } from '../menu/menu.component';
 import { CheckoutService } from '../../../service/checkout.service';
-
+import { NotificationService } from '../../../service/notification.service';
+import { HttpClient } from '@angular/common/http';
+interface CheckoutResponse {
+  orderId: number;
+  // Các thuộc tính khác nếu có
+}
 @Component({
   selector: 'app-booking',
   standalone: true,
@@ -48,8 +53,10 @@ export class BookingComponent implements OnInit {
   isValidDish: boolean = false;
   maxValue: number = 1000;
   private socket!: WebSocket;
+  private reservationQueue: any[] = [];
 
-  constructor(private reservationService: ReservationService, private router: Router, public dialog: MatDialog, private checkoutService: CheckoutService) {
+  constructor(private reservationService: ReservationService, private http: HttpClient,
+     private notificationService: NotificationService, private router: Router, public dialog: MatDialog, private checkoutService: CheckoutService) {
     const today = new Date();
     this.minDate = this.formatDate(today);
     const maxDate = new Date();
@@ -66,7 +73,6 @@ export class BookingComponent implements OnInit {
     };
     this.generateAvailableHours();
   }
-  private reservationQueue: any[] = [];
 
   ngOnInit(): void {
     this.updateTimes();
@@ -79,17 +85,14 @@ export class BookingComponent implements OnInit {
       this.accountId = JSON.parse(accountIdString);
     }
     this.socket = new WebSocket('wss://localhost:7188/ws');
-
     this.socket.onopen = () => {
       while (this.reservationQueue.length > 0) {
-        this.socket.send(this.reservationQueue.shift()); // Gửi yêu cầu từ hàng đợi
+        this.socket.send(this.reservationQueue.shift());
       }
     };
-
     this.socket.onclose = () => {
       console.log('WebSocket connection closed');
     };
-
     this.socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
@@ -103,10 +106,26 @@ export class BookingComponent implements OnInit {
       this.socket.close();
     }
   }
-
+  createNotification(guestPhone: string, customerName: string) {
+    let description = `Khách hàng ${customerName} vừa đặt đơn đặt bàn mới! Vui lòng kiểm tra và xác nhận đơn hàng.`;
+    const body = {
+      description: description,
+      type: 3
+    }
+    this.makeReservation(description);
+    console.log(body);
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
   generateAvailableHours() {
     this.availableHours = [];
-    for (let hour = 9; hour <= 21; hour++) {
+    for (let hour = 9; hour <= 23; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         const formattedHour = hour.toString().padStart(2, '0') + ':' + minute.toString().padStart(2, '0');
         this.availableHours.push(formattedHour);
@@ -142,7 +161,7 @@ export class BookingComponent implements OnInit {
 
     this.availableTimes = [];
 
-    for (let hour = 9; hour <= 21; hour++) {
+    for (let hour = 9; hour <= 23; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         if (!isToday || (hour > currentHour || (hour === currentHour && minute >= currentMinute))) {
           this.addTimeOption(hour, minute);
@@ -194,7 +213,7 @@ export class BookingComponent implements OnInit {
             this.reservationService.createResevetion(this.currentRequest).subscribe({
               next: response => {
                 console.log('Order submitted successfully', response);
-                this.makeReservation(this.currentRequest); // Gọi phương thức gửi yêu cầu đặt bàn
+                this.createNotification(this.currentRequest.guestPhone, this.currentRequest.customerName);
                 this.reservationService.clearCart();
                 this.router.navigate(['/paymentReservation']);
               },

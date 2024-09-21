@@ -9,37 +9,37 @@
     display: flex;
     align-items: center;
   }
-  
+
   .navbar-brand img {
     height: 40px;
     margin-right: 10px;
   }
-  
+
   .navbar-brand span {
     font-size: 1.5rem;
     color: white;
   }
-  
+
   .nav-link {
     color: white;
   }
-  
+
   .nav-link:hover {
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
   }
-  
+
   .user-info {
     margin-left: 20px;
   }
-  
+
   .user-avatar {
     height: 40px;
     border-radius: 50%;
     font-size: 2rem;
     margin-top: 12px;
   }
-  
+
   .user-name {
     color: white;
     font-weight: 500;
@@ -54,7 +54,7 @@
     margin-left: 20px;
     margin-bottom: -80px;
   }
-  
+
   .dropdown-menu {
     display: none; /* Initially hidden */
     position: absolute;
@@ -69,8 +69,8 @@
     margin: 0;
     width: 200px; /* Adjust the width of the dropdown menu */
   }
-  
-  
+
+
   .dropdown-menu.show {
     display: block;
   }
@@ -94,4 +94,166 @@
     border-radius: 70%; /* Làm cho hình ảnh thành hình tròn */
     object-fit: cover; /* Đảm bảo hình ảnh không bị méo */
   }
-  
+
+
+
+  /* Navbar General Styles */
+.navbar-nav {
+  display: flex;
+  align-items: center;
+}
+
+.nav-item {
+  margin-left: 15px;
+}
+
+.noti-icon {
+  font-size: 26px;
+  color: #555;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.noti-icon:hover {
+  color: #007bff;
+}
+
+/* Notifications Dropdown */
+.notifications-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  width: 300px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  cursor: pointer;
+}
+
+.notification-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-item {
+  padding: 10px;
+  border-bottom: 1px solid #f1f1f1;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.notification-item:hover {
+  background-color: #f9f9f9;
+}
+
+.notification-content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.notification-description {
+  font-size: 14px;
+  color: #333;
+}
+
+.notification-time {
+  font-size: 12px;
+  color: #888;
+}
+
+.view-all-btn {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.view-all-btn:hover {
+  color: #0056b3;
+}
+
+/* Logout Link */
+.logout-link {
+  font-size: 16px;
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.logout-link:hover {
+  color: #0056b3;
+}
+
+/* User Info Dropdown */
+.user-info {
+  position: relative;
+  cursor: pointer;
+}
+
+.user-avatar {
+  font-size: 26px;
+  color: #555;
+  transition: color 0.3s ease;
+}
+
+.user-avatar:hover {
+  color: #007bff;
+}
+
+.user-name {
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+}
+
+.dropdown-menu-container {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  width: 200px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: none;
+}
+
+.dropdown-menu-container .dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 10px 15px;
+  font-size: 14px;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f9f9f9;
+}
+/* CSS cho dấu đỏ hiển thị khi có thông báo */
+.item-count-noti {
+  position: absolute;
+  left: 15px;
+  background-color: red;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 6px 6px;
+  border-radius: 50%; /* Tạo dấu đỏ hình tròn */
+  display: none; /* Mặc định ẩn */
+}
+
+/* Hiển thị dấu đỏ khi itemCountNoti > 0 */
+.item-count-noti.active {
+  display: inline-block;
+}

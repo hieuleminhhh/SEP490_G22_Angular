@@ -54,6 +54,10 @@ export interface ListOrderDetailByOrder{
   cancelationReason:string;
   orderDetails:ListOrderDetail[];
   tables: Table[];
+  staffFirstName:string;
+  staffLastName:string;
+  refundDate:Date;
+  cancelDate:Date;
 }
 export interface AddOrderDetail{
   unitPrice: number;

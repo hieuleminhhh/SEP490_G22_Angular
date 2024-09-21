@@ -9,6 +9,7 @@ import { CookingService } from '../../../service/cooking.service';
 import { HttpClient } from '@angular/common/http';
 import { PaymentService } from '../../../service/payment.service';
 import { ReservationService } from '../../../service/reservation.service';
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
   selector: 'app-orderDetail',
@@ -33,17 +34,38 @@ export class OrderDetailComponent implements OnInit {
   cancelationReason: string = 'Không còn nhu cầu';
   orderCancelled: boolean = false;
   cancelBy: string = 'Người mua';
+  private socket!: WebSocket;
+  private reservationQueue: any[] = [];
   constructor(
     private route: ActivatedRoute,
     private purchaseOrderService: PurchaseOrderService,
     private location: Location, private router: Router, private cookingService: CookingService,
-    private paymentService: PaymentService, private http: HttpClient, private reservationService: ReservationService
+    private paymentService: PaymentService, private http: HttpClient,
+    private notificationService: NotificationService, private reservationService: ReservationService
   ) { }
 
   ngOnInit() {
     this.orderId = this.route.snapshot.paramMap.get('id');
     console.log(this.orderId);
     this.getOrderDetail();
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift());
+      }
+    };
+    this.socket.onmessage = (event) => {
+      const reservation = JSON.parse(event.data);
+      try {
+        this.getOrderDetail();
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
+      }
+    };
+    this.socket.onclose = () => {
+    };
+    this.socket.onerror = (error) => {
+    };
   }
 
   getOrderDetail() {
@@ -124,6 +146,7 @@ export class OrderDetailComponent implements OnInit {
         this.orderCancelled = true;
         this.updateCancelResion(orderId);
         this.updateStatusReservation(reserId);
+        this.createNotification(orderId);
         window.location.reload();
       },
       error => {
@@ -170,5 +193,32 @@ export class OrderDetailComponent implements OnInit {
       }
     );
   }
-
+  createNotification(orderId: number) {
+    let description = `Khách hàng đã hủy đơn ${orderId}! Lý do hủy: ${this.cancelationReason}. Vui lòng kiểm tra lại đơn hàng đơn hàng.`;
+    const body = {
+      description: description,
+      orderId: orderId,
+      type: 2
+    }
+    this.makeReservation(description);
+    console.log(body);
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Gửi yêu cầu đặt bàn khi WebSocket đã mở
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message);
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
+    }
+  }
 }

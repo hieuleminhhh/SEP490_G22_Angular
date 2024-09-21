@@ -25,4 +25,12 @@ export class NotificationService {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
     return this.http.post(url, body, { headers });
   }
+  getNotificationByType(id: number): Observable<any> {
+    const url = `https://localhost:7188/api/Notifications/type/${id}`;
+    return this.http.get(url);
+  }
+  getType(id: number): Observable<any> {
+    const url = `https://localhost:7188/api/Account/GetTypeNotificationByAccountId/${id}`;
+    return this.http.get(url);
+  }
 }

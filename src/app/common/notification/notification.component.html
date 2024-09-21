@@ -9,8 +9,10 @@
 
 <body>
   <div class="container">
-    <h1>Danh Sách Thông Báo</h1>
-
+    <div class="header">
+      <i class="fas fa-arrow-left back-icon" (click)="goBack()"></i>
+      <h1>Danh Sách Thông Báo</h1>
+    </div>
     <div *ngIf="filteredData.length === 0" class="no-notifications">
       <div class="icon">
         <i class="fas fa-bell-slash"></i>

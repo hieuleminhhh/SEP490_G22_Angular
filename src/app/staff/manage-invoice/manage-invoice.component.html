@@ -101,14 +101,14 @@
                 Đơn hàng chưa hoàn tiền
               </button>
               <button class="status-button" [ngClass]="{'active': selectedStatusFun === 'refun'}"
-              (click)="selectedStatusFun = 'refun'; filterOrdersByStatus()">
+                (click)="selectedStatusFun = 'refun'; filterOrdersByStatus()">
                 Đơn hàng đã hoàn tiền
               </button>
             </div>
 
             <br>
-             <!-- Kiểm tra xem có đơn hàng không -->
-             <div *ngIf="filteredOrdersCancel.length === 0" class="no-orders-message">
+            <!-- Kiểm tra xem có đơn hàng không -->
+            <div *ngIf="filteredOrdersCancel.length === 0" class="no-orders-message">
               <p>Không có đơn hàng nào.</p>
             </div>
 
@@ -124,6 +124,7 @@
                   <th *ngIf="selectedStatusFun ==='unrefun'">Tổng tiền phải hoàn trả</th>
                   <th *ngIf="selectedStatusFun ==='refun'">Tổng tiền đã hoàn trả</th>
                   <th *ngIf="selectedStatusFun ==='refun'"> Nhân viên hoàn tiền</th>
+                  <th *ngIf="selectedStatusFun ==='refun'"> Ngày hoàn tiền</th>
                   <th></th>
                 </tr>
               </thead>
@@ -147,6 +148,7 @@
                       </button>
                     </td>
                     <td *ngIf="selectedStatusFun ==='refun'"> {{order.staffFirstName}} {{order.staffLastName}}</td>
+                    <td *ngIf="selectedStatusFun ==='refun'"> {{order.refundDate | date:'dd/MM/yyyy - HH:mm'}}</td>
                     <td *ngIf="selectedStatusFun ==='refun'">
                       <button class="action-button view-button" (click)="showDetails(order.orderId)">
                         <i class="fas fa-eye"></i>
@@ -291,7 +293,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invoiceModal"
-          (click)="update(orderShipper.orderId, orderShipper.totalPaid)">Xác
+          (click)="update(orderShipper.orderId, orderShipper.totalPaid, orderShipper.staffId)">Xác
           nhận</button>
       </div>
     </div>

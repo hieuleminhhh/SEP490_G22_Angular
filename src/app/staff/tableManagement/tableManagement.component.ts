@@ -72,6 +72,7 @@ export class TableManagementComponent implements OnInit {
   cancelMessage: string | null = null;
   showAcceptModal: boolean = false;
   isModalVisible: boolean = false;
+  isModalVisibles: boolean = false;
   onConfirmCallback: () => void = () => { };
   modalMessage: any;
   guestInfo: any;
@@ -100,11 +101,9 @@ export class TableManagementComponent implements OnInit {
     this.socket.onopen = () => {
     };
     this.socket.onmessage = (event) => {
+      const reservation = JSON.parse(event.data);
       try {
-        const reservation = JSON.parse(event.data);
-        if (reservation && typeof reservation === 'object') {
-          this.dataReservationPending.push(reservation);
-        }
+        this.getReservation();
       } catch (error) {
         console.error('Error parsing reservation data:', error);
       }
@@ -203,12 +202,12 @@ export class TableManagementComponent implements OnInit {
   selectedReservations: any[] = [];
   openModalSchedule(reservations: any[]) {
     this.selectedReservations = reservations; // Set reservations for the modal
-    this.isModalVisible = true; // Show modal
+    this.isModalVisibles = true; // Show modal
   }
 
   // Function to close the modal
   closeModalSchedule() {
-    this.isModalVisible = false; // Hide modal
+    this.isModalVisibles = false; // Hide modal
   }
   //=================================================================================================================================
 
@@ -248,16 +247,14 @@ export class TableManagementComponent implements OnInit {
           this.selectedTableIds.push(table.tableId);
           this.totalCapacity += table.capacity;
         }
-        console.log(this.totalCapacity);
       } else {
         this.selectedTableIds.splice(tableIdIndex, 1);
         this.totalCapacity -= table.capacity;
         this.ishas = false;
-        console.log(this.totalCapacity);
       }
     }
+    this.getSelectedTableNames();
   }
-
 
   toggleDropdownTable(event: Event, table: any) {
     event.stopPropagation();
@@ -466,6 +463,11 @@ export class TableManagementComponent implements OnInit {
         return total + reservation.capacity;
       }, 0);
       this.ishas = true;
+      console.log(this.totalCapacity);
+      console.log(this.selectedTableIds);
+      console.log(this.allTable);
+
+
     }
   }
 
@@ -496,8 +498,9 @@ export class TableManagementComponent implements OnInit {
       setTimeout(() => {
         this.validMessage = '';
       }, 3000);
-
     }
+    console.log(this.selectedTableIds);
+
   }
 
   closeConfirmSaveModal() {
@@ -514,9 +517,6 @@ export class TableManagementComponent implements OnInit {
       reservationId: this.reserId,
       tableIds: this.selectedTableIds
     }
-    console.log(request);
-    console.log(this.tableOfReservation.length);
-
     if (this.tableOfReservation.length > 0) {
       this.reservationService.updateTableReservation(request).subscribe({
         next: response => {
@@ -530,6 +530,7 @@ export class TableManagementComponent implements OnInit {
             console.error(`Backend returned code ${error.status}, ` +
               `body was: ${JSON.stringify(error.error)}`);
           }
+          this.getReservationData();
         }
       });
     } else {
@@ -545,10 +546,11 @@ export class TableManagementComponent implements OnInit {
             console.error(`Backend returned code ${error.status}, ` +
               `body was: ${JSON.stringify(error.error)}`);
           }
+          this.getReservationData();
         }
       });
     }
-
+    this.getReservationData();
     this.closeConfirmSaveModal();
     this.closePopup();
   }
@@ -604,6 +606,7 @@ export class TableManagementComponent implements OnInit {
   }
   closeModal(): void {
     this.isModalVisible = false;
+    this.isModalVisibles = false;
   }
   confirmReservation(): void {
     this.onConfirmCallback();
@@ -799,7 +802,7 @@ export class TableManagementComponent implements OnInit {
       if (tableIds.length === 1) {
         tableRange = `${tableIds[0]}`;
       } else {
-        tableRange = `${tableIds[0]}-${tableIds[tableIds.length - 1]}`;
+        tableRange = `${tableIds[0]},${tableIds[tableIds.length - 1]}`;
       }
       return {
         floor,
@@ -812,7 +815,7 @@ export class TableManagementComponent implements OnInit {
       return 'Chưa xếp bàn';
     }
     const grouped = this.groupTablesByFloor(tables);
-    return grouped.map(group => `Khu vực: ${group.floor} gồm ${group.tableRange}`).join('<br>');
+    return grouped.map(group => `${group.floor}: ${group.tableRange}`).join('<br>');
   }
 
   getStatusLabel(status: number): { label: string, class: string } {

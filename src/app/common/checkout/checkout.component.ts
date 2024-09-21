@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Dish } from '../../../models/dish.model';
-import { CommonModule, Time } from '@angular/common';
+import { CommonModule, DatePipe, Time } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CheckoutService } from '../../../service/checkout.service';
@@ -10,14 +10,20 @@ import { HttpClient } from '@angular/common/http';
 import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
 import { PercentagePipe } from '../material/percentFormat/percentFormat.component';
 import { ReservationService } from '../../../service/reservation.service';
-
+import { NotificationService } from '../../../service/notification.service';
+interface CheckoutResponse {
+  orderId: number;
+  // Các thuộc tính khác nếu có
+}
 @Component({
   selector: 'app-checkout',
   standalone: true,
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css'],
-  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, MatDialogModule, CurrencyFormatPipe, PercentagePipe]
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, MatDialogModule, CurrencyFormatPipe, PercentagePipe],
+  providers: [DatePipe]
 })
+
 export class CheckoutComponent implements OnInit {
   selectedService: string = 'service1';
   orderTime: string = 'Giao hàng sớm nhất';
@@ -32,7 +38,7 @@ export class CheckoutComponent implements OnInit {
   consigneeName: string = '';
   guestPhone: string = '';
   email: string = '';
-  emailGuest:string = '';
+  emailGuest: string = '';
   address: string = '';
   note: string = '';
   people: number | undefined;
@@ -49,10 +55,11 @@ export class CheckoutComponent implements OnInit {
 
   comboIds: number[] = [];
   dishIds: number[] = [];
-
+  private socket!: WebSocket;
+  private reservationQueue: any[] = [];
 
   constructor(private cartService: CartService, private reservationService: ReservationService, private http: HttpClient, private router: Router,
-     private route: ActivatedRoute, private checkoutService: CheckoutService) {
+    private route: ActivatedRoute,private datePipe: DatePipe, private notificationService: NotificationService, private checkoutService: CheckoutService) {
     const today = new Date();
     this.date = this.formatDate(today);
     this.minDate = this.formatDate(today);
@@ -73,8 +80,31 @@ export class CheckoutComponent implements OnInit {
       this.accountId = JSON.parse(accountIdString);
     }
     this.updateTimes();
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift()); // Gửi yêu cầu từ hàng đợi
+      }
+    };
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
   }
 
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Gửi yêu cầu đặt bàn khi WebSocket đã mở
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message);
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
+    }
+  }
   generateAvailableHours() {
     this.availableHours = [];
     for (let hour = 9; hour <= 21; hour++) {
@@ -306,6 +336,8 @@ export class CheckoutComponent implements OnInit {
       console.log(request);
       this.checkoutService.submitOrder(request).subscribe({
         next: response => {
+          this.createNotification(this.guestPhone, this.consigneeName);
+
           console.log('Order submitted successfully', response);
           this.cartService.clearCart();
           sessionStorage.removeItem('cartItems');
@@ -352,6 +384,8 @@ export class CheckoutComponent implements OnInit {
       console.log("Request Object:", request);
       this.reservationService.createResevetion(request).subscribe({
         next: response => {
+          this.createNotification(this.guestPhone, this.consigneeName);
+
           console.log('Order submitted successfully', response);
           this.reservationService.clearCart();
           this.cartService.clearCart();
@@ -372,7 +406,30 @@ export class CheckoutComponent implements OnInit {
       });
     }
   }
+  createNotification(guestPhone: string, customerName: string) {
+    const url = `https://localhost:7188/api/Cart/checkoutsuccess/${guestPhone}`;
+    this.http.get<CheckoutResponse>(url).subscribe(
+      response => {
+        let description = `Khách hàng ${customerName} vừa đặt đơn mới! Vui lòng kiểm tra và xác nhận đơn hàng.`;
+        const body = {
+          description: description,
+          orderId: response.orderId,
+          type: 2
+        }
+        this.makeReservation(description);
+        console.log(body);
+        this.notificationService.createNotification(body).subscribe(
+          response => {
+            console.log(response);
+          },
+          error => {
+            console.error('Error fetching account details:', error);
+          }
+        );
+      }
+    )
 
+  }
 
   checkVnPay(guestPhone: string) {
     sessionStorage.setItem('guestPhone', guestPhone);

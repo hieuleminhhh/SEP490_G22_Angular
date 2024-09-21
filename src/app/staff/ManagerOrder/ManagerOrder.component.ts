@@ -80,6 +80,9 @@ export class ManagerOrderComponent implements OnInit {
   cancelationReason: string = '';
   depositOrder: any;
   accountGuest: any;
+  private socket!: WebSocket;
+  showNotification: boolean = false;
+  notificationMessage:  string[] = [];
 
   constructor(
     private orderService: ManagerOrderService,
@@ -111,8 +114,37 @@ export class ManagerOrderComponent implements OnInit {
     } else {
       console.error('Account ID is not available');
     }
-  }
 
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+    };
+    this.socket.onmessage = (event) => {
+      const reservation = JSON.parse(event.data);
+      try {
+        this.loadListOrder();
+        this.showSlideNotification(reservation);
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
+      }
+    };
+
+    this.socket.onclose = () => {
+    };
+    this.socket.onerror = (error) => {
+    };
+  }
+  showSlideNotification(message: string) {
+    this.notificationMessage.push(message);
+    this.showNotification = true;
+
+    // Hide the notification after 3 seconds
+    setTimeout(() => {
+      this.showNotification = false;
+    }, 6000);
+  }
+  closeModal(index: number) {
+    this.notificationMessage = [];
+  }
   setDefaultDates() {
     const today = new Date();
     this.dateFrom = this.formatDate(today);
@@ -579,25 +611,25 @@ export class ManagerOrderComponent implements OnInit {
   //   }
   // }
 
-  async CancelOrderReason(orderId: number | undefined) { 
+  async CancelOrderReason(orderId: number | undefined) {
     if (orderId !== undefined) {
       const cancelationReason = this.cancelationReason;
-  
+
       if (cancelationReason) {
         const cancelationData = {
           cancelationReason: cancelationReason
         };
-  
+
         try {
           const response = await this.orderService.CancelOrder(orderId, cancelationData).toPromise();
           this.createNotification(orderId, 2);
           this.updateCancelResion(orderId);
           console.log('Invoice status updated successfully:', response);
-  
+
           // Gọi sendOrderEmail để lấy địa chỉ email của khách hàng
           const emailResponse = await this.orderService.sendOrderEmail(orderId).toPromise();
           const customerEmail = emailResponse.email;
-  
+
           // Gửi email thông báo (chạy không đồng bộ, không chờ đợi)
           this.orderService.sendEmail(customerEmail, 'Thông báo từ Eating House', `Xin chào quý khách, rất tiếc đơn hàng của bạn đã bị hủy. Lý do: ${cancelationReason}. Cảm ơn bạn đã tin tưởng và lựa chọn Eating House!`)
             .subscribe(
@@ -608,7 +640,7 @@ export class ManagerOrderComponent implements OnInit {
                 console.error('Lỗi khi gửi email thông báo hủy đơn hàng:', emailError);
               }
             );
-  
+
           // Không cần chờ gửi email, reload ngay lập tức
           window.location.reload();
         } catch (error) {
@@ -621,7 +653,7 @@ export class ManagerOrderComponent implements OnInit {
       console.error('Order ID không xác định');
     }
   }
-  
+
 
 
   updateCancelResion(orderId: number) {
@@ -849,7 +881,7 @@ export class ManagerOrderComponent implements OnInit {
   async acceptOrder(orderId: number | undefined): Promise<void> {
     if (orderId) {
       this.loadListOrderDetails(orderId);
-  
+
       // Định nghĩa common data object
       const commonData = {
         paymentAmount: 0,
@@ -859,24 +891,39 @@ export class ManagerOrderComponent implements OnInit {
         returnAmount: 0,
         description: "string"
       };
-  
+
       // Xác định phương thức thanh toán dựa trên depositOrder
       const paymentData = {
         ...commonData,
         paymentMethods: this.depositOrder > 0 ? 1 : 2
       };
-  
+
       try {
         // Chấp nhận đơn hàng
         const response = await this.orderService.AcceptOrderWaiting(orderId, paymentData).toPromise();
         console.log('Order accepted successfully:', response);
         this.createNotification(orderId, 1);
-  
+        this.createNotification(orderId, 3);
+
         // Gọi sendOrderEmail để lấy địa chỉ email của khách hàng
         const emailResponse = await this.orderService.sendOrderEmail(orderId).toPromise();
         const customerEmail = emailResponse.email;
         console.log(customerEmail); // Điều chỉnh dựa trên cấu trúc phản hồi
-  
+        const body = {
+          orderId: orderId,
+          acceptBy: this.accountId
+        }
+        this.orderService.updateAcceptBy(body).subscribe(
+          response => {
+            console.log(response);
+          },
+          error => {
+            console.error('Lỗi khi cập nhật trạng thái:', error);
+            if (error.error && error.error.errors) {
+              console.error('Lỗi xác thực:', error.error.errors);
+            }
+          }
+        );
         // Gửi email thông báo (thực hiện không đồng bộ, không chờ đợi)
         this.orderService.sendEmail(customerEmail, 'Thông báo từ Eating House', 'Xin chào quý khách, đơn hàng của bạn đã được chấp nhận và đang trong quá trình xử lý. Cảm ơn bạn đã tin tưởng và lựa chọn Eating House!')
           .subscribe(
@@ -887,7 +934,7 @@ export class ManagerOrderComponent implements OnInit {
               console.error('Error sending email:', emailError);
             }
           );
-  
+
         // Không cần chờ đợi việc gửi email, reload trang ngay lập tức
         window.location.reload();
       } catch (error) {
@@ -896,21 +943,44 @@ export class ManagerOrderComponent implements OnInit {
       }
     }
   }
-  
+
 
   createNotification(orderId: number, check: number) {
     let description;
+    let body;
     if (check === 1) {
       description = "Chúng tôi xin chân thành cảm ơn Quý Khách đã đặt hàng tại Eating House. Chúng tôi rất vui mừng thông báo rằng đơn đặt hàng của Quý Khách đã được chấp nhận và đang được xử lý.Chúng tôi sẽ cố gắng giao hàng đúng thời gian và đảm bảo rằng Quý Khách sẽ hài lòng với những món ăn mà chúng tôi đã chuẩn bị. Nếu có bất kỳ câu hỏi nào hoặc cần thay đổi đơn hàng, xin vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã chọn Eating House. Chúng tôi rất mong được phục vụ Quý Khách!"
+      body = {
+        description: description,
+        accountId: this.accountGuest,
+        orderId: orderId,
+        type: 1
+      }
     } else if (check === 2) {
       description = `Kính gửi Quý Khách. Chúng tôi rất tiếc phải thông báo rằng đơn đặt hàng của Quý Khách tại Eating House với mã đơn hàng ${orderId} đã bị hủy. Lý do hủy đơn hàng: ${this.cancelationReason}. Chúng tôi thành thật xin lỗi về sự bất tiện này và mong rằng Quý Khách sẽ thông cảm. Chúng tôi luôn cố gắng cải thiện dịch vụ của mình để mang đến cho Quý Khách những trải nghiệm tốt nhất. Nếu Quý Khách cần thêm thông tin hoặc muốn đặt lại đơn hàng, vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã hiểu và đồng hành cùng Eating House. `;
+      body = {
+        description: description,
+        accountId: this.accountGuest,
+        orderId: orderId,
+        type: 1
+      }
+    }else if (check === 3) {
+      description = `Có đơn hàng mới. Vui lòng xem danh sách các món ăn để làm! `;
+      body = {
+        description: description,
+        orderId: orderId,
+        type: 4
+      }
     }
-    const body = {
-      description: description,
-      accountId: this.accountGuest,
-      orderId: orderId,
-      type: 1
+    else if (check === 4) {
+      description = `Đơn hàng ${orderId} đã giao hàng thất bại. Lý do ${this.cancelationReason} `;
+      body = {
+        description: description,
+        orderId: orderId,
+        type: 4
+      }
     }
+
 
     this.notificationService.createNotification(body).subscribe(
       response => {
