@@ -7,112 +7,113 @@
 </head>
 
 <body>
-  <div class="wrapper">
-    <div class="filter-grid">
-      <div class="inner-wrap">
-        <div class="filter-cell">
-          <select class="form-control" (click)="onCategoryChange($event)" *ngIf="category$ | async as categories">
-            <option value="*">Thực đơn</option>
-            <option *ngFor="let category of categories" [value]="category.categoryName">
-              {{ category.categoryName }}
-            </option>
-          </select>
-        </div>
-
-        <div class="filter-cell">
-          <button (click)="onFilterChange('Combo')" class="sort-button">Combo</button>
-        </div>
-
-        <div class="filter-cell">
-          <select class="form-control" (change)="onSortChange($event)">
-            <option value="">Sắp xếp</option>
-            <option *ngFor="let sortOption of sortOptions" [value]="sortOption">{{ sortOption }}</option>
-          </select>
-        </div>
-
-        <div class="filter-cell">
-          <input type="text" id="search" placeholder="Tìm kiếm theo tên" (input)="filterList()" class="sort-button">
-        </div>
-      </div>
+  <div style="text-align: center;">
+    <h1 style="margin: 0;">Thực đơn quán ăn</h1>
+  </div>
+  <div class="sort">
+    <h1 style="text-decoration: underline;">Sắp xếp:</h1>
+    <div class="select-wrapper">
+      <select class="form-control" (change)="onSortChange($event)">
+        <option value="">Tùy chọn</option>
+        <option *ngFor="let sortOption of sortOptions" [value]="sortOption">{{ sortOption }}</option>
+      </select>
+      <i class="fas fa-chevron-down"></i> <!-- Thêm icon ở đây -->
     </div>
+  </div>
 
-    <div class="inner-wrap content-wrap">
-      <div class="product-grid" #productGrid id="product-grid">
-        <ng-container *ngIf="selectedFilter === 'Combo'; else dishesView">
-          <ng-container *ngIf="filteredData$ | async as combos">
-            <ng-container *ngIf="combos.length > 0; else noItems">
-              <div *ngFor="let item of combos; let i = index" class="grid-product square"
-                style="width: auto;border: 2px solid rgb(0, 0, 0);">
-                <div class="img-name" (click)="showDetails(item, 'combo')">
-                  <img [src]="item.imageUrl" [alt]="item.nameCombo" width="200" height="200">
-                  <h4>{{ item.nameCombo }}</h4>
-                </div>
-                <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
-                  <span>{{ item.price | currencyFormat}}</span>
-                  <button *ngIf="!isReser;" (click)="addToCart(item, 'combo')"
-                    class="add-to-cart js-add-to-cart btn small-btn">Thêm vào giỏ hàng</button>
-                  <button *ngIf="isReser;" (click)="addToCart(item, 'combo')"
-                    class="add-to-cart js-add-to-cart btn small-btn">Thêm vào đặt bàn</button>
-                </p>
-              </div>
-            </ng-container>
-            <ng-template #noItems>
-              <p>Không có combo ...</p>
-            </ng-template>
-          </ng-container>
-        </ng-container>
-        <ng-template #dishesView>
-          <ng-container *ngIf="filteredData$ | async as dishs">
-            <ng-container *ngIf="dishs.length > 0 ; else noDishes">
-              <div *ngFor="let item of dishs; let i = index" class="grid-product square"
-                style="width: auto;border: 2px solid rgb(0, 0, 0);">
-                <div class="img-name" (click)="showDetails(item, 'dish')">
-                  <img [src]="item.imageUrl" [alt]="item.itemName" width="200" height="200">
-                  <h4>{{ item.itemName }}</h4>
-                </div>
-                <p class="price">
-                  <span class="price-container">
-                    <span *ngIf="item.discountedPrice" class="discounted-price">{{ item.discountedPrice |
-                      currencyFormat}}</span>
-                    <span [class]="item.discountedPrice ? 'original-price' : 'no-discount'">{{ item.price |
-                      currencyFormat}}</span>
-                  </span>
-                  <span class="button-container">
-                    <button *ngIf="!isReser;" (click)="addToCart(item, 'dish')"
-                      class="add-to-cart js-add-to-cart btn small-btn">Thêm vào giỏ hàng</button>
-                    <button *ngIf="isReser;" (click)="addToCart(item, 'dish')"
-                      class="add-to-cart js-add-to-cart btn small-btn">Thêm vào đặt bàn</button>
-                  </span>
-                </p>
-
-              </div>
-            </ng-container>
-            <ng-template #noDishes>
-              <p>Không có món ăn ...</p>
-            </ng-template>
-          </ng-container>
-        </ng-template>
-      </div>
-    </div>
-
-    <div class="pagination" *ngIf="totalPages > 0">
-      <button (click)="onPreviousPage()" [disabled]="currentPage === 1">
-        <i class="fas fa-arrow-left"></i> <!-- Icon mũi tên trái -->
-      </button>
-
-      <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1" max="{{ totalPages }}">
-
-      <span>of {{ totalPages }}</span>
-
-      <button (click)="onNextPage()" [disabled]="currentPage === totalPages">
-        <i class="fas fa-arrow-right"></i> <!-- Icon mũi tên phải -->
-      </button>
-    </div>
-
-
+  <div class="search" style="width: 22%; padding: 20px; position: relative;">
+    <span class="search-icon fas fa-search"></span> <!-- Thay đổi thành icon Font Awesome -->
+    <input type="text" id="search" placeholder="Tìm kiếm theo tên món ăn" (input)="filterList()" class="sort-button">
   </div>
 
 
+
+  <div class="inner-wrap content-wrap">
+    <div class="categories">
+      <div *ngIf="category$ | async as categories">
+        <h2>Thể loại</h2>
+        <button *ngFor="let category of categories" class="btn"
+          [ngClass]="{'selected': selectedCategory === category.categoryName}" (click)="onCategoryChange($event)">
+          {{ category.categoryName }}
+        </button>
+      </div>
+      <button (click)="onFilterChange('Combo')" class="btn" [ngClass]="{'selected': selectedCategory === 'Combo'}">
+        Combo
+      </button>
+    </div>
+
+
+    <div class="product-grid" #productGrid id="product-grid">
+      <ng-container *ngIf="selectedFilter === 'Combo'; else dishesView">
+        <ng-container *ngIf="filteredData$ | async as combos">
+          <ng-container *ngIf="combos.length > 0; else noItems">
+            <div *ngFor="let item of combos; let i = index" class="grid-product square"
+              style="width: auto;border: 2px solid rgb(0, 0, 0);">
+              <div class="img-name" (click)="showDetails(item, 'combo')">
+                <img [src]="item.imageUrl" [alt]="item.nameCombo" width="200" height="200">
+                <h4>{{ item.nameCombo }}</h4>
+              </div>
+              <p class="price" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>{{ item.price | currencyFormat}}</span>
+                <button *ngIf="!isReser;" (click)="addToCart(item, 'combo')"
+                  class="add-to-cart js-add-to-cart btn small-btn">Thêm vào giỏ hàng</button>
+                <button *ngIf="isReser;" (click)="addToCart(item, 'combo')"
+                  class="add-to-cart js-add-to-cart btn small-btn">Thêm vào đặt bàn</button>
+              </p>
+            </div>
+          </ng-container>
+          <ng-template #noItems>
+            <p>Không có combo ...</p>
+          </ng-template>
+        </ng-container>
+      </ng-container>
+      <ng-template #dishesView>
+        <ng-container *ngIf="filteredData$ | async as dishs">
+          <ng-container *ngIf="dishs.length > 0 ; else noDishes">
+            <div *ngFor="let item of dishs; let i = index" class="grid-product square"
+              style="width: auto;border: 2px solid rgb(0, 0, 0);">
+              <div class="img-name" (click)="showDetails(item, 'dish')">
+                <img [src]="item.imageUrl" [alt]="item.itemName" width="200" height="200">
+                <h4>{{ item.itemName }}</h4>
+              </div>
+              <p class="price">
+                <span class="price-container">
+                  <span *ngIf="item.discountedPrice" class="discounted-price">{{ item.discountedPrice |
+                    currencyFormat}}</span>
+                  <span [class]="item.discountedPrice ? 'original-price' : 'no-discount'">{{ item.price |
+                    currencyFormat}}</span>
+                </span>
+                <span class="button-container">
+                  <button *ngIf="!isReser;" (click)="addToCart(item, 'dish')"
+                    class="add-to-cart js-add-to-cart btn small-btn">Thêm vào giỏ hàng</button>
+                  <button *ngIf="isReser;" (click)="addToCart(item, 'dish')"
+                    class="add-to-cart js-add-to-cart btn small-btn">Thêm vào đặt bàn</button>
+                </span>
+              </p>
+
+            </div>
+          </ng-container>
+          <ng-template #noDishes>
+            <p>Không có món ăn ...</p>
+          </ng-template>
+        </ng-container>
+      </ng-template>
+    </div>
+  </div>
+
+  <div class="pagination" *ngIf="totalPages > 0">
+    <button (click)="onPreviousPage()" [disabled]="currentPage === 1">
+      <i class="fas fa-arrow-left"></i> <!-- Icon mũi tên trái -->
+    </button>
+
+    <input type="number" [(ngModel)]="currentPage" (keyup.enter)="goToDesiredPage()" min="1" max="{{ totalPages }}">
+
+    <span>of {{ totalPages }}</span>
+
+    <button (click)="onNextPage()" [disabled]="currentPage === totalPages">
+      <i class="fas fa-arrow-right"></i> <!-- Icon mũi tên phải -->
+    </button>
+  </div>
 
   <div *ngFor="let message of successMessages; let i = index" class="modal-dialog">
     <div class="modal-content">
