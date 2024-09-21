@@ -1,7 +1,6 @@
 
 html,
 body {
-  padding-top: 80px;
   font-family: 'Source Sans Pro', sans-serif;
   font-weight: 400;
   font-size: 14px;
@@ -12,7 +11,9 @@ body {
   box-sizing: border-box; /* Đảm bảo padding và border không làm thay đổi kích thước của phần tử */
 }
 
-
+.container {
+  display: flex;
+}
 
  a:hover,
  a:active {
@@ -33,8 +34,10 @@ body {
  }
 
  .inner-wrap {
-   width: 960px;
    margin: 0 auto;
+   width: 100%;
+   display: flex;
+   padding: 20px;
  }
 
  .content-wrap {
@@ -186,13 +189,62 @@ body {
      }
 
    }
-
  }
+
+ .categories {
+  width: 20%; /* Adjust the width as needed */
+  padding-right: 20px;
+  background-color: #f9f9f9; /* Light background color */
+  border: 1px solid #ddd; /* Subtle border */
+  border-radius: 8px; /* Rounded corners */
+  padding: 20px; /* Padding inside the container */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+}
+.categories h2 {
+  font-size: 1.5em; /* Larger font for heading */
+  margin-bottom: 15px; /* Space below the heading */
+  color: #333; /* Darker color for the heading */
+}
+.btn {
+  display: inline-block; /* Inline block for better spacing */
+  background-color: #ccc; /* Gray color for buttons */
+  color: black; /* Text color */
+  border: none; /* No border */
+  border-radius: 5px; /* Slightly rounded corners */
+  padding: 10px 15px; /* Padding inside buttons */
+  margin: 5px; /* Space between buttons */
+  cursor: pointer; /* Pointer on hover */
+  transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
+}
+
+.btn.selected {
+  background-color: #007bff; /* Blue color for selected state */
+  color: white; /* Change text color to white when selected */
+}
+
+.btn:hover {
+  background-color: #b3b3b3; /* Darker gray shade on hover */
+  transform: translateY(-2px); /* Lift effect on hover */
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .categories {
+    padding: 15px; /* Reduce padding on smaller screens */
+  }
+
+  .btn {
+    width: 100%; /* Full width buttons on smaller screens */
+    margin: 10px 0; /* Vertical spacing */
+  }
+}
  .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   grid-gap: 20px;
   margin-top: -70px;
+  width: 65%;
+  padding-left: 140px;
 }
 .price {
   display: flex;
@@ -375,4 +427,99 @@ button.add-to-cart:hover {
 
 .pagination span {
   font-weight: bold;
+}
+.form-control {
+  position: relative; /* Đặt vị trí tương đối cho biểu tượng mũi tên */
+  width: auto; /* Chiều rộng theo yêu cầu của bạn */
+  padding: 10px 40px 10px 15px; /* Padding cho trường input */
+  font-size: 16px; /* Kích thước chữ cho dropdown */
+  border: 1px solid #ccc; /* Đường viền nhẹ */
+  border-radius: 5px; /* Góc bo tròn */
+  background-color: #fff; /* Nền trắng */
+  appearance: none; /* Xóa mũi tên mặc định */
+  cursor: pointer; /* Con trỏ khi hover */
+  width: 220px;
+}
+
+/* Thêm biểu tượng Font Awesome */
+.form-control:after {
+  content: '\f107'; /* Mã Unicode cho biểu tượng mũi tên xuống */
+  font-family: 'Font Awesome 5 Free'; /* Đặt font family */
+  font-weight: 900; /* Đặt độ đậm của font */
+  position: absolute; /* Đặt vị trí tuyệt đối cho icon */
+  right: 10px; /* Khoảng cách từ bên phải */
+  top: 50%; /* Căn giữa theo chiều dọc */
+  transform: translateY(-50%); /* Căn giữa icon */
+  pointer-events: none; /* Ngăn icon nhận sự kiện chuột */
+}
+
+
+/* Thêm hiệu ứng hover */
+.form-control:hover {
+  border-color: #007bff; /* Đổi màu đường viền khi hover */
+}
+
+/* Thêm hiệu ứng khi chọn */
+.form-control:focus {
+  outline: none; /* Xóa viền khi focus */
+  border-color: #007bff; /* Đổi màu đường viền khi focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Hiệu ứng bóng */
+}
+
+.sort {
+  display: flex; /* Sử dụng flexbox để căn chỉnh các phần tử */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  justify-content: flex-end; /* Đẩy nội dung sang bên phải */
+
+}
+
+.sort h1 {
+  margin-right: 10px; /* Khoảng cách giữa h1 và select */
+  font-size: 1.5rem; /* Kích thước chữ của h1 */
+}
+
+.sort select {
+  padding: 5px; /* Khoảng cách bên trong của select */
+  font-size: 1rem; /* Kích thước chữ của select */
+}
+.select-wrapper {
+  position: relative; /* Đặt vị trí tương đối cho biểu tượng */
+}
+/* Thêm biểu tượng Font Awesome */
+.select-wrapper i {
+  position: absolute; /* Đặt vị trí tuyệt đối cho icon */
+  right: 10px; /* Khoảng cách từ bên phải */
+  top: 50%; /* Căn giữa theo chiều dọc */
+  transform: translateY(-50%); /* Căn giữa icon */
+  pointer-events: none; /* Ngăn icon nhận sự kiện chuột */
+}
+.search {
+  width: 22%; /* Đặt chiều rộng */
+  padding: 20px; /* Padding xung quanh */
+  position: relative; /* Để định vị biểu tượng tìm kiếm */
+}
+
+.sort-button {
+  width: 100%; /* Chiều rộng đầy đủ */
+  padding: 10px 40px 10px 40px; /* Padding cho ô nhập liệu */
+  font-size: 16px; /* Kích thước chữ */
+  border: 1px solid #ccc; /* Đường viền nhẹ */
+  border-radius: 5px; /* Góc bo tròn */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  transition: border-color 0.3s; /* Hiệu ứng chuyển tiếp cho đường viền */
+}
+
+.sort-button:focus {
+  border-color: #007bff; /* Đổi màu đường viền khi ô nhập liệu được chọn */
+  outline: none; /* Bỏ outline mặc định */
+}
+
+.search-icon {
+  position: absolute; /* Đặt vị trí tuyệt đối cho icon */
+  left: 30px; /* Khoảng cách từ bên trái */
+  top: 50%; /* Căn giữa theo chiều dọc */
+  transform: translateY(-50%); /* Căn giữa icon */
+  color: #888; /* Màu icon */
+  pointer-events: none; /* Ngăn icon nhận sự kiện chuột */
+  font-size: 18px; /* Kích thước icon */
 }

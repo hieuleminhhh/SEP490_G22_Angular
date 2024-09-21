@@ -125,8 +125,8 @@ export class MenuComponent {
   }
 
   onCategoryChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    this.selectedCategory = target.value === '*' ? '' : target.value;
+    const target = event.target as HTMLButtonElement;
+    this.selectedCategory = target.innerText;
     this.selectedFilter = 'Category';
     console.log(this.selectedFilter);
 
@@ -141,6 +141,7 @@ export class MenuComponent {
 
   onFilterChange(filter: 'Category' | 'Combo') {
     this.selectedFilter = filter;
+    this.selectedCategory = filter;
     this.loadDishes();
   }
 
