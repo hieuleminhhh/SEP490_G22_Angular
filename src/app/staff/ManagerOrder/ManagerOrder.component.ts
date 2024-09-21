@@ -56,10 +56,10 @@ export class ManagerOrderComponent implements OnInit {
   ];
 
   types = [
-    { value: '1', text: 'Mang về' },//thanh toan trc
-    { value: '2', text: 'Online' },// thanh toan trc
-    { value: '3', text: 'Đặt bàn' },
-    { value: '4', text: 'Tại chỗ' }
+    { value: '1', text: 'Đơn mang về' },//thanh toan trc
+    { value: '2', text: 'Đơn đặt ship' },// thanh toan trc
+    { value: '3', text: 'Đơn đặt bàn trước' },
+    { value: '4', text: 'Đơn ăn tại quán' }
   ];
   filterByDate = [
     { value: 'Đặt hàng', text: 'Đặt hàng' },
@@ -190,42 +190,77 @@ export class ManagerOrderComponent implements OnInit {
     );
   }
 
+  // loadListOrderDetails(orderId: number) {
+  //   console.log(this.DiscountedTotalAmount());
+
+  //   console.log('Loading details for Order ID:', orderId);
+  //   this.orderDetailService.getOrderDetail(orderId).subscribe(
+  //     (orderDetail: ListOrderDetailByOrder) => {
+  //       this.orderDetail = orderDetail;
+  //       this.tables = orderDetail.tables; // Assigning tables to a separate variable
+
+  //       if (this.tables.length > 0) {
+  //         this.tableId = this.tables[0].tableId; // Extracting tableId from the first table
+  //       }
+
+  //       // Iterate through orderDetails to access dishesServed and quantity
+  //       let totalDishesServed = 0;
+  //       let totalQuantity = 0;
+
+  //       orderDetail.orderDetails.forEach((detail) => {
+  //         totalDishesServed += detail.dishesServed; // No need for parseInt
+  //         totalQuantity += detail.quantity; // No need for parseInt
+  //       });
+  //       this.dishesServed = totalDishesServed;
+  //       this.totalQuantity = totalQuantity;
+
+  //       console.log('Fetched order detail:', this.orderDetail);
+  //       this.accountGuest = orderDetail.accountId;
+  //       console.log(this.accountGuest);
+  //       this.depositOrder = this.orderDetail.deposits;
+  //     },
+  //     (error) => {
+  //       console.error('Error fetching order detail:', error);
+  //     }
+  //   );
+  // }
+
+  timeIn: string = '';
   loadListOrderDetails(orderId: number) {
     console.log(this.DiscountedTotalAmount());
 
     console.log('Loading details for Order ID:', orderId);
     this.orderDetailService.getOrderDetail(orderId).subscribe(
-      (orderDetail: ListOrderDetailByOrder) => {
+      (orderDetail: any) => {  // Using 'any' typecasting here
         this.orderDetail = orderDetail;
-        this.tables = orderDetail.tables; // Assigning tables to a separate variable
+        this.tables = orderDetail.tables;
 
         if (this.tables.length > 0) {
-          this.tableId = this.tables[0].tableId; // Extracting tableId from the first table
+          this.tableId = this.tables[0].tableId;
         }
 
-        // Iterate through orderDetails to access dishesServed and quantity
         let totalDishesServed = 0;
         let totalQuantity = 0;
 
-        orderDetail.orderDetails.forEach((detail) => {
-          totalDishesServed += detail.dishesServed; // No need for parseInt
-          totalQuantity += detail.quantity; // No need for parseInt
+        orderDetail.orderDetails.forEach((detail: any) => {
+          totalDishesServed += detail.dishesServed;
+          totalQuantity += detail.quantity;
         });
         this.dishesServed = totalDishesServed;
         this.totalQuantity = totalQuantity;
 
-        console.log('Fetched order detail:', this.orderDetail);
         this.accountGuest = orderDetail.accountId;
-        console.log(this.accountGuest);
-        this.depositOrder = this.orderDetail.deposits;
+        this.depositOrder = this.orderDetail?.deposits;
+
+        // Directly accessing reservation
+        this.timeIn = orderDetail.reservation?.timeIn;  // Using optional chaining for safety
+        console.log('Reservation timeIn:', this.timeIn);
       },
       (error) => {
         console.error('Error fetching order detail:', error);
       }
     );
   }
-
-
 
 
   updateOrder(orderId: number) {
@@ -903,27 +938,12 @@ export class ManagerOrderComponent implements OnInit {
         const response = await this.orderService.AcceptOrderWaiting(orderId, paymentData).toPromise();
         console.log('Order accepted successfully:', response);
         this.createNotification(orderId, 1);
-        this.createNotification(orderId, 3);
-
+  
         // Gọi sendOrderEmail để lấy địa chỉ email của khách hàng
         const emailResponse = await this.orderService.sendOrderEmail(orderId).toPromise();
         const customerEmail = emailResponse.email;
         console.log(customerEmail); // Điều chỉnh dựa trên cấu trúc phản hồi
-        const body = {
-          orderId: orderId,
-          acceptBy: this.accountId
-        }
-        this.orderService.updateAcceptBy(body).subscribe(
-          response => {
-            console.log(response);
-          },
-          error => {
-            console.error('Lỗi khi cập nhật trạng thái:', error);
-            if (error.error && error.error.errors) {
-              console.error('Lỗi xác thực:', error.error.errors);
-            }
-          }
-        );
+  
         // Gửi email thông báo (thực hiện không đồng bộ, không chờ đợi)
         this.orderService.sendEmail(customerEmail, 'Thông báo từ Eating House', 'Xin chào quý khách, đơn hàng của bạn đã được chấp nhận và đang trong quá trình xử lý. Cảm ơn bạn đã tin tưởng và lựa chọn Eating House!')
           .subscribe(
