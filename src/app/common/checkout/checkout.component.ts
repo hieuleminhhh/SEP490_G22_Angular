@@ -82,14 +82,14 @@ export class CheckoutComponent implements OnInit {
     this.updateTimes();
     this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => {
+      console.log('WebSocket connection opened');
       while (this.reservationQueue.length > 0) {
-        this.socket.send(this.reservationQueue.shift()); // Gửi yêu cầu từ hàng đợi
+        this.socket.send(this.reservationQueue.shift());
       }
     };
     this.socket.onclose = () => {
       console.log('WebSocket connection closed');
     };
-
     this.socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
@@ -410,7 +410,7 @@ export class CheckoutComponent implements OnInit {
     const url = `https://localhost:7188/api/Cart/checkoutsuccess/${guestPhone}`;
     this.http.get<CheckoutResponse>(url).subscribe(
       response => {
-        let description = `Khách hàng ${customerName} vừa đặt đơn mới! Vui lòng kiểm tra và xác nhận đơn hàng.`;
+        let description = `Có đơn đặt hàng mới! Vui lòng kiểm tra và xác nhận đơn hàng.`;
         const body = {
           description: description,
           orderId: response.orderId,

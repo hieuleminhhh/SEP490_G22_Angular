@@ -14,6 +14,7 @@ import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currenc
 import { HeaderOrderStaffComponent } from '../ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component';
 import { MatDialog } from '@angular/material/dialog';
 import { AccountService } from '../../../service/account.service';
+import { NotificationService } from '../../../service/notification.service';
 
 
 @Component({
@@ -79,8 +80,12 @@ export class TableManagementComponent implements OnInit {
   messageerrorTable: string = '';
   isClose: boolean = false;
   private socket!: WebSocket;
+  private reservationQueue: any[] = [];
+  notifications: string[] = [];
+  isVisible: boolean[] = [];
+
   constructor(private tableService: TableService, private dialog: MatDialog, private reservationService: ReservationService,
-    private router: Router, private accountService: AccountService) { }
+    private router: Router, private notificationService: NotificationService, private accountService: AccountService) { }
 
   ngOnInit(): void {
     const today = new Date();
@@ -88,33 +93,51 @@ export class TableManagementComponent implements OnInit {
     this.dateTo = this.formatDate(today);
     this.dateNow = this.formatDate(today);
     this.dateString = this.dateNow.toString();
+
     this.getTableData();
+
     this.searchTermSubject.pipe(debounceTime(300)).subscribe(searchTerm => {
       this.getSearchList();
     });
+
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
+
     if (this.accountId) {
       this.getAccountData();
     }
+
     this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => {
+      console.log('WebSocket connection opened');
     };
     this.socket.onmessage = (event) => {
-      const reservation = JSON.parse(event.data);
+      const data = JSON.parse(event.data);
       try {
         this.getReservation();
+        this.addSuccessMessage(data);
       } catch (error) {
         console.error('Error parsing reservation data:', error);
       }
     };
-
     this.socket.onclose = () => {
+      console.log('WebSocket connection closed');
     };
     this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
     };
   }
-
+  addSuccessMessage(message: string) {
+    this.notifications.push(message);
+    this.isVisible.push(true);
+    const currentIndex = this.notifications.length - 1;
+    setTimeout(() => this.closeNotification(currentIndex), 5000);
+  }
+  closeNotification(index: number) {
+    if (index >= 0 && index < this.isVisible.length) {
+      this.isVisible[index] = false;
+    }
+  }
   formatDate(date: Date): string {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -338,11 +361,9 @@ export class TableManagementComponent implements OnInit {
           cancelBy: this.accountName
         }
         console.log(body);
-
         this.reservationService.updatereasonCancel(id, body).subscribe(
           response => {
             console.log(response);
-
             this.getTableData();
             this.getReservation();
             this.getReservationData();
@@ -365,8 +386,10 @@ export class TableManagementComponent implements OnInit {
     );
   }
 
-  openCancelModal(reservationId: number): void {
-    this.currentReservationId = reservationId;
+  openCancelModal(reservation: any): void {
+    this.currentReservationId = reservation.reservationId;
+    this.orderOfReserId = reservation?.order?.orderId;
+    this.accountGuestId = reservation?.accountGuestId;
     this.showCancelModal = true;
     this.cancelMessage = null;
   }
@@ -378,9 +401,13 @@ export class TableManagementComponent implements OnInit {
     this.cancelMessage = null;
   }
   detailRes: any;
+  orderOfReserId: any;
+  accountGuestId: any;
   openAcceptModal(reservation: any): void {
     this.detailRes = reservation;
     this.currentReservationId = reservation.reservationId;
+    this.orderOfReserId = reservation?.order?.orderId;
+    this.accountGuestId = reservation?.accountGuestId;
     this.showAcceptModal = true;
   }
 
@@ -392,12 +419,13 @@ export class TableManagementComponent implements OnInit {
     if (this.currentReservationId) {
       const reservation = this.dataReservationPending.find((reservation: { reservationId: any }) => reservation.reservationId === this.currentReservationId);
       this.updateStatusReservationById(this.currentReservationId, 2, reservation?.reservationTime, reservation?.guestNumber);
-
+      this.createNotification(this.orderOfReserId, 1, this.accountGuestId);
     }
   }
   confirmCancel(): void {
     if (this.currentReservationId && this.cancelReason.trim()) {
       this.updateStatusReservation(this.currentReservationId, this.cancelReason);
+      this.createNotification(this.orderOfReserId, 2, this.accountGuestId);
       this.closeCancelModal();
     } else {
       this.errorMessage = 'Vui lòng nhập lý do hủy';
@@ -565,6 +593,7 @@ export class TableManagementComponent implements OnInit {
     this.reservationService.getReservationList(1).subscribe(
       response => {
         this.dataReservationPending = response;
+        console.log(response);
         this.totalItems = this.dataReservationPending.length; // Cập nhật lại tổng số bản ghi
         this.paginateData(); // Sau khi cập nhật totalItems, cắt dữ liệu cho trang hiện tại
 
@@ -1048,6 +1077,47 @@ export class TableManagementComponent implements OnInit {
 
     // Điều kiện 3: reservationTime lớn hơn 1 giờ so với hiện tại => không làm gì
     return '';
+  }
+
+  createNotification(orderId: number, check: number, accountId: number) {
+    let description;
+    let body;
+    if (check === 1) {
+      description = "Chúng tôi xin chân thành cảm ơn Quý Khách đã đặt bàn tại Eating House. Chúng tôi rất vui mừng thông báo rằng đơn đặt bàn của Quý Khách đã được chấp nhận và đang được xử lý. Chúng tôi sẽ cố gắng và đảm bảo rằng Quý Khách sẽ hài lòng với dịch vụ của chúng tôi. Nếu có bất kỳ câu hỏi nào hoặc cần thay đổi đơn hàng, xin vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã chọn Eating House. Chúng tôi rất mong được phục vụ Quý Khách!"
+      body = {
+        description: description,
+        accountId: accountId,
+        orderId: orderId,
+        type: 1
+      }
+    } else if (check === 2) {
+      description = `Kính gửi Quý Khách. Chúng tôi rất tiếc phải thông báo rằng đơn đặt bàn của Quý Khách tại Eating House đã bị hủy. Lý do hủy đơn: ${this.cancelReason}. Chúng tôi thành thật xin lỗi về sự bất tiện này và mong rằng Quý Khách sẽ thông cảm. Chúng tôi luôn cố gắng cải thiện dịch vụ của mình để mang đến cho Quý Khách những trải nghiệm tốt nhất. Nếu Quý Khách cần thêm thông tin hoặc muốn đặt lại đơn hàng, vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã hiểu và đồng hành cùng Eating House. `;
+      body = {
+        description: description,
+        accountId: accountId,
+        orderId: orderId,
+        type: 1
+      }
+    }
+    this.makeReservation(description);
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Gửi yêu cầu đặt bàn khi WebSocket đã mở
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message);
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
+    }
   }
 }
 

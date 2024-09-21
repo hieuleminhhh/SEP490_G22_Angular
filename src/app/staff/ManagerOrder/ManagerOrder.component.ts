@@ -81,8 +81,8 @@ export class ManagerOrderComponent implements OnInit {
   depositOrder: any;
   accountGuest: any;
   private socket!: WebSocket;
-  showNotification: boolean = false;
-  notificationMessage:  string[] = [];
+  notifications: string[] = [];
+  isVisible: boolean[] = [];
 
   constructor(
     private orderService: ManagerOrderService,
@@ -117,12 +117,13 @@ export class ManagerOrderComponent implements OnInit {
 
     this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => {
+      console.log('WebSocket connection opened');
     };
     this.socket.onmessage = (event) => {
-      const reservation = JSON.parse(event.data);
+      const data = JSON.parse(event.data);
       try {
         this.loadListOrder();
-        this.showSlideNotification(reservation);
+        this.addSuccessMessage(data);
       } catch (error) {
         console.error('Error parsing reservation data:', error);
       }
@@ -133,17 +134,16 @@ export class ManagerOrderComponent implements OnInit {
     this.socket.onerror = (error) => {
     };
   }
-  showSlideNotification(message: string) {
-    this.notificationMessage.push(message);
-    this.showNotification = true;
-
-    // Hide the notification after 3 seconds
-    setTimeout(() => {
-      this.showNotification = false;
-    }, 6000);
+  addSuccessMessage(message: string) {
+    this.notifications.push(message);
+    this.isVisible.push(true);
+    const currentIndex = this.notifications.length - 1;
+    setTimeout(() => this.closeNotification(currentIndex), 5000);
   }
-  closeModal(index: number) {
-    this.notificationMessage = [];
+  closeNotification(index: number) {
+    if (index >= 0 && index < this.isVisible.length) {
+      this.isVisible[index] = false;
+    }
   }
   setDefaultDates() {
     const today = new Date();

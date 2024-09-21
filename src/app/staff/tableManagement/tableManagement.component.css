@@ -1429,3 +1429,51 @@ button:focus {
   margin-left: 5px; /* Space between label and 'x' */
   font-weight: bold; /* Make 'x' bold */
 }
+.notification {
+  position: fixed;
+  top: 20px; /* Khoảng cách từ trên cùng */
+  right: -400px; /* Bắt đầu bên ngoài màn hình */
+  transition: right 0.5s ease; /* Hiệu ứng trượt */
+  z-index: 1000;
+  opacity: 0; /* Ban đầu ẩn */
+  transform: translateY(-10px); /* Đưa lên một chút */
+}
+
+.notification.show {
+  right: 20px; /* Vị trí cuối cùng bên phải */
+  opacity: 1; /* Hiển thị */
+  transform: translateY(0); /* Đưa về vị trí ban đầu */
+}
+
+.notification-content {
+  background-color: #28a745; /* Màu nền xanh lá */
+  color: white;
+  padding: 20px;
+  border-radius: 8px; /* Bo tròn góc */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Đổ bóng */
+  margin-bottom: 15px; /* Khoảng cách giữa các thông báo */
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-title {
+  font-weight: bold; /* Đậm */
+  margin: 0; /* Bỏ khoảng cách */
+}
+
+.closenoti {
+  color: white;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 20px;
+  transition: color 0.3s ease; /* Hiệu ứng chuyển màu khi hover */
+}
+
+.closenoti:hover {
+  color: #ffdddd; /* Màu khi hover */
+}

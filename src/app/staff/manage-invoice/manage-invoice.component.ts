@@ -341,12 +341,13 @@ export class ManageInvoiceComponent implements OnInit {
           response => {
             console.log(response);
             this.getOrdersCancel();
+            console.log(this.filteredOrdersCancel);
             this.getOrdersShip();
             this.getOrdersStatic();
           },
           error => {
             console.error('Error:', error);
-            this.selectTab('refund');
+            this.getOrdersCancel();
           }
         );
         this.getOrdersCancel();
