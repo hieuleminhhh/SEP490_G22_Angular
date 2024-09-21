@@ -60,6 +60,20 @@
 
     </header>
     <hr>
+    <div *ngFor="let message of notifications; let i = index" class="notification" [ngClass]="{'show': isVisible[i]}">
+      <div class="notification-content">
+        <div class="notification-header">
+          <h5 class="notification-title">Thông báo</h5>
+          <button type="button" class="closenoti" aria-label="Close" (click)="closeNotification(i)">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="notification-body">
+          {{ message }}
+        </div>
+      </div>
+    </div>
+
 
     <section *ngIf="currentView === 'table-layout'">
       <div class="container">
@@ -422,7 +436,7 @@
                         (click)="openAcceptModal(reservation)">Nhận đơn</button></td>
                     <td>
                       <button type="button" class="btn btn-primary btn-sm" style="background-color: red;"
-                        (click)="openCancelModal(reservation.reservationId)">Hủy đơn</button>
+                        (click)="openCancelModal(reservation)">Hủy đơn</button>
                     </td>
                   </tr>
                 </ng-container>

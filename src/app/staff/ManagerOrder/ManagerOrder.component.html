@@ -1078,15 +1078,15 @@
     </div>
   </div>
 
-  <div *ngFor="let message of notificationMessage; let i = index" class="modal-dialog-notification">
-    <div class="modal-content-notification">
-      <div class="modal-header-notification">
-        <h5 class="modal-title-notification">Thành công!</h5>
-        <button type="button" class="close" aria-label="Close" (click)="closeModal(i)">
+  <div *ngFor="let message of notifications; let i = index" class="notification" [ngClass]="{'show': isVisible[i]}">
+    <div class="notification-content">
+      <div class="notification-header">
+        <h5 class="notification-title">Thông báo</h5>
+        <button type="button" class="closenoti" aria-label="Close" (click)="closeNotification(i)">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body-notification">
+      <div class="notification-body">
         {{ message }}
       </div>
     </div>

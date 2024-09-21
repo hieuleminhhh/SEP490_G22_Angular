@@ -76,16 +76,19 @@ export class BookingComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateTimes();
+
     this.cartSubscription = this.reservationService.getCart().subscribe(cartItems => {
       this.cartItems = cartItems;
       this.calculateItemQuantity();
     });
+
     const accountIdString = localStorage.getItem('accountId');
     if (accountIdString) {
       this.accountId = JSON.parse(accountIdString);
     }
     this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => {
+      console.log('WebSocket connection opened');
       while (this.reservationQueue.length > 0) {
         this.socket.send(this.reservationQueue.shift());
       }
@@ -98,6 +101,7 @@ export class BookingComponent implements OnInit {
     };
   }
 
+
   ngOnDestroy() {
     if (this.cartSubscription) {
       this.cartSubscription.unsubscribe();
@@ -107,7 +111,7 @@ export class BookingComponent implements OnInit {
     }
   }
   createNotification(guestPhone: string, customerName: string) {
-    let description = `Khách hàng ${customerName} vừa đặt đơn đặt bàn mới! Vui lòng kiểm tra và xác nhận đơn hàng.`;
+    let description = `Có đơn đặt bàn mới! Vui lòng kiểm tra và xác nhận đơn hàng.`;
     const body = {
       description: description,
       type: 3
