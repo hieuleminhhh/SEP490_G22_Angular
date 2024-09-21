@@ -33,20 +33,20 @@
             <i class="fas fa-walking me-2"></i> <!-- Font Awesome icon -->
             Tạo đơn mang về
           </a>
-        </li>        
+        </li>
         <li class="nav-item mb-3" *ngIf="account?.role === 'Cashier'">
-          <a class="nav-link d-flex align-items-center" [routerLink]="['/a']" routerLinkActive="active">
+          <a class="nav-link d-flex align-items-center" [routerLink]="['/refund']" routerLinkActive="active">
             <i class="fas fa-undo-alt me-2"></i> <!-- Refund icon -->
             Đơn hoàn tiền
           </a>
         </li>
         <li class="nav-item mb-3" *ngIf="account?.role === 'Cashier'">
-          <a class="nav-link d-flex align-items-center" [routerLink]="['/a']" routerLinkActive="active">
+          <a class="nav-link d-flex align-items-center" [routerLink]="['/delivery']" routerLinkActive="active">
             <i class="fas fa-money-bill me-2"></i> <!-- Payment icon -->
             Đơn thu tiền
           </a>
         </li>
-        
+
       </ul>
     </div>
 
@@ -72,7 +72,7 @@
             <i class="fas fa-walking me-2"></i> <!-- Font Awesome icon -->
             Đơn mang về
           </a>
-        </li>        
+        </li>
         <li class="nav-item mb-3"  *ngIf="account?.role === 'OrderStaff'">
           <a class="nav-link d-flex align-items-center" [routerLink]="['/createOnline']" routerLinkActive="active">
             <i class="fas fa-globe me-2"></i> <!-- Font Awesome icon -->

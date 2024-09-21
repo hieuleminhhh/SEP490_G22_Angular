@@ -15,6 +15,7 @@ import { AccountService } from '../../../service/account.service';
 export class SidebarOrderComponent implements OnInit {
   isMenuCollapsed: boolean = false;
   accountId: number | null = null;
+
   constructor(private router: Router, private accountService: AccountService) { }
 
   ngOnInit() {
