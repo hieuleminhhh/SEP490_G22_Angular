@@ -139,10 +139,10 @@
                   <div class="mb-3">
                     <span class="fw-bold">Loại đơn: </span>
                     <ng-container [ngSwitch]="orderDetail.type">
-                      <span *ngSwitchCase="1">Mang về</span>
-                      <span *ngSwitchCase="2">Online</span>
-                      <span *ngSwitchCase="3">Đặt bàn</span>
-                      <span *ngSwitchCase="4">Tại chỗ</span>
+                      <span *ngSwitchCase="1">Đơn mang về</span>
+                      <span *ngSwitchCase="2">Đơn đặt ship</span>
+                      <span *ngSwitchCase="3">Đơn đặt bàn trước</span>
+                      <span *ngSwitchCase="4">Đơn ăn tại quán</span>
                       <span *ngSwitchDefault>Khách lẻ</span>
                     </ng-container>
                   </div>
@@ -191,6 +191,9 @@
                   </div>
                   <div class="mb-3" *ngIf="orderDetail?.type === 4">
                     <span class="fw-bold">Thời gian vào:</span> {{ orderDetail.orderDate | dateFormat }}
+                  </div>
+                  <div class="mb-3" *ngIf="orderDetail?.type === 3">
+                    <span class="fw-bold">Thời gian vào:</span>  {{ timeIn | dateFormat }}
                   </div>
                   <div class="mb-3" *ngIf="orderDetail.paymentTime && (orderDetail?.type === 4 || orderDetail?.type === 3)">
                     <span class="fw-bold">Thời gian ra:</span> {{ orderDetail.paymentTime| dateFormat }}
