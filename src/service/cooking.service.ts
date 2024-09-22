@@ -23,6 +23,10 @@ export class CookingService {
     const url = `https://localhost:7188/api/OrderDetailsForChef/${type} orderdetails`;
     return this.http.get(url, this.getHttpOptions());
   }
+  checkOrders(id: number): Observable<any> {
+    const url = `https://localhost:7188/api/OrderDetailsForChef/checkOrder/${id}`;
+    return this.http.get(url, this.getHttpOptions());
+  }
 
   updateDishesServed(request: any): Observable<any> {
     const url = `https://localhost:7188/api/OrderDetailsForChef/update-dishes-served`;

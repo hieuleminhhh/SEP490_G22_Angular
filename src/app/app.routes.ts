@@ -39,6 +39,8 @@ import { SignupComponent } from './common/signup/signup/signup.component';
 import { OtpVerificationComponent } from './common/login/OtpVerification/OtpVerification/OtpVerification.component';
 import { ForgetPasswordComponent } from './common/login/forgetPass/forgetPassword/forgetPassword.component';
 import { VerifyOtpSignupComponent } from './common/signup/signup/verifyOtpSignup/verifyOtpSignup.component';
+import { RefundComponent } from './staff/manage-invoice/refund/refund.component';
+import { DeliveryComponent } from './staff/manage-invoice/delivery/delivery.component';
 
 
 export const routes: Routes = [
@@ -80,6 +82,8 @@ export const routes: Routes = [
     {'path': 'signup', component: SignupComponent},
     {'path': 'otp-verification', component: OtpVerificationComponent},
     {'path': 'forgot-password', component: ForgetPasswordComponent},
-    {'path': 'verifyOTPsignin', component: VerifyOtpSignupComponent}
+    {'path': 'verifyOTPsignin', component: VerifyOtpSignupComponent},
+    {'path': 'refund', component: RefundComponent},
+    {'path': 'delivery', component: DeliveryComponent}
 ];
 

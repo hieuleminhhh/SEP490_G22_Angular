@@ -114,12 +114,12 @@ export class CookingManagementComponent implements OnInit {
     }
   }
 
-  completeDish(orderDetailId: number, itemNameOrComboName: string, type: number): void {
+  completeDish(orderDetailId: number, itemNameOrComboName: string, type: number, orderId:number): void {
     const form = this.forms[orderDetailId];
     const dishesServed = form.value.dishesServed;
 
     if (type === 1 || type === 2) {
-      this.updateDishesServed(orderDetailId, dishesServed);
+      this.updateDishesServed(orderDetailId, dishesServed, orderId);
 
     } else {
       this.updateLocal(orderDetailId, dishesServed, itemNameOrComboName);
@@ -161,13 +161,23 @@ export class CookingManagementComponent implements OnInit {
     this.filteredOrders = this.order.filter((order: { quantity: number; }) => order.quantity > 0);
   }
 
-  updateDishesServed(orderDetailId: number, dishesServed: number) {
+  updateDishesServed(orderDetailId: number, dishesServed: number, orderId:number) {
     const request = {
       orderDetailId: orderDetailId,
       dishesServed: dishesServed
     };
     this.cookingService.updateDishesServed(request).subscribe(
       response => {
+        this.cookingService.checkOrders(orderId).subscribe(
+          response => {
+            if(response===true){
+              this.createNotification(2);
+            }
+          },
+          error => {
+            console.error('Error:', error);
+          }
+        );
       },
       error => {
         console.error('Error:', error);
