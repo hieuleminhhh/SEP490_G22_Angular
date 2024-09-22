@@ -282,7 +282,7 @@ export class CookingManagementComponent implements OnInit {
     }
     const body = {
       description: description,
-      type: 3
+      type: 2
     }
     this.makeReservation(description);
     console.log(body);

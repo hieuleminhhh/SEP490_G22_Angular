@@ -53,7 +53,7 @@
                   <td> {{order.cancelationReason}}</td>
                   <td>{{ (order.deposits > 0 ? order.deposits : order.totalAmount) | currencyFormat }}</td>
                   <td *ngIf="selectedStatusFun ==='unrefun'">
-                    <button class="action-button view-button" (click)="showDetails(order.orderId)">
+                    <button class="action-button view-button" (click)="showDetails(order)">
                       <i class="fas fa-eye"></i>
                     </button>
                     <button class="action-button complete-button" data-bs-toggle="modal"
@@ -64,7 +64,7 @@
                   <td *ngIf="selectedStatusFun ==='refun'"> {{order.staffFirstName}} {{order.staffLastName}}</td>
                   <td *ngIf="selectedStatusFun ==='refun'"> {{order.refundDate | date:'dd/MM/yyyy - HH:mm'}}</td>
                   <td *ngIf="selectedStatusFun ==='refun'">
-                    <button class="action-button view-button" (click)="showDetails(order.orderId)">
+                    <button class="action-button view-button" (click)="showDetails(order)">
                       <i class="fas fa-eye"></i>
                     </button>
                   </td>
@@ -74,15 +74,13 @@
           </table>
         </section>
       </div>
-
     </div>
   </div>
 </div>
 
 <!-- Confirmation Modal -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog" *ngIf="selectedTab === 'refund'">
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel">
+  <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="confirmationModalLabel">Xác nhận</h5>
@@ -105,8 +103,6 @@
       </div>
     </div>
   </div>
-
-
 </div>
 
 
@@ -124,6 +120,9 @@
       <p>Địa chỉ: {{selectedItem.guestAddress}}</p>
       <p>Thời gian đặt hàng: {{ selectedItem.orderDate | date:'dd/MM/yyyy - HH:mm' }}</p>
       <p>Thời gian nhận hàng: {{ selectedItem.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</p>
+      <p *ngIf="selectedStatusFun==='unrefun'">Trạng thái: Đã hủy - Chưa hoàn tiền</p>
+      <p *ngIf="selectedStatusFun==='refun'">Trạng thái: Đã hủy - Đã hoàn tiền</p>
+      <p *ngIf="selectedStatusFun==='refun'">Nhân viên hoàn tiền : {{ employ.staffFirstName}} {{employ.staffLastName}}</p>
 
       <table class="table table-bordered table-hover">
         <thead class="table-light">

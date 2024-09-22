@@ -12,17 +12,19 @@
     </a>
   </li>
   <li class="nav-item mb-3 " *ngIf="account?.role === 'Cashier'">
-    <a class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#orderMenu1" role="button" aria-expanded="false" aria-controls="orderMenu"
-       (click)="toggleOrderMenu()" [ngClass]="{'active': isOrderMenuActive()}" >
+    <a class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#orderMenu1"
+      role="button" aria-expanded="false" aria-controls="orderMenu" (click)="toggleOrderMenu()"
+      [ngClass]="{'active': isOrderMenuActive()}">
       <span class="d-flex align-items-center">
         <i class="fas fa-cash-register me-2"></i> <!-- Font Awesome icon for sales -->
         Đơn hàng
       </span>
-      <i class="fas" [ngClass]="{'fa-chevron-up': isOrderMenuActive(), 'fa-chevron-down': !isOrderMenuActive()}"></i> <!-- Toggle icon -->
+      <i class="fas" [ngClass]="{'fa-chevron-up': isOrderMenuActive(), 'fa-chevron-down': !isOrderMenuActive()}"></i>
+      <!-- Toggle icon -->
     </a>
     <div class="collapse mt-2" id="orderMenu1" [ngClass]="{'show': isOrderMenuActive()}">
       <ul class="nav flex-column ms-3">
-        <li class="nav-item mb-3"  *ngIf="account?.role === 'Cashier'">
+        <li class="nav-item mb-3" *ngIf="account?.role === 'Cashier'">
           <a class="nav-link d-flex align-items-center" [routerLink]="['/managerorder']" routerLinkActive="active">
             <i class="fas fa-utensils me-2"></i> <!-- Font Awesome icon -->
             Xem thông tin
@@ -51,17 +53,19 @@
     </div>
 
   <li class="nav-item mb-3 " *ngIf="account?.role === 'OrderStaff'">
-    <a class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#orderMenu" role="button" aria-expanded="false" aria-controls="orderMenu"
-       (click)="toggleOrderMenu()" [ngClass]="{'active': isOrderMenuActive()}" >
+    <a class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#orderMenu"
+      role="button" aria-expanded="false" aria-controls="orderMenu" (click)="toggleOrderMenu()"
+      [ngClass]="{'active': isOrderMenuActive()}">
       <span class="d-flex align-items-center">
         <i class="fas fa-cash-register me-2"></i> <!-- Font Awesome icon for sales -->
         Bán hàng
       </span>
-      <i class="fas" [ngClass]="{'fa-chevron-up': isOrderMenuActive(), 'fa-chevron-down': !isOrderMenuActive()}"></i> <!-- Toggle icon -->
+      <i class="fas" [ngClass]="{'fa-chevron-up': isOrderMenuActive(), 'fa-chevron-down': !isOrderMenuActive()}"></i>
+      <!-- Toggle icon -->
     </a>
     <div class="collapse mt-2" id="orderMenu" [ngClass]="{'show': isOrderMenuActive()}">
       <ul class="nav flex-column ms-3">
-        <li class="nav-item mb-3"  *ngIf="account?.role === 'OrderStaff'">
+        <li class="nav-item mb-3" *ngIf="account?.role === 'OrderStaff'">
           <a class="nav-link d-flex align-items-center" [routerLink]="['/listTable']" routerLinkActive="active">
             <i class="fas fa-utensils me-2"></i> <!-- Font Awesome icon -->
             Đơn ăn tại quán
@@ -73,7 +77,7 @@
             Đơn mang về
           </a>
         </li>
-        <li class="nav-item mb-3"  *ngIf="account?.role === 'OrderStaff'">
+        <li class="nav-item mb-3" *ngIf="account?.role === 'OrderStaff'">
           <a class="nav-link d-flex align-items-center" [routerLink]="['/createOnline']" routerLinkActive="active">
             <i class="fas fa-globe me-2"></i> <!-- Font Awesome icon -->
             Đơn đặt ship
@@ -81,50 +85,58 @@
         </li>
       </ul>
     </div>
-    <li class="nav-item mb-3" *ngIf="account?.role === 'OrderStaff'">
-      <a class="nav-link d-flex align-items-center" [routerLink]="['/fillDish']" routerLinkActive="active">
-        <i class="fas fa-concierge-bell me-2"></i> <!-- Icon for service -->
-        Lên món
-      </a>
-    </li>
-    <li class="nav-item mb-3" *ngIf="account?.role === 'OrderStaff'">
-      <a class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#tableManagementMenu" role="button" aria-expanded="false" aria-controls="tableManagementMenu"
-         (click)="toggleTableManagementMenu()" [ngClass]="{'active': isTableManagementMenuActive()}">
-        <span class="d-flex align-items-center">
-          <i class="fas fa-chair me-2"></i> <!-- Font Awesome icon for table management -->
-          Đặt bàn
-        </span>
-        <i class="fas" [ngClass]="{'fa-chevron-up': isTableManagementMenuActive(), 'fa-chevron-down': !isTableManagementMenuActive()}"></i> <!-- Toggle icon -->
-      </a>
-      <div class="collapse mt-2" id="tableManagementMenu" [ngClass]="{'show': isTableManagementMenuActive()}">
-        <ul class="nav flex-column ms-3">
-          <li class="nav-item mb-3">
-            <a class="nav-link d-flex align-items-center" [routerLink]="['/table-layout']" routerLinkActive="active">
-              <i class="fas fa-th-large me-2"></i> <!-- Icon for table layout -->
-              Sơ đồ bàn
-            </a>
-          </li>
-          <li class="nav-item mb-3">
-            <a class="nav-link d-flex align-items-center" [routerLink]="['/booking-request']" routerLinkActive="active">
-              <i class="fas fa-calendar-check me-2"></i> <!-- Icon for booking request -->
-              Yêu cầu đặt bàn
-            </a>
-          </li>
-          <li class="nav-item mb-3">
-            <a class="nav-link d-flex align-items-center" [routerLink]="['/booking-schedule']" routerLinkActive="active">
-              <i class="fas fa-calendar-alt me-2"></i> <!-- Icon for booking schedule -->
-              Lịch đặt bàn
-            </a>
-          </li>
-          <li class="nav-item mb-3">
-            <a class="nav-link d-flex align-items-center" [routerLink]="['/booking-history']" routerLinkActive="active">
-              <i class="fas fa-history me-2"></i> <!-- Icon for booking history -->
-              Lịch sử đặt bàn
-            </a>
-          </li>
-        </ul>
-      </div>
-    </li>
-    
-    
+  <li class="nav-item mb-3" *ngIf="account?.role === 'OrderStaff'">
+    <a class="nav-link d-flex align-items-center" [routerLink]="['/fillDish']" routerLinkActive="active">
+      <i class="fas fa-concierge-bell me-2"></i> <!-- Icon for service -->
+      Lên món
+    </a>
+  </li>
+  <li class="nav-item mb-3" *ngIf="account?.role === 'OrderStaff'">
+    <a class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse"
+      href="#tableManagementMenu" role="button" aria-expanded="false" aria-controls="tableManagementMenu"
+      (click)="toggleTableManagementMenu()" [ngClass]="{'active': isTableManagementMenuActive()}">
+      <span class="d-flex align-items-center">
+        <i class="fas fa-chair me-2"></i> <!-- Font Awesome icon for table management -->
+        Đặt bàn
+      </span>
+      <i class="fas"
+        [ngClass]="{'fa-chevron-up': isTableManagementMenuActive(), 'fa-chevron-down': !isTableManagementMenuActive()}"></i>
+      <!-- Toggle icon -->
+    </a>
+    <div class="collapse mt-2" id="tableManagementMenu" [ngClass]="{'show': isTableManagementMenuActive()}">
+      <ul class="nav flex-column ms-3">
+        <li class="nav-item mb-3">
+          <a class="nav-link d-flex align-items-center" [routerLink]="['/tableManagement']"
+            [queryParams]="{ section: 'table-layout' }" routerLinkActive="active">
+            <i class="fas fa-th-large me-2"></i> <!-- Icon for table layout -->
+            Sơ đồ bàn
+          </a>
+        </li>
+        <li class="nav-item mb-3">
+          <a class="nav-link d-flex align-items-center" [routerLink]="['/tableManagement']"
+            [queryParams]="{ section: 'booking-request' }" routerLinkActive="active">
+            <i class="fas fa-calendar-check me-2"></i> <!-- Icon for booking request -->
+            Yêu cầu đặt bàn
+          </a>
+        </li>
+        <li class="nav-item mb-3">
+          <a class="nav-link d-flex align-items-center" [routerLink]="['/tableManagement']"
+            [queryParams]="{ section: 'booking-schedule' }" routerLinkActive="active">
+            <i class="fas fa-calendar-alt me-2"></i> <!-- Icon for booking schedule -->
+            Lịch đặt bàn
+          </a>
+        </li>
+        <li class="nav-item mb-3">
+          <a class="nav-link d-flex align-items-center" [routerLink]="['/tableManagement']"
+            [queryParams]="{ section: 'booking-history' }" routerLinkActive="active">
+            <i class="fas fa-history me-2"></i> <!-- Icon for booking history -->
+            Lịch sử đặt bàn
+          </a>
+        </li>
+      </ul>
+
+    </div>
+  </li>
+
+
 </ul>

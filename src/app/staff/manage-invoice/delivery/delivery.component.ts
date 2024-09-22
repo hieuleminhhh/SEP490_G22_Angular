@@ -158,24 +158,29 @@ export class DeliveryComponent implements OnInit {
 
     }
   }
-
-  // Mở modal
   openModal(): void {
     const modal = this.collectAllModal.nativeElement;
     modal.classList.add('show');
     modal.style.display = 'block';
     modal.setAttribute('aria-modal', 'true');
     modal.removeAttribute('aria-hidden');
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
   }
-
-  // Đóng modal
   closeModal(): void {
     const modal = this.collectAllModal.nativeElement;
     modal.classList.remove('show');
     modal.style.display = 'none';
     modal.setAttribute('aria-hidden', 'true');
     modal.removeAttribute('aria-modal');
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
   }
+
 
   // Xác nhận thu tất cả
   collectAllPayments(): void {
@@ -214,10 +219,11 @@ export class DeliveryComponent implements OnInit {
       }
     );
   }
-
+employ:any;
   showDetails(order: any) {
     console.log(order);
-    this.getOrdersDetail(order);
+    this.employ=order;
+    this.getOrdersDetail(order.orderId);
   }
 
   closePopup() {
@@ -238,23 +244,5 @@ export class DeliveryComponent implements OnInit {
   getOrderShip(data: any) {
     this.orderShipper = data;
   }
-  orderCancelMoney: any;
-  getOrderCancel(data: any) {
-    this.orderCancelMoney = data;
-  }
-
-
-
-  formatDateTime(dateString: string): string {
-    return new Date(dateString).toLocaleString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false // Không sử dụng định dạng 12 giờ
-    });
-  }
-
 }
 
