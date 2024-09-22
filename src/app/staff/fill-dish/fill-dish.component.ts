@@ -47,6 +47,18 @@ export class FillDishComponent implements OnInit {
         this.socket.send(this.reservationQueue.shift());
       }
     };
+    this.socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      try {
+        if (data.orderDetailId && data.dishesServed && data.itemNameOrComboName) {
+          this.updateLocal(data.orderDetailId, data.dishesServed, data.itemNameOrComboName);
+        }
+        this.getCompletedDishesFromLocalStorage();
+        this.getOrdersTakeaway();
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
+      }
+    };
     this.socket.onclose = () => {
       console.log('WebSocket connection closed');
     };

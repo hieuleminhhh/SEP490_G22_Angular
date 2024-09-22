@@ -1004,15 +1004,6 @@ export class ManagerOrderComponent implements OnInit {
         type: 4
       }
     }
-    else if (check === 4) {
-      description = `Đơn hàng ${orderId} đã giao hàng thất bại. Lý do ${this.cancelationReason} `;
-      body = {
-        description: description,
-        orderId: orderId,
-        type: 4
-      }
-    }
-
 
     this.notificationService.createNotification(body).subscribe(
       response => {

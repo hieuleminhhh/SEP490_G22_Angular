@@ -27,6 +27,7 @@ import { AccountService } from '../../../../service/account.service';
 import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
 import { ReservationService } from '../../../../service/reservation.service';
 import { SelectedItem } from '../../../../models/order.model';
+import { NotificationService } from '../../../../service/notification.service';
 @Component({
   selector: 'app-create-offline-order',
   templateUrl: './CreateOfflineOrder.component.html',
@@ -83,9 +84,11 @@ export class CreateOfflineOrderComponent implements OnInit {
   reservationData: any;
   orderId: number | null = null
   status: number | null = null;
+  private socket!: WebSocket;
+  private reservationQueue: any[] = [];
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute, private dishService: ManagerDishService,
     private comboService: ManagerComboService, private orderDetailService: ManagerOrderDetailService, private invoiceService: InvoiceService, private dialog: MatDialog
-    , private discountService: DiscountService,
+    , private discountService: DiscountService, private notificationService: NotificationService,
     private checkoutService: CheckoutService, private accountService: AccountService,
     private reservationService: ReservationService) { }
   @ViewChild('formModal') formModal!: ElementRef;
@@ -104,24 +107,70 @@ export class CreateOfflineOrderComponent implements OnInit {
     this.selectedDiscount = null;
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
-
-    console.log('31', this.accountId);
-
     if (this.accountId) {
       this.getAccountDetails(this.accountId);
     } else {
       console.error('Account ID is not available');
     }
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift());
+      }
+    };
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
   }
+  createNotification(orderId: number) {
+    let description;
+    let body;
+    description = `Có đơn hàng mới. Vui lòng xem danh sách các món ăn để làm! `;
+    body = {
+      description: description,
+      orderId: orderId,
+      type: 4
+    }
+    this.makeReservation(description);
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+        // this.callFunctionInB(this.accountGuest);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
 
+    // Check if the WebSocket connection (this.socket) is defined
+    if (!this.socket) {
+      console.error('WebSocket is not initialized.');
+      return; // Exit the function if socket is not defined
+    }
+
+    // Check the WebSocket readyState
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Send the reservation request if WebSocket is open
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message); // Queue the message if WebSocket is connecting
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
+    }
+  }
   getReservationByTableId(tableId: number): void {
     this.reservationService.getReservationByTableId(tableId).subscribe(
       (data) => {
         console.log('API Response:', data); // Log the entire response to check its structure
 
-          this.reservationId = data.reservationId;
-          this.reservationData = data;
-          console.log('Reservation Data:', this.reservationData);
+        this.reservationId = data.reservationId;
+        this.reservationData = data;
+        console.log('Reservation Data:', this.reservationData);
       },
       (error) => {
         console.error('Error fetching reservation:', error);
@@ -129,8 +178,6 @@ export class CreateOfflineOrderComponent implements OnInit {
       }
     );
   }
-
-
 
   clearCart() {
     this.selectedItems = [];
@@ -221,13 +268,13 @@ export class CreateOfflineOrderComponent implements OnInit {
   addItem(item: any) {
     // Determine whether the item is a dish or a combo
     const isCombo = item.hasOwnProperty('quantityCombo');
-    
+
     // Use the appropriate quantity property based on whether it's a dish or combo
     const availableQuantity = isCombo ? item.quantityCombo : item.quantityDish;
-  
+
     // Find if the item already exists in selectedItems
     const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-  
+
     if (index !== -1) {
       // If the item already exists, check if we can still increase its quantity
       if (this.selectedItems[index].quantity < availableQuantity) {
@@ -242,7 +289,7 @@ export class CreateOfflineOrderComponent implements OnInit {
     } else {
       // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
       const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
-  
+
       // Only add if there is at least 1 item available in stock
       if (availableQuantity > 0) {
         this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
@@ -251,7 +298,7 @@ export class CreateOfflineOrderComponent implements OnInit {
         this.clearErrorMessageAfterTimeout();
       }
     }
-  
+
     // Recalculate totalAmount and totalAmountAfterDiscount after adding the item
     this.calculateAndSetTotalAmount();
   }
@@ -263,26 +310,26 @@ export class CreateOfflineOrderComponent implements OnInit {
 
   validateQuantity(index: number): void {
     const item = this.selectedItems[index];
-    
+
     // Determine the maximum quantity based on whether the item is a dish or a combo
     const maxQuantity = this.getMaxQuantity(item);
-    
+
     // Ensure the quantity is at least 1
     if (item.quantity < 1) {
       item.quantity = 1;
-    } 
+    }
     // Ensure the quantity doesn't exceed the available quantity
     else if (item.quantity > maxQuantity) {
       item.quantity = maxQuantity;
     }
-  
+
     // Update the total price after validating the quantity
     item.totalPrice = item.quantity * item.unitPrice;
-  
+
     // Recalculate the total amount after changes
     this.calculateAndSetTotalAmount();
   }
-  
+
   getMaxQuantity(item: any): number {
     // Check if the item is a combo or a dish
     if (item.hasOwnProperty('quantityCombo')) {
@@ -557,6 +604,7 @@ export class CreateOfflineOrderComponent implements OnInit {
       response => {
         console.log('Offline order created successfully:', response);
         this.successMessage = 'Đơn hàng đã được tạo thành công';
+        this.orderonlineId = response.orderId;
         setTimeout(() => this.successMessage = '', 5000);
       },
       error => {
@@ -566,7 +614,9 @@ export class CreateOfflineOrderComponent implements OnInit {
         }
       }
     );
+    this.createNotification(this.orderonlineId);
   }
+  orderonlineId:any;
   createOrderReservation(tableId: number): void {
     this.getTableReser(this.reservationData?.reservationId);
     console.log(this.reservationData?.reservationId);
@@ -602,6 +652,7 @@ export class CreateOfflineOrderComponent implements OnInit {
         console.log('Offline order created successfully:', response);
         this.successMessage = 'Đơn hàng đã được tạo thành công';
         const orderId = response.orderId;
+        this.createNotification(response.orderId);
         const request = {
           reservationId: this.reservationData?.reservationId,
           orderId: orderId

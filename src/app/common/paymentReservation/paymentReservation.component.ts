@@ -65,7 +65,7 @@ export class PaymentReservationComponent implements OnInit {
     this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => {
       while (this.reservationQueue.length > 0) {
-        this.socket.send(this.reservationQueue.shift()); // Gửi yêu cầu từ hàng đợi
+        this.socket.send(this.reservationQueue.shift());
       }
     };
     this.socket.onclose = () => {
@@ -84,7 +84,7 @@ export class PaymentReservationComponent implements OnInit {
         const body = {
           description: description,
           orderId: response.orderId,
-          type: 3
+          type: 2
         }
         this.makeReservation(description);
         console.log(body);
