@@ -25,6 +25,7 @@ import { CheckoutService } from '../../../../service/checkout.service';
 import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal/modal.module';
 import { SettingService } from '../../../../service/setting.service';
+import { NotificationService } from '../../../../service/notification.service';
 
 @Component({
   selector: 'app-CreateTakeAwayOrder',
@@ -37,7 +38,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
 
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService,
     private orderService: ManagerOrderService, private cd: ChangeDetectorRef, private invoiceService: InvoiceService,
-    private route: ActivatedRoute, private dialog: MatDialog, private discountService: DiscountService, private checkoutService: CheckoutService,
+    private route: ActivatedRoute, private dialog: MatDialog, private notificationService: NotificationService, private discountService: DiscountService, private checkoutService: CheckoutService,
     private settingService: SettingService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   @ViewChild('checkDishModal') checkDishModal!: ElementRef;
@@ -97,7 +98,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     accountId: 0
   };
   ischecked: boolean = false;
-  lastOrderId: number | undefined;
+  lastOrderId: any;
   discountInvalid: any = {};
   accountId: number | null = null;
   newAddress: AddNewAddress = {
@@ -112,6 +113,9 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   minDate: string | undefined;
   maxDate: string | undefined;
   availableHours: string[] = [];
+
+  private socket!: WebSocket;
+  private reservationQueue: any[] = [];
   ngOnInit() {
     this.loadListDishes();
     this.loadListCombo();
@@ -138,7 +142,58 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     console.log(this.time);
     this.updateTimes();
     this.getInfo();
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift());
+      }
+    };
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
   }
+  createNotification(orderId: number) {
+    let description;
+    let body;
+    description = `Có đơn hàng mới. Vui lòng xem danh sách các món ăn để làm! `;
+    body = {
+      description: description,
+      orderId: orderId,
+      type: 4
+    }
+    this.makeReservation(description);
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+        // this.callFunctionInB(this.accountGuest);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
+
+    // Check if the WebSocket connection (this.socket) is defined
+    if (!this.socket) {
+      console.error('WebSocket is not initialized.');
+      return; // Exit the function if socket is not defined
+    }
+
+    // Check the WebSocket readyState
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Send the reservation request if WebSocket is open
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message); // Queue the message if WebSocket is connecting
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
+    }
+  }
+
   formatDate(date: Date): string {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -245,13 +300,13 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   addItem(item: any) {
     // Determine whether the item is a dish or a combo
     const isCombo = item.hasOwnProperty('quantityCombo');
-    
+
     // Use the appropriate quantity property based on whether it's a dish or combo
     const availableQuantity = isCombo ? item.quantityCombo : item.quantityDish;
-  
+
     // Find if the item already exists in selectedItems
     const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-  
+
     if (index !== -1) {
       // If the item already exists, simply increase its quantity and update the total price
       this.selectedItems[index].quantity++;
@@ -259,16 +314,16 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     } else {
       // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
       const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
-  
+
       // Directly add the item without checking for availableQuantity
       this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
     }
-  
+
     // Recalculate totalAmount and totalAmountAfterDiscount after adding the item
     this.calculateAndSetTotalAmount();
   }
-  
-  
+
+
   clearErrorMessageAfterTimeout() {
     setTimeout(() => {
       this.errorMessage = '';  // Clear the message after 5 seconds
@@ -282,7 +337,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       this.calculateAndSetTotalAmount();
     }
   }
-  
+
   decreaseQuantity(index: number): void {
     if (this.selectedItems[index].quantity > 1) {
       this.selectedItems[index].quantity--;
@@ -293,25 +348,25 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   }
   validateQuantity(index: number): void {
     const item = this.selectedItems[index];
-    
+
     // Determine the maximum quantity based on whether the item is a dish or a combo
-    
+
     // Ensure the quantity is at least 1
     if (item.quantity < 1) {
       item.quantity = 1;
-    } 
+    }
     // Ensure the quantity doesn't exceed the available quantity
     else if (item.quantity > 1000) {
       item.quantity = 1000;
     }
-  
+
     // Update the total price after validating the quantity
     item.totalPrice = item.quantity * item.unitPrice;
-  
+
     // Recalculate the total amount after changes
     this.calculateAndSetTotalAmount();
   }
-  
+
   getMaxQuantity(item: any): number {
     // Check if the item is a combo or a dish
     if (item.hasOwnProperty('quantityCombo')) {
@@ -324,7 +379,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     // Default to a high number if quantity properties are not found
     return Number.MAX_SAFE_INTEGER;
   }
-  
+
   clearSelectedDiscount() {
     this.selectedDiscount = null;
     this.selectedDiscountName = '';
@@ -862,6 +917,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
         console.log('Order created successfully:', response);
         this.lastOrderId = response.orderId;
         console.log(this.lastOrderId);
+        this.createNotification(this.lastOrderId);
         setTimeout(() => this.successMessage = '', 5000);
       },
       error => {
@@ -970,7 +1026,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
         console.error('Error:', error);
       }
     );
-  }   
+  }
   messages: string[] = [];
   isValid: boolean = false;
   // Thêm thuộc tính trong component
@@ -1068,7 +1124,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     const modalBackdrop = document.getElementsByClassName('modal-backdrop')[0];
     modalBackdrop?.parentNode?.removeChild(modalBackdrop);
   }
-  
+
   closesModal(): void {
     const modal = this.checkDishModal.nativeElement;
     if (modal) {
@@ -1076,12 +1132,12 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       modal.classList.remove('show');
       modal.style.display = 'none';
       document.body.classList.remove('modal-open');
-      
+
       // Remove the backdrop if it exists
       this.removeExistingBackdrop();
     }
   }
-  
+
   // Utility function to remove existing backdrop
   removeExistingBackdrop(): void {
     const backdrops = document.querySelectorAll('.modal-backdrop');
