@@ -31,7 +31,10 @@ export class SidebarOrderComponent implements OnInit {
     feather.replace();
   }
   toggleOrderMenu() {
-    this.isMenuCollapsed = !this.isMenuCollapsed; // Thay đổi trạng thái của menu
+    this.isMenuCollapsed = !this.isMenuCollapsed; // Toggle the order menu
+  }
+  openOrderMenu() {
+    this.isMenuCollapsed = true; // Ensure the order menu is open
   }
 
   isOrderMenuActive(): boolean {
@@ -39,8 +42,10 @@ export class SidebarOrderComponent implements OnInit {
     return this.isMenuCollapsed || // Kiểm tra trạng thái của menu
            currentUrl.includes('/listTable') ||
            currentUrl.includes('/createTakeaway') ||
-           currentUrl.includes('/createOnline') ||
-           currentUrl.includes('/fillDish');
+           currentUrl.includes('/createOnline') || 
+           currentUrl.includes('/refund') ||
+           currentUrl.includes('/delivery') ||
+           currentUrl.includes('/managerorder')
   }
   account: any;
   showSidebar: boolean = true;
@@ -58,4 +63,17 @@ export class SidebarOrderComponent implements OnInit {
       }
     );
   }
+  tableManagementMenuActive: boolean = false;
+  toggleTableManagementMenu() {
+    this.tableManagementMenuActive = !this.tableManagementMenuActive;
+  }
+
+  isTableManagementMenuActive() {
+    return this.tableManagementMenuActive;
+  }
+
+  toggleDishMenu() {
+    this.isMenuCollapsed = true; // Open "Bán hàng" menu when "Lên món" is clicked
+  }
+  
 }
