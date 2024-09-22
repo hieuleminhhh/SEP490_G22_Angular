@@ -1084,4 +1084,65 @@ export class ManagerOrderComponent implements OnInit {
       }
     );
   }
+  printInvoiceAll(isFinal: boolean): void {
+    let invoiceContent: string = `
+    <h2 style="text-align: center;">${isFinal ? 'Hóa đơn' : 'Hóa đơn tạm'}</h2>
+      <p><strong>Mã đơn hàng:</strong> ${this.orderDetail?.orderId || 'Khách lẻ'}</p>
+      <p><strong>Tên khách hàng:</strong> ${this.orderDetail?.consigneeName || 'Khách lẻ'}</p>
+      <p><strong>Số điện thoại:</strong> ${this.orderDetail?.guestPhone || '------------------'}</p>
+      ${this.orderDetail?.type === 2 ? `<p><strong>Địa chỉ nhận hàng:</strong> ${this.orderDetail.guestAddress || 'N/A'}</p>` : ''}
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th style="border: 1px solid black;">Món ăn</th>
+            <th style="border: 1px solid black;">Số lượng</th>
+            <th style="border: 1px solid black;">Giá</th>
+            <th style="border: 1px solid black;">Tổng cộng</th>
+          </tr>
+        </thead>
+        <tbody>
+        ${this.orderDetail?.orderDetails.map(item => `
+          <tr>
+            <td style="border: 1px solid black;">${item.itemName || item.nameCombo}</td>
+            <td style="border: 1px solid black;">${item.quantity}</td>
+            <td style="border: 1px solid black;">${this.formatCurrency(item.discountedPrice || item.price)}</td>
+            <td style="border: 1px solid black;">${this.formatCurrency(item.unitPrice)}</td>
+          </tr>
+        `).join('')}
+        
+        </tbody>
+      </table>
+       <p><strong>Tạm tính:</strong> ${this.formatCurrency(this.orderDetail?.totalAmount)}</p>
+${this.orderDetail?.discountId !== undefined ? `
+  <p><strong>Giảm giá:</strong> ${this.formatCurrency(this.getDiscountOrderAmount() || 0)}</p>
+  <p><strong>Tổng cộng:</strong> ${this.formatCurrency(this.orderDetail?.totalAmount - (this.getDiscountOrderAmount() || 0))}</p>
+` : ''}
+
+    `;
+
+    // Open new window
+    let printWindow = window.open('', '', 'height=500,width=800');
+    printWindow?.document.write('<html><head><title>In hóa đơn</title></head><body>');
+    printWindow?.document.write(invoiceContent);
+    printWindow?.document.write('</body></html>');
+    printWindow?.document.close();
+    printWindow?.print();
+  }
+  formatCurrency(amount: number | undefined): string {
+    if (amount === undefined) return '0đ';
+    return `${amount.toLocaleString('vi-VN')}đ`;
+  }
+
+  printTemporaryInvoice(): void {
+    if (this.orderDetail && this.account?.role === 'Cashier') {
+      this.printInvoiceAll(false);  // Hóa đơn tạm
+    }
+  }
+
+  printFinalInvoice(): void {
+    if (this.orderDetail?.paymentStatus === 1 && this.account?.role === 'Cashier') {
+      this.printInvoiceAll(true);  // Hóa đơn chính thức
+    }
+  }
+
 }

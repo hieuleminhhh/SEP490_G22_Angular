@@ -56,6 +56,9 @@ export class LoginComponent implements OnInit {
   
   handleUserRole(role: string) {
     switch (role) {
+      case 'User':
+        window.location.href = '/';
+        break;
       case 'Chef':
         window.location.href = '/cooking';
         break;
