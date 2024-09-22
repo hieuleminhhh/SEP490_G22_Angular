@@ -450,7 +450,8 @@ clearErrorMessageAfterTimeout() {
       discountId: this.selectedDiscount,
       taxcode: 'ABCD',
       paymentStatus: 0,
-      accountId: this.accountId
+      accountId: this.accountId,
+      type: 2
     };
 
     console.log(this.addNew);

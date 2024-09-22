@@ -7,7 +7,7 @@ import { ReservationService } from '../../../service/reservation.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
 import { catchError, debounceTime, switchMap } from 'rxjs/operators';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Table, TableReservationResponse, Tables } from '../../../models/table.model';
 import { DatePipe } from '@angular/common';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
@@ -83,9 +83,8 @@ export class TableManagementComponent implements OnInit {
   private reservationQueue: any[] = [];
   notifications: string[] = [];
   isVisible: boolean[] = [];
-  isSending: boolean = false;
 
-  constructor(private tableService: TableService, private route: ActivatedRoute, private dialog: MatDialog, private reservationService: ReservationService,
+  constructor(private tableService: TableService, private dialog: MatDialog, private reservationService: ReservationService,
     private router: Router, private notificationService: NotificationService, private accountService: AccountService) { }
 
   ngOnInit(): void {
@@ -94,42 +93,31 @@ export class TableManagementComponent implements OnInit {
     this.dateTo = this.formatDate(today);
     this.dateNow = this.formatDate(today);
     this.dateString = this.dateNow.toString();
-    this.route.queryParams.subscribe(params => {
-      if (params['section']) {
-        this.currentView = params['section'];
-        this.getTableData();
-        this.getReservation();
-        this.getReservationData();
-        this.getReservationList();
-      }
-    });
+
+    this.getTableData();
+
     this.searchTermSubject.pipe(debounceTime(300)).subscribe(searchTerm => {
       this.getSearchList();
     });
+
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
+
     if (this.accountId) {
       this.getAccountData();
     }
+
     this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => {
       console.log('WebSocket connection opened');
-      while (this.reservationQueue.length > 0) {
-        this.socket.send(this.reservationQueue.shift());
-        this.isSending = true;
-      }
     };
     this.socket.onmessage = (event) => {
-      if (this.isSending) {
-        const data = JSON.parse(event.data);
-        try {
-          this.getReservation();
-          this.addSuccessMessage(data);
-        } catch (error) {
-          console.error('Error parsing reservation data:', error);
-        }
-        this.isSending = false;
-        return;
+      const data = JSON.parse(event.data);
+      try {
+        this.getReservation();
+        this.addSuccessMessage(data);
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
       }
     };
     this.socket.onclose = () => {
@@ -419,10 +407,8 @@ export class TableManagementComponent implements OnInit {
     this.detailRes = reservation;
     this.currentReservationId = reservation.reservationId;
     this.orderOfReserId = reservation?.order?.orderId;
-    this.accountGuestId = reservation?.accountId;
+    this.accountGuestId = reservation?.accountGuestId;
     this.showAcceptModal = true;
-    console.log(this.accountGuestId);
-
   }
 
   closeAcceptModal(): void {

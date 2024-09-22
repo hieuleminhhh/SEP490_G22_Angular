@@ -103,6 +103,7 @@ export class HeaderOrderStaffComponent implements OnInit {
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
   }
+  
   changeProfile() {
     if (this.accountId) {
       this.accountService.changeProfile(this.accountId, this.account).subscribe({

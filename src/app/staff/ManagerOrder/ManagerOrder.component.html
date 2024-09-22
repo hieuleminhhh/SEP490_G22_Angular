@@ -195,7 +195,7 @@
                   <div class="mb-3" *ngIf="orderDetail?.type === 3">
                     <span class="fw-bold">Thời gian vào:</span>  {{ timeIn | dateFormat }}
                   </div>
-                  <div class="mb-3" *ngIf="orderDetail.paymentTime && (orderDetail?.type === 4 || orderDetail?.type === 3)">
+                  <div class="mb-3" *ngIf="orderDetail.paymentTime && orderDetail.paymentStatus === 1 && (orderDetail?.type === 4 || orderDetail?.type === 3)">
                     <span class="fw-bold">Thời gian ra:</span> {{ orderDetail.paymentTime| dateFormat }}
                   </div>
                   <div class="mb-3"
@@ -220,7 +220,21 @@
                   <!-- <div class="mb-3">
             <span class="fw-bold">Thanh toán:</span> {{ orderDetail.recevingOrder | dateFormat }}
           </div> -->
-                  <h5 class="mb-3">Thông tin chi tiết đơn hàng</h5>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5>Thông tin chi tiết đơn hàng</h5>
+            <div>
+              <ng-container *ngIf="orderDetail?.type === 4 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2)">
+                <button type="button" class="btn" [ngStyle]="{'background-color': '#ff6600', 'color': '#ffffff'}" (click)="printTemporaryInvoice()" *ngIf="account?.role === 'Cashier'">In hóa đơn tạm</button>
+              </ng-container>
+              
+              <!-- Final invoice button -->
+              <ng-container *ngIf="(orderDetail?.paymentStatus === 1 && (orderDetail?.type === 4 || orderDetail?.type === 3 || orderDetail?.type === 1 || orderDetail?.type === 2)) || (orderDetail?.paymentStatus === 0 && orderDetail?.type === 2)">
+                <button type="button" class="btn btn-primary me-2" (click)="printFinalInvoice()" *ngIf="account?.role === 'Cashier'">In hóa đơn</button>
+              </ng-container>
+              
+            </div>
+          </div>
+          
                   <table class="table table-bordered table-hover">
                     <thead class="table-light">
                       <tr>
@@ -374,6 +388,8 @@
                     *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && dishesServed === 0 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2)">
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
                       data-bs-toggle="modal" *ngIf="account?.role === 'OrderStaff' || account?.role === 'Cashier'">Hủy đơn</button>
+
+
                   </ng-container>
 
                   <ng-container *ngIf="(orderDetail?.type === 4 || orderDetail?.type === 3) && orderDetail?.status === 3 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2) &&
@@ -384,7 +400,11 @@
                       data-bs-target="#paymentModalOffline"  *ngIf="account?.role === 'Cashier'">Hoàn thành</button>
                   </ng-container>
                 </div>
+
+               
+
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+               
               </div>
 
             </div>
