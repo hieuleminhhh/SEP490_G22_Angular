@@ -26,6 +26,7 @@ export class CookingManagementComponent implements OnInit {
   ingredient: any;
   private socket!: WebSocket;
   private reservationQueue: any[] = [];
+  isSending: boolean = false;
   constructor(private cookingService: CookingService, private notificationService: NotificationService, private fb: FormBuilder) { }
 
   ngOnInit(): void {
@@ -38,6 +39,21 @@ export class CookingManagementComponent implements OnInit {
     this.socket.onopen = () => {
       while (this.reservationQueue.length > 0) {
         this.socket.send(this.reservationQueue.shift());
+        this.isSending = true;
+      }
+    };
+    this.socket.onmessage = (event) => {
+      if (this.isSending) {
+        const data = JSON.parse(event.data);
+        console.log(data);
+        try {
+          this.getOrders('Current');
+          window.location.reload();
+        } catch (error) {
+          console.error('Error parsing reservation data:', error);
+        }
+        this.isSending = false;
+        return;
       }
     };
     this.socket.onclose = () => {
@@ -114,16 +130,16 @@ export class CookingManagementComponent implements OnInit {
     }
   }
 
-  completeDish(orderDetailId: number, itemNameOrComboName: string, type: number, orderId:number): void {
+  completeDish(orderDetailId: number, itemNameOrComboName: string, type: number, orderId: number): void {
     const form = this.forms[orderDetailId];
     const dishesServed = form.value.dishesServed;
 
     if (type === 1 || type === 2) {
-      this.updateDishesServed(orderDetailId, dishesServed, orderId);
+      this.updateDishesServed(orderDetailId, dishesServed, itemNameOrComboName, type, orderId);
 
     } else {
       this.updateLocal(orderDetailId, dishesServed, itemNameOrComboName);
-      this.createNotification(1);
+      this.createNotification(1, orderDetailId, dishesServed, itemNameOrComboName);
     }
     this.updateOrderQuantity(orderDetailId, dishesServed);
     this.filterOrders();
@@ -161,7 +177,7 @@ export class CookingManagementComponent implements OnInit {
     this.filteredOrders = this.order.filter((order: { quantity: number; }) => order.quantity > 0);
   }
 
-  updateDishesServed(orderDetailId: number, dishesServed: number, orderId:number) {
+  updateDishesServed(orderDetailId: number, dishesServed: number, itemNameOrComboName: string, type: number, orderId: number) {
     const request = {
       orderDetailId: orderDetailId,
       dishesServed: dishesServed
@@ -170,8 +186,8 @@ export class CookingManagementComponent implements OnInit {
       response => {
         this.cookingService.checkOrders(orderId).subscribe(
           response => {
-            if(response===true){
-              this.createNotification(2);
+            if (response === true) {
+              this.createNotification(2, orderDetailId, dishesServed, itemNameOrComboName);
             }
           },
           error => {
@@ -272,19 +288,29 @@ export class CookingManagementComponent implements OnInit {
       console.log('WebSocket is not open. Current state:', this.socket.readyState);
     }
   }
-  createNotification(check: number) {
+  createNotification(check: number, orderDetailId: number, dishesServed: number, itemNameOrComboName: string) {
     let description;
+    let data;
     if (check === 1) {
+      data = {
+        description: description,
+        orderDetailId: orderDetailId,
+        dishesServed: dishesServed,
+        itemNameOrComboName: itemNameOrComboName,
+      }
       description = `Có món ăn đã làm xong cho đơn tại quán ăn. Vui lòng kiểm tra và lên món`;
     }
     else if (check === 2) {
+      data = {
+        description: description
+      }
       description = `Có đơn hàng đã xong . Vui lòng kiểm tra và trả đơn`;
     }
     const body = {
       description: description,
       type: 2
     }
-    this.makeReservation(description);
+    this.makeReservation(data);
     console.log(body);
     this.notificationService.createNotification(body).subscribe(
       response => {

@@ -24,6 +24,7 @@ import { Discount } from '../../../../models/discount.model';
 import { CheckoutService } from '../../../../service/checkout.service';
 import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
 import { SettingService } from '../../../../service/setting.service';
+import { NotificationService } from '../../../../service/notification.service';
 @Component({
   selector: 'app-CreateOnlineOrder',
   templateUrl: './CreateOnlineOrder.component.html',
@@ -35,7 +36,7 @@ export class CreateOnlineOrderComponent implements OnInit {
 
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService: ManagerOrderService,
     private invoiceService: InvoiceService, private dialog: MatDialog, private renderer: Renderer2, private discountService: DiscountService, private checkoutService: CheckoutService,
-    private settingService: SettingService) {
+    private settingService: SettingService,private notificationService: NotificationService) {
     const today = new Date();
     this.date = this.formatDate(today);
     this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
@@ -107,6 +108,8 @@ export class CreateOnlineOrderComponent implements OnInit {
   minDate: string; // Ngày nhận tối thiểu là ngày hiện tại
   maxDate: string;
   availableHours: string[] = [];
+  private socket!: WebSocket;
+  private reservationQueue: any[] = [];
   @ViewChild('paymentModal') paymentModal!: ElementRef;
   ngOnInit() {
     this.loadListDishes();
@@ -127,6 +130,56 @@ export class CreateOnlineOrderComponent implements OnInit {
     console.log(this.time);
     this.selectTime();
     this.getInfo();
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift());
+      }
+    };
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+  }
+  createNotification(orderId: number) {
+    let description;
+    let body;
+    description = `Có đơn hàng mới. Vui lòng xem danh sách các món ăn để làm! `;
+    body = {
+      description: description,
+      orderId: orderId,
+      type: 4
+    }
+    this.makeReservation(description);
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+        // this.callFunctionInB(this.accountGuest);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
+
+    // Check if the WebSocket connection (this.socket) is defined
+    if (!this.socket) {
+      console.error('WebSocket is not initialized.');
+      return; // Exit the function if socket is not defined
+    }
+
+    // Check the WebSocket readyState
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Send the reservation request if WebSocket is open
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message); // Queue the message if WebSocket is connecting
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
+    }
   }
   selectTime() {
     const currentTime = new Date();
@@ -276,13 +329,13 @@ export class CreateOnlineOrderComponent implements OnInit {
   addItem(item: any) {
     // Determine whether the item is a dish or a combo
     const isCombo = item.hasOwnProperty('quantityCombo');
-    
+
     // Use the appropriate quantity property based on whether it's a dish or combo
     const availableQuantity = isCombo ? item.quantityCombo : item.quantityDish;
-  
+
     // Find if the item already exists in selectedItems
     const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-  
+
     if (index !== -1) {
       // If the item already exists, simply increase its quantity and update the total price
       this.selectedItems[index].quantity++;
@@ -290,11 +343,11 @@ export class CreateOnlineOrderComponent implements OnInit {
     } else {
       // If the item does not exist, add it to selectedItems with quantity 1 and set the total price
       const unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
-  
+
       // Directly add the item without checking for availableQuantity
       this.selectedItems.push({ ...item, quantity: 1, unitPrice: unitPrice, totalPrice: unitPrice });
     }
-  
+
     // Recalculate totalAmount and totalAmountAfterDiscount after adding the item
     this.calculateAndSetTotalAmount();
   }
@@ -410,6 +463,7 @@ clearErrorMessageAfterTimeout() {
       response => {
         console.log('Order created successfully:', response);
         this.successMessage = 'Đơn hàng đã được tạo thành công!';
+        this.createNotification(response.orderId);
         this.lastOrderId = response.orderId;
         setTimeout(() => this.successMessage = '', 5000);
       },
@@ -909,18 +963,18 @@ clearErrorMessageAfterTimeout() {
     }
     return 0;
   }
-  CreateInvoiceOnline(): void { 
+  CreateInvoiceOnline(): void {
     if (this.lastOrderId != null && this.lastOrderId !== undefined) {
       const paymentMethod = parseInt(this.paymentMethod, 10);
       const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
-  
+
       const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : totalAmount;
       const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - totalAmount : 0;
       let status = 0;
       if (paymentMethod === 0 || paymentMethod === 1) {
         status = 1;
       }
-      
+
       const updateData = {
         status: 6,
         paymentTime: new Date().toISOString(),
@@ -933,19 +987,19 @@ clearErrorMessageAfterTimeout() {
         paymentMethods: paymentMethod,
         description: ""
       };
-  
+
       console.log('Update Data:', updateData);
-  
+
       this.invoiceService.updateStatusAndCreateInvoice(this.lastOrderId, updateData).subscribe(
         async response => {
           console.log('Order status updated and invoice created:', response);
           this.loadInvoice(this.lastOrderId!);
-  
+
           // Gửi email thông báo cho khách hàng
           try {
             const emailResponse = await this.orderService.sendOrderEmail(this.lastOrderId).toPromise();
             const customerEmail = emailResponse?.email; // Safe access to email
-  
+
             if (customerEmail) {
               await this.orderService.sendEmail(
                 customerEmail,
@@ -956,12 +1010,12 @@ clearErrorMessageAfterTimeout() {
                 Trân trọng,<br>
                 Eating House`
               ).toPromise();
-            
+
               console.log('Email sent successfully to:', customerEmail);
             } else {
               console.error('Customer email not found.');
             }
-            
+
           } catch (emailError) {
             console.error('Error sending email:', emailError);
           }
@@ -974,8 +1028,8 @@ clearErrorMessageAfterTimeout() {
       console.warn('Order ID is not valid or is undefined. LastOrderId:', this.lastOrderId);
     }
   }
-  
-  
+
+
   settings: any;
   QRUrl: string = '';
   getInfo(): void {

@@ -24,6 +24,7 @@ import { DiscountService } from '../../../../service/discount.service';
 import { CheckoutService } from '../../../../service/checkout.service';
 import { AccountService } from '../../../../service/account.service';
 import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
+import { NotificationService } from '../../../../service/notification.service';
 @Component({
   selector: 'app-UpdateOfflineOrder',
   templateUrl: './UpdateOfflineOrder.component.html',
@@ -82,9 +83,11 @@ export class UpdateOfflineOrderComponent implements OnInit {
   account: any;
   showSidebar: boolean = true;
   orderIdForUpdate: any;
+  private socket!: WebSocket;
+  private reservationQueue: any[] = [];
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute, private dishService: ManagerDishService,
     private comboService: ManagerComboService, private orderDetailService: ManagerOrderDetailService, private invoiceService: InvoiceService, private discountService: DiscountService,
-    private checkoutService: CheckoutService, private accountService: AccountService) { }
+    private checkoutService: CheckoutService, private notificationService: NotificationService,private accountService: AccountService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   ngOnInit() {
     this.loadListDishes();
@@ -105,6 +108,56 @@ export class UpdateOfflineOrderComponent implements OnInit {
       this.getAccountDetails(this.accountId);
     } else {
       console.error('Account ID is not available');
+    }
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift());
+      }
+    };
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+  }
+  createNotification(orderId: number) {
+    let description;
+    let body;
+    description = `Có đơn hàng mới. Vui lòng xem danh sách các món ăn để làm! `;
+    body = {
+      description: description,
+      orderId: orderId,
+      type: 4
+    }
+    this.makeReservation(description);
+    this.notificationService.createNotification(body).subscribe(
+      response => {
+        console.log(response);
+        // this.callFunctionInB(this.accountGuest);
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
+  makeReservation(reservationData: any) {
+    const message = JSON.stringify(reservationData);
+
+    // Check if the WebSocket connection (this.socket) is defined
+    if (!this.socket) {
+      console.error('WebSocket is not initialized.');
+      return; // Exit the function if socket is not defined
+    }
+
+    // Check the WebSocket readyState
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message); // Send the reservation request if WebSocket is open
+    } else if (this.socket.readyState === WebSocket.CONNECTING) {
+      this.reservationQueue.push(message); // Queue the message if WebSocket is connecting
+    } else {
+      console.log('WebSocket is not open. Current state:', this.socket.readyState);
     }
   }
   currentQuantities: any[] = [];
@@ -130,7 +183,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
     const item = this.selectedItems[index];
     if (item) {
       const maxQuantity = this.getMaxQuantity(item);
-      
+
       // Check if the current quantity is already at the maximum
       if (item.quantity < maxQuantity) {
         item.quantity++;
@@ -141,8 +194,8 @@ export class UpdateOfflineOrderComponent implements OnInit {
       }
     }
   }
-  
-  
+
+
   // Method to decrease item quantity
   decreaseQuantity(index: number, orderId: number): void {
     const item = this.selectedItems[index];
@@ -286,17 +339,17 @@ export class UpdateOfflineOrderComponent implements OnInit {
   async addItem(item: any) {
     // Find if the item already exists in selectedItems
     const index = this.selectedItems.findIndex(selectedItem => this.itemsAreEqual(selectedItem, item));
-    
+
     // Determine the maximum allowable quantity based on item type
     const maxQuantity = this.getMaxQuantity(item);
-  
+
     // Ensure unitPrice is a valid number
     let unitPrice = item.discountedPrice ? item.discountedPrice : item.price;
     if (isNaN(unitPrice)) {
       console.error('Unit price is not a number:', unitPrice);
       unitPrice = 0; // Ensure unitPrice has a valid number
     }
-  
+
     if (index !== -1) {
       // If the item already exists, check if we can increase its quantity
       if (this.selectedItems[index].quantity < maxQuantity) {
@@ -325,15 +378,15 @@ export class UpdateOfflineOrderComponent implements OnInit {
         return; // Exit the method early
       }
     }
-    
+
     console.log('Updated Selected Items:', this.selectedItems);
-  
+
     // Recalculate totalAmount and totalAmountAfterDiscount after adding item
     this.calculateAndSetTotalAmount();
-  
+
     // Find the specific item in newlyAddedItems
     const newlyAddedIndex = this.newlyAddedItems.findIndex(newlyAddedItem => this.itemsAreEqual(newlyAddedItem, item));
-  
+
     if (newlyAddedIndex !== -1) {
       // If the item already exists in newlyAddedItems, update its quantity
       if (this.newlyAddedItems[newlyAddedIndex].quantity < maxQuantity) {
@@ -361,7 +414,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
         return; // Exit the method early
       }
     }
-    
+
     console.log('Updated Newly Added Items:', this.newlyAddedItems);
   }
    clearErrorMessageAfterTimeout() {
@@ -399,8 +452,8 @@ validateQuantity(index: number): void {
     const maxQuantity = this.getMaxQuantity(item);
 
     // Giới hạn số lượng trong khoảng từ 1 đến maxQuantity
-    item.quantity = Math.max(1, Math.min(item.quantity, maxQuantity)); 
-    
+    item.quantity = Math.max(1, Math.min(item.quantity, maxQuantity));
+
     // Cập nhật giá tiền và tổng số lượng
     this.updateTotalPrice(index);
     this.calculateTotalAmount();
@@ -526,13 +579,12 @@ validateQuantity(index: number): void {
   }
 
   updateOrderOffline(tableId: number): void {
-    // Extract newly added items to update in the DB
     const orderDetails = this.newlyAddedItems.map(item => ({
       dishId: item.dishId || null,
       comboId: item.comboId || null,
       quantity: item.quantity,
-      note: item.note || '', // Assuming you have a note property or set it to an empty string
-      orderTime: new Date().toISOString() // Assuming you want the current time
+      note: item.note || '',
+      orderTime: new Date().toISOString()
     }));
 
     // Log the data before sending
@@ -549,6 +601,7 @@ validateQuantity(index: number): void {
     this.orderService.updateOrderOffline(tableId, updatedOrder).subscribe(
       response => {
         console.log('Offline order updated successfully:', response);
+        this.createNotification(this.orderIdForUpdate);
         this.successMessage = 'Offline order updated successfully!';
         this.updateOrderDetail(this.orderIdForUpdate);
         // Clear newlyAddedItems after successful update
