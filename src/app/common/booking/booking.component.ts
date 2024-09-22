@@ -114,7 +114,7 @@ export class BookingComponent implements OnInit {
     let description = `Có đơn đặt bàn mới! Vui lòng kiểm tra và xác nhận đơn hàng.`;
     const body = {
       description: description,
-      type: 3
+      type: 2
     }
     this.makeReservation(description);
     console.log(body);

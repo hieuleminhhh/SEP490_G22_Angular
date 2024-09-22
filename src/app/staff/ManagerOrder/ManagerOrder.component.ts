@@ -943,6 +943,7 @@ export class ManagerOrderComponent implements OnInit {
         const response = await this.orderService.AcceptOrderWaiting(orderId, paymentData).toPromise();
         console.log('Order accepted successfully:', response);
         this.createNotification(orderId, 1);
+        this.createNotification(orderId, 3);
 
         // Gọi sendOrderEmail để lấy địa chỉ email của khách hàng
         const emailResponse = await this.orderService.sendOrderEmail(orderId).toPromise();
