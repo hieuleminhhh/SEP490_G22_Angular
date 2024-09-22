@@ -178,10 +178,11 @@ export class RefundComponent implements OnInit {
     this.getOrdersCancel();
 
   }
-
+  employ: any;
   showDetails(order: any) {
     console.log(order);
-    this.getOrdersDetail(order);
+    this.employ = order;
+    this.getOrdersDetail(order.orderId);
   }
 
   closePopup() {
@@ -191,6 +192,8 @@ export class RefundComponent implements OnInit {
     this.invoiceService.getOrderDetail(id).subscribe(
       response => {
         this.selectedItem = response;
+        console.log(response);
+
       },
       error => {
         console.error('Error:', error);

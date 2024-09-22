@@ -6,7 +6,7 @@
     </nav>
     <div class="app-body-main-content">
       <div class="cod-content">
-        <section class="payment-section" >
+        <section class="payment-section">
           <div class="header-section">
             <h2>Đơn giao hàng</h2>
             <select class="employee-select" [(ngModel)]="selectedEmployee" (change)="filterOrders()">
@@ -57,7 +57,7 @@
                   <td *ngIf="order.paymentStatus===0">Chưa thanh toán cho thu ngân</td>
                   <td *ngIf="order.paymentStatus===1"> {{order.collectedFirstName}} {{order.collectedLastName}}</td>
                   <td *ngIf="order.paymentStatus===0">
-                    <button class="action-button view-button" (click)="showDetails(order.orderId)">
+                    <button class="action-button view-button" (click)="showDetails(order)">
                       <i class="fas fa-eye"></i>
                     </button>
                     <button class="action-button complete-button" data-bs-toggle="modal"
@@ -66,7 +66,7 @@
                     </button>
                   </td>
                   <td *ngIf="order.paymentStatus===1">
-                    <button class="action-button view-button" (click)="showDetails(order.orderId)">
+                    <button class="action-button view-button" (click)="showDetails(order)">
                       <i class="fas fa-eye"></i>
                     </button>
                   </td>
@@ -88,23 +88,25 @@
   </div>
 </div>
 
-<div class="modal-dialog" *ngIf="selectedTab === 'cash-on-delivery'">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title" id="confirmationModalLabel">Xác nhận</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-    <div class="modal-body">
-      <p class="confirmation-text">
-        Xác nhận thu tiền <span class="customer-name">{{orderShipper?.firstName}}{{orderShipper?.lastName}}</span><br>
-        Số tiền: <span class="refund-amount">{{orderShipper?.totalPaid | currencyFormat}}</span>
-      </p>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invoiceModal"
-        (click)="update(orderShipper.orderId, orderShipper.totalPaid, orderShipper.staffId)">Xác
-        nhận</button>
+<div id="confirmationModal" class="modal fade" tabindex="-1" aria-labelledby="confirmationModalLabel">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Xác nhận</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="confirmation-text">
+          Xác nhận thu tiền <span class="customer-name">{{orderShipper?.firstName}}{{orderShipper?.lastName}}</span><br>
+          Số tiền: <span class="refund-amount">{{orderShipper?.totalPaid | currencyFormat}}</span>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invoiceModal"
+          (click)="update(orderShipper.orderId, orderShipper.totalPaid, orderShipper.staffId)">Xác
+          nhận</button>
+      </div>
     </div>
   </div>
 </div>
@@ -145,6 +147,10 @@
       <p>Địa chỉ: {{selectedItem.guestAddress}}</p>
       <p>Thời gian đặt hàng: {{ selectedItem.orderDate | date:'dd/MM/yyyy - HH:mm' }}</p>
       <p>Thời gian nhận hàng: {{ selectedItem.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</p>
+      <p>Nhân viên giao hàng: {{ employ.firstName}} {{employ.lastName}}</p>
+      <p *ngIf="selectedStatus==='unpaid'">Trạng thái: Giao hàng thành công - Chưa thanh toán cho thu ngân</p>
+      <p *ngIf="selectedStatus==='paid'">Trạng thái: Giao hàng thành công - Đã thanh toán cho thu ngân</p>
+      <p *ngIf="selectedStatus==='paid'">Nhân viên thu tiền : {{ employ.collectedFirstName}} {{employ.collectedLastName}}</p>
 
       <table class="table table-bordered table-hover">
         <thead class="table-light">
@@ -196,6 +202,3 @@
     </div>
   </div>
 </div>
-<p>
-  delivery works!
-</p>

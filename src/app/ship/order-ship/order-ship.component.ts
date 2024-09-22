@@ -81,11 +81,11 @@ export class OrderShipComponent implements OnInit {
     const request = {
       status: 4
     };
+    this.createNotification(order.orderId, 1, order.accountId);
+    this.createNotification(order.orderId, 3, order.accountId);
     this.cookingService.updateOrderStatus(order.orderId, request).subscribe(
       response => {
         if (order.deposits > 0) {
-          this.createNotification(order.orderId, 1, order.accountId);
-          this.createNotification(order.orderId, 3, order.accountId);
           this.update(order.orderId, order.deposits);
         }
         window.location.reload();
