@@ -84,6 +84,7 @@ export const routes: Routes = [
     {'path': 'forgot-password', component: ForgetPasswordComponent},
     {'path': 'verifyOTPsignin', component: VerifyOtpSignupComponent},
     {'path': 'refund', component: RefundComponent},
-    {'path': 'delivery', component: DeliveryComponent}
+    {'path': 'delivery', component: DeliveryComponent},
+    
 ];
 

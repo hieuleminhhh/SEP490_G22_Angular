@@ -1,155 +1,141 @@
-<app-HeaderOrderStaff></app-HeaderOrderStaff>
-<div class="container">
-  <main class="main-content">
-    <div class="container">
-
-      <div class="card fixed-size">
-        <div class="title">
-          <a href="javascript:history.back()" class="back-link">
-            <i class="fas fa-arrow-left back-icon"></i>
-          </a>
-          <button (click)="onButtonClick('dineIn')" [class.selected]="isSelected('dineIn')">Phục vụ tại chỗ</button>
-          <button (click)="onButtonClick('takeAway')" [class.selected]="isSelected('takeAway')">Đơn mang về</button>
-          <button (click)="onButtonClick('ship')" [class.selected]="isSelected('ship')">Đơn giao hàng</button>
-        </div>
-        <br>
-        <div class="card-body">
-          <!-- Content for dineIn -->
-          <div *ngIf="selectedButton === 'dineIn'">
-            <!-- Upper Section -->
-            <div class="upper-section">
-              <table *ngIf="filteredOrders.length > 0; else noContent">
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Tên món</th>
-                    <th>Số lượng hoàn thành</th>
-                  </tr>
-                </thead>
-                <tbody class="scrollable-tbody">
-                  <ng-container *ngFor="let order of filteredOrders">
+<div class="app">
+  <app-HeaderOrderStaff></app-HeaderOrderStaff>
+  <div class="app-body d-flex">
+    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+      <app-SidebarOrder></app-SidebarOrder>
+    </nav>
+    <div class="app-body-main-content flex-fill">
+      <main class="main-content">
+        <div class="card fixed-size">
+          <div class="title">
+            <!-- <a href="javascript:history.back()" class="back-link">
+              <i class="fas fa-arrow-left back-icon"></i>
+            </a> -->
+            <button (click)="onButtonClick('dineIn')" [class.selected]="isSelected('dineIn')">Phục vụ tại chỗ</button>
+            <button (click)="onButtonClick('takeAway')" [class.selected]="isSelected('takeAway')">Đơn mang về</button>
+            <button (click)="onButtonClick('ship')" [class.selected]="isSelected('ship')">Đơn giao hàng</button>
+          </div>
+          <br>
+          <div class="card-body">
+            <!-- Nội dung cho dineIn -->
+            <div *ngIf="selectedButton === 'dineIn'">
+              <div class="upper-section">
+                <table *ngIf="filteredOrders.length > 0; else noContent">
+                  <thead>
                     <tr>
-                      <td>
-                        <input type="checkbox" (change)="onCheckboxChange(order, $event)"
-                          [checked]="order === selectedOrder">
-                      </td>
-                      <td>{{ order.itemNameOrComboName }}</td>
-                      <td>{{ order.dishesServed }}</td>
+                      <th></th>
+                      <th>Tên món</th>
+                      <th>Số lượng hoàn thành</th>
                     </tr>
-                  </ng-container>
-                </tbody>
-              </table>
-              <ng-template #noContent>
-                <div>Không có món ăn hoàn thành</div>
-              </ng-template>
-            </div>
-
-            <!-- Lower Section -->
-            <div class="lower-section" *ngIf="orderDish">
-              <hr><br>
-              <h5>Danh sách bàn cần lên món:</h5>
-              <br>
-              <div class="grid-container">
-                <div *ngFor="let dish of orderDish; let i = index" class="grid-item">
-                  <div class="dish-info">
-                    <p>Bàn {{ dish.tableId }} - {{ getOrderTimeHoursMinutes(dish.orderTime) }}</p>
-                    <p>Số lượng yêu cầu: {{ dish.quantityRequired }}</p>
-                    <div class="quantity-container">
-                      <p>Phục vụ</p>
-                      <input type="number" min="1" [attr.max]="dish.quantityRequired" [(ngModel)]="quantitiesServed[i]"
-                        (keypress)="preventNonNumericalInput($event)"
-                        (input)="validateInput($event, i, dish.quantityRequired)">
+                  </thead>
+                  <tbody class="scrollable-tbody">
+                    <ng-container *ngFor="let order of filteredOrders">
+                      <tr>
+                        <td>
+                          <input type="checkbox" (change)="onCheckboxChange(order, $event)" [checked]="order === selectedOrder">
+                        </td>
+                        <td>{{ order.itemNameOrComboName }}</td>
+                        <td>{{ order.dishesServed }}</td>
+                      </tr>
+                    </ng-container>
+                  </tbody>
+                </table>
+                <ng-template #noContent>
+                  <div>Không có món ăn hoàn thành</div>
+                </ng-template>
+              </div>
+              <div class="lower-section" *ngIf="orderDish">
+                <hr><br>
+                <h5>Danh sách bàn cần lên món:</h5>
+                <br>
+                <div class="grid-container">
+                  <div *ngFor="let dish of orderDish; let i = index" class="grid-item">
+                    <div class="dish-info">
+                      <p>Bàn {{ dish.tableId }} - {{ getOrderTimeHoursMinutes(dish.orderTime) }}</p>
+                      <p>Số lượng yêu cầu: {{ dish.quantityRequired }}</p>
+                      <div class="quantity-container">
+                        <p>Phục vụ</p>
+                        <input type="number" min="1" [attr.max]="dish.quantityRequired" [(ngModel)]="quantitiesServed[i]"
+                          (keypress)="preventNonNumericalInput($event)"
+                          (input)="validateInput($event, i, dish.quantityRequired)">
+                      </div>
+                      <button (click)="updateDishesServed(dish.orderDetailId, dish.itemName || dish.comboName); $event.stopPropagation()">Lên món</button>
                     </div>
-                    <button (click)="updateDishesServed(dish.orderDetailId, dish.itemName || dish.comboName)">
-                      Lên món
-                    </button>
                   </div>
                 </div>
               </div>
             </div>
 
-          </div>
-
-          <!-- Content for takeAway -->
-          <div *ngIf="selectedButton === 'takeAway'">
-            <h5 *ngIf="takeawayOrders.length>0;else noContent">Thông tin đơn mang về:</h5>
-            <div class="lower-section" *ngIf="takeawayOrders" style="height: 570px; overflow: auto;">
-              <div class="grid-container">
-                <div *ngFor="let order of takeawayOrders; let i = index" class="grid-item">
-                  <div class="dish-info" (click)="showDetails(order)">
-                    <p>Đơn {{order.orderId}} </p>
-                    <p>Tình trạng: {{order.status === 1 ? "Hoàn thành" : "Chưa hoàn thành"}}</p>
-                    <button *ngIf="order.status === 1" (click)="handleButtonClick(order); $event.stopPropagation()">
-                      Trả đơn
-                    </button>
+            <!-- Nội dung cho takeAway -->
+            <div *ngIf="selectedButton === 'takeAway'">
+              <h5 *ngIf="takeawayOrders.length > 0; else noContent">Thông tin đơn mang về:</h5>
+              <div class="lower-section" *ngIf="takeawayOrders" style="height: 570px; overflow: auto;">
+                <div class="grid-container">
+                  <div *ngFor="let order of takeawayOrders; let i = index" class="grid-item">
+                    <div class="dish-info" (click)="showDetails(order)">
+                      <p>Đơn {{ order.orderId }} </p>
+                      <p>Tình trạng: {{ order.status === 1 ? "Hoàn thành" : "Chưa hoàn thành" }}</p>
+                      <button *ngIf="order.status === 1" (click)="handleButtonClick(order); $event.stopPropagation()">Trả đơn</button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <ng-template #noContent>
-              <div>Không có đơn hàng hoàn thành</div>
-            </ng-template>
-          </div>
-
-          <!-- Content for takeAway -->
-          <div *ngIf="selectedButton === 'ship'">
-            <div class="upper-section">
-              <table *ngIf="deliveryOrders.length > 0; else noContent">
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Mã đơn hàng</th>
-                    <th>Tình trạng</th>
-                    <th>Thời gian dự kiến nhận hàng</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody class="scrollable-tbody">
-                  <ng-container *ngFor="let order of deliveryOrders">
-                    <tr>
-                      <td *ngIf="order.status===1">
-                        <input type="checkbox" (change)="onCheckBoxChange(order, $event)"
-                          [checked]="order === selectedOrders">
-                      </td>
-                      <td *ngIf="order.status!==1"></td>
-                      <td>{{ order.orderId }}</td>
-                      <td>{{order.status === 1 ? "Sẵn sàng giao" : "Chưa hoàn thành"}}</td>
-                      <td>{{order.recevingOrder | date:'dd/MM/yyyy - HH:mm'}}</td>
-                      <td><button (click)="showDetails(order)">Chi tiết</button></td>
-                    </tr>
-                  </ng-container>
-                </tbody>
-              </table>
               <ng-template #noContent>
                 <div>Không có đơn hàng hoàn thành</div>
               </ng-template>
             </div>
 
-            <!-- Lower Section -->
-            <div class="lower-section" *ngIf="selectedOrders.length > 0">
-              <hr><br>
-              <h5>Danh sách nhân viên ship:</h5>
-              <br>
-              <div class="grid-container">
-                <div *ngFor="let shiper of dataShipStaff; let i = index" class="grid-item">
-                  <div class="dish-info">
-                    <p>{{shiper.firstName}}{{shiper.lastName}}</p>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal"
-                    (click)="GetAccountById(shiper.accountId)">
-                      Chỉ định
-                      giao hàng</button>
+            <!-- Nội dung cho ship -->
+            <div *ngIf="selectedButton === 'ship'">
+              <div class="upper-section">
+                <table *ngIf="deliveryOrders.length > 0; else noContent">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Mã đơn hàng</th>
+                      <th>Tình trạng</th>
+                      <th>Thời gian dự kiến nhận hàng</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody class="scrollable-tbody">
+                    <ng-container *ngFor="let order of deliveryOrders">
+                      <tr>
+                        <td *ngIf="order.status === 1">
+                          <input type="checkbox" (change)="onCheckBoxChange(order, $event)" [checked]="order === selectedOrders">
+                        </td>
+                        <td *ngIf="order.status !== 1"></td>
+                        <td>{{ order.orderId }}</td>
+                        <td>{{ order.status === 1 ? "Sẵn sàng giao" : "Chưa hoàn thành" }}</td>
+                        <td>{{ order.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</td>
+                        <td><button (click)="showDetails(order)">Chi tiết</button></td>
+                      </tr>
+                    </ng-container>
+                  </tbody>
+                </table>
+                <ng-template #noContent>
+                  <div>Không có đơn hàng hoàn thành</div>
+                </ng-template>
+              </div>
+              <div class="lower-section" *ngIf="selectedOrders.length > 0">
+                <hr><br>
+                <h5>Danh sách nhân viên ship:</h5>
+                <br>
+                <div class="grid-container">
+                  <div *ngFor="let shiper of dataShipStaff; let i = index" class="grid-item">
+                    <div class="dish-info">
+                      <p>{{ shiper.firstName }} {{ shiper.lastName }}</p>
+                      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal" (click)="GetAccountById(shiper.accountId)">Chỉ định giao hàng</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
-  </main>
-</div>
-
-<!-- Popup for item details -->
+    <!-- Popup for item details -->
 <div *ngIf="selectedItem" class="popup" (click)="closePopup()">
   <div class="popup-content" (click)="$event.stopPropagation()">
     <span class="close" (click)="closePopup()">&times;</span>
@@ -335,9 +321,6 @@
         <button type="button" class="btn btn-secondary" *ngIf="isPrinted" (click)="reloadPage()">Đóng</button>
         <button type="button" class="btn btn-primary" (click)="printOrder()">In đơn cho ship</button>
     </div>
-
-
-    </div>
+  </div>
   </div>
 </div>
-
