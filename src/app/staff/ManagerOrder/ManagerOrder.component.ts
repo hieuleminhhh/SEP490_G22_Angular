@@ -666,15 +666,20 @@ export class ManagerOrderComponent implements OnInit {
           const customerEmail = emailResponse.email;
 
           // Gửi email thông báo (chạy không đồng bộ, không chờ đợi)
-          this.orderService.sendEmail(customerEmail, 'Thông báo từ Eating House', `Xin chào quý khách, rất tiếc đơn hàng của bạn đã bị hủy. Lý do: ${cancelationReason}. Cảm ơn bạn đã tin tưởng và lựa chọn Eating House!`)
-            .subscribe(
-              emailSentResponse => {
-                console.log('Email thông báo hủy đơn hàng đã được gửi thành công:', emailSentResponse);
-              },
-              emailError => {
-                console.error('Lỗi khi gửi email thông báo hủy đơn hàng:', emailError);
-              }
-            );
+          this.orderService.sendEmail(
+            customerEmail,
+            'Thông báo hủy đơn hàng từ Eating House',
+            `Xin chào quý khách,<br><br>
+  Rất tiếc, đơn hàng của bạn đã bị hủy. Lý do: ${cancelationReason}.<br>
+  Cảm ơn bạn đã tin tưởng và lựa chọn Eating House!`
+          ).subscribe(
+            emailSentResponse => {
+              console.log('Email thông báo hủy đơn hàng đã được gửi thành công:', emailSentResponse);
+            },
+            emailError => {
+              console.error('Lỗi khi gửi email thông báo hủy đơn hàng:', emailError);
+            }
+          );
 
           // Không cần chờ gửi email, reload ngay lập tức
           window.location.reload();
@@ -938,22 +943,28 @@ export class ManagerOrderComponent implements OnInit {
         const response = await this.orderService.AcceptOrderWaiting(orderId, paymentData).toPromise();
         console.log('Order accepted successfully:', response);
         this.createNotification(orderId, 1);
-  
+
         // Gọi sendOrderEmail để lấy địa chỉ email của khách hàng
         const emailResponse = await this.orderService.sendOrderEmail(orderId).toPromise();
         const customerEmail = emailResponse.email;
         console.log(customerEmail); // Điều chỉnh dựa trên cấu trúc phản hồi
-  
+
         // Gửi email thông báo (thực hiện không đồng bộ, không chờ đợi)
-        this.orderService.sendEmail(customerEmail, 'Thông báo từ Eating House', 'Xin chào quý khách, đơn hàng của bạn đã được chấp nhận và đang trong quá trình xử lý. Cảm ơn bạn đã tin tưởng và lựa chọn Eating House!')
-          .subscribe(
-            emailSentResponse => {
-              console.log('Email sent successfully:', emailSentResponse);
-            },
-            emailError => {
-              console.error('Error sending email:', emailError);
-            }
-          );
+        this.orderService.sendEmail(
+          customerEmail,
+          'Thông báo đơn hàng từ Eating House',
+          `Xin chào quý khách,<br><br>
+          Đơn hàng của bạn đã được chấp nhận và đang trong quá trình xử lý.<br>
+          Cảm ơn bạn đã tin tưởng và lựa chọn Eating House!`
+        ).subscribe(
+          emailSentResponse => {
+            console.log('Email sent successfully:', emailSentResponse);
+          },
+          emailError => {
+            console.error('Error sending email:', emailError);
+          }
+        );
+
 
         // Không cần chờ đợi việc gửi email, reload trang ngay lập tức
         window.location.reload();
@@ -984,7 +995,7 @@ export class ManagerOrderComponent implements OnInit {
         orderId: orderId,
         type: 1
       }
-    }else if (check === 3) {
+    } else if (check === 3) {
       description = `Có đơn hàng mới. Vui lòng xem danh sách các món ăn để làm! `;
       body = {
         description: description,

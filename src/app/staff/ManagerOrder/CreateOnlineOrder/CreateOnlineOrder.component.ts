@@ -72,7 +72,7 @@ export class CreateOnlineOrderComponent implements OnInit {
   selectedDiscountPercent: number = 0;
   totalAmountAfterDiscount: number = 0;
   totalAmount: number = 0;
-  lastOrderId: number | undefined;
+  lastOrderId: any;
   accountId: number | null = null;
   addNew: AddNewOrder = {
     guestPhone: '',
@@ -909,11 +909,11 @@ clearErrorMessageAfterTimeout() {
     }
     return 0;
   }
-  CreateInvoiceOnline(): void {
+  CreateInvoiceOnline(): void { 
     if (this.lastOrderId != null && this.lastOrderId !== undefined) {
       const paymentMethod = parseInt(this.paymentMethod, 10);
       const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
-
+  
       const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : totalAmount;
       const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - totalAmount : 0;
       let status = 0;
@@ -933,13 +933,38 @@ clearErrorMessageAfterTimeout() {
         paymentMethods: paymentMethod,
         description: ""
       };
-
+  
       console.log('Update Data:', updateData);
-
+  
       this.invoiceService.updateStatusAndCreateInvoice(this.lastOrderId, updateData).subscribe(
-        response => {
+        async response => {
           console.log('Order status updated and invoice created:', response);
           this.loadInvoice(this.lastOrderId!);
+  
+          // Gửi email thông báo cho khách hàng
+          try {
+            const emailResponse = await this.orderService.sendOrderEmail(this.lastOrderId).toPromise();
+            const customerEmail = emailResponse?.email; // Safe access to email
+  
+            if (customerEmail) {
+              await this.orderService.sendEmail(
+                customerEmail,
+                'Thông báo đơn hàng từ Eating House',
+                `Kính gửi quý khách,<br><br>
+                Bạn có một đơn hàng đã được tạo thành công.<br>
+                Cảm ơn bạn đã tin tưởng và lựa chọn Eating House!<br><br>
+                Trân trọng,<br>
+                Eating House`
+              ).toPromise();
+            
+              console.log('Email sent successfully to:', customerEmail);
+            } else {
+              console.error('Customer email not found.');
+            }
+            
+          } catch (emailError) {
+            console.error('Error sending email:', emailError);
+          }
         },
         error => {
           console.error('Error updating order status and creating invoice:', error);
@@ -949,6 +974,8 @@ clearErrorMessageAfterTimeout() {
       console.warn('Order ID is not valid or is undefined. LastOrderId:', this.lastOrderId);
     }
   }
+  
+  
   settings: any;
   QRUrl: string = '';
   getInfo(): void {

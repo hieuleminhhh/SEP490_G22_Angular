@@ -28,9 +28,6 @@ export class AuthGuard implements CanActivate {
       if (url === 'invoice' && user.role === 'Cashier') {
         return true; 
       }
-      if (url === 'tableManagement' && user.role === 'Cashier') {
-        return true; 
-      }
       //Order Staff
       if (url === 'createOffline' && user.role === 'OrderStaff') {
         return true; 
@@ -42,6 +39,9 @@ export class AuthGuard implements CanActivate {
         return true; 
       }
       if (url === 'fillDish' && user.role === 'OrderStaff') {
+        return true; 
+      }
+      if (url === 'tableManagement' && user.role === 'OrderStaff') {
         return true; 
       }
       //Manager
