@@ -26,6 +26,7 @@ import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal/modal.module';
 import { SettingService } from '../../../../service/setting.service';
 import { NotificationService } from '../../../../service/notification.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-CreateTakeAwayOrder',
@@ -39,7 +40,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService,
     private orderService: ManagerOrderService, private cd: ChangeDetectorRef, private invoiceService: InvoiceService,
     private route: ActivatedRoute, private dialog: MatDialog, private notificationService: NotificationService, private discountService: DiscountService, private checkoutService: CheckoutService,
-    private settingService: SettingService) { }
+    private settingService: SettingService,  private titleService: Title) { }
   @ViewChild('formModal') formModal!: ElementRef;
   @ViewChild('checkDishModal') checkDishModal!: ElementRef;
 
@@ -117,6 +118,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   private socket!: WebSocket;
   private reservationQueue: any[] = [];
   ngOnInit() {
+    this.titleService.setTitle('Tạo đơn | Eating House');
     this.loadListDishes();
     this.loadListCombo();
     this.loadAddresses();

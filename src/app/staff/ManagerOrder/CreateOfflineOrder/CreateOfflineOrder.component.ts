@@ -28,6 +28,7 @@ import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.
 import { ReservationService } from '../../../../service/reservation.service';
 import { SelectedItem } from '../../../../models/order.model';
 import { NotificationService } from '../../../../service/notification.service';
+import { Title } from '@angular/platform-browser';
 @Component({
   selector: 'app-create-offline-order',
   templateUrl: './CreateOfflineOrder.component.html',
@@ -90,9 +91,10 @@ export class CreateOfflineOrderComponent implements OnInit {
     private comboService: ManagerComboService, private orderDetailService: ManagerOrderDetailService, private invoiceService: InvoiceService, private dialog: MatDialog
     , private discountService: DiscountService, private notificationService: NotificationService,
     private checkoutService: CheckoutService, private accountService: AccountService,
-    private reservationService: ReservationService) { }
+    private reservationService: ReservationService, private titleService: Title) { }
   @ViewChild('formModal') formModal!: ElementRef;
   ngOnInit() {
+    this.titleService.setTitle('Tạo đơn | Eating House');
     this.loadListDishes();
     this.loadListCombo();
     this.loadAddresses();

@@ -13,21 +13,23 @@
   </li>
   <li class="nav-item mb-3 " *ngIf="account?.role === 'Cashier'">
     <a class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#orderMenu1"
-      role="button" aria-expanded="false" aria-controls="orderMenu" (click)="toggleOrderMenu()"
-      [ngClass]="{'active': isOrderMenuActive()}">
+      role="button" aria-expanded="false" aria-controls="orderMenu" (click)="toggleOrderMenuCashier()"
+      [ngClass]="{'active': isOrderMenuActiveOrderCashier()}">
       <span class="d-flex align-items-center">
         <i class="fas fa-cash-register me-2"></i> <!-- Font Awesome icon for sales -->
         Đơn hàng
       </span>
-      <i class="fas" [ngClass]="{'fa-chevron-up': isOrderMenuActive(), 'fa-chevron-down': !isOrderMenuActive()}"></i>
+      <i class="fas"
+        [ngClass]="{'fa-chevron-up': isOrderMenuActiveOrderCashier(), 'fa-chevron-down': !isOrderMenuActiveOrderCashier()}"></i>
       <!-- Toggle icon -->
     </a>
-    <div class="collapse mt-2" id="orderMenu1" [ngClass]="{'show': isOrderMenuActive()}">
+    <div class="collapse mt-2" id="orderMenu1" [ngClass]="{'show': isOrderMenuActiveOrderCashier()}">
       <ul class="nav flex-column ms-3">
         <li class="nav-item mb-3" *ngIf="account?.role === 'Cashier'">
           <a class="nav-link d-flex align-items-center" [routerLink]="['/managerorder']" routerLinkActive="active">
-            <i class="fas fa-utensils me-2"></i> <!-- Font Awesome icon -->
-            Xem thông tin
+            <i class="fas fa-clipboard me-2"></i>
+            <!-- Font Awesome icon -->
+            Quản lý đơn
           </a>
         </li>
         <li class="nav-item mb-3" *ngIf="account?.role === 'Cashier'">
@@ -54,16 +56,17 @@
 
   <li class="nav-item mb-3 " *ngIf="account?.role === 'OrderStaff'">
     <a class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#orderMenu"
-      role="button" aria-expanded="false" aria-controls="orderMenu" (click)="toggleOrderMenu()"
-      [ngClass]="{'active': isOrderMenuActive()}">
+      role="button" aria-expanded="false" aria-controls="orderMenu" (click)="toggleOrderMenuOrderStaff()"
+      [ngClass]="{'active': isOrderMenuActiveOrderStaff()}">
       <span class="d-flex align-items-center">
         <i class="fas fa-cash-register me-2"></i> <!-- Font Awesome icon for sales -->
         Bán hàng
       </span>
-      <i class="fas" [ngClass]="{'fa-chevron-up': isOrderMenuActive(), 'fa-chevron-down': !isOrderMenuActive()}"></i>
+      <i class="fas"
+        [ngClass]="{'fa-chevron-up': isOrderMenuActiveOrderStaff(), 'fa-chevron-down': !isOrderMenuActiveOrderStaff()}"></i>
       <!-- Toggle icon -->
     </a>
-    <div class="collapse mt-2" id="orderMenu" [ngClass]="{'show': isOrderMenuActive()}">
+    <div class="collapse mt-2" id="orderMenuOrderStaff" [ngClass]="{'show': isOrderMenuActiveOrderStaff()}">
       <ul class="nav flex-column ms-3">
         <li class="nav-item mb-3" *ngIf="account?.role === 'OrderStaff'">
           <a class="nav-link d-flex align-items-center" [routerLink]="['/listTable']" routerLinkActive="active">

@@ -8,6 +8,7 @@ import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currenc
 import { CookingService } from '../../../service/cooking.service';
 import { ExportService } from '../../../service/export.service';
 import { NotificationService } from '../../../service/notification.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-manage-invoice',
@@ -37,9 +38,10 @@ export class ManageInvoiceComponent implements OnInit {
   private reservationQueue: any[] = [];
   private socket!: WebSocket;
 
-  constructor(private invoiceService: InvoiceService, private notificationService: NotificationService, private cookingService: CookingService, private exportService: ExportService) { }
+  constructor(private invoiceService: InvoiceService, private notificationService: NotificationService, private cookingService: CookingService, private exportService: ExportService, private titleService: Title) { }
   @ViewChild('collectAllModal') collectAllModal!: ElementRef;
   ngOnInit() {
+    this.titleService.setTitle('Thống kê | Eating House');
     const today = new Date();
     this.dateFrom = this.formatDate(today);
     this.dateTo = this.formatDate(today);

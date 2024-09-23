@@ -8,6 +8,7 @@ import { CookingService } from '../../../../service/cooking.service';
 import { ExportService } from '../../../../service/export.service';
 import { InvoiceService } from '../../../../service/invoice.service';
 import { NotificationService } from '../../../../service/notification.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-delivery',
@@ -37,9 +38,10 @@ export class DeliveryComponent implements OnInit {
   private reservationQueue: any[] = [];
   private socket!: WebSocket;
 
-  constructor(private invoiceService: InvoiceService, private notificationService: NotificationService, private cookingService: CookingService, private exportService: ExportService) { }
+  constructor(private invoiceService: InvoiceService, private notificationService: NotificationService, private cookingService: CookingService, private exportService: ExportService,private titleService: Title ) { }
   @ViewChild('collectAllModal') collectAllModal!: ElementRef;
   ngOnInit() {
+    this.titleService.setTitle('Đơn thu tiền | Eating House');
     this.getOrdersShip();
     this.getEmployees();
     const accountIdString = localStorage.getItem('accountId');
