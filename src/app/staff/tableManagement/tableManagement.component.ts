@@ -1283,6 +1283,7 @@ export class TableManagementComponent implements OnInit {
   isConfirmModalOpen = false;
   openConfirmModal() {
     this.isConfirmModalOpen = true;
+    console.log(this.selectedTableIds);
   }
   closeConfirmModal() {
     this.isConfirmModalOpen = false;
@@ -1318,6 +1319,8 @@ export class TableManagementComponent implements OnInit {
     this.selectedTableIds = [];
     this.ishas = false;
     this.totalCapacity = 0;
+    console.log(this.selectedTableIds);
+
 
   }
   formatDateTime(date: string, time: string): string {
@@ -1342,6 +1345,7 @@ export class TableManagementComponent implements OnInit {
           reservationId: response.reservation.reservationId,
           tableIds: this.selectedTableIds
         }
+        console.log(request);
         this.tableService.createTableReservation(request).subscribe({
           next: response => {
             console.log(response);
@@ -1357,7 +1361,22 @@ export class TableManagementComponent implements OnInit {
             this.getReservationData();
           }
         });
-
+        this.closeConfirmModal();
+        this.reservation = {
+          name: '',
+          phone: '',
+          email: '',
+          date: this.formatDate(today),
+          time: '',
+          people: 2,
+          notes: ''
+        };
+        this.updateTimes();
+        this.showPersonalInfo = false;
+        this.selectedFloor = this.dataTable[0].floor;
+        this.selectedTableIds = [];
+        this.ishas = false;
+        this.totalCapacity = 0;
         this.getReservationData();
       },
       error: error => {
@@ -1369,22 +1388,7 @@ export class TableManagementComponent implements OnInit {
         }
       }
     });
-    this.closeConfirmModal();
-    this.reservation = {
-      name: '',
-      phone: '',
-      email: '',
-      date: this.formatDate(today),
-      time: '',
-      people: 2,
-      notes: ''
-    };
-    this.updateTimes();
-    this.showPersonalInfo = false;
-    this.selectedFloor = this.dataTable[0].floor;
-    this.selectedTableIds = [];
-    this.ishas = false;
-    this.totalCapacity = 0;
+
   }
 
   assignTable(dateTime: any) {
