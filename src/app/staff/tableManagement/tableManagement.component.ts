@@ -18,6 +18,7 @@ import { NotificationService } from '../../../service/notification.service';
 import { Dish } from '../../../models/dish.model';
 import { CheckoutService } from '../../../service/checkout.service';
 import { MenuComponent } from '../../common/menu/menu.component';
+import { SidebarOrderComponent } from '../SidebarOrder/SidebarOrder.component';
 
 
 @Component({
@@ -25,7 +26,7 @@ import { MenuComponent } from '../../common/menu/menu.component';
   standalone: true,
   templateUrl: './tableManagement.component.html',
   styleUrls: ['./tableManagement.component.css'],
-  imports: [CommonModule, FormsModule, NgxPaginationModule, CurrencyFormatPipe, MenuComponent, HeaderOrderStaffComponent],
+  imports: [CommonModule, FormsModule, NgxPaginationModule,SidebarOrderComponent, CurrencyFormatPipe, MenuComponent, HeaderOrderStaffComponent],
   providers: [DatePipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
@@ -180,6 +181,10 @@ export class TableManagementComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.selectedSection = params['section'] || 'table-layout';
       this.setView(this.selectedSection);
+      this.getReservation();
+      this.getTableData();
+      this.getReservationData();
+      this.getReservationList();
     });
 
   }
