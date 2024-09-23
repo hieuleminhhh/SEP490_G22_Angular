@@ -1339,7 +1339,7 @@ export class TableManagementComponent implements OnInit {
         console.log('Order submitted successfully', response);
         this.reservationService.clearCart();
         const request = {
-          reservationId: response.reservationId,
+          reservationId: response.reservation.reservationId,
           tableIds: this.selectedTableIds
         }
         this.tableService.createTableReservation(request).subscribe({
