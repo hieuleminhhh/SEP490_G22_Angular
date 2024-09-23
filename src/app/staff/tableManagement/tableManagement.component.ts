@@ -7,7 +7,7 @@ import { ReservationService } from '../../../service/reservation.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
 import { catchError, debounceTime, switchMap } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Table, TableReservationResponse, Tables } from '../../../models/table.model';
 import { DatePipe } from '@angular/common';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
@@ -15,6 +15,7 @@ import { HeaderOrderStaffComponent } from '../ManagerOrder/HeaderOrderStaff/Head
 import { MatDialog } from '@angular/material/dialog';
 import { AccountService } from '../../../service/account.service';
 import { NotificationService } from '../../../service/notification.service';
+import { SidebarOrderComponent } from '../SidebarOrder/SidebarOrder.component';
 
 
 @Component({
@@ -22,7 +23,7 @@ import { NotificationService } from '../../../service/notification.service';
   standalone: true,
   templateUrl: './tableManagement.component.html',
   styleUrls: ['./tableManagement.component.css'],
-  imports: [CommonModule, FormsModule, NgxPaginationModule, CurrencyFormatPipe, HeaderOrderStaffComponent],
+  imports: [CommonModule, FormsModule, NgxPaginationModule, CurrencyFormatPipe, HeaderOrderStaffComponent, SidebarOrderComponent],
   providers: [DatePipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
@@ -85,9 +86,13 @@ export class TableManagementComponent implements OnInit {
   isVisible: boolean[] = [];
 
   constructor(private tableService: TableService, private dialog: MatDialog, private reservationService: ReservationService,
-    private router: Router, private notificationService: NotificationService, private accountService: AccountService) { }
+    private router: Router, private notificationService: NotificationService, private accountService: AccountService,
+    private route: ActivatedRoute) { }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.currentView = params['section'] || 'table-layout'; // Default section
+    });
     const today = new Date();
     this.dateFrom = this.formatDate(today);
     this.dateTo = this.formatDate(today);

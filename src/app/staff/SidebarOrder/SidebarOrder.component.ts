@@ -50,6 +50,16 @@ export class SidebarOrderComponent implements OnInit {
            currentUrl.includes('/listTable') ||
            currentUrl.includes('/createTakeaway') ||
            currentUrl.includes('/createOnline')
+           
+  }
+  isOrderMenuActiveOrderStaffBooking(): boolean {
+    const currentUrl = this.router.url;
+    return this.isMenuCollapsedOrderStaff || // Kiểm tra trạng thái của menu
+           currentUrl.includes('/tableManagement?section=table-layout') ||
+           currentUrl.includes('/tableManagement?section=booking-request') ||
+           currentUrl.includes('/tableManagement?section=booking-schedule') ||
+           currentUrl.includes('/tableManagement?section=booking-history')
+           
   }
   isOrderMenuActiveOrderCashier(): boolean {
     const currentUrl = this.router.url;
