@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import moment from 'moment';
 import { ReservationService } from '../../../service/reservation.service';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable, of, Subscription } from 'rxjs';
 import { catchError, debounceTime, switchMap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Table, TableReservationResponse, Tables } from '../../../models/table.model';
@@ -15,7 +15,9 @@ import { HeaderOrderStaffComponent } from '../ManagerOrder/HeaderOrderStaff/Head
 import { MatDialog } from '@angular/material/dialog';
 import { AccountService } from '../../../service/account.service';
 import { NotificationService } from '../../../service/notification.service';
-import { SidebarOrderComponent } from '../SidebarOrder/SidebarOrder.component';
+import { Dish } from '../../../models/dish.model';
+import { CheckoutService } from '../../../service/checkout.service';
+import { MenuComponent } from '../../common/menu/menu.component';
 
 
 @Component({
@@ -23,7 +25,7 @@ import { SidebarOrderComponent } from '../SidebarOrder/SidebarOrder.component';
   standalone: true,
   templateUrl: './tableManagement.component.html',
   styleUrls: ['./tableManagement.component.css'],
-  imports: [CommonModule, FormsModule, NgxPaginationModule, CurrencyFormatPipe, HeaderOrderStaffComponent, SidebarOrderComponent],
+  imports: [CommonModule, FormsModule, NgxPaginationModule, CurrencyFormatPipe, MenuComponent, HeaderOrderStaffComponent],
   providers: [DatePipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
@@ -84,10 +86,41 @@ export class TableManagementComponent implements OnInit {
   private reservationQueue: any[] = [];
   notifications: string[] = [];
   isVisible: boolean[] = [];
-
+  selectedSection: string = 'table-layout';
+  reservation = {
+    name: '',
+    phone: '',
+    email: '',
+    date: 'today',
+    time: '',
+    people: 2,
+    notes: ''
+  };
+  minDate: string | undefined;
+  maxDate: string | undefined;
+  availableHours: string[] = [];
+  consigneeName: string = '';
+  guestPhone: string = '';
+  note: string = '';
+  emailGuest: string = '';
+  availableTimes: string[] = [];
+  formSubmitted = false;
+  messages: string[] = [];
+  isValid: boolean = false;
+  message: string = '';
+  formChanged = true;
+  cartItems: Dish[] = [];
+  currentRequest: any;
+  maxValue: number = 1000;
+  isValidDish: boolean = false;
+  isMenuPopupOpen = false;
+  itemQuantityMap: { [key: string]: number } = {};
+  private cartSubscription!: Subscription;
+  showPersonalInfo: boolean = false;
+  dateTime: any;
   constructor(private tableService: TableService, private dialog: MatDialog, private reservationService: ReservationService,
-    private router: Router, private notificationService: NotificationService, private accountService: AccountService,
-    private route: ActivatedRoute) { }
+    private router: Router, private checkoutService: CheckoutService,
+    private route: ActivatedRoute, private notificationService: NotificationService, private accountService: AccountService) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -98,20 +131,33 @@ export class TableManagementComponent implements OnInit {
     this.dateTo = this.formatDate(today);
     this.dateNow = this.formatDate(today);
     this.dateString = this.dateNow.toString();
-
     this.getTableData();
-
     this.searchTermSubject.pipe(debounceTime(300)).subscribe(searchTerm => {
       this.getSearchList();
     });
-
+    this.updateTimes();
+    this.minDate = this.formatDate(today);
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 7);
+    this.maxDate = this.formatDate(maxDate);
+    this.reservation = {
+      name: '',
+      phone: '',
+      email: '',
+      date: this.formatDate(today),
+      time: '',
+      people: 2,
+      notes: ''
+    };
+    this.cartSubscription = this.reservationService.getCart().subscribe(cartItems => {
+      this.cartItems = cartItems;
+      this.calculateItemQuantity();
+    });
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
-
     if (this.accountId) {
       this.getAccountData();
     }
-
     this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => {
       console.log('WebSocket connection opened');
@@ -131,7 +177,13 @@ export class TableManagementComponent implements OnInit {
     this.socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
+    this.route.queryParams.subscribe(params => {
+      this.selectedSection = params['section'] || 'table-layout';
+      this.setView(this.selectedSection);
+    });
+
   }
+
   addSuccessMessage(message: string) {
     this.notifications.push(message);
     this.isVisible.push(true);
@@ -496,11 +548,6 @@ export class TableManagementComponent implements OnInit {
         return total + reservation.capacity;
       }, 0);
       this.ishas = true;
-      console.log(this.totalCapacity);
-      console.log(this.selectedTableIds);
-      console.log(this.allTable);
-
-
     }
   }
 
@@ -736,8 +783,7 @@ export class TableManagementComponent implements OnInit {
     }
     return [];
   }
-  isValid: boolean = false;
-  message: string = '';
+
   updateStatusReservationById(id: number, status: number, reservationTime: string, number: number): void {
     this.reservationService.checkValidTable(reservationTime, number).subscribe({
       next: response => {
@@ -1124,5 +1170,302 @@ export class TableManagementComponent implements OnInit {
       console.log('WebSocket is not open. Current state:', this.socket.readyState);
     }
   }
+
+  //===========================================================================================================================
+
+  updateTimes(): void {
+    const now = new Date();
+    const selectedDate = new Date(this.reservation.date);
+    const isToday = now.toDateString() === selectedDate.toDateString();
+    now.setMinutes(now.getMinutes() + 30);
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+
+    this.availableTimes = [];
+
+    for (let hour = 9; hour <= 21; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        if (!isToday || (hour > currentHour || (hour === currentHour && minute >= currentMinute))) {
+          this.addTimeOption(hour, minute);
+        }
+      }
+    }
+  }
+  addTimeOption(hour: number, minute: number): void {
+    const formattedTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+    this.availableTimes.push(formattedTime);
+  }
+  getTotalPrice(item: any): number {
+    const price = item.discountedPrice != null ? item.discountedPrice : item.price;
+    return parseFloat((item.quantity * price).toFixed(2));
+  }
+  submitForm(form: any) {
+    this.formSubmitted = true;
+    if (form.valid) {
+      let dateTime = this.formatDateTime(this.reservation.date, this.reservation.time);
+
+      const request = {
+        accountId: this.accountId,
+        guestPhone: this.guestPhone,
+        email: this.emailGuest,
+        guestAddress: '',
+        consigneeName: this.consigneeName,
+        reservationTime: dateTime,
+        guestNumber: this.reservation.people,
+        note: this.note,
+        orderDate: new Date().toISOString(),
+        status: 2,
+        recevingOrder: dateTime,
+        totalAmount: 0,
+        deposits: 0,
+        type: 0,
+        orderDetails: this.cartItems.map(item => ({
+          unitPrice: this.getTotalPrice(item),
+          quantity: item.quantity,
+          dishId: item.dishId,
+          comboId: item.comboId,
+          orderTime: new Date().toISOString()
+        }))
+      };
+      this.currentRequest = request;
+      const today = new Date();
+      console.log(request);
+
+      if (this.reservation.date === this.formatDate(today)) {
+        const data = {
+          comboIds: this.cartItems.map(item => item.comboId).filter(id => id !== undefined),
+          dishIds: this.cartItems.map(item => item.dishId).filter(id => id !== undefined)
+        };
+        if (data.comboIds.length > 0 || data.dishIds.length > 0) {
+          this.checkoutService.getRemainingItems(data).subscribe(response => {
+            this.messages = []; // Đặt lại messages
+            for (const combo of response.combos) {
+              const itemInCart = this.cartItems.find(item => item.comboId === combo.comboId);
+              if (itemInCart && combo.quantityRemaining < itemInCart.quantity) {
+                this.messages.push(`Không đủ số lượng món ăn: ${combo.name}. Số lượng yêu cầu: ${itemInCart.quantity}, Số lượng còn lại: ${combo.quantityRemaining}`);
+                this.isValidDish = true;
+              }
+            }
+            for (const dish of response.dishes) {
+              const itemInCart = this.cartItems.find(item => item.dishId === dish.dishId);
+              if (itemInCart && dish.quantityRemaining < itemInCart.quantity) {
+                this.messages.push(`Không đủ số lượng món ăn: ${dish.name}. Số lượng yêu cầu: ${itemInCart.quantity}, Số lượng còn lại: ${dish.quantityRemaining}`);
+                this.isValidDish = true;
+              }
+            }
+
+            if (this.messages.length > 0) {
+              setTimeout(() => {
+                this.messages = [];
+              }, 3000);
+              return;
+            }
+            this.openConfirmModal();
+          }, error => {
+            console.error('Error during payment initiation', error);
+          });
+          return;
+        }
+        else {
+          this.openConfirmModal();
+        }
+      }
+      else {
+        this.openConfirmModal();
+      }
+    }
+  }
+  isConfirmModalOpen = false;
+  openConfirmModal() {
+    this.isConfirmModalOpen = true;
+  }
+  closeConfirmModal() {
+    this.isConfirmModalOpen = false;
+  }
+
+  checkAvailability() {
+    this.dateTime = this.formatDateTime(this.reservation.date, this.reservation.time);
+    console.log(this.dateTime, this.reservation.people);
+
+    this.reservationService.checkValidTable(this.dateTime, this.reservation.people).subscribe({
+      next: response => {
+        this.showPersonalInfo = response.canReserve;
+        this.formChanged = false;
+        console.log(response);
+        if (this.showPersonalInfo === false) {
+          this.message = response.message;
+          setTimeout(() => {
+            this.message = '';
+          }, 3000);
+        }
+      },
+      error: error => {
+        console.error('An error occurred:', error.error.message);
+        this.message = 'Có lỗi xảy ra khi kiểm tra bàn, vui lòng thử lại.';
+      }
+    });
+  }
+  onFormChange() {
+    this.formChanged = true;
+    console.log(this.formChanged);
+    this.showPersonalInfo = false;
+    this.selectedFloor = this.dataTable[0].floor;
+    this.selectedTableIds = [];
+    this.ishas = false;
+    this.totalCapacity = 0;
+
+  }
+  formatDateTime(date: string, time: string): string {
+    const datetimeString = `${date}T${time}:00`;
+    const dateObj = new Date(datetimeString);
+
+    const localTimezoneOffset = dateObj.getTimezoneOffset();
+
+    const localDateObj = new Date(dateObj.getTime() - localTimezoneOffset * 60000);
+
+    const formattedDateTime = localDateObj.toISOString().slice(0, 19);
+
+    return formattedDateTime;
+  }
+  createReservation() {
+    const today = new Date();
+    this.reservationService.createResevetion(this.currentRequest).subscribe({
+      next: response => {
+        console.log('Order submitted successfully', response);
+        this.reservationService.clearCart();
+        const request = {
+          reservationId: response.reservationId,
+          tableIds: this.selectedTableIds
+        }
+        this.tableService.createTableReservation(request).subscribe({
+          next: response => {
+            console.log(response);
+            this.getReservationData();
+          },
+          error: error => {
+            if (error.error instanceof ErrorEvent) {
+              console.error('An error occurred:', error.error.message);
+            } else {
+              console.error(`Backend returned code ${error.status}, ` +
+                `body was: ${JSON.stringify(error.error)}`);
+            }
+            this.getReservationData();
+          }
+        });
+
+        this.getReservationData();
+      },
+      error: error => {
+        if (error.error instanceof ErrorEvent) {
+          console.error('An error occurred:', error.error.message);
+        } else {
+          console.error(`Backend returned code ${error.status}, ` +
+            `body was: ${JSON.stringify(error.error)}`);
+        }
+      }
+    });
+    this.closeConfirmModal();
+    this.reservation = {
+      name: '',
+      phone: '',
+      email: '',
+      date: this.formatDate(today),
+      time: '',
+      people: 2,
+      notes: ''
+    };
+    this.updateTimes();
+    this.showPersonalInfo = false;
+    this.selectedFloor = this.dataTable[0].floor;
+    this.selectedTableIds = [];
+    this.ishas = false;
+    this.totalCapacity = 0;
+  }
+
+  assignTable(dateTime: any) {
+    this.reservationTimeSelected = dateTime;
+    const modal = document.getElementById('updateTimeModal');
+    if (modal) {
+      modal.classList.add('show');
+      modal.style.display = 'block';
+    }
+    this.selectedTable = 'all';
+    this.selectedFloor = this.dataTable[0].floor;
+    console.log(dateTime);
+    this.guestNumber = this.reservation.people;
+    this.getTableOFFloorEmpty(this.selectedFloor, dateTime);
+  }
+  closeTableAssignPopup() {
+    const modal = document.getElementById('updateTimeModal');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
+  }
+
+  openMenuPopup(): void {
+    this.isMenuPopupOpen = true;
+    console.log(this.isMenuPopupOpen);
+  }
+  closeMenuPopup(): void {
+    this.isMenuPopupOpen = false;
+  }
+  decreaseQuantity(item: any) {
+    if (item.quantity > 1) {
+      item.quantity--;
+      this.reservationService.updateCart(this.cartItems);
+    }
+  }
+
+  increaseQuantity(item: any) {
+    item.quantity++;
+    this.reservationService.updateCart(this.cartItems);
+  }
+  calculateItemQuantity() {
+    this.itemQuantityMap = {};
+    this.cartItems.forEach(item => {
+      const itemName = item.itemName;
+      this.itemQuantityMap[itemName] = item.quantity;
+    });
+  }
+  getTotalCartPrice(): number {
+    return parseFloat(this.cartItems.reduce((total, item) => {
+      const price = item.discountedPrice != null ? item.discountedPrice : item.price;
+      return total + (price * item.quantity);
+    }, 0).toFixed(2));
+  }
+  removeItem(item: any) {
+    if (item.hasOwnProperty('dishId')) {
+      this.reservationService.removeFromCart(item.dishId, 'Dish');
+    } else if (item.hasOwnProperty('comboId')) {
+      this.reservationService.removeFromCart(item.comboId, 'Combo');
+    }
+  }
+  validateInput(item: any, maxValue: number) {
+    const value = parseInt(item.quantity, 10);
+    if (isNaN(value) || value < 1) {
+      item.quantity = 1;
+    } else if (value > maxValue) {
+      item.quantity = maxValue;
+    }
+  }
+
+  preventDelete(event: KeyboardEvent, currentQuantity: number) {
+    if (currentQuantity <= 1 && (event.key === 'Backspace' || event.key === 'Delete')) {
+      event.preventDefault();
+    }
+    if (currentQuantity >= this.maxValue) {
+      if (event.key !== 'Backspace' && event.key !== 'Delete') {
+        event.preventDefault();
+      }
+      return;
+    }
+    const validKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Tab'];
+    if (validKeys.indexOf(event.key) !== -1 || /^[0-9]$/.test(event.key)) {
+      return;
+    }
+    event.preventDefault();
+  }
 }
+
 

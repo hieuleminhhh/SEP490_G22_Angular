@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Dish } from '../../../models/dish.model';
-import { CartService } from '../../../service/cart.service';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ReservationService } from '../../../service/reservation.service';
@@ -12,10 +11,7 @@ import { MenuComponent } from '../menu/menu.component';
 import { CheckoutService } from '../../../service/checkout.service';
 import { NotificationService } from '../../../service/notification.service';
 import { HttpClient } from '@angular/common/http';
-interface CheckoutResponse {
-  orderId: number;
-  // Các thuộc tính khác nếu có
-}
+
 @Component({
   selector: 'app-booking',
   standalone: true,
@@ -129,7 +125,7 @@ export class BookingComponent implements OnInit {
   }
   generateAvailableHours() {
     this.availableHours = [];
-    for (let hour = 9; hour <= 23; hour++) {
+    for (let hour = 9; hour <= 21; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         const formattedHour = hour.toString().padStart(2, '0') + ':' + minute.toString().padStart(2, '0');
         this.availableHours.push(formattedHour);
@@ -165,7 +161,7 @@ export class BookingComponent implements OnInit {
 
     this.availableTimes = [];
 
-    for (let hour = 9; hour <= 23; hour++) {
+    for (let hour = 9; hour <= 21; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         if (!isToday || (hour > currentHour || (hour === currentHour && minute >= currentMinute))) {
           this.addTimeOption(hour, minute);

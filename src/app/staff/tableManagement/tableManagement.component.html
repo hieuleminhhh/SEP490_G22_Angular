@@ -1,6 +1,6 @@
 <app-HeaderOrderStaff></app-HeaderOrderStaff>
 <div class="container">
-  
+
   <!-- <aside class="sidebar">
     <nav class="sidebar-nav">
       <ul>
@@ -36,6 +36,7 @@
       <h2 *ngIf="currentView === 'booking-schedule'">Lịch đặt bàn</h2>
       <h2 *ngIf="currentView === 'booking-history'">Lịch sử đặt bàn</h2>
       <h2 *ngIf="currentView === 'detail-reservation'">Chi tiết đơn đặt bàn</h2>
+      <h2 *ngIf="currentView === 'create-reservation'">Tạo đơn đặt bàn</h2>
 
 
       <div class="col-md-3" *ngIf="currentView === 'booking-schedule'">
@@ -53,12 +54,17 @@
         </div>
       </div>
 
+      <div class="col-md-3" *ngIf="currentView === 'booking-request'">
+        <div class="create-reservation">
+          <button (click)="setView('create-reservation')">Tạo đơn đặt bàn</button>
+        </div>
+      </div>
 
       <select id="timeframe" name="timeframe" *ngIf="currentView === 'table-layout'" [(ngModel)]="selectedTable "
         (ngModelChange)="filterTablesByFloorAndStatus(selectedTable)" class="floor-select"
         style="width: 20%;padding: 5px;">
-        <option value="all">Tất cả bàn</option>
-        <option value="empty">Bàn trống</option>
+        <option value="all">Tất cả phòng/bàn</option>
+        <option value="empty">Phòng/bàn trống</option>
       </select>
 
     </header>
@@ -121,6 +127,226 @@
         <ng-template #noReservations>
           <p>No reservations found.</p>
         </ng-template>
+      </div>
+    </div>
+
+    <section *ngIf="currentView === 'create-reservation'">
+      <div class="container">
+        <form #reservationForm="ngForm" (ngSubmit)="submitForm(reservationForm)" class="reservation-form-new">
+          <div class="row-new">
+            <div class="col-md-4-new">
+              <div class="form-group-new">
+                <label for="date-new">Ngày <span class="required-new">*</span></label>
+                <input id="date-new" type="date" name="date" [(ngModel)]="reservation.date" [min]="minDate"
+                  [max]="maxDate" (change)="updateTimes();onFormChange();" class="input-new" required>
+              </div>
+            </div>
+            <div class="col-md-4-new">
+              <div class="form-group-new">
+                <label for="time-new">Giờ <span class="required-new">*</span></label>
+                <select id="time-new" name="time" [(ngModel)]="reservation.time" class="select-new" required
+                  #time="ngModel" (change)="onFormChange();">
+                  <option value="">Chọn</option>
+                  <option *ngFor="let time of availableTimes" [value]="time">{{ time }}</option>
+                </select>
+                <div *ngIf="availableTimes.length < 1" class="error-message-new">
+                  <small class="text-danger-new">Đã hết giờ đặt bàn ngày hôm nay!</small>
+                </div>
+                <div *ngIf="time.invalid && (time.dirty || time.touched || formSubmitted) && availableTimes.length>1">
+                  <small class="text-danger">Vui lòng chọn giờ ăn!</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4-new">
+              <div class="form-group-new">
+                <label for="people-new">Số người <span class="required-new">*</span></label>
+                <input type="number" id="people-new" name="guestNumber" min="1" [(ngModel)]="reservation.people"
+                  class="input-new" value="2" required #people="ngModel" (ngModelChange)="onFormChange();">
+                <div *ngIf="people.invalid && (people.dirty || people.touched || formSubmitted)"
+                  class="error-message-new">
+                  <small class="text-danger-new">Vui lòng nhập số lượng khách</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="button-container">
+            <button *ngIf="showPersonalInfo===false" type="button" (click)="checkAvailability()" class="button-new">
+              Kiểm tra
+            </button>
+          </div>
+
+          <div *ngIf="showPersonalInfo">
+            <div class="row-new">
+              <div class="col-md-4-new">
+                <div class="form-group-new">
+                  <label for="name-new">Tên người đặt <span class="required-new">*</span></label>
+                  <input type="text" id="name-new" name="consigneeName" placeholder="Nhập tên"
+                    [(ngModel)]="consigneeName" class="input-new" required #name="ngModel">
+                  <div *ngIf="name.invalid && (name.dirty || name.touched || formSubmitted)" class="error-message-new">
+                    <small class="text-danger-new">Vui lòng nhập Tên quý khách!</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4-new">
+                <div class="form-group-new">
+                  <label for="phone-new">Số điện thoại <span class="required-new">*</span></label>
+                  <input type="tel" id="phone-new" name="guestPhone" placeholder="Nhập số điện thoại"
+                    [(ngModel)]="guestPhone" class="input-new" required pattern="^0\d{9,10}$" #phone="ngModel">
+                  <div *ngIf="phone.invalid && (phone.dirty || phone.touched || formSubmitted)"
+                    class="error-message-new">
+                    <small class="text-danger-new" *ngIf="phone.errors?.['pattern']">Số điện thoại phải có 10 hoặc 11
+                      chữ số!</small>
+                    <small class="text-danger-new" *ngIf="phone.errors?.['required'] && !phone.errors?.['pattern']">Vui
+                      lòng nhập số điện thoại!</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4-new">
+                <div class="form-group-new">
+                  <label for="email-new">Email</label>
+                  <input type="text" id="email-new" name="email" placeholder="Nhập email của bạn"
+                    [(ngModel)]="emailGuest" class="input-new"
+                    pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$">
+                </div>
+              </div>
+              <div class="col-md-4-new">
+                <div class="form-group-new">
+                  <label for="note">Ghi chú</label>
+                  <textarea id="notes" name="note" placeholder="Ghi chú" [(ngModel)]="note"></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="createlable" *ngIf="selectedTableIds.length>0">
+              <p class="createlable-p">Bàn đã xếp: </p>
+              <span *ngFor="let table of getSelectedTableNames(); let i = index" class="table-createlable-label">
+                {{ table }}
+              </span>
+            </div>
+            <div class="button-group-new">
+              <button type="button" (click)="openMenuPopup()" class="add-button-new">
+                <i class="fas fa-plus"></i> Thêm món
+              </button>
+              <button type="button" (click)="assignTable(dateTime)" class="add-button-new">
+                <i class="fas fa-plus"></i> Xếp bàn
+              </button>
+            </div>
+            <br>
+            <div *ngIf="message" class="error-message">
+              {{ message }}
+            </div>
+            <div *ngIf="messages.length > 0" class="alert alert-warning">
+              <div *ngFor="let msg of messages">
+                {{ msg }}
+              </div>
+            </div>
+            <button type="submit" class="button-submit-new">Đặt bàn</button>
+          </div>
+          <br>
+          <div class="dish" class="cart" *ngIf="cartItems && cartItems.length > 0">
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Món ăn</th>
+                  <th>Giá bán</th>
+                  <th>Số lượng</th>
+                  <th>Thành tiền</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody *ngFor="let item of cartItems">
+                <tr>
+                  <td><img class="img-fluid" [src]="item.imageUrl" alt="Item Image"
+                      style="max-width: 100%; height: 56px;"></td>
+                  <td>{{ item.itemName||item.nameCombo }}</td>
+                  <td>{{ item.discountedPrice || item.price | currencyFormat}} </td>
+                  <td>
+                    <div class="quantity-control">
+                      <a (click)="decreaseQuantity(item)" class="icon" style="cursor: pointer;">
+                        <i class="fas fa-minus" style="color: black; font-size: 10px;"></i>
+                      </a>
+                      <input type="number" [(ngModel)]="item.quantity" class="quantity-input" [min]="1" [max]="maxValue"
+                        (input)="validateInput(item, maxValue)" (keydown)="preventDelete($event, item.quantity)"
+                        pattern="[0-9]*" inputmode="numeric" [ngModelOptions]="{standalone: true}"
+                        style="appearance: none; -moz-appearance: textfield;" required />
+                      <a (click)="increaseQuantity(item)" class="icon" style="cursor: pointer;">
+                        <i class="fas fa-plus" style="color: black; font-size: 10px;"></i>
+                      </a>
+                    </div>
+                  </td>
+                  <td><span class="price"> {{ getTotalPrice(item) | currencyFormat}}</span></td>
+                  <td><button class="delete icon-button" (click)="removeItem(item)">🗑️</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="summary" *ngIf="cartItems && cartItems.length > 0;">
+            <div class="summary-content">
+              <p style="font-weight: bold;">Tổng cộng: <span id="total">{{ getTotalCartPrice() | currencyFormat }}
+                </span></p>
+            </div>
+          </div>
+          <div *ngIf="message" class="error-message-new">{{ message }}</div>
+        </form>
+      </div>
+    </section>
+    <!-- Modal -->
+    <div id="menuModal" class="custom-modal" [ngClass]="{'custom-show': isMenuPopupOpen}">
+      <div class="custom-modal-dialog" role="document">
+        <div class="custom-modal-content">
+          <span class="custom-close" (click)="closeMenuPopup()">&times;</span>
+          <app-menu [isReser]="true"></app-menu> <!-- Pass the value here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="confirmReservationModal" class="modal-custom" [ngClass]="{'show': isConfirmModalOpen}">
+      <div class="modal-dialog-custom">
+        <div class="modal-content-custom">
+          <span class="close" (click)="closeConfirmModal()">&times;</span>
+          <h2>Xác nhận đặt bàn</h2>
+
+          <div class="modal-body-custom">
+            <p><strong>Tên người đặt:</strong> {{ consigneeName }}</p>
+            <p><strong>Số điện thoại:</strong> {{ guestPhone }}</p>
+            <p><strong>Email:</strong> {{ emailGuest }}</p>
+            <p><strong>Số người:</strong> {{ reservation.people }}</p>
+            <p><strong>Ghi chú:</strong> {{ note }}</p>
+            <br *ngIf="selectedTableIds.length>0">
+            <p *ngIf="selectedTableIds.length>0"><strong>Bàn đã chọn:</strong>
+              <span *ngFor="let table of getSelectedTableNames()" class="table-label-custom">{{ table }}</span>
+            </p>
+            <br>
+            <div *ngIf="cartItems && cartItems.length > 0">
+              <p><strong>Món ăn đã chọn:</strong></p>
+              <table class="cart-items-table">
+                <thead>
+                  <tr>
+                    <th>Món ăn</th>
+                    <th>Giá bán</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of cartItems">
+                    <td>{{ item.itemName || item.nameCombo }}</td>
+                    <td>{{ item.discountedPrice || item.price | currencyFormat}} </td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ getTotalPrice(item) | currencyFormat }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Confirmation Buttons -->
+          <div class="modal-footer-custom">
+            <button type="button" class="confirm-button" (click)="createReservation()">Xác nhận</button>
+            <button type="button" class="cancel-button" (click)="closeConfirmModal()">Hủy</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -259,86 +485,6 @@
         </div>
       </div>
 
-      <!-- Main Modal -->
-      <div class="modal fade" id="updateTimeModal" tabindex="-1" role="dialog" aria-labelledby="updateTimeModalLabel">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content" style="overflow: auto;">
-            <div class="modal-header">
-              <h5 class="modal-title" id="updateTimeModalLabel">Đăng ký bàn</h5>
-              <div class="text-center text-white flex-fill" style="font-size: 18px;">
-                {{ reservationTimeSelected | date: 'dd/MM/yyyy - HH:mm' }}
-              </div>
-              <span type="button" class="close" data-dismiss="modal" aria-label="Close"
-                (click)="closePopup()">&times;</span>
-            </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="table-status-container">
-                  <div>Xếp bàn cho {{guestNumber}} người:</div>
-
-                  <div class="selected-tables-container" *ngIf="getSelectedTableNames().length > 0">
-                    <span>Đã chọn:</span>
-                    <span *ngFor="let table of getSelectedTableNames(); let i = index" class="table-label">
-                      {{ table }}
-                      <span (click)="removeTable(i)" class="remove-button">&times;</span>
-                    </span>
-                  </div>
-
-                  <span *ngIf="getSelectedTableNames().length === 0">
-                    Chưa chọn phòng/bàn
-                  </span>
-
-                  <div class="checkbox-container">
-                    <label *ngIf="ishas === false">
-                      <i class="fas fa-times-circle" style="color: red;"></i>
-                      <span style="color: red;">Chưa đủ</span>
-                    </label>
-                    <label *ngIf="ishas === true">
-                      <i class="fas fa-check-circle" style="color: green;"></i>
-                      <span style="color: green;">Đã đủ</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div class="col-md-3" style="display: flex; justify-content: center; align-items: center;">
-                  <select id="floor" name="floor" [(ngModel)]="selectedFloor"
-                    (change)="getTableOFFloorEmpty(selectedFloor,reservationTimeSelected)" class="floor-select">
-                    <option *ngFor="let floor of getFloors()" [value]="floor" [class.active]="selectedFloor === floor">
-                      {{ floor }}
-                    </option>
-                  </select>
-                </div>
-                <div class="col-md-7">
-                  <div class="card" style="max-height: 400px; overflow: auto;">
-                    <div class="table-grid">
-                      <div class="table" *ngFor="let table of tableEmpty" (click)="toggleTableSelection(table)">
-                        {{ table.lable }}<br>
-                        <span class="icon-sl">
-                          <i class="fas fa-chair"></i>{{ table.capacity }}
-                        </span>
-                        <span class="icon-table" style="left: 170px;"
-                          *ngIf="selectedTableIds.includes(table.tableId)">&#10004;</span>
-                      </div>
-                    </div>
-                    <div *ngIf="tableEmpty.length < 1" style="height: 100px;">
-                      <p>Khu vực này không còn phòng/bàn trống</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div *ngIf="validMessage" class="alert alert-danger" style="color: red; margin-top: 10px;">
-              {{ validMessage }}
-            </div>
-            <div class="modal-footer">
-              <button type="button" style="background-color: red;" class="btn btn-secondary"
-                (click)="closePopup()">Đóng</button>
-              <button type="button" class="btn btn-primary" (click)="openConfirmSaveModal()">Lưu thay đổi</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Confirm Save Modal -->
       <div class="modal fade" id="confirmSaveModal" tabindex="-1" role="dialog" aria-labelledby="confirmSaveModalLabel"
         aria-hidden="true">
@@ -367,6 +513,98 @@
         </div>
       </div>
     </section>
+    <!-- Main Modal -->
+    <div class="modal fade" id="updateTimeModal" tabindex="-1" role="dialog" aria-labelledby="updateTimeModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content" style="overflow: auto;">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateTimeModalLabel">Đăng ký bàn</h5>
+            <div class="text-center text-white flex-fill" style="font-size: 18px;">
+              {{ reservationTimeSelected | date: 'dd/MM/yyyy - HH:mm' }}
+            </div>
+            <span type="button" class="close" data-dismiss="modal" aria-label="Close"
+              (click)="closePopup()">&times;</span>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="table-status-container">
+                <div>Xếp bàn cho {{guestNumber}} người:</div>
+
+                <div class="selected-tables-container" *ngIf="getSelectedTableNames().length > 0">
+                  <span>Đã chọn:</span>
+                  <span *ngFor="let table of getSelectedTableNames(); let i = index" class="table-label">
+                    {{ table }}
+                    <span (click)="removeTable(i)" class="remove-button">&times;</span>
+                  </span>
+                </div>
+
+                <span *ngIf="getSelectedTableNames().length === 0">
+                  Chưa chọn phòng/bàn
+                </span>
+
+                <div class="checkbox-container">
+                  <label *ngIf="ishas === false">
+                    <i class="fas fa-times-circle" style="color: red;"></i>
+                    <span style="color: red;">Chưa đủ</span>
+                  </label>
+                  <label *ngIf="ishas === true">
+                    <i class="fas fa-check-circle" style="color: green;"></i>
+                    <span style="color: green;">Đã đủ</span>
+                  </label>
+                </div>
+              </div>
+
+              <div *ngIf="!showPersonalInfo" class="col-md-3"
+                style="display: flex; justify-content: center; align-items: center;">
+                <select id="floor" name="floor" [(ngModel)]="selectedFloor"
+                  (change)="getTableOFFloorEmpty(selectedFloor,reservationTimeSelected)" class="floor-select">
+                  <option *ngFor="let floor of getFloors()" [value]="floor" [class.active]="selectedFloor === floor">
+                    {{ floor }}
+                  </option>
+                </select>
+              </div>
+              <div *ngIf="showPersonalInfo" class="col-md-3"
+                style="display: flex; justify-content: center; align-items: center;">
+                <select id="floor" name="floor" [(ngModel)]="selectedFloor"
+                  (change)="getTableOFFloorEmpty(selectedFloor,dateTime)" class="floor-select">
+                  <option *ngFor="let floor of getFloors()" [value]="floor" [class.active]="selectedFloor === floor">
+                    {{ floor }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-7">
+                <div class="card" style="max-height: 400px; overflow: auto;">
+                  <div class="table-grid">
+                    <div class="table" *ngFor="let table of tableEmpty" (click)="toggleTableSelection(table)">
+                      {{ table.lable }}<br>
+                      <span class="icon-sl">
+                        <i class="fas fa-chair"></i>{{ table.capacity }}
+                      </span>
+                      <span class="icon-table" style="left: 170px;"
+                        *ngIf="selectedTableIds.includes(table.tableId)">&#10004;</span>
+                    </div>
+                  </div>
+                  <div *ngIf="tableEmpty.length < 1" style="height: 100px;">
+                    <p>Khu vực này không còn phòng/bàn trống</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="validMessage" class="alert alert-danger" style="color: red; margin-top: 10px;">
+            {{ validMessage }}
+          </div>
+          <div class="modal-footer">
+            <button type="button" style="background-color: red;" class="btn btn-secondary"
+              (click)="closePopup()">Đóng</button>
+            <button *ngIf="!showPersonalInfo" type="button" class="btn btn-primary" (click)="openConfirmSaveModal()">Lưu
+              thay đổi</button>
+            <button *ngIf="showPersonalInfo" type="button" class="btn btn-primary" (click)="closeTableAssignPopup()">Lưu
+              thay đổi</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Confirm Cancel Modal -->
     <div class="reservation-cancel-modal" *ngIf="showCancelModal">
       <div class="reservation-cancel-modal-content">
@@ -623,10 +861,8 @@
               <i class="fas fa-arrow-right"></i> <!-- Icon mũi tên phải -->
             </button>
           </div>
-
         </div>
       </div>
     </section>
-
   </main>
 </div>

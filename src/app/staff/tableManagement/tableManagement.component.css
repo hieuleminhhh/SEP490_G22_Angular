@@ -1,4 +1,3 @@
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -55,10 +54,14 @@ body {
 .sidebar-nav a:hover {
   background-color: #e2e6ea;
 }
+
 .sidebar-nav ul li a.active {
-  color: #fff; /* Màu chữ khi chọn */
-  background-color: #007bff; /* Màu nền khi chọn */
+  color: #fff;
+  /* Màu chữ khi chọn */
+  background-color: #007bff;
+  /* Màu nền khi chọn */
 }
+
 .main-content {
   flex-grow: 1;
   padding: 20px;
@@ -114,36 +117,50 @@ header {
 }
 
 .table-layout-buttons button:hover {
-  background-color: #45a049; /* Darker green background on hover */
+  background-color: #45a049;
+  /* Darker green background on hover */
 }
 
 .table-layout-buttons button:active,
 .table-layout-buttons button.active {
-  background-color: #3e8e41; /* Màu xanh nhạt khi button được click hoặc đang active */
+  background-color: #3e8e41;
+  /* Màu xanh nhạt khi button được click hoặc đang active */
 }
 
 .table-grid {
   display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Responsive grid with min width for each item */
-    gap: 16px; /* Space between grid items */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  /* Responsive grid with min width for each item */
+  gap: 16px;
+  /* Space between grid items */
 }
 
 .table {
   position: relative;
-  border: 1px solid black; /* Green border for table */
-  border-radius: 8px; /* Rounded corners for table */
-  padding: 16px; /* Padding inside the table */
-  text-align: center; /* Centered text */
-  background-color: #f9f9f9; /* Light background for table */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for table */
-  font-size: 16px; /* Font size for table text */
+  border: 1px solid black;
+  /* Green border for table */
+  border-radius: 8px;
+  /* Rounded corners for table */
+  padding: 16px;
+  /* Padding inside the table */
+  text-align: center;
+  /* Centered text */
+  background-color: #f9f9f9;
+  /* Light background for table */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow for table */
+  font-size: 16px;
+  /* Font size for table text */
   cursor: pointer;
 }
 
 .table hr {
-  border: none; /* Remove default border */
-  border-top: 1px solid black; /* Light gray border line */
-  margin: 8px 0; /* Margin around the horizontal rule */
+  border: none;
+  /* Remove default border */
+  border-top: 1px solid black;
+  /* Light gray border line */
+  margin: 8px 0;
+  /* Margin around the horizontal rule */
 }
 
 .icon-table {
@@ -153,7 +170,8 @@ header {
   font-size: 20px;
   left: 145px;
 }
-.icon-sl{
+
+.icon-sl {
   position: absolute;
   top: -1px;
   color: black;
@@ -222,15 +240,18 @@ header {
 }
 
 .card {
-  padding: 16px; /* Padding inside the card */
-  margin: 16px; /* Margin around the card */
+  padding: 16px;
+  /* Padding inside the card */
+  margin: 16px;
+  /* Margin around the card */
   max-width: 2500px;
   width: 115%;
   box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   border-radius: 1rem;
   border: transparent;
   flex: 1;
-  background-color: #fff; /* White background for the card */
+  background-color: #fff;
+  /* White background for the card */
 }
 
 @media(max-width:767px) {
@@ -260,24 +281,36 @@ header {
 
 .reservation-grid {
   display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); /* Responsive grid with min width for each item */
-    gap: 16px; /* Space between grid items */
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  /* Responsive grid with min width for each item */
+  gap: 16px;
+  /* Space between grid items */
 }
 
 .reservation {
-  border: 1px solid black; /* Green border for table */
-  border-radius: 8px; /* Rounded corners for table */
-  padding: 16px; /* Padding inside the table */
-  text-align: center; /* Centered text */
-  background-color: #f9f9f9; /* Light background for table */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for table */
-  font-size: 16px; /* Font size for table text */
+  border: 1px solid black;
+  /* Green border for table */
+  border-radius: 8px;
+  /* Rounded corners for table */
+  padding: 16px;
+  /* Padding inside the table */
+  text-align: center;
+  /* Centered text */
+  background-color: #f9f9f9;
+  /* Light background for table */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow for table */
+  font-size: 16px;
+  /* Font size for table text */
 }
 
 .reservation hr {
-  border: none; /* Remove default border */
-  border-top: 1px solid black; /* Light gray border line */
-  margin: 8px 0; /* Margin around the horizontal rule */
+  border: none;
+  /* Remove default border */
+  border-top: 1px solid black;
+  /* Light gray border line */
+  margin: 8px 0;
+  /* Margin around the horizontal rule */
 }
 
 .reservation-table {
@@ -287,11 +320,14 @@ header {
   color: green;
   font-size: 20px;
 }
+
 .vertical-line {
   width: 1px;
   /* height: 100px;  */
-  background-color: black; /* Điều chỉnh màu sắc của đường gạch dọc */
+  background-color: black;
+  /* Điều chỉnh màu sắc của đường gạch dọc */
 }
+
 .number-table {
   display: flex;
   justify-content: center;
@@ -300,7 +336,7 @@ header {
   font-weight: bold;
 }
 
-.label-reser{
+.label-reser {
   color: #007bff;
   cursor: pointer;
 }
@@ -335,7 +371,7 @@ header {
   position: absolute;
   background-color: #f9f9f9;
   min-width: 130px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
   margin-left: -10px;
   cursor: pointer;
@@ -352,6 +388,7 @@ header {
 .dropdown-content a:hover {
   background-color: #f1f1f1;
 }
+
 .dropdown-table ul {
   list-style: none;
   padding: 10px;
@@ -371,7 +408,8 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: 10px;
   text-align: left;
   border-bottom: 1px solid #ddd;
@@ -420,20 +458,27 @@ summary {
 
 .row {
   display: flex;
-  flex-wrap: wrap; /* Cho phép các phần tử xuống dòng khi không đủ không gian */
+  flex-wrap: wrap;
+  /* Cho phép các phần tử xuống dòng khi không đủ không gian */
 }
 
 .row p {
-  flex: 1; /* Phần tử p sẽ tự động chia đều chiều rộng của flex container */
-  margin-bottom: 10px; /* Khoảng cách giữa các dòng */
-  display: block; /* Hiển thị mỗi thẻ p trên một dòng */
-  padding-right: 50%; /* Tạo khoảng trống bên phải để span có thể chiếm */
+  flex: 1;
+  /* Phần tử p sẽ tự động chia đều chiều rộng của flex container */
+  margin-bottom: 10px;
+  /* Khoảng cách giữa các dòng */
+  display: block;
+  /* Hiển thị mỗi thẻ p trên một dòng */
+  padding-right: 50%;
+  /* Tạo khoảng trống bên phải để span có thể chiếm */
 }
 
 .row p span {
   position: absolute;
-  left: 30%; /* Đẩy span về phía giữa */
+  left: 30%;
+  /* Đẩy span về phía giữa */
 }
+
 /* Định dạng container của giỏ hàng */
 .cart-container {
   padding: 15px;
@@ -498,6 +543,7 @@ summary {
 
 /* Định dạng cho các thiết bị nhỏ hơn */
 @media (max-width: 768px) {
+
   .cart-header h5,
   .cart-items .col {
     font-size: 14px;
@@ -507,80 +553,114 @@ summary {
     height: 40px;
   }
 }
-.fas{
+
+.fas {
   font-family: "Font Awesome 6 Free";
 }
 
 /* Style cho nền mờ khi hiển thị modal */
 .modal {
-  display: none; /* Ẩn modal mặc định */
-  position: fixed; /* Hiển thị modal cố định khi cuộn trang */
-  z-index: 1000; /* Độ sâu của modal */
+  display: none;
+  /* Ẩn modal mặc định */
+  position: fixed;
+  /* Hiển thị modal cố định khi cuộn trang */
+  z-index: 1000;
+  /* Độ sâu của modal */
   left: 0;
   top: 0;
   width: 300%;
   height: 300%;
-  overflow: auto; /* Cho phép cuộn khi modal dài hơn trang */
-  background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
+  overflow: auto;
+  /* Cho phép cuộn khi modal dài hơn trang */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Màu nền mờ */
 }
 
 /* Style cho nội dung modal */
 .modal-content {
-  background-color: #fefefe; /* Màu nền của modal */
-  margin: 20% 55%; /* Căn giữa theo chiều dọc */
+  background-color: #fefefe;
+  /* Màu nền của modal */
+  margin: 20% 55%;
+  /* Căn giữa theo chiều dọc */
   padding: 20px;
-  border: 1px solid #ccc; /* Viền xung quanh */
-  width: 200%; /* Chiều rộng của modal */
-  max-width: 1000px; /* Chiều rộng tối đa */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng cho modal */
-  border-radius: 8px; /* Bo góc */
+  border: 1px solid #ccc;
+  /* Viền xung quanh */
+  width: 200%;
+  /* Chiều rộng của modal */
+  max-width: 1000px;
+  /* Chiều rộng tối đa */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* Đổ bóng cho modal */
+  border-radius: 8px;
+  /* Bo góc */
 }
 
 /* Style cho tiêu đề của modal */
 .modal-header {
-  background-color: #007bff; /* Màu nền tiêu đề */
-  color: white; /* Màu chữ */
-  padding: 10px 20px; /* Khoảng cách bên trong */
-  border-top-left-radius: 8px; /* Bo góc trên bên trái */
-  border-top-right-radius: 8px; /* Bo góc trên bên phải */
+  background-color: #007bff;
+  /* Màu nền tiêu đề */
+  color: white;
+  /* Màu chữ */
+  padding: 10px 20px;
+  /* Khoảng cách bên trong */
+  border-top-left-radius: 8px;
+  /* Bo góc trên bên trái */
+  border-top-right-radius: 8px;
+  /* Bo góc trên bên phải */
 }
 
 .close {
-  color: black; /* Màu chữ của nút đóng */
-  position: absolute; /* Đặt vị trí tuyệt đối */
-  right: 40px; /* Khoảng cách từ phía phải */
+  color: black;
+  /* Màu chữ của nút đóng */
+  position: absolute;
+  /* Đặt vị trí tuyệt đối */
+  right: 40px;
+  /* Khoảng cách từ phía phải */
   font-weight: bold;
   font-size: 28px;
 }
+
 .close:hover,
 .close:focus {
-  color: #ffffff; /* Màu chữ khi di chuột qua */
-  text-decoration: none; /* Không gạch chân */
-  cursor: pointer; /* Con trỏ chuột là pointer */
+  color: #ffffff;
+  /* Màu chữ khi di chuột qua */
+  text-decoration: none;
+  /* Không gạch chân */
+  cursor: pointer;
+  /* Con trỏ chuột là pointer */
 }
 
 /* Style cho footer của modal */
 .modal-footer {
-  background-color: #f1f1f1; /* Màu nền footer */
-  padding: 10px 20px; /* Khoảng cách bên trong */
-  border-bottom-left-radius: 8px; /* Bo góc dưới bên trái */
-  border-bottom-right-radius: 8px; /* Bo góc dưới bên phải */
+  background-color: #f1f1f1;
+  /* Màu nền footer */
+  padding: 10px 20px;
+  /* Khoảng cách bên trong */
+  border-bottom-left-radius: 8px;
+  /* Bo góc dưới bên trái */
+  border-bottom-right-radius: 8px;
+  /* Bo góc dưới bên phải */
 }
 
 /* Style cho các nút trong footer */
 .modal-footer button {
-  margin-right: 10px; /* Khoảng cách giữa các nút */
+  margin-right: 10px;
+  /* Khoảng cách giữa các nút */
 }
 
 /* Style cho nút Đóng */
 .btn-secondary {
-  background-color: #dc3545; /* Màu nền nút Đóng */
-  border-color: #dc3545; /* Viền của nút Đóng */
+  background-color: #dc3545;
+  /* Màu nền nút Đóng */
+  border-color: #dc3545;
+  /* Viền của nút Đóng */
 }
 
 .btn-secondary:hover {
-  background-color: #c82333; /* Màu nền khi di chuột qua */
-  border-color: #bd2130; /* Viền khi di chuột qua */
+  background-color: #c82333;
+  /* Màu nền khi di chuột qua */
+  border-color: #bd2130;
+  /* Viền khi di chuột qua */
 }
 
 
@@ -591,9 +671,12 @@ summary {
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: #f9f9f9;
-  -webkit-appearance: none; /* Remove default styling in Chrome */
-  -moz-appearance: none; /* Remove default styling in Firefox */
-  appearance: none; /* Remove default styling in other browsers */
+  -webkit-appearance: none;
+  /* Remove default styling in Chrome */
+  -moz-appearance: none;
+  /* Remove default styling in Firefox */
+  appearance: none;
+  /* Remove default styling in other browsers */
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23007bff' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 10px top 50%;
@@ -642,6 +725,7 @@ summary {
   align-items: center;
   border-bottom: 1px solid #ccc;
 }
+
 .tab {
   padding: 10px 20px;
   border: none;
@@ -652,13 +736,17 @@ summary {
   outline: none;
   transition: color 0.3s, border-bottom 0.3s;
 }
-.tab:hover, .tab:focus {
+
+.tab:hover,
+.tab:focus {
   color: #000;
 }
+
 .tab.active {
   color: blue;
   border-bottom: 2px solid blue;
 }
+
 .tabs input[type="text"] {
   margin-left: auto;
   padding: 8px 12px;
@@ -667,28 +755,36 @@ summary {
   border-radius: 4px;
   outline: none;
 }
+
 .status-pending {
   color: #ffc107;
-  border: 1px solid #ffc107; /* yellow border */
+  border: 1px solid #ffc107;
+  /* yellow border */
 }
 
 .status-confirmed {
   color: #007bff;
-  border: 1px solid #007bff; /* blue border */
+  border: 1px solid #007bff;
+  /* blue border */
 }
 
 .status-completed {
   color: #28a745;
-  border: 1px solid #28a745; /* green border */
+  border: 1px solid #28a745;
+  /* green border */
 }
 
 .status-cancelled {
   color: #dc3545;
-  border: 1px solid #dc3545; /* red border */
+  border: 1px solid #dc3545;
+  /* red border */
 }
+
 .status-label {
-  display: inline-block; /* Đảm bảo phần tử là inline-block */
-  padding: 4px; /* Thêm padding cho khoảng cách */
+  display: inline-block;
+  /* Đảm bảo phần tử là inline-block */
+  padding: 4px;
+  /* Thêm padding cho khoảng cách */
   height: auto;
   width: 140px;
   border-radius: 50px;
@@ -898,6 +994,7 @@ textarea {
 }
 
 @media (max-width: 768px) {
+
   .col-md-4,
   .col-md-6 {
     flex: 0 0 100%;
@@ -910,6 +1007,7 @@ textarea {
     flex: 0 0 50%;
     max-width: 50%;
   }
+
   .col-md-4 {
     flex: 0 0 33.333333%;
     max-width: 33.333333%;
@@ -936,20 +1034,23 @@ textarea {
 }
 
 .input-group {
-  display: flex; /* Use flexbox to align label and input */
+  display: flex;
+  /* Use flexbox to align label and input */
   width: 100%;
 }
 
 .input-group-text {
   background-color: #f8f9fa;
   border: 1px solid #ced4da;
-  border-right: none; /* Remove right border to avoid double border with input */
+  border-right: none;
+  /* Remove right border to avoid double border with input */
   border-radius: 4px 0 0 4px;
   padding: 5px 10px;
   font-weight: bold;
   white-space: nowrap;
   display: flex;
-  align-items: center; /* Center the label vertically */
+  align-items: center;
+  /* Center the label vertically */
   margin-bottom: 0;
 }
 
@@ -959,7 +1060,8 @@ textarea {
   padding: 5px 10px;
   flex: 1;
   display: flex;
-  align-items: center; /* Ensure input content is centered */
+  align-items: center;
+  /* Ensure input content is centered */
 }
 
 .form-control:focus {
@@ -967,30 +1069,41 @@ textarea {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
+
 .back-link {
-  text-decoration: none; /* Loại bỏ gạch chân của liên kết */
+  text-decoration: none;
+  /* Loại bỏ gạch chân của liên kết */
 }
 
 /* Tạo kiểu cho biểu tượng */
 .back-icon {
   cursor: pointer;
-  margin-right: 15px; /* Khoảng cách giữa biểu tượng và tiêu đề */
-  font-size: 1.8em; /* Kích thước biểu tượng */
-  color: rgb(83, 82, 82); /* Màu sắc biểu tượng */
-  transition: color 0.3s ease; /* Hiệu ứng chuyển màu khi hover */
+  margin-right: 15px;
+  /* Khoảng cách giữa biểu tượng và tiêu đề */
+  font-size: 1.8em;
+  /* Kích thước biểu tượng */
+  color: rgb(83, 82, 82);
+  /* Màu sắc biểu tượng */
+  transition: color 0.3s ease;
+  /* Hiệu ứng chuyển màu khi hover */
 }
+
 /* Thay đổi màu sắc biểu tượng khi hover */
 .back-icon:hover {
-  color: black; /* Màu sắc mới khi hover */
+  color: black;
+  /* Màu sắc mới khi hover */
 }
+
 #confirmationModal.modal-cf {
-  & ~ .modal-backdrop.show {
+  &~.modal-backdrop.show {
     opacity: 0 !important;
   }
 }
+
 .modal-body .table-status-container {
   display: flex;
-  align-items: flex-start; /* Thay đổi align-items thành flex-start để căn chỉnh tốt hơn */
+  align-items: flex-start;
+  /* Thay đổi align-items thành flex-start để căn chỉnh tốt hơn */
   justify-content: space-between;
   margin-bottom: 15px;
 }
@@ -1002,24 +1115,35 @@ textarea {
 }
 
 .modal-body .table-status-container span {
-  margin-left: 10px; /* Thêm khoảng cách giữa "Đã chọn:" và các input */
+  margin-left: 10px;
+  /* Thêm khoảng cách giữa "Đã chọn:" và các input */
 }
 
 .selected-table-input {
-  border: 1px solid #ccc; /* Thêm viền cho input */
-  background-color: #f0f0f0; /* Màu nền cho input */
-  padding: 5px; /* Padding cho input */
-  margin-right: 5px; /* Khoảng cách giữa input và nút x */
-  border-radius: 4px; /* Bo góc cho input */
-  width: auto; /* Để chiều rộng tự động */
-  font-size: 1rem; /* Đặt kích thước font cho input */
+  border: 1px solid #ccc;
+  /* Thêm viền cho input */
+  background-color: #f0f0f0;
+  /* Màu nền cho input */
+  padding: 5px;
+  /* Padding cho input */
+  margin-right: 5px;
+  /* Khoảng cách giữa input và nút x */
+  border-radius: 4px;
+  /* Bo góc cho input */
+  width: auto;
+  /* Để chiều rộng tự động */
+  font-size: 1rem;
+  /* Đặt kích thước font cho input */
   margin-left: 55px;
 }
 
 .remove-table {
-  color: red; /* Màu cho nút x */
-  cursor: pointer; /* Thay đổi con trỏ khi hover */
-  margin-left: 5px; /* Khoảng cách giữa input và nút x */
+  color: red;
+  /* Màu cho nút x */
+  cursor: pointer;
+  /* Thay đổi con trỏ khi hover */
+  margin-left: 5px;
+  /* Khoảng cách giữa input và nút x */
 }
 
 
@@ -1031,7 +1155,8 @@ textarea {
 
 .modal-body .checkbox-container input[type="checkbox"] {
   margin-left: 10px;
-  transform: scale(1.2); /* Phóng to checkbox */
+  transform: scale(1.2);
+  /* Phóng to checkbox */
   cursor: pointer;
 }
 
@@ -1039,15 +1164,18 @@ textarea {
   margin-left: 5px;
   font-size: 1rem;
   font-weight: normal;
-  color: #000; /* Màu mặc định cho nhãn */
+  color: #000;
+  /* Màu mặc định cho nhãn */
 }
 
-.modal-body .checkbox-container input[type="checkbox"]:first-child + label {
-  color: red; /* Màu đỏ cho nhãn "Chưa đủ" */
+.modal-body .checkbox-container input[type="checkbox"]:first-child+label {
+  color: red;
+  /* Màu đỏ cho nhãn "Chưa đủ" */
 }
 
-.modal-body .checkbox-container input[type="checkbox"]:nth-child(2) + label {
-  color: green; /* Màu xanh cho nhãn "Đã đủ" */
+.modal-body .checkbox-container input[type="checkbox"]:nth-child(2)+label {
+  color: green;
+  /* Màu xanh cho nhãn "Đã đủ" */
 }
 
 .toggle-dropdown {
@@ -1080,7 +1208,8 @@ textarea {
 }
 
 .dropdown-table-item:last-child {
-  border-bottom: none; /* Bỏ đường viền cuối cùng */
+  border-bottom: none;
+  /* Bỏ đường viền cuối cùng */
 }
 
 .dropdown-table-item:hover {
@@ -1091,21 +1220,25 @@ textarea {
 .table-dropdown::before {
   content: '';
   position: absolute;
-  bottom: -8px; /* Đưa mũi tên xuống dưới */
+  bottom: -8px;
+  /* Đưa mũi tên xuống dưới */
   left: 20px;
   border-width: 8px;
   border-style: solid;
-  border-color: #ddd transparent transparent transparent; /* Tạo mũi tên tam giác */
+  border-color: #ddd transparent transparent transparent;
+  /* Tạo mũi tên tam giác */
 }
 
 .table-dropdown::after {
   content: '';
   position: absolute;
-  bottom: -7px; /* Đưa mũi tên xuống dưới */
+  bottom: -7px;
+  /* Đưa mũi tên xuống dưới */
   left: 20px;
   border-width: 7px;
   border-style: solid;
-  border-color: white transparent transparent transparent; /* Mũi tên bên trong */
+  border-color: white transparent transparent transparent;
+  /* Mũi tên bên trong */
 }
 
 /* parent.component.css */
@@ -1116,8 +1249,10 @@ textarea {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent background */
-  z-index: 999; /* Ensure it is above other content */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* semi-transparent background */
+  z-index: 999;
+  /* Ensure it is above other content */
 }
 
 /* Modal container style */
@@ -1130,7 +1265,8 @@ textarea {
   max-width: 500px;
   background-color: white;
   border-radius: 8px;
-  z-index: 1000; /* Above the backdrop */
+  z-index: 1000;
+  /* Above the backdrop */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -1181,8 +1317,10 @@ button:focus {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-  z-index: 999; /* Lower than modal but higher than other elements */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Semi-transparent background */
+  z-index: 999;
+  /* Lower than modal but higher than other elements */
 }
 
 /* Modal container */
@@ -1191,7 +1329,8 @@ button:focus {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1000; /* Higher than everything */
+  z-index: 1000;
+  /* Higher than everything */
   width: 500px;
   background-color: white;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
@@ -1250,10 +1389,12 @@ button:focus {
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
 }
+
 .confirm-button {
   padding: 10px 20px;
   margin: 10px;
-  background-color: #4caf50; /* Màu xanh lá cây */
+  background-color: #4caf50;
+  /* Màu xanh lá cây */
   color: white;
   border: none;
   cursor: pointer;
@@ -1262,13 +1403,15 @@ button:focus {
 }
 
 .confirm-button:hover {
-  background-color: #45a049; /* Màu xanh lá cây đậm hơn khi hover */
+  background-color: #45a049;
+  /* Màu xanh lá cây đậm hơn khi hover */
 }
 
 .cancel-button {
   padding: 10px 20px;
   margin: 10px;
-  background-color: #f44336; /* Màu đỏ */
+  background-color: #f44336;
+  /* Màu đỏ */
   color: white;
   border: none;
   cursor: pointer;
@@ -1277,7 +1420,8 @@ button:focus {
 }
 
 .cancel-button:hover {
-  background-color: #e53935; /* Màu đỏ đậm hơn khi hover */
+  background-color: #e53935;
+  /* Màu đỏ đậm hơn khi hover */
 }
 
 .reservation-accept-modal {
@@ -1307,18 +1451,26 @@ button:focus {
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
 }
+
 .modal-text {
-  margin-bottom: 10px; /* Tạo khoảng cách dưới mỗi đoạn văn bản */
+  margin-bottom: 10px;
+  /* Tạo khoảng cách dưới mỗi đoạn văn bản */
 }
 
 
 .calendar-icon {
-  position: absolute; /* Position the icon absolutely */
-  bottom: -2px; /* Adjust this value to move it up or down */
-  left: 5px; /* Adjust this value to move it left or right */
-  font-size: 18px; /* Adjust the size of the icon as needed */
-  color: blue; /* Change the color as needed */
+  position: absolute;
+  /* Position the icon absolutely */
+  bottom: -2px;
+  /* Adjust this value to move it up or down */
+  left: 5px;
+  /* Adjust this value to move it left or right */
+  font-size: 18px;
+  /* Adjust the size of the icon as needed */
+  color: blue;
+  /* Change the color as needed */
 }
+
 .reservation-modal-detail {
   display: flex;
   justify-content: center;
@@ -1329,129 +1481,193 @@ button:focus {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7); /* Darker background for better visibility */
+  background-color: rgba(0, 0, 0, 0.7);
+  /* Darker background for better visibility */
 }
 
 .modal-content-detail {
-  background-color: #ffffff; /* White background for the modal */
-  padding: 30px; /* Added padding for better spacing */
-  border-radius: 10px; /* Rounded corners */
-  width: 90%; /* Full width with a max width */
-  max-width: 600px; /* Max width */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+  background-color: #ffffff;
+  /* White background for the modal */
+  padding: 30px;
+  /* Added padding for better spacing */
+  border-radius: 10px;
+  /* Rounded corners */
+  width: 90%;
+  /* Full width with a max width */
+  max-width: 600px;
+  /* Max width */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  /* Soft shadow for depth */
 }
 
 .close-detail {
   cursor: pointer;
   float: right;
-  font-size: 24px; /* Larger close button */
-  color: #ff0000; /* Red color for the close button */
+  font-size: 24px;
+  /* Larger close button */
+  color: #ff0000;
+  /* Red color for the close button */
 }
 
 .reservation-list {
-  list-style-type: none; /* Remove default list styling */
-  padding: 0; /* Remove padding */
+  list-style-type: none;
+  /* Remove default list styling */
+  padding: 0;
+  /* Remove padding */
 }
 
 .reservation-item {
-  margin-bottom: 15px; /* Space between items */
+  margin-bottom: 15px;
+  /* Space between items */
 }
 
 .reservation-item p {
-  margin: 5px 0; /* Margin between paragraphs */
+  margin: 5px 0;
+  /* Margin between paragraphs */
 }
 
 .reservation-item hr {
-  margin-top: 10px; /* Space above the horizontal line */
-  border: 0; /* Remove default border */
-  height: 1px; /* Set height of the line */
-  background-color: #ccc; /* Light gray color for the line */
+  margin-top: 10px;
+  /* Space above the horizontal line */
+  border: 0;
+  /* Remove default border */
+  height: 1px;
+  /* Set height of the line */
+  background-color: #ccc;
+  /* Light gray color for the line */
 }
+
 .reservation-detail {
-  background-color: #f9f9f9; /* Màu nền nhẹ */
-  border-radius: 8px; /* Bo góc */
-  padding: 15px; /* Khoảng cách bên trong */
-  margin: 10px 0; /* Khoảng cách phía trên và dưới */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  background-color: #f9f9f9;
+  /* Màu nền nhẹ */
+  border-radius: 8px;
+  /* Bo góc */
+  padding: 15px;
+  /* Khoảng cách bên trong */
+  margin: 10px 0;
+  /* Khoảng cách phía trên và dưới */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  /* Đổ bóng nhẹ */
 }
 
 .reservation-detail p {
-  margin: 5px 0; /* Khoảng cách giữa các đoạn văn */
-  font-size: 16px; /* Kích thước chữ */
-  line-height: 1.5; /* Khoảng cách dòng */
-  color: #333; /* Màu chữ */
-  text-align: left; /* Canh lề bên trái */
-  padding-left: 0; /* Đảm bảo không có khoảng cách bên trái */
+  margin: 5px 0;
+  /* Khoảng cách giữa các đoạn văn */
+  font-size: 16px;
+  /* Kích thước chữ */
+  line-height: 1.5;
+  /* Khoảng cách dòng */
+  color: #333;
+  /* Màu chữ */
+  text-align: left;
+  /* Canh lề bên trái */
+  padding-left: 0;
+  /* Đảm bảo không có khoảng cách bên trái */
 }
 
 .reservation-detail strong {
-  color: #007bff; /* Màu chữ đậm cho tiêu đề */
+  color: #007bff;
+  /* Màu chữ đậm cho tiêu đề */
 }
+
 .reservation-red {
-  background-color: #ffcccc; /* Màu nền đỏ nhạt */
-  border-left: 5px solid red; /* Đường viền trái màu đỏ */
+  background-color: #ffcccc;
+  /* Màu nền đỏ nhạt */
+  border-left: 5px solid red;
+  /* Đường viền trái màu đỏ */
 }
 
 .reservation-gray {
-  background-color: #f0f0f0; /* Màu nền xám nhạt */
-  border-left: 5px solid gray; /* Đường viền trái màu xám */
+  background-color: #f0f0f0;
+  /* Màu nền xám nhạt */
+  border-left: 5px solid gray;
+  /* Đường viền trái màu xám */
 }
 
 .reservation {
   padding: 15px;
   margin-bottom: 10px;
   border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Đổ bóng nhẹ */
 }
+
 .selected-tables-container {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  padding: 10px; /* Adjust padding as needed */
-  border: 1px solid #ccc; /* Border color */
-  border-radius: 5px; /* Rounded corners */
-  background-color: #f9f9f9; /* Background color */
-  max-width: 400px; /* Adjust width as needed */
+  padding: 10px;
+  /* Adjust padding as needed */
+  border: 1px solid #ccc;
+  /* Border color */
+  border-radius: 5px;
+  /* Rounded corners */
+  background-color: #f9f9f9;
+  /* Background color */
+  max-width: 400px;
+  /* Adjust width as needed */
 }
 
 .table-label {
-  background-color: #e9ecef; /* Background for each label */
-  border-radius: 3px; /* Rounded corners for labels */
-  padding: 5px 10px; /* Padding inside labels */
-  margin: 5px; /* Space between labels */
+  background-color: #e9ecef;
+  /* Background for each label */
+  border-radius: 3px;
+  /* Rounded corners for labels */
+  padding: 5px 10px;
+  /* Padding inside labels */
+  margin: 5px;
+  /* Space between labels */
   display: flex;
-  align-items: center; /* Center content vertically */
+  align-items: center;
+  /* Center content vertically */
 }
 
 .remove-button {
-  cursor: pointer; /* Cursor style for the button */
-  color: red; /* Color of the 'x' */
-  margin-left: 5px; /* Space between label and 'x' */
-  font-weight: bold; /* Make 'x' bold */
+  cursor: pointer;
+  /* Cursor style for the button */
+  color: red;
+  /* Color of the 'x' */
+  margin-left: 5px;
+  /* Space between label and 'x' */
+  font-weight: bold;
+  /* Make 'x' bold */
 }
+
 .notification {
   position: fixed;
-  top: 20px; /* Khoảng cách từ trên cùng */
-  right: -400px; /* Bắt đầu bên ngoài màn hình */
-  transition: right 0.5s ease; /* Hiệu ứng trượt */
+  top: 20px;
+  /* Khoảng cách từ trên cùng */
+  right: -400px;
+  /* Bắt đầu bên ngoài màn hình */
+  transition: right 0.5s ease;
+  /* Hiệu ứng trượt */
   z-index: 1000;
-  opacity: 0; /* Ban đầu ẩn */
-  transform: translateY(-10px); /* Đưa lên một chút */
+  opacity: 0;
+  /* Ban đầu ẩn */
+  transform: translateY(-10px);
+  /* Đưa lên một chút */
 }
 
 .notification.show {
-  right: 20px; /* Vị trí cuối cùng bên phải */
-  opacity: 1; /* Hiển thị */
-  transform: translateY(0); /* Đưa về vị trí ban đầu */
+  right: 20px;
+  /* Vị trí cuối cùng bên phải */
+  opacity: 1;
+  /* Hiển thị */
+  transform: translateY(0);
+  /* Đưa về vị trí ban đầu */
 }
 
 .notification-content {
-  background-color: #28a745; /* Màu nền xanh lá */
+  background-color: #28a745;
+  /* Màu nền xanh lá */
   color: white;
   padding: 20px;
-  border-radius: 8px; /* Bo tròn góc */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Đổ bóng */
-  margin-bottom: 15px; /* Khoảng cách giữa các thông báo */
+  border-radius: 8px;
+  /* Bo tròn góc */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  /* Đổ bóng */
+  margin-bottom: 15px;
+  /* Khoảng cách giữa các thông báo */
 }
 
 .notification-header {
@@ -1461,8 +1677,10 @@ button:focus {
 }
 
 .notification-title {
-  font-weight: bold; /* Đậm */
-  margin: 0; /* Bỏ khoảng cách */
+  font-weight: bold;
+  /* Đậm */
+  margin: 0;
+  /* Bỏ khoảng cách */
 }
 
 .closenoti {
@@ -1471,9 +1689,659 @@ button:focus {
   border: none;
   background: none;
   font-size: 20px;
-  transition: color 0.3s ease; /* Hiệu ứng chuyển màu khi hover */
+  transition: color 0.3s ease;
+  /* Hiệu ứng chuyển màu khi hover */
 }
 
 .closenoti:hover {
-  color: #ffdddd; /* Màu khi hover */
+  color: #ffdddd;
+  /* Màu khi hover */
+}
+
+/* Form Container */
+.reservation-form-new {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 20px auto;
+  transition: all 0.3s ease-in-out;
+}
+
+.reservation-form-new:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Row and Column Layout */
+.row-new {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.col-md-4-new {
+  flex-grow: 1;
+  /* Đảm bảo cột có thể giãn đều */
+  flex-basis: calc(33.33% - 20px);
+  /* Chia đều không gian cho 3 cột và trừ đi khoảng cách */
+  box-sizing: border-box;
+  min-width: 250px;
+}
+
+@media (max-width: 768px) {
+  .col-md-4-new {
+    flex-basis: 100%;
+    /* Ở màn hình nhỏ, cột chiếm toàn bộ chiều rộng */
+  }
+}
+
+/* Label Styles */
+.form-group-new label {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  display: block;
+  color: #555;
+}
+
+/* Required Symbol */
+.required-new {
+  color: red;
+}
+
+/* Input and Select Styles */
+.input-new,
+.select-new {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  transition: border 0.3s ease;
+}
+
+.input-new:focus,
+.select-new:focus {
+  border-color: #5cb85c;
+  outline: none;
+  box-shadow: 0 0 5px rgba(92, 184, 92, 0.5);
+}
+
+/* Button Styles */
+.button-new,
+.button-submit-new {
+  background-color: #5cb85c;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button-new:hover,
+.button-submit-new:hover {
+  background-color: #4cae4c;
+}
+
+.button-new:focus,
+.button-submit-new:focus {
+  outline: none;
+}
+
+.button-submit-new {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.button-new[disabled] {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Error Message Styling */
+.error-message-new {
+  color: red;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* Small Text for Errors */
+.text-danger-new {
+  font-size: 12px;
+  color: #d9534f;
+}
+
+/* Animations */
+@keyframes shake-new {
+  0% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  50% {
+    transform: translateX(5px);
+  }
+
+  75% {
+    transform: translateX(-5px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.input-new.ng-invalid.ng-touched,
+.select-new.ng-invalid.ng-touched {
+  border-color: #d9534f;
+  animation: shake-new 0.3s ease-in-out;
+}
+
+.input-new.ng-valid.ng-touched,
+.select-new.ng-valid.ng-touched {
+  border-color: #5cb85c;
+}
+
+.input-new.ng-pristine {
+  border-color: #ddd;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .reservation-form-new {
+    padding: 15px;
+  }
+
+  .row-new {
+    gap: 15px;
+  }
+
+  .button-submit-new {
+    width: 100%;
+    margin-top: 15px;
+  }
+}
+
+/* Styling for the note section */
+.form-group-new textarea {
+  width: 100%;
+  /* Chiếm toàn bộ chiều rộng của cột */
+  padding: 10px;
+  /* Tạo khoảng cách bên trong */
+  font-size: 16px;
+  /* Kích thước chữ */
+  line-height: 1.5;
+  /* Đảm bảo khoảng cách giữa các dòng */
+  border: 1px solid #ccc;
+  /* Đường viền xung quanh */
+  border-radius: 4px;
+  /* Bo góc cho đẹp */
+  resize: vertical;
+  /* Cho phép người dùng thay đổi chiều cao */
+  box-sizing: border-box;
+  /* Đảm bảo padding không làm tăng kích thước tổng thể */
+  background-color: #f9f9f9;
+  /* Màu nền nhẹ */
+  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  /* Hiệu ứng mượt khi focus */
+}
+
+/* Placeholder styling */
+.form-group-new textarea::placeholder {
+  color: #999;
+  /* Màu placeholder nhạt hơn */
+  font-style: italic;
+  /* Kiểu chữ nghiêng */
+}
+
+/* Styling when textarea is focused */
+.form-group-new textarea:focus {
+  border-color: #007bff;
+  /* Đổi màu viền khi focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  /* Tạo hiệu ứng bóng sáng khi focus */
+  outline: none;
+  /* Bỏ đường viền mặc định khi focus */
+}
+
+/* Styling for the label */
+.form-group-new label {
+  display: block;
+  /* Đảm bảo label nằm trên input */
+  font-weight: bold;
+  /* Chữ đậm */
+  margin-bottom: 8px;
+  /* Khoảng cách giữa label và textarea */
+  color: #333;
+  /* Màu chữ cho label */
+}
+
+.button-container {
+  display: flex;
+  /* Thiết lập Flexbox */
+  justify-content: center;
+  /* Căn giữa theo chiều ngang */
+  margin: 20px 0;
+  /* Khoảng cách phía trên và dưới */
+}
+
+/* Styling for the button */
+.button-new {
+  background-color: #007bff;
+  /* Màu nền */
+  color: #fff;
+  /* Màu chữ */
+  border: none;
+  /* Bỏ đường viền mặc định */
+  border-radius: 4px;
+  /* Bo góc */
+  padding: 10px 20px;
+  /* Khoảng cách bên trong */
+  font-size: 16px;
+  /* Kích thước chữ */
+  cursor: pointer;
+  /* Con trỏ khi di chuột vào nút */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  /* Hiệu ứng chuyển màu và nhấn */
+}
+
+/* Hover effect */
+.button-new:hover {
+  background-color: #0056b3;
+  /* Màu nền khi hover */
+  transform: translateY(-2px);
+  /* Nâng nút lên một chút */
+}
+
+/* Active effect */
+.button-new:active {
+  transform: translateY(0);
+  /* Đưa nút về vị trí ban đầu khi nhấn */
+}
+
+/* Disabled state */
+.button-new:disabled {
+  background-color: #ccc;
+  /* Màu nền khi bị vô hiệu hóa */
+  color: #666;
+  /* Màu chữ khi bị vô hiệu hóa */
+  cursor: not-allowed;
+  /* Con trỏ không cho phép */
+}
+
+/* Optional: add focus effect */
+.button-new:focus {
+  outline: none;
+  /* Bỏ đường viền mặc định */
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
+  /* Hiệu ứng bóng khi focus */
+}
+
+.button-group-new {
+  display: flex;
+  justify-content: space-between;
+  /* Giãn cách đều giữa các nút */
+  margin-top: 20px;
+  /* Khoảng cách phía trên giữa form và nút */
+}
+
+.add-button-new {
+  background-color: #007bff;
+  /* Màu nền xanh */
+  color: #fff;
+  /* Màu chữ trắng */
+  border: none;
+  /* Không có viền */
+  border-radius: 5px;
+  /* Bo góc */
+  padding: 10px 15px;
+  /* Padding cho nút */
+  cursor: pointer;
+  /* Hiển thị con trỏ tay khi hover */
+  display: flex;
+  /* Sử dụng flex để căn chỉnh biểu tượng và chữ */
+  align-items: center;
+  /* Căn giữa theo chiều dọc */
+  margin-right: 10px;
+  /* Khoảng cách giữa các nút */
+  transition: background-color 0.3s;
+  /* Hiệu ứng chuyển màu khi hover */
+}
+
+.add-button-new:hover {
+  background-color: #0056b3;
+  /* Màu nền tối hơn khi hover */
+}
+
+.add-button-new i {
+  margin-right: 5px;
+  /* Khoảng cách giữa biểu tượng và chữ */
+}
+
+.button-submit-new {
+  background-color: #28a745;
+  /* Màu nền xanh */
+  color: #fff;
+  /* Màu chữ trắng */
+  border: none;
+  /* Không có viền */
+  border-radius: 5px;
+  /* Bo góc */
+  padding: 10px 20px;
+  /* Padding cho nút */
+  margin-top: 20px;
+  /* Khoảng cách phía trên */
+  cursor: pointer;
+  /* Hiển thị con trỏ tay khi hover */
+  transition: background-color 0.3s;
+  /* Hiệu ứng chuyển màu khi hover */
+}
+
+.button-submit-new:hover {
+  background-color: #218838;
+  /* Màu nền tối hơn khi hover */
+}
+
+/* Custom Modal styles */
+.custom-modal {
+  display: none;
+  /* Ẩn modal mặc định */
+  position: fixed;
+  /* Hiển thị modal cố định khi cuộn trang */
+  z-index: 1000;
+  /* Độ sâu của modal */
+  width: 100%;
+  /* Thay đổi chiều rộng về 100% */
+  height: 100%;
+  /* Thay đổi chiều cao về 100% */
+  overflow: auto;
+  /* Cho phép cuộn khi modal dài hơn trang */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Màu nền mờ */
+}
+
+.custom-modal-dialog {
+  display: flex;
+  justify-content: center;
+  /* Căn giữa theo chiều ngang */
+  align-items: center;
+  /* Căn giữa theo chiều dọc */
+  height: 100%;
+  /* Đảm bảo chiều cao 100% cho dialog */
+}
+
+.custom-modal-content {
+  background-color: #fefefe;
+  /* Màu nền của modal */
+  padding: 20px;
+  border: 1px solid #ccc;
+  /* Viền xung quanh */
+  width: 100%;
+  max-width: 1400px;
+  /* Chiều rộng tối đa cho modal thông thường */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* Đổ bóng cho modal */
+  border-radius: 8px;
+  /* Bo góc */
+  margin: auto;
+  /* Đảm bảo tự động căn giữa */
+}
+
+/* Để nút đóng được căn đúng vị trí */
+.custom-close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.custom-close:hover,
+.custom-close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Show class for modal */
+.custom-show {
+  display: block;
+  /* Hiện modal */
+}
+
+/* Bố cục cho giỏ hàng */
+.dish {
+  padding: 20px;
+  background-color: #fff; /* Màu nền trắng cho giỏ hàng */
+  border-radius: 8px; /* Bo góc */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng cho giỏ hàng */
+  max-width: 1000px; /* Chiều rộng tối đa */
+  margin: 20px auto; /* Căn giữa giỏ hàng */
+}
+
+/* Bảng giỏ hàng */
+.cart {
+  width: 100%;
+  border-collapse: collapse; /* Gộp các đường viền của bảng */
+}
+
+/* Đầu bảng */
+.cart thead tr {
+  background-color: #f8f8f8; /* Màu nền cho đầu bảng */
+  text-align: left; /* Căn trái văn bản */
+}
+
+.cart th {
+  padding: 12px; /* Khoảng cách trong các ô */
+  font-weight: bold; /* In đậm văn bản */
+}
+
+/* Nội dung bảng */
+.cart tbody tr {
+  border-bottom: 1px solid #ddd; /* Đường viền dưới cho các hàng */
+  transition: background-color 0.3s; /* Hiệu ứng chuyển màu nền */
+}
+
+.cart tbody tr:hover {
+  background-color: #f1f1f1; /* Màu nền khi di chuột qua hàng */
+}
+
+/* Hình ảnh món ăn */
+.cart img {
+  max-width: 56px; /* Chiều rộng tối đa cho hình ảnh */
+  border-radius: 4px; /* Bo góc cho hình ảnh */
+}
+
+/* Nhập số lượng */
+.quantity-input {
+  width: 50px; /* Chiều rộng ô nhập */
+  text-align: center; /* Căn giữa văn bản */
+  border: 1px solid #ccc; /* Đường viền xung quanh ô nhập */
+  border-radius: 4px; /* Bo góc */
+  margin: 0 5px; /* Khoảng cách giữa các nút */
+}
+
+/* Nút xóa */
+.delete {
+  background: none; /* Không có nền cho nút */
+  border: none; /* Không có đường viền */
+  cursor: pointer; /* Hiển thị con trỏ khi di chuột */
+  color: #e74c3c; /* Màu đỏ cho biểu tượng xóa */
+  font-size: 16px; /* Kích thước font */
+  transition: color 0.3s; /* Hiệu ứng chuyển màu */
+}
+
+.delete:hover {
+  color: #c0392b; /* Màu đỏ đậm khi di chuột qua */
+}
+
+/* Icon trong ô số lượng */
+.icon {
+  padding: 5px; /* Khoảng cách trong icon */
+  cursor: pointer; /* Hiển thị con trỏ khi di chuột */
+}
+
+/* Hiệu ứng khi nhấn nút cộng hoặc trừ */
+.icon:hover {
+  color: #3498db; /* Màu xanh khi di chuột qua icon */
+}
+.quantity-control {
+  display: flex; /* Sử dụng Flexbox để căn chỉnh các phần tử */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  justify-content: space-between; /* Tạo khoảng cách giữa các phần tử */
+}
+
+.quantity-control .icon {
+  margin: 0 5px; /* Khoảng cách giữa icon và ô nhập */
+}
+
+.quantity-input {
+  width: 50px; /* Chiều rộng của ô nhập */
+  text-align: center; /* Căn giữa văn bản trong ô nhập */
+  border: 1px solid #ccc; /* Đường viền cho ô nhập */
+  border-radius: 4px; /* Bo góc cho ô nhập */
+}
+.icon {
+  text-decoration: none; /* Xóa gạch chân */
+}
+.createlable {
+  display: flex;
+  align-items: center; /* Căn chỉnh nội dung theo chiều dọc */
+  flex-wrap: wrap; /* Đảm bảo nếu có quá nhiều span, chúng sẽ xuống dòng */
+}
+
+.createlable-p {
+  margin: 0; /* Xóa khoảng cách mặc định của thẻ p */
+  padding-right: 10px; /* Tạo khoảng cách giữa thẻ p và các span */
+  font-weight: bold; /* Tùy chọn: làm đậm chữ trong thẻ p */
+}
+
+.table-createlable-label {
+  display: inline-block; /* Hiển thị các span trên cùng một hàng */
+  background-color: #f0f0f0; /* Màu nền cho các span */
+  padding: 5px 10px; /* Khoảng cách bên trong */
+  margin-right: 8px; /* Khoảng cách giữa các span */
+  border-radius: 5px; /* Bo góc cho đẹp */
+  border: 1px solid #ccc; /* Đường viền cho các span */
+  font-size: 14px; /* Cỡ chữ */
+  color: #333; /* Màu chữ */
+}
+
+
+/* Modal Styles */
+.modal-custom {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-custom.show {
+  display: flex; /* Show the modal */
+}
+
+.modal-dialog-custom {
+  max-width: 600px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+}
+
+.modal-content-custom {
+  padding: 20px;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-body-custom {
+  margin-top: 20px;
+}
+
+.modal-footer-custom {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.confirm-button, .cancel-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.confirm-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.cancel-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.table-label-custom {
+  display: inline-block;
+  background-color: #f0f0f0;
+  padding: 5px 10px;
+  margin-right: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Button Styling */
+.create-reservation button {
+  padding: 10px 20px; /* Padding for the button */
+  background-color: #28a745; /* Green background color */
+  color: white; /* White text color */
+  font-size: 16px; /* Slightly larger font for readability */
+  border: none; /* Remove default border */
+  border-radius: 5px; /* Rounded corners for the button */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition for hover effects */
+}
+
+/* Hover effect */
+.create-reservation button:hover {
+  background-color: #218838; /* Darker green on hover */
+  transform: scale(1.05); /* Slightly increase the size on hover */
+}
+
+/* Button Active State */
+.create-reservation button:active {
+  transform: scale(0.98); /* Slightly shrink the button when clicked */
+  background-color: #1e7e34; /* Even darker green when button is active */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .create-reservation {
+    padding: 15px;
+  }
+
+  .create-reservation button {
+    width: 100%; /* Full width button on smaller screens */
+  }
 }

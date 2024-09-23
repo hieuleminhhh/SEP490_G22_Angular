@@ -267,7 +267,7 @@ tr:hover {
   padding: 20px;
   border: 1px solid #ccc; /* Viền xung quanh */
   width: 100%;
-  max-width: 1000px; /* Chiều rộng tối đa cho modal thông thường */
+  max-width: 1400px; /* Chiều rộng tối đa cho modal thông thường */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng cho modal */
   border-radius: 8px; /* Bo góc */
   position: relative; /* Để close button có thể được căn chỉnh chính xác */
