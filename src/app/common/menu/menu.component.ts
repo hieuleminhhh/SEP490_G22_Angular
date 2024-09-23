@@ -35,7 +35,7 @@ export class MenuComponent {
   @Input() isReser: boolean = false;
 
   currentPage = 1; // Trang hiện tại
-  itemsPerPage = 8; // Số bản ghi trên mỗi trang
+  itemsPerPage = 9; // Số bản ghi trên mỗi trang
   totalItems = 0; // Tổng số bản ghi
 
   filteredDataSubject = new BehaviorSubject<any[]>([]);
