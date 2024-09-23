@@ -1,0 +1,56 @@
+<app-HeaderOrderStaff></app-HeaderOrderStaff>
+<div class="category-manager">
+  <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light collapse">
+    <app-SideBar></app-SideBar>
+  </nav>
+  <div class="content">
+    <h1>Quản Lý Danh Mục</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tên Danh Mục</th>
+          <th>Thao Tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let category of categories">
+          <td>{{ category.categoryId }}</td>
+          <td>{{ category.categoryName }}</td>
+          <td>
+            <button (click)="editCategory(category.categoryId)">Sửa</button>
+            <button (click)="deleteCategory(category.categoryId)">Xóa</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="add-category" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Thêm Danh Mục</button>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCategoryModalLabel">Thêm Danh Mục Mới</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Form for adding a new category -->
+          <form (ngSubmit)="onSubmit()" #categoryForm="ngForm">
+            <div class="mb-3">
+              <label for="categoryName" class="form-label">Tên Danh Mục</label>
+              <input type="text" class="form-control" id="categoryName" name="categoryName" [(ngModel)]="categoryName"
+                required />
+            </div>
+            <!-- Add more fields as necessary -->
+            <button type="submit" class="btn btn-primary" (click)="addCategory()">Thêm</button>
+          </form>
+          <div *ngIf="successMessage" class="alert alert-success mt-3">
+            {{ successMessage }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
