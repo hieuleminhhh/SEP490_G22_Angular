@@ -8,6 +8,7 @@ import { NotificationService } from "../../../../service/notification.service";
 import { CurrencyFormatPipe } from "../../../common/material/currencyFormat/currencyFormat.component";
 import { HeaderOrderStaffComponent } from "../../ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 import { SidebarOrderComponent } from "../../SidebarOrder/SidebarOrder.component";
+import { Title } from "@angular/platform-browser";
 
 @Component({
   selector: 'app-refund',
@@ -37,9 +38,10 @@ export class RefundComponent implements OnInit {
   private reservationQueue: any[] = [];
   private socket!: WebSocket;
 
-  constructor(private invoiceService: InvoiceService, private notificationService: NotificationService, private cookingService: CookingService, private exportService: ExportService) { }
+  constructor(private invoiceService: InvoiceService, private notificationService: NotificationService, private cookingService: CookingService, private exportService: ExportService, private titleService: Title) { }
   @ViewChild('collectAllModal') collectAllModal!: ElementRef;
   ngOnInit() {
+    this.titleService.setTitle('Đơn hoàn tiền | Eating House');
     this.getOrdersCancel();
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;

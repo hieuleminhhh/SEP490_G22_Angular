@@ -95,7 +95,7 @@
                       data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">
                       Chi tiết
                     </button>
-                    <button *ngIf="(order.paymentStatus === 0 || order.paymentStatus === 2) && order.status === 3"
+                    <button *ngIf="(order.paymentStatus === 0 || order.paymentStatus === 2) && order.status === 3 && account?.role === 'OrderStaff'"
                       type="button" class="btn btn-warning btn-sm" (click)="updateOrder(order.orderId)">
                       Cập nhật
                     </button>

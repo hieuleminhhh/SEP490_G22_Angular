@@ -20,6 +20,7 @@ import { SettingService } from '../../../service/setting.service';
 import { NotificationService } from '../../../service/notification.service';
 import { DataService } from '../../../service/dataservice.service';
 import { PaymentService } from '../../../service/payment.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-ManagerOrder',
@@ -92,10 +93,12 @@ export class ManagerOrderComponent implements OnInit {
     private invoiceService: InvoiceService,
     private accountService: AccountService,
     private settingService: SettingService, private notificationService: NotificationService,
-    private dataService: DataService, private paymentService: PaymentService
+    private dataService: DataService, private paymentService: PaymentService,
+    private titleService: Title
   ) { }
 
   ngOnInit() {
+    this.titleService.setTitle('Quản lý đơn hàng | Eating House');
     this.setDefaultDates();
     this.selectedType = 0;
     this.loadListOrder();
