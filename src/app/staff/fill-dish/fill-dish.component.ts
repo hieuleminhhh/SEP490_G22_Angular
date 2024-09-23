@@ -9,6 +9,7 @@ import { DateFormatPipe } from '../../common/material/dateFormat/dateFormat.comp
 import { AccountService } from '../../../service/account.service';
 import { SidebarOrderComponent } from "../SidebarOrder/SidebarOrder.component";
 import { NotificationService } from '../../../service/notification.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-fill-dish',
@@ -35,9 +36,11 @@ export class FillDishComponent implements OnInit {
   isPrinted: boolean = false;
   private socket!: WebSocket;
   private reservationQueue: any[] = [];
-  constructor(private cookingService: CookingService, private notificationService: NotificationService, private accountService: AccountService) { }
+  constructor(private cookingService: CookingService, private notificationService: NotificationService, private accountService: AccountService,  private titleService: Title) { }
 
   ngOnInit(): void {
+    this.titleService.setTitle('Lên món | Eating House');
+
     this.getCompletedDishesFromLocalStorage();
     this.getOrdersTakeaway();
     this.getShipStaff();

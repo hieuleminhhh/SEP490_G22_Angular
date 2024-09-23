@@ -25,6 +25,7 @@ import { CheckoutService } from '../../../../service/checkout.service';
 import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
 import { SettingService } from '../../../../service/setting.service';
 import { NotificationService } from '../../../../service/notification.service';
+import { Title } from '@angular/platform-browser';
 @Component({
   selector: 'app-CreateOnlineOrder',
   templateUrl: './CreateOnlineOrder.component.html',
@@ -36,7 +37,7 @@ export class CreateOnlineOrderComponent implements OnInit {
 
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService: ManagerOrderService,
     private invoiceService: InvoiceService, private dialog: MatDialog, private renderer: Renderer2, private discountService: DiscountService, private checkoutService: CheckoutService,
-    private settingService: SettingService,private notificationService: NotificationService) {
+    private settingService: SettingService,private notificationService: NotificationService, private titleService: Title) {
     const today = new Date();
     this.date = this.formatDate(today);
     this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
@@ -112,6 +113,7 @@ export class CreateOnlineOrderComponent implements OnInit {
   private reservationQueue: any[] = [];
   @ViewChild('paymentModal') paymentModal!: ElementRef;
   ngOnInit() {
+    this.titleService.setTitle('Tạo đơn | Eating House');
     this.loadListDishes();
     this.loadListCombo();
     const today = new Date();
@@ -450,7 +452,8 @@ clearErrorMessageAfterTimeout() {
       discountId: this.selectedDiscount,
       taxcode: 'ABCD',
       paymentStatus: 0,
-      accountId: this.accountId
+      accountId: this.accountId,
+      type: 2
     };
 
     console.log(this.addNew);

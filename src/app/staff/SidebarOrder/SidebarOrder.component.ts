@@ -13,7 +13,8 @@ import { AccountService } from '../../../service/account.service';
   imports: [CommonModule, FormsModule, RouterModule]
 })
 export class SidebarOrderComponent implements OnInit {
-  isMenuCollapsed: boolean = false;
+  isMenuCollapsedOrderStaff: boolean = false;
+  isMenuCollapsedCashier: boolean = false;
   accountId: number | null = null;
 
   constructor(private router: Router, private accountService: AccountService) { }
@@ -30,16 +31,29 @@ export class SidebarOrderComponent implements OnInit {
   ngAfterViewInit() {
     feather.replace();
   }
-  toggleOrderMenu() {
-    this.isMenuCollapsed = !this.isMenuCollapsed; // Toggle the order menu
+  toggleOrderMenuOrderStaff() {
+    this.isMenuCollapsedOrderStaff = !this.isMenuCollapsedOrderStaff; // Toggle the order menu
   }
-  openOrderMenu() {
-    this.isMenuCollapsed = true; // Ensure the order menu is open
+  toggleOrderMenuCashier() {
+    this.isMenuCollapsedCashier = !this.isMenuCollapsedCashier; // Toggle the order menu
+  }
+  openOrderMenuOrderStaff() {
+    this.isMenuCollapsedOrderStaff = true; // Ensure the order menu is open
+  }
+  openOrderMenuCashier() {
+    this.isMenuCollapsedCashier = true; // Ensure the order menu is open
   }
 
-  isOrderMenuActive(): boolean {
+  isOrderMenuActiveOrderStaff(): boolean {
     const currentUrl = this.router.url;
-    return this.isMenuCollapsed || // Kiểm tra trạng thái của menu
+    return this.isMenuCollapsedOrderStaff || // Kiểm tra trạng thái của menu
+           currentUrl.includes('/listTable') ||
+           currentUrl.includes('/createTakeaway') ||
+           currentUrl.includes('/createOnline')
+  }
+  isOrderMenuActiveOrderCashier(): boolean {
+    const currentUrl = this.router.url;
+    return this.isMenuCollapsedCashier || // Kiểm tra trạng thái của menu
            currentUrl.includes('/listTable') ||
            currentUrl.includes('/createTakeaway') ||
            currentUrl.includes('/createOnline') || 
@@ -72,8 +86,5 @@ export class SidebarOrderComponent implements OnInit {
     return this.tableManagementMenuActive;
   }
 
-  toggleDishMenu() {
-    this.isMenuCollapsed = true; // Open "Bán hàng" menu when "Lên món" is clicked
-  }
   
 }
