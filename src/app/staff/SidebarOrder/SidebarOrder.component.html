@@ -97,16 +97,16 @@
   <li class="nav-item mb-3" *ngIf="account?.role === 'OrderStaff'">
     <a class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse"
       href="#tableManagementMenu" role="button" aria-expanded="false" aria-controls="tableManagementMenu"
-      (click)="toggleTableManagementMenu()" [ngClass]="{'active': isTableManagementMenuActive()}">
+      (click)="toggleTableManagementMenu()" [ngClass]="{'active': isOrderMenuActiveOrderStaffBooking()}">
       <span class="d-flex align-items-center">
         <i class="fas fa-chair me-2"></i> <!-- Font Awesome icon for table management -->
         Đặt bàn
       </span>
       <i class="fas"
-        [ngClass]="{'fa-chevron-up': isTableManagementMenuActive(), 'fa-chevron-down': !isTableManagementMenuActive()}"></i>
+        [ngClass]="{'fa-chevron-up': isOrderMenuActiveOrderStaffBooking(), 'fa-chevron-down': !isOrderMenuActiveOrderStaffBooking()}"></i>
       <!-- Toggle icon -->
     </a>
-    <div class="collapse mt-2" id="tableManagementMenu" [ngClass]="{'show': isTableManagementMenuActive()}">
+    <div class="collapse mt-2" id="tableManagementMenu" [ngClass]="{'show': isOrderMenuActiveOrderStaffBooking()}">
       <ul class="nav flex-column ms-3">
         <li class="nav-item mb-3">
           <a class="nav-link d-flex align-items-center" [routerLink]="['/tableManagement']"
