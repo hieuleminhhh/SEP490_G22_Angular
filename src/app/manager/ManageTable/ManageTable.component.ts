@@ -11,6 +11,7 @@ import { HeaderComponent } from '../Header/Header.component';
 import { SideBarComponent } from '../SideBar/SideBar.component';
 import { Table } from '../../../models/table.model';
 import { TableService } from '../../../service/table.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-ManageTable',
@@ -58,9 +59,10 @@ export class ManageTableComponent implements OnInit {
   @ViewChild('editFloorModal') editFloorModal!: ElementRef;
   @ViewChild('confirmDeleteFloorModal') confirmDeleteFloorModal!: ElementRef;
 
-  constructor(private tableService: TableService) { }
+  constructor(private tableService: TableService, private titleService: Title) { }
 
   ngOnInit(): void {
+    this.titleService.setTitle('Quản lý phòng/bàn | Eating House');
     this.getTableData();
   }
 

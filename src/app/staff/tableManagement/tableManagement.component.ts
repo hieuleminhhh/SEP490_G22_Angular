@@ -19,6 +19,7 @@ import { Dish } from '../../../models/dish.model';
 import { CheckoutService } from '../../../service/checkout.service';
 import { MenuComponent } from '../../common/menu/menu.component';
 import { SidebarOrderComponent } from '../SidebarOrder/SidebarOrder.component';
+import { Title } from '@angular/platform-browser';
 
 
 @Component({
@@ -121,7 +122,8 @@ export class TableManagementComponent implements OnInit {
   dateTime: any;
   constructor(private tableService: TableService, private dialog: MatDialog, private reservationService: ReservationService,
     private router: Router, private checkoutService: CheckoutService,
-    private route: ActivatedRoute, private notificationService: NotificationService, private accountService: AccountService) {
+    private route: ActivatedRoute, private notificationService: NotificationService, private accountService: AccountService,
+    private titleService: Title) {
     const today = new Date();
     this.dateFrom = this.formatDate(today);
     this.dateTo = this.formatDate(today);
@@ -144,6 +146,7 @@ export class TableManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.titleService.setTitle('Đăt bàn | Eating House');
     this.route.queryParams.subscribe(params => {
       this.currentView = params['section'] || 'table-layout'; // Default section
     });

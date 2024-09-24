@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HeaderOrderStaffComponent } from '../../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component';
 import { SideBarComponent } from '../../SideBar/SideBar.component';
 import { CategoryService } from '../../../../service/category.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-ManageCategory',
@@ -17,9 +18,10 @@ export class ManageCategoryComponent implements OnInit {
   categories: any;
   categoryName: string = '';
   successMessage: string = '';
-  constructor(private categoryService: CategoryService) { }
+  constructor(private categoryService: CategoryService, private titleService: Title) { }
 
   ngOnInit() {
+    this.titleService.setTitle('Quản lý thể loại | Eating House');
     this.getAllCategories();
   }
   getAllCategories() {

@@ -4,6 +4,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { DiscountService } from '../../../service/discount.service';
 import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 import { SideBarComponent } from "../SideBar/SideBar.component";
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-manage-discount',
@@ -49,9 +50,10 @@ export class ManageDiscountComponent implements OnInit {
   itemsPerPage = 10; // Số bản ghi trên mỗi trang
   totalItems = 0; // Tổng số bản ghi
 
-  constructor(private discountService: DiscountService) { }
+  constructor(private discountService: DiscountService, private titleService: Title) { }
 
   ngOnInit(): void {
+    this.titleService.setTitle('Quản lý giảm giá | Eating House');
     this.getListDiscount();
     const today = new Date();
     this.dateNow = this.formatDate(today);

@@ -28,7 +28,7 @@
               <div class="table-layout-buttons">
                 <button *ngFor="let floor of getFloors()" (click)="getTableOFFloor(floor)"
                   [class.active]="selectedFloor === floor" class="floor-button">
-                   {{ floor }}
+                  {{ floor }}
                 </button>
               </div>
             </div>
@@ -43,12 +43,36 @@
                     <i class="fas fa-chair"></i>{{ table.capacity }}
                   </div>
                   <div class="table-check" *ngIf="table.status === 1">&#10004;</div>
+                  <span class="calendar-icon" *ngIf="table.tableReservations.length > 0"
+                    (click)="openModalSchedule(table.tableReservations, $event)">
+                    <i class="fas fa-calendar-alt"></i>
+                  </span>
+
                 </div>
               </div>
             </div>
           </div>
         </section>
       </main>
+    </div>
+  </div>
+  <div class="reservation-modal-detail" *ngIf="isModalVisibles">
+    <div class="modal-content-detail">
+      <span class="close-detail" (click)="closeModal()">&times;</span>
+      <h2>Thông tin đặt bàn</h2><br>
+      <div *ngIf="selectedReservations.length > 0; else noReservations">
+        <ul class="reservation-list">
+          <li *ngFor="let reservation of selectedReservations" class="reservation-item">
+            <p><strong>Khách hàng:</strong> {{ reservation?.consigneeName }}</p>
+            <p><strong>Thời gian nhận bàn:</strong> {{ reservation?.reservationTime | date:'dd/MM/yyyy - HH:mm' }}</p>
+            <p><strong>Số lượng khách:</strong> {{ reservation?.guestNumber }}</p>
+            <hr />
+          </li>
+        </ul>
+      </div>
+      <ng-template #noReservations>
+        <p>No reservations found.</p>
+      </ng-template>
     </div>
   </div>
 </body>
