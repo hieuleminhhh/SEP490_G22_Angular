@@ -1200,9 +1200,9 @@ export class TableManagementComponent implements OnInit {
   lastSentMessageId: any;
   makeReservation(reservationData: any) {
     this.lastSentMessageId = Date.now();
-    const body={
-      lastSentMessageId:this.lastSentMessageId,
-      reservationData:reservationData
+    const body = {
+      lastSentMessageId: this.lastSentMessageId,
+      reservationData: reservationData
     }
     const message = JSON.stringify(body);
     if (this.socket.readyState === WebSocket.OPEN) {
@@ -1246,7 +1246,6 @@ export class TableManagementComponent implements OnInit {
     this.formSubmitted = true;
     if (form.valid) {
       let dateTime = this.formatDateTime(this.reservation.date, this.reservation.time);
-
       const request = {
         accountId: this.accountId,
         guestPhone: this.guestPhone,
@@ -1326,8 +1325,16 @@ export class TableManagementComponent implements OnInit {
   closeConfirmModal() {
     this.isConfirmModalOpen = false;
   }
-
+  errorTime: string = '';
   checkAvailability() {
+    console.log(this.reservation.time);
+    if (this.reservation.time.trim() === '') {
+      this.errorTime = 'Vui lòng chọn giờ ăn!';
+      setTimeout(() => {
+        this.errorTime = '';
+      }, 3000);
+      return;
+    }
     this.dateTime = this.formatDateTime(this.reservation.date, this.reservation.time);
     console.log(this.dateTime, this.reservation.people);
 
@@ -1373,6 +1380,7 @@ export class TableManagementComponent implements OnInit {
 
     return formattedDateTime;
   }
+  reset:boolean=true;
   createReservation() {
     const today = new Date();
     this.reservationService.createResevetion(this.currentRequest).subscribe({
@@ -1409,6 +1417,7 @@ export class TableManagementComponent implements OnInit {
           people: 2,
           notes: ''
         };
+        this.reset=false;
         this.updateTimes();
         this.showPersonalInfo = false;
         this.selectedFloor = this.dataTable[0].floor;
@@ -1416,7 +1425,7 @@ export class TableManagementComponent implements OnInit {
         this.ishas = false;
         this.totalCapacity = 0;
         this.getReservationData();
-        this.updateTimes();
+        this.addSuccessMessage('Tạo đơn đặt bàn thành công');
       },
       error: error => {
         if (error.error instanceof ErrorEvent) {
