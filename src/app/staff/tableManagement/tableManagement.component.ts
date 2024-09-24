@@ -168,7 +168,7 @@ export class TableManagementComponent implements OnInit {
     };
     this.socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (data.lastSentMessageId === this.lastSentMessageId) {
+      if (data.lastSentMessageId &&data.lastSentMessageId === this.lastSentMessageId) {
         console.log('Ignoring message from our own request:', data);
         return;
       }
@@ -179,12 +179,7 @@ export class TableManagementComponent implements OnInit {
         console.error('Error parsing reservation data:', error);
       }
     };
-    this.socket.onclose = () => {
-      console.log('WebSocket connection closed');
-    };
-    this.socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+
     this.route.queryParams.subscribe(params => {
       this.selectedSection = params['section'] || 'table-layout';
       this.setView(this.selectedSection);
@@ -201,7 +196,22 @@ export class TableManagementComponent implements OnInit {
         this.getReservationList();
       }
     });
-
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed, attempting to reconnect...');
+      setTimeout(() => {
+        this.initializeWebSocket();
+      }, 5000);
+    };
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+  }
+  initializeWebSocket() {
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => { /* xử lý onopen */ };
+    this.socket.onmessage = (event) => { /* xử lý onmessage */ };
+    this.socket.onclose = () => { /* xử lý onclose */ };
+    this.socket.onerror = (error) => { /* xử lý onerror */ };
   }
   generateAvailableHours() {
     this.availableHours = [];
@@ -490,9 +500,11 @@ export class TableManagementComponent implements OnInit {
   accountGuestId: any;
   openAcceptModal(reservation: any): void {
     this.detailRes = reservation;
+    console.log(reservation.accountId);
+
     this.currentReservationId = reservation.reservationId;
     this.orderOfReserId = reservation?.order?.orderId;
-    this.accountGuestId = reservation?.accountGuestId;
+    this.accountGuestId = reservation?.accountId;
     this.showAcceptModal = true;
   }
 

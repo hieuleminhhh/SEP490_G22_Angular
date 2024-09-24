@@ -23,6 +23,8 @@ export class NotificationComponent implements OnInit {
   selectedNotification: any;
   showModal: boolean = false;
   count: any;
+  private socket!: WebSocket;
+  private reservationQueue: any[] = [];
 
   ngOnInit(): void {
     const accountIdString = localStorage.getItem('accountId');
@@ -38,6 +40,36 @@ export class NotificationComponent implements OnInit {
         this.getNotificationById(id); // Gọi lại getNotificationById với accountId nhận được
       }
     });
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => {
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift());
+      }
+    };
+    this.socket.onmessage = (event) => {
+      const reservation = JSON.parse(event.data);
+      try {
+        this.getNotificationById(this.accountId);
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
+      }
+    };
+    this.socket.onclose = () => {
+      console.log('WebSocket connection closed, attempting to reconnect...');
+      setTimeout(() => {
+        this.initializeWebSocket(); // Hàm khởi tạo WebSocket
+      }, 5000); // Thử lại sau 5 giây
+    };
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+  }
+  initializeWebSocket() {
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => { /* xử lý onopen */ };
+    this.socket.onmessage = (event) => { /* xử lý onmessage */ };
+    this.socket.onclose = () => { /* xử lý onclose */ };
+    this.socket.onerror = (error) => { /* xử lý onerror */ };
   }
   goBack() {
     this.location.back();

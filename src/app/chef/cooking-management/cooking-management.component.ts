@@ -39,31 +39,34 @@ export class CookingManagementComponent implements OnInit {
     this.socket.onopen = () => {
       while (this.reservationQueue.length > 0) {
         this.socket.send(this.reservationQueue.shift());
-        this.isSending = true;
       }
     };
     this.socket.onmessage = (event) => {
-      if (this.isSending) {
-        const data = JSON.parse(event.data);
-        console.log(data);
-        try {
-          this.getOrders('Current');
-          window.location.reload();
-        } catch (error) {
-          console.error('Error parsing reservation data:', error);
-        }
-        this.isSending = false;
-        return;
+      const data = JSON.parse(event.data);
+      console.log(data);
+      try {
+        this.getOrders('Current');
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
       }
     };
     this.socket.onclose = () => {
-      console.log('WebSocket connection closed');
+      console.log('WebSocket connection closed, attempting to reconnect...');
+      setTimeout(() => {
+        this.initializeWebSocket(); // Hàm khởi tạo WebSocket
+      }, 5000); // Thử lại sau 5 giây
     };
     this.socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
   }
-
+  initializeWebSocket() {
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => { /* xử lý onopen */ };
+    this.socket.onmessage = (event) => { /* xử lý onmessage */ };
+    this.socket.onclose = () => { /* xử lý onclose */ };
+    this.socket.onerror = (error) => { /* xử lý onerror */ };
+  }
   setView(view: string) {
     this.currentView = view;
   }

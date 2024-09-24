@@ -61,9 +61,21 @@ export class HeaderOrderStaffComponent implements OnInit {
       }
     };
     this.socket.onclose = () => {
+      console.log('WebSocket connection closed, attempting to reconnect...');
+      setTimeout(() => {
+        this.initializeWebSocket(); // Hàm khởi tạo WebSocket
+      }, 5000); // Thử lại sau 5 giây
     };
     this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
     };
+  }
+  initializeWebSocket() {
+    this.socket = new WebSocket('ws://yourserver.com');
+    this.socket.onopen = () => { /* xử lý onopen */ };
+    this.socket.onmessage = (event) => { /* xử lý onmessage */ };
+    this.socket.onclose = () => { /* xử lý onclose */ };
+    this.socket.onerror = (error) => { /* xử lý onerror */ };
   }
   setActiveTab(tab: string) {
     this.activeTab = tab;
@@ -117,7 +129,7 @@ export class HeaderOrderStaffComponent implements OnInit {
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
   }
-  
+
   changeProfile() {
     if (this.accountId) {
       this.accountService.changeProfile(this.accountId, this.account).subscribe({
