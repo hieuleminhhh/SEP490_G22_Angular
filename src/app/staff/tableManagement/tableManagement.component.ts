@@ -146,19 +146,11 @@ export class TableManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.titleService.setTitle('Đăt bàn | Eating House');
-    this.route.queryParams.subscribe(params => {
-      this.currentView = params['section'] || 'table-layout'; // Default section
-    });
-
     this.getTableData();
     this.searchTermSubject.pipe(debounceTime(300)).subscribe(searchTerm => {
       this.getSearchList();
     });
-    console.log(this.availableHours);
-
     this.updateTimes();
-
     this.cartSubscription = this.reservationService.getCart().subscribe(cartItems => {
       this.cartItems = cartItems;
       this.calculateItemQuantity();
@@ -170,10 +162,16 @@ export class TableManagementComponent implements OnInit {
     }
     this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => {
-      console.log('WebSocket connection opened');
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift());
+      }
     };
     this.socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      if (data.lastSentMessageId === this.lastSentMessageId) {
+        console.log('Ignoring message from our own request:', data);
+        return;
+      }
       try {
         this.getReservation();
         this.addSuccessMessage(data);
@@ -190,10 +188,18 @@ export class TableManagementComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.selectedSection = params['section'] || 'table-layout';
       this.setView(this.selectedSection);
-      this.getReservation();
-      this.getTableData();
-      this.getReservationData();
-      this.getReservationList();
+      if (this.selectedSection === 'table-layout') {
+        this.getTableData();
+      }
+      if (this.selectedSection === 'booking-request') {
+        this.getReservation();
+      }
+      if (this.selectedSection === 'booking-schedule') {
+        this.getReservationData();
+      }
+      if (this.selectedSection === 'booking-history') {
+        this.getReservationList();
+      }
     });
 
   }
@@ -514,7 +520,7 @@ export class TableManagementComponent implements OnInit {
   getReservationId(id: any) {
     this.reservationService.getReservation(id).subscribe(
       response => {
-        this.updateOrderStatus(response.data.order.orderId);
+        this.updateOrderStatus(response.data?.order?.orderId);
       },
       error => {
         console.error('Error fetching invoice:', error);
@@ -538,6 +544,8 @@ export class TableManagementComponent implements OnInit {
 
   openPopup(reserId: number, time: any, tableOfReservation: any) {
     this.reservationTimeSelected = time;
+    console.log(this.showPersonalInfo);
+
     const modal = document.getElementById('updateTimeModal');
     if (modal) {
       modal.classList.add('show');
@@ -589,6 +597,11 @@ export class TableManagementComponent implements OnInit {
   }
   validMessage: string = '';
   openConfirmSaveModal() {
+    const modal = document.getElementById('updateTimeModal');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
     if (this.ishas === true) {
       const confirmModal = document.getElementById('confirmSaveModal');
       if (confirmModal) {
@@ -611,7 +624,11 @@ export class TableManagementComponent implements OnInit {
       confirmModal.classList.remove('show');
       confirmModal.style.display = 'none';
     }
-
+    const modal = document.getElementById('updateTimeModal');
+    if (modal) {
+      modal.classList.add('show');
+      modal.style.display = 'block';
+    }
   }
 
   confirmSave() {
@@ -829,9 +846,7 @@ export class TableManagementComponent implements OnInit {
                   }
                 }
               );
-              this.getTableData();
               this.getReservation();
-              this.getReservationData();
             },
             error => {
               console.error('Lỗi khi cập nhật trạng thái:', error);
@@ -1182,10 +1197,16 @@ export class TableManagementComponent implements OnInit {
       }
     );
   }
+  lastSentMessageId: any;
   makeReservation(reservationData: any) {
-    const message = JSON.stringify(reservationData);
+    this.lastSentMessageId = Date.now();
+    const body={
+      lastSentMessageId:this.lastSentMessageId,
+      reservationData:reservationData
+    }
+    const message = JSON.stringify(body);
     if (this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(message); // Gửi yêu cầu đặt bàn khi WebSocket đã mở
+      this.socket.send(message);
     } else if (this.socket.readyState === WebSocket.CONNECTING) {
       this.reservationQueue.push(message);
     } else {
@@ -1428,6 +1449,7 @@ export class TableManagementComponent implements OnInit {
       modal.classList.remove('show');
       modal.style.display = 'none';
     }
+    this.showPersonalInfo = false;
   }
 
   openMenuPopup(): void {

@@ -25,7 +25,7 @@
   </aside> -->
   <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar" style="padding: 12px;">
     <app-SidebarOrder></app-SidebarOrder>
-</nav>
+  </nav>
 
   <main class="main-content">
     <header>
@@ -426,7 +426,7 @@
                         bàn</a>
                       <a *ngIf="reservation.tableOfReservation.length>0"
                         (click)="getReservationById(reservation.reservationId)">Chi tiết</a>
-                      <a (click)="openCancelModal(reservation.reservationId)">Hủy đặt bàn</a>
+                      <a (click)="openCancelModal(reservation)">Hủy đặt bàn</a>
                     </div>
                   </div>
                 </div>
@@ -488,7 +488,7 @@
 
       <!-- Confirm Save Modal -->
       <div class="modal fade" id="confirmSaveModal" tabindex="-1" role="dialog" aria-labelledby="confirmSaveModalLabel"
-        aria-hidden="true">
+        >
         <div class="modal-dialog" role="document">
           <div class="modal-content" style="width: 110%;margin: 60% 110%;">
             <div class="modal-header">
@@ -598,9 +598,11 @@
           <div class="modal-footer">
             <button type="button" style="background-color: red;" class="btn btn-secondary"
               (click)="closePopup()">Đóng</button>
-            <button *ngIf="!showPersonalInfo" type="button" class="btn btn-primary" (click)="openConfirmSaveModal()">Lưu
+            <button *ngIf="showPersonalInfo === false" type="button" class="btn btn-primary"
+              (click)="openConfirmSaveModal()">Lưu
               thay đổi</button>
-            <button *ngIf="showPersonalInfo" type="button" class="btn btn-primary" (click)="closeTableAssignPopup()">Lưu
+            <button *ngIf="showPersonalInfo===true" type="button" class="btn btn-primary"
+              (click)="closeTableAssignPopup()">Lưu
               thay đổi</button>
           </div>
         </div>
