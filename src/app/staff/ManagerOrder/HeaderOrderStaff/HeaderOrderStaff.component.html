@@ -9,6 +9,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
+
         <li *ngIf="accountId" (mouseenter)="showNotifications = true" (mouseleave)="showNotifications = false"
           class="dropdown">
           <a routerLink="/notification" routerLinkActive="active" class="cart-link-noti">
@@ -24,9 +25,45 @@
                 </div>
               </li>
             </ul>
-            <a  class="view-all-btn" (click)="viewDetails()">Xem tất cả</a>
+            <a class="view-all-btn" (click)="viewDetails()">Xem tất cả</a>
           </div>
         </li>
+
+
+        <!-- <li *ngIf="role===2" (mouseenter)="showNotifications = true" (mouseleave)="showNotifications = false"
+          class="dropdown">
+          <a routerLink="/notification" routerLinkActive="active" class="cart-link-noti">
+            <span class="item-count-noti" [ngClass]="{'active': itemCountNoti > 0}"></span>
+            <i class='far fa-bell noti-icon'></i>
+          </a>
+          <div class="dropdown-menu notifications-menu" [class.show]="showNotifications && notifications.length > 0">
+            <div class="notification-tabs">
+              <button [ngClass]="{'active-tab': activeTab === 'kitchen'}" (click)="setActiveTab('kitchen')">Từ
+                Bếp</button>
+              <button [ngClass]="{'active-tab': activeTab === 'customer'}" (click)="setActiveTab('customer')">Từ
+                Khách</button>
+            </div>
+            <ul class="notification-list" *ngIf="activeTab === 'kitchen'">
+              <li *ngFor="let notification of kitchenNotifications | slice:0:5" class="notification-item">
+                <div class="notification-content" (click)="viewDetails()">
+                  <p class="notification-description">{{ notification.description }}</p>
+                  <span class="notification-time">{{ notification.time | date:'dd/MM/yyyy - HH:mm' }}</span>
+                </div>
+              </li>
+            </ul>
+            <ul class="notification-list" *ngIf="activeTab === 'customer'">
+              <li *ngFor="let notification of customerNotifications | slice:0:5" class="notification-item">
+                <div class="notification-content" (click)="viewDetails()">
+                  <p class="notification-description">{{ notification.description }}</p>
+                  <span class="notification-time">{{ notification.time | date:'dd/MM/yyyy - HH:mm' }}</span>
+                </div>
+              </li>
+            </ul>
+
+            <a class="view-all-btn" (click)="viewDetails()">Xem tất cả</a>
+          </div>
+        </li> -->
+
         <li class="nav-item">
           <a class="nav-link logout-link" (click)="logout()">
             <i class="fas fa-sign-out-alt"></i> Đăng xuất
@@ -36,16 +73,15 @@
       <div class="user-info d-flex align-items-center ms-3" id="utk">
         <i class="fas fa-user-circle user-avatar" (click)="toggleDropdown()"></i>
         <span class="user-name ms-2" (click)="toggleDropdown()">{{account?.username}}</span>
-        <div class="dropdown-menu-container">
-          <ul class="dropdown-menu" [class.show]="dropdownOpen">
-            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">Xem thông tin</a></li>
-            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Đổi mật khẩu</a>
-            </li>
-          </ul>
-        </div>
+
+        <ul class="dropdown-menu" [class.show]="dropdownOpen">
+          <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">Xem thông tin</a></li>
+          <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Đổi mật khẩu</a>
+          </li>
+        </ul>
+
       </div>
     </div>
-
   </div>
 </header>
 <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">

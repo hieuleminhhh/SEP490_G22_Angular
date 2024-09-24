@@ -18,7 +18,7 @@ export class HeaderOrderStaffComponent implements OnInit {
   accountId: any;
   constructor(private router: Router,
     private route: ActivatedRoute, private accountService: AccountService,
-     private settingService: SettingService, private notificationService: NotificationService) { }
+    private settingService: SettingService, private notificationService: NotificationService) { }
   account: any = {};
   dropdownOpen = false;
   currentPassword: string = '';
@@ -33,6 +33,11 @@ export class HeaderOrderStaffComponent implements OnInit {
   notifications: any[] = [];
   itemCountNoti: number = 0;
   private socket!: WebSocket;
+
+  activeTab: string = 'kitchen';
+  kitchenNotifications: any[] = [];
+  customerNotifications: any[] = []; // Filtered customer notifications
+  role:any;
 
   ngOnInit() {
     const accountIdString = localStorage.getItem('accountId');
@@ -60,12 +65,21 @@ export class HeaderOrderStaffComponent implements OnInit {
     this.socket.onerror = (error) => {
     };
   }
+  setActiveTab(tab: string) {
+    this.activeTab = tab;
+  }
+  filterNotifications() {
+    // Assuming each notification has a 'type' property to distinguish the origin
+    this.kitchenNotifications = this.notifications.filter(noti => noti.type === 'kitchen');
+    this.customerNotifications = this.notifications.filter(noti => noti.type === 'customer');
+  }
   viewDetails() {
     window.location.href = '/notification';
   }
   getNotificationByType(accountId: number): void {
     this.notificationService.getType(accountId).subscribe(
       response => {
+        this.role=response;
         this.notificationService.getNotificationByType(response).subscribe(
           response => {
             this.notifications = response.filter((notification: { isView: boolean; }) => notification.isView === false);
@@ -164,7 +178,7 @@ export class HeaderOrderStaffComponent implements OnInit {
         this.settings = response;
         console.log(response);
         this.logoUrl = this.settings[0].logo;
-        console.log('URL Logo',this.logoUrl);
+        console.log('URL Logo', this.logoUrl);
       },
       error => {
         console.error('Error:', error);
