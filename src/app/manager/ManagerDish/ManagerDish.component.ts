@@ -12,6 +12,7 @@ import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderS
 import { SidebarAdminComponent } from "../../admin/SidebarAdmin/SidebarAdmin.component";
 import { JwtInterceptor } from '../../../jwt.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { Title } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-ManagerDish',
@@ -73,9 +74,10 @@ export class ManagerDishComponent implements OnInit {
     imageError: '',
     categoryError: '',
   };
-  constructor(@Inject(ManagerDishService) private dishService: ManagerDishService, private cdr: ChangeDetectorRef) { }
+  constructor(@Inject(ManagerDishService) private dishService: ManagerDishService, private cdr: ChangeDetectorRef,  private titleService: Title) { }
 
   ngOnInit(): void {
+    this.titleService.setTitle('Quản lý món ăn | Eating House');
     this.loadListDishes();
     this.loadCategories();
     this.loadListDisheSetting();

@@ -142,6 +142,142 @@ body.sidebar-visible main {
   font-family: 'Arial', sans-serif; /* Ensure options use the same font */
   font-size: 1rem; /* Ensure options have consistent font size */
 }
+.calendar-icon {
+  position: absolute;
+  /* Position the icon absolutely */
+  bottom: -2px;
+  /* Adjust this value to move it up or down */
+  left: 5px;
+  /* Adjust this value to move it left or right */
+  font-size: 18px;
+  /* Adjust the size of the icon as needed */
+  color: blue;
+  /* Change the color as needed */
+}
 
+.reservation-modal-detail {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  /* Darker background for better visibility */
+}
 
+.modal-content-detail {
+  background-color: #ffffff;
+  /* White background for the modal */
+  padding: 30px;
+  /* Added padding for better spacing */
+  border-radius: 10px;
+  /* Rounded corners */
+  width: 90%;
+  /* Full width with a max width */
+  max-width: 600px;
+  /* Max width */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  /* Soft shadow for depth */
+}
 
+.close-detail {
+  cursor: pointer;
+  float: right;
+  font-size: 24px;
+  /* Larger close button */
+  color: #ff0000;
+  /* Red color for the close button */
+}
+
+.reservation-list {
+  list-style-type: none;
+  /* Remove default list styling */
+  padding: 0;
+  /* Remove padding */
+}
+
+.reservation-item {
+  margin-bottom: 15px;
+  /* Space between items */
+}
+
+.reservation-item p {
+  margin: 5px 0;
+  /* Margin between paragraphs */
+}
+
+.reservation-item hr {
+  margin-top: 10px;
+  /* Space above the horizontal line */
+  border: 0;
+  /* Remove default border */
+  height: 1px;
+  /* Set height of the line */
+  background-color: #ccc;
+  /* Light gray color for the line */
+}
+
+.reservation-detail {
+  background-color: #f9f9f9;
+  /* Màu nền nhẹ */
+  border-radius: 8px;
+  /* Bo góc */
+  padding: 15px;
+  /* Khoảng cách bên trong */
+  margin: 10px 0;
+  /* Khoảng cách phía trên và dưới */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  /* Đổ bóng nhẹ */
+}
+
+.reservation-detail p {
+  margin: 5px 0;
+  /* Khoảng cách giữa các đoạn văn */
+  font-size: 16px;
+  /* Kích thước chữ */
+  line-height: 1.5;
+  /* Khoảng cách dòng */
+  color: #333;
+  /* Màu chữ */
+  text-align: left;
+  /* Canh lề bên trái */
+  padding-left: 0;
+  /* Đảm bảo không có khoảng cách bên trái */
+}
+
+.reservation-detail strong {
+  color: #007bff;
+  /* Màu chữ đậm cho tiêu đề */
+}
+
+.reservation-red {
+  background-color: #ffcccc;
+  /* Màu nền đỏ nhạt */
+  border-left: 5px solid red;
+  /* Đường viền trái màu đỏ */
+}
+
+.reservation-gray {
+  background-color: #f0f0f0;
+  /* Màu nền xám nhạt */
+  border-left: 5px solid gray;
+  /* Đường viền trái màu xám */
+}
+
+.reservation {
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Đổ bóng nhẹ */
+}
+.calendar-icon {
+  cursor: pointer; /* Change cursor to pointer on hover */
+}
+.table-grid{
+  cursor: pointer;
+}

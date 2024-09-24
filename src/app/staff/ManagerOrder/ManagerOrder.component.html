@@ -95,7 +95,8 @@
                       data-bs-target="#viewOrderModal" (click)="loadListOrderDetails(order.orderId)">
                       Chi tiết
                     </button>
-                    <button *ngIf="(order.paymentStatus === 0 || order.paymentStatus === 2) && order.status === 3 && account?.role === 'OrderStaff'"
+                    <button
+                      *ngIf="(order.paymentStatus === 0 || order.paymentStatus === 2) && order.status === 3 && account?.role === 'OrderStaff'"
                       type="button" class="btn btn-warning btn-sm" (click)="updateOrder(order.orderId)">
                       Cập nhật
                     </button>
@@ -186,26 +187,30 @@
                     <span class="fw-bold">Thời gian đặt hàng:</span> {{ orderDetail.orderDate | dateFormat }}
                   </div>
                   <div class="mb-3"
-                    *ngIf="orderDetail.recevingOrder && (orderDetail?.type === 2 || orderDetail?.type === 1)">
+                    *ngIf="orderDetail.recevingOrder && (orderDetail?.type === 2 || orderDetail?.type === 1) && orderDetail?.status !== 5">
                     <span class="fw-bold">Thời gian giao hàng:</span> {{ orderDetail.recevingOrder | dateFormat }}
                   </div>
-                  <div class="mb-3" *ngIf="orderDetail?.type === 4">
+                  <div class="mb-3"
+                    *ngIf="orderDetail.cancelDate && (orderDetail?.type === 2 || orderDetail?.type === 1) && orderDetail?.status === 5">
+                    <span class="fw-bold">Thời gian hủy</span> {{ orderDetail.cancelDate| dateFormat }}
+                  </div>
+                  <div class="mb-3" *ngIf="orderDetail?.type === 4 && orderDetail?.status !== 5">
                     <span class="fw-bold">Thời gian vào:</span> {{ orderDetail.orderDate | dateFormat }}
                   </div>
-                  <div class="mb-3" *ngIf="orderDetail?.type === 3">
-                    <span class="fw-bold">Thời gian vào:</span>  {{ timeIn | dateFormat }}
+                  <div class="mb-3" *ngIf="orderDetail?.type === 3 && orderDetail?.status !== 5">
+                    <span class="fw-bold">Thời gian vào:</span> {{ timeIn | dateFormat }}
                   </div>
-                  <div class="mb-3" *ngIf="orderDetail.paymentTime && orderDetail.paymentStatus === 1 && (orderDetail?.type === 4 || orderDetail?.type === 3)">
+                  <div class="mb-3"
+                    *ngIf="orderDetail.paymentTime && orderDetail.paymentStatus === 1 && (orderDetail?.type === 4 || orderDetail?.type === 3) && orderDetail?.status !== 5">
                     <span class="fw-bold">Thời gian ra:</span> {{ orderDetail.paymentTime| dateFormat }}
                   </div>
-                  <div class="mb-3"
-                    *ngIf="orderDetail.status===8">
-                    <span class="fw-bold">Người hoàn tiền:</span> {{orderDetail.staffFirstName}} {{orderDetail.staffLastName}}
+                  <div class="mb-3" *ngIf="orderDetail.status===8">
+                    <span class="fw-bold">Người hoàn tiền:</span> {{orderDetail.staffFirstName}}
+                    {{orderDetail.staffLastName}}
                   </div>
-                  <div class="mb-3"
-                  *ngIf="orderDetail.status===8">
-                  <span class="fw-bold">Thời gian hoàn tiền:</span> {{ orderDetail.refundDate | dateFormat }}
-                </div>
+                  <div class="mb-3" *ngIf="orderDetail.status===8">
+                    <span class="fw-bold">Thời gian hoàn tiền:</span> {{ orderDetail.refundDate | dateFormat }}
+                  </div>
                   <div *ngIf="orderDetail.paymentMethods !== null && orderDetail.paymentMethods !== undefined"
                     class="mb-3">
                     <span class="fw-bold">Phương thức thanh toán: </span>
@@ -220,21 +225,31 @@
                   <!-- <div class="mb-3">
             <span class="fw-bold">Thanh toán:</span> {{ orderDetail.recevingOrder | dateFormat }}
           </div> -->
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5>Thông tin chi tiết đơn hàng</h5>
-            <div>
-              <ng-container *ngIf="orderDetail?.type === 4 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2)">
-                <button type="button" class="btn" [ngStyle]="{'background-color': '#ff6600', 'color': '#ffffff'}" (click)="printTemporaryInvoice()" *ngIf="account?.role === 'Cashier'">In hóa đơn tạm</button>
-              </ng-container>
-              
-              <!-- Final invoice button -->
-              <ng-container *ngIf="(orderDetail?.paymentStatus === 1 && (orderDetail?.type === 4 || orderDetail?.type === 3 || orderDetail?.type === 1 || orderDetail?.type === 2)) || (orderDetail?.paymentStatus === 0 && orderDetail?.type === 2)">
-                <button type="button" class="btn btn-primary me-2" (click)="printFinalInvoice()" *ngIf="account?.role === 'Cashier'">In hóa đơn</button>
-              </ng-container>
-              
-            </div>
-          </div>
-          
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5>Thông tin chi tiết đơn hàng</h5>
+                    <div>
+                      <ng-container
+                        *ngIf="orderDetail?.type === 4 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2)">
+                        <button type="button" class="btn"
+                          [ngStyle]="{'background-color': '#ff6600', 'color': '#ffffff'}"
+                          (click)="printTemporaryInvoice()" *ngIf="account?.role === 'Cashier'">In hóa đơn tạm</button>
+                      </ng-container>
+
+                      <!-- Final invoice button -->
+                      <ng-container *ngIf="((orderDetail?.paymentStatus === 1 && 
+              (orderDetail?.type === 4 || orderDetail?.type === 3 || orderDetail?.type === 1 || orderDetail?.type === 2)) || 
+              (orderDetail?.paymentStatus === 0 && orderDetail?.type === 2)) && 
+              orderDetail?.status !== 5">
+                        <button type="button" class="btn btn-primary me-2" (click)="printFinalInvoice()"
+                          *ngIf="account?.role === 'Cashier'">
+                          In hóa đơn
+                        </button>
+                      </ng-container>
+
+
+                    </div>
+                  </div>
+
                   <table class="table table-bordered table-hover">
                     <thead class="table-light">
                       <tr>
@@ -308,21 +323,26 @@
                       <!-- Second Column -->
                       <div class="col-md-6 d-flex align-items-start justify-content-end">
                         <!-- Online -->
-                        <div *ngIf=" orderDetail.deposits === 0 && orderDetail.type ===2 && orderDetail.paymentStatus===0"
+                        <div
+                          *ngIf=" orderDetail.deposits === 0 && orderDetail.type ===2 && orderDetail.paymentStatus===0"
                           class="badge bg-danger ms-auto badge-circle">Chưa thanh toán
                         </div>
-                        <div *ngIf=" orderDetail.deposits === 0 && orderDetail.type ===2 && orderDetail.paymentStatus===1"
+                        <div
+                          *ngIf=" orderDetail.deposits === 0 && orderDetail.type ===2 && orderDetail.paymentStatus===1"
                           class="badge bg-success ms-auto badge-circle">Đã thanh toán
                         </div>
                         <div *ngIf=" orderDetail.deposits > 0 && orderDetail.type ===2"
                           class="badge bg-success ms-auto badge-circle">Đã thanh toán
                         </div>
                         <!-- Mang ve -->
-                        <div *ngIf="orderDetail.type === 1 && orderDetail.status!==5" class="badge bg-success ms-auto badge-circle">Đã thanh toán
+                        <div *ngIf="orderDetail.type === 1 && orderDetail.status!==5"
+                          class="badge bg-success ms-auto badge-circle">Đã thanh toán
                         </div>
-                        <div *ngIf="orderDetail.type === 1 && orderDetail.status===5 && orderDetail.paymentStatus===0" class="badge bg-danger ms-auto badge-circle">Chưa thanh toán
+                        <div *ngIf="orderDetail.type === 1 && orderDetail.status===5 && orderDetail.paymentStatus===0"
+                          class="badge bg-danger ms-auto badge-circle">Chưa thanh toán
                         </div>
-                        <div *ngIf="orderDetail.type === 1 && orderDetail.status===5 && orderDetail.paymentStatus===1" class="badge bg-success ms-auto badge-circle">Đã thanh toán
+                        <div *ngIf="orderDetail.type === 1 && orderDetail.status===5 && orderDetail.paymentStatus===1"
+                          class="badge bg-success ms-auto badge-circle">Đã thanh toán
                         </div>
                         <!-- Tại quan -->
                         <div
@@ -356,11 +376,11 @@
                   <!-- Online guest -->
                   <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 1">
                     <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
-                      data-bs-target="#acceptOrderModal"  *ngIf="account?.role === 'OrderStaff'">
+                      data-bs-target="#acceptOrderModal" *ngIf="account?.role === 'OrderStaff'">
                       Chấp nhận đơn hàng
                     </button>
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
-                    *ngIf="account?.role === 'OrderStaff'" data-bs-toggle="modal">Hủy đơn</button>
+                      *ngIf="account?.role === 'OrderStaff'" data-bs-toggle="modal">Hủy đơn</button>
                   </ng-container>
                   <!-- Online staff -->
 
@@ -375,19 +395,22 @@
                   <!-- Mang ve -->
                   <ng-container *ngIf="orderDetail?.type === 1 && orderDetail?.status === 2">
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
-                      data-bs-toggle="modal" *ngIf="account?.role === 'OrderStaff' || account?.role === 'Cashier'">Hủy đơn</button>
+                      data-bs-toggle="modal" *ngIf="account?.role === 'OrderStaff' || account?.role === 'Cashier'">Hủy
+                      đơn</button>
                   </ng-container>
 
                   <!-- Tai quan -->
                   <ng-container *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && orderDetail?.deposits === 0 && orderDetail?.paymentStatus == 0 &&
                   dishesServed !== totalQuantity ">
                     <button type="button" class="btn btn-success me-2" data-bs-toggle="modal"
-                      data-bs-target="#prepaymentModalOffline" *ngIf="account?.role === 'Cashier'">Thanh toán trước</button>
+                      data-bs-target="#prepaymentModalOffline" *ngIf="account?.role === 'Cashier'">Thanh toán
+                      trước</button>
                   </ng-container>
                   <ng-container
                     *ngIf="orderDetail?.type === 4 && orderDetail?.status === 3 && dishesServed === 0 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2)">
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
-                      data-bs-toggle="modal" *ngIf="account?.role === 'OrderStaff' || account?.role === 'Cashier'">Hủy đơn</button>
+                      data-bs-toggle="modal" *ngIf="account?.role === 'OrderStaff' || account?.role === 'Cashier'">Hủy
+                      đơn</button>
 
 
                   </ng-container>
@@ -397,14 +420,14 @@
                     <!-- &&
           dishesServed === totalQuantity -->
                     <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
-                      data-bs-target="#paymentModalOffline"  *ngIf="account?.role === 'Cashier'">Hoàn thành</button>
+                      data-bs-target="#paymentModalOffline" *ngIf="account?.role === 'Cashier'">Hoàn thành</button>
                   </ng-container>
                 </div>
 
-               
+
 
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-               
+
               </div>
 
             </div>
@@ -531,12 +554,12 @@
               <label for="cashOnDelivery">Thanh toán khi nhận hàng</label>
             </div>
           </div>
-             <!-- Payment by cash -->
+          <!-- Payment by cash -->
           <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="customerPaid" class="form-label">Tiền khách trả:</label>
             <input type="text" id="customerPaid" class="form-control"
-            [value]="customerPaid !== null ? formatCurrency1() : ''" (input)="onCustomerPaidInput($event)"
-            (blur)="formatCurrency1()" name="customerPaid" required>
+              [value]="customerPaid !== null ? formatCurrency1() : ''" (input)="onCustomerPaidInput($event)"
+              (blur)="formatCurrency1()" name="customerPaid" required>
 
 
             <!-- Error messages -->
@@ -595,8 +618,8 @@
           <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="customerPaid" class="form-label">Tiền khách trả:</label>
             <input type="text" id="customerPaid" class="form-control"
-            [value]="customerPaid !== null ? formatCurrency1() : ''" (input)="onCustomerPaidInput($event)"
-            (blur)="formatCurrency1()" name="customerPaid" required>
+              [value]="customerPaid !== null ? formatCurrency1() : ''" (input)="onCustomerPaidInput($event)"
+              (blur)="formatCurrency1()" name="customerPaid" required>
 
             <!-- Error messages -->
             <div *ngIf="customerPaid !== null && customerPaid < DiscountedTotalAmount()" class="text-danger">
@@ -656,8 +679,8 @@
           <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="customerPaid" class="form-label">Tiền khách trả:</label>
             <input type="text" id="customerPaid" class="form-control"
-            [value]="customerPaid !== null ? formatCurrency1() : ''" (input)="onCustomerPaidInput($event)"
-            (blur)="formatCurrency1()" name="customerPaid" required>
+              [value]="customerPaid !== null ? formatCurrency1() : ''" (input)="onCustomerPaidInput($event)"
+              (blur)="formatCurrency1()" name="customerPaid" required>
 
             <!-- Error messages -->
             <div *ngIf="customerPaid !== null && customerPaid < DiscountedTotalAmount()" class="text-danger">
@@ -717,8 +740,8 @@
           <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="customerPaid" class="form-label">Tiền khách trả:</label>
             <input type="text" id="customerPaid" class="form-control"
-            [value]="customerPaid !== null ? formatCurrency1() : ''" (input)="onCustomerPaidInput($event)"
-            (blur)="formatCurrency1()" name="customerPaid" required>
+              [value]="customerPaid !== null ? formatCurrency1() : ''" (input)="onCustomerPaidInput($event)"
+              (blur)="formatCurrency1()" name="customerPaid" required>
 
             <!-- Error messages -->
             <div *ngIf="customerPaid !== null && customerPaid < DiscountedTotalAmount()" class="text-danger">
@@ -770,19 +793,18 @@
             <label for="orderID" class="form-label">Mã hóa đơn: </label>
             <span id="orderID"> {{ invoice?.invoiceId || 'N/A' }}</span>
           </div>
-            <div class="mb-3">
-              <label for="customerName" class="form-label">Tên khách hàng:</label>
-              <input id="customerName" class="form-control" [(ngModel)]="invoice.consigneeName"
-                placeholder="Khách lẻ" />
-            </div>
-            <div class="mb-3">
-              <label for="phoneNumber" class="form-label">Số điện thoại: </label>
-              <input id="phoneNumber" class="form-control" [(ngModel)]="invoice.guestPhone" placeholder="N/A" />
-            </div>
-            <div class="mb-3">
-              <label for="address" class="form-label">Địa chỉ: </label>
-              <input id="address" class="form-control" [(ngModel)]="invoice.address" placeholder="N/A" />
-            </div>
+          <div class="mb-3">
+            <label for="customerName" class="form-label">Tên khách hàng:</label>
+            <input id="customerName" class="form-control" [(ngModel)]="invoice.consigneeName" placeholder="Khách lẻ" />
+          </div>
+          <div class="mb-3">
+            <label for="phoneNumber" class="form-label">Số điện thoại: </label>
+            <input id="phoneNumber" class="form-control" [(ngModel)]="invoice.guestPhone" placeholder="N/A" />
+          </div>
+          <div class="mb-3">
+            <label for="address" class="form-label">Địa chỉ: </label>
+            <input id="address" class="form-control" [(ngModel)]="invoice.address" placeholder="N/A" />
+          </div>
           <div class="mb-3">
             <label for="orderDate" class="form-label">Ngày đặt hàng:</label>
             <span id="orderDate"> {{ invoice?.orderDate | dateFormat }}</span>
@@ -871,7 +893,8 @@
           invoice?.amountReceived - (invoice?.totalAmount - getDiscountInvoiceAmount() - invoice?.deposits))">Đóng</button>
           <button type="button" class="btn btn-primary" (click)="printInvoiceOrder(invoice?.invoiceId,
           invoice?.totalAmount - getDiscountInvoiceAmount() - invoice?.deposits + invoice?.deposits ,
-          invoice?.amountReceived - (invoice?.totalAmount - getDiscountInvoiceAmount() - invoice?.deposits))">In hóa đơn</button>
+          invoice?.amountReceived - (invoice?.totalAmount - getDiscountInvoiceAmount() - invoice?.deposits))">In hóa
+            đơn</button>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 import { SideBarComponent } from "../SideBar/SideBar.component"; // Import CommonModule
+import { Title } from '@angular/platform-browser';
 @Component({
   selector: 'app-manage-new',
   templateUrl: './ManageNew.component.html',
@@ -11,7 +12,7 @@ import { SideBarComponent } from "../SideBar/SideBar.component"; // Import Commo
 })
 export class ManageNewComponent implements OnInit {
 
-  constructor() { }
+  constructor(private titleService: Title) { }
 
   newsItems = [
     { NewsID: 1, NewsTitle: 'Item 1', NewsContent: 'Description for item 1', NewsDate: new Date(), AccountID: 101, ImageUrl: 'https://th.bing.com/th/id/OIP.mKZw98Zy6OgQHAqhTP_SvQHaFP?w=263&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7' },
@@ -20,6 +21,7 @@ export class ManageNewComponent implements OnInit {
   ];
 
   ngOnInit() {
+    this.titleService.setTitle('Quản lý bài viết | Eating House');
   }
 
 }

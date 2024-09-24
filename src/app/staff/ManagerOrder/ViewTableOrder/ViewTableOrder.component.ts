@@ -174,6 +174,22 @@ export class ViewTableOrderComponent implements OnInit {
     } else {
       console.error('No tables selected');
     }
+  } 
+  isModalVisible: boolean = false;
+  isModalVisibles: boolean = false;
+  selectedReservations: any[] = [];
+  openModalSchedule(reservations: any, event: MouseEvent) {
+    event.stopPropagation();  // Prevent the event from propagating to the parent element
+    // Logic to open the modal
+    this.selectedReservations = reservations; // Set reservations for the modal
+    this.isModalVisibles = true; // Show modal
   }
-
+   // Function to close the modal
+   closeModalSchedule() {
+    this.isModalVisibles = false; // Hide modal
+  }
+  closeModal(): void {
+    this.isModalVisible = false;
+    this.isModalVisibles = false;
+  }
 }
