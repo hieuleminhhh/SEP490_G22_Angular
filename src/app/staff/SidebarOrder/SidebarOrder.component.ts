@@ -20,6 +20,7 @@ export class SidebarOrderComponent implements OnInit {
   constructor(private router: Router, private accountService: AccountService) { }
 
   ngOnInit() {
+    
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
     if (this.accountId) {

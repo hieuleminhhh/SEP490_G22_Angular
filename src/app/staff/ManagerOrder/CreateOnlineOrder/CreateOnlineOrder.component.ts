@@ -26,6 +26,7 @@ import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.
 import { SettingService } from '../../../../service/setting.service';
 import { NotificationService } from '../../../../service/notification.service';
 import { Title } from '@angular/platform-browser';
+import { CategoryService } from '../../../../service/category.service';
 @Component({
   selector: 'app-CreateOnlineOrder',
   templateUrl: './CreateOnlineOrder.component.html',
@@ -37,7 +38,7 @@ export class CreateOnlineOrderComponent implements OnInit {
 
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService, private orderService: ManagerOrderService,
     private invoiceService: InvoiceService, private dialog: MatDialog, private renderer: Renderer2, private discountService: DiscountService, private checkoutService: CheckoutService,
-    private settingService: SettingService,private notificationService: NotificationService, private titleService: Title) {
+    private settingService: SettingService,private notificationService: NotificationService, private titleService: Title, private categoryService: CategoryService) {
     const today = new Date();
     this.date = this.formatDate(today);
     this.minDate = this.formatDate(today); // Ngày nhận tối thiểu là ngày hiện tại
@@ -114,6 +115,7 @@ export class CreateOnlineOrderComponent implements OnInit {
   @ViewChild('paymentModal') paymentModal!: ElementRef;
   ngOnInit() {
     this.titleService.setTitle('Tạo đơn | Eating House');
+    this.getAllCategories();
     this.loadListDishes();
     this.loadListCombo();
     const today = new Date();
@@ -1131,4 +1133,48 @@ clearErrorMessageAfterTimeout() {
         this.messages = []; // Ẩn thông báo sau khoảng thời gian
     }, duration);
 }
+onCustomerPaidInput(event: Event): void {
+  const input = (event.target as HTMLInputElement).value;
+  const sanitizedInput = input.replace(/[^\d]/g, ''); // Chỉ cho phép số
+
+  // Kiểm tra chiều dài của sanitizedInput
+  if (sanitizedInput.length > 12) {
+    // Cắt sanitizedInput về tối đa 12 ký tự
+    const truncatedInput = sanitizedInput.slice(0, 12);
+    // Cập nhật giá trị của input để ngăn chặn việc nhập thêm
+    (event.target as HTMLInputElement).value = truncatedInput;
+    // Cập nhật customerPaid
+    this.customerPaid = parseFloat(truncatedInput);
+    console.log("Vượt quá giới hạn 12 chữ số.");
+    return; // Kết thúc hàm
+  }
+
+  // Cập nhật customerPaid nếu chiều dài hợp lệ
+  this.customerPaid = sanitizedInput ? parseFloat(sanitizedInput) : null;
+}
+
+
+
+// Format the number when the input loses focus
+formatCurrency(): string {
+  if (this.customerPaid !== null) {
+    // Chuyển đổi số thành chuỗi và định dạng
+    const formattedValue = this.customerPaid.toLocaleString('vi-VN') + 'đ';
+    console.log('Formatted Customer Paid:', formattedValue);
+    return formattedValue; // Trả về giá trị đã định dạng
+  }
+  return ''; // Trả về chuỗi rỗng nếu customerPaid là null
+}
+categories: any;
+  getAllCategories() {
+    this.categoryService.getAllCategories().subscribe(
+      (data: any) => {
+        this.categories = data;
+        console.log(this.categories); // Kiểm tra cấu trúc dữ liệu
+      },
+      error => {
+        console.error('Error fetching categories', error);
+      }
+    );
+  }
 }

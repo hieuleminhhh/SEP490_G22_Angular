@@ -24,6 +24,8 @@ import { DiscountService } from '../../../../service/discount.service';
 import { CheckoutService } from '../../../../service/checkout.service';
 import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
 import { NotificationService } from '../../../../service/notification.service';
+import { Title } from '@angular/platform-browser';
+import { CategoryService } from '../../../../service/category.service';
 @Component({
   selector: 'app-UpdateOrderForGuest',
   templateUrl: './UpdateOrderForGuest.component.html',
@@ -35,7 +37,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
 
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute, private dishService: ManagerDishService,
     private comboService: ManagerComboService, private notificationService: NotificationService, private orderDetailService: ManagerOrderDetailService, private invoiceService: InvoiceService, private discountService: DiscountService,
-    private checkoutService: CheckoutService) { }
+    private checkoutService: CheckoutService, private titleService: Title, private categoryService: CategoryService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   orderId: number = 0;
   tableId: number = 0;
@@ -88,6 +90,8 @@ export class UpdateOrderForGuestComponent implements OnInit {
   private socket!: WebSocket;
   private reservationQueue: any[] = [];
   ngOnInit() {
+    this.titleService.setTitle('Cập nhập đơn | Eating House');
+    this.getAllCategories();
     this.loadListDishes();
     this.loadListCombo();
     this.loadAddresses();
@@ -1012,5 +1016,17 @@ export class UpdateOrderForGuestComponent implements OnInit {
     const discountAmount = totalAmount * (this.selectedDiscountPercent / 100);
 
     return discountAmount;
+  }
+  categories: any;
+  getAllCategories() {
+    this.categoryService.getAllCategories().subscribe(
+      (data: any) => {
+        this.categories = data;
+        console.log(this.categories); // Kiểm tra cấu trúc dữ liệu
+      },
+      error => {
+        console.error('Error fetching categories', error);
+      }
+    );
   }
 }

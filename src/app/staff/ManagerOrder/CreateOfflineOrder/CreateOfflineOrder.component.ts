@@ -29,6 +29,7 @@ import { ReservationService } from '../../../../service/reservation.service';
 import { SelectedItem } from '../../../../models/order.model';
 import { NotificationService } from '../../../../service/notification.service';
 import { Title } from '@angular/platform-browser';
+import { CategoryService } from '../../../../service/category.service';
 @Component({
   selector: 'app-create-offline-order',
   templateUrl: './CreateOfflineOrder.component.html',
@@ -91,10 +92,11 @@ export class CreateOfflineOrderComponent implements OnInit {
     private comboService: ManagerComboService, private orderDetailService: ManagerOrderDetailService, private invoiceService: InvoiceService, private dialog: MatDialog
     , private discountService: DiscountService, private notificationService: NotificationService,
     private checkoutService: CheckoutService, private accountService: AccountService,
-    private reservationService: ReservationService, private titleService: Title) { }
+    private reservationService: ReservationService, private titleService: Title,  private categoryService: CategoryService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   ngOnInit() {
     this.titleService.setTitle('Tạo đơn | Eating House');
+    this.getAllCategories();
     this.loadListDishes();
     this.loadListCombo();
     this.loadAddresses();
@@ -856,6 +858,17 @@ export class CreateOfflineOrderComponent implements OnInit {
       this.selectedDiscount = discountId; // Chọn mã giảm giá mới
     }
   }
-
+  categories: any;
+  getAllCategories() {
+    this.categoryService.getAllCategories().subscribe(
+      (data: any) => {
+        this.categories = data;
+        console.log(this.categories); // Kiểm tra cấu trúc dữ liệu
+      },
+      error => {
+        console.error('Error fetching categories', error);
+      }
+    );
+  }
 
 }

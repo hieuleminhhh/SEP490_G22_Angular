@@ -41,6 +41,7 @@ import { ForgetPasswordComponent } from './common/login/forgetPass/forgetPasswor
 import { VerifyOtpSignupComponent } from './common/signup/signup/verifyOtpSignup/verifyOtpSignup.component';
 import { RefundComponent } from './staff/manage-invoice/refund/refund.component';
 import { DeliveryComponent } from './staff/manage-invoice/delivery/delivery.component';
+import { ManageCategoryComponent } from './manager/ManageCategory/ManageCategory/ManageCategory.component';
 
 
 export const routes: Routes = [
@@ -85,6 +86,7 @@ export const routes: Routes = [
     {'path': 'verifyOTPsignin', component: VerifyOtpSignupComponent},
     {'path': 'refund', component: RefundComponent},
     {'path': 'delivery', component: DeliveryComponent},
+    {'path': 'manageCategory', component: ManageCategoryComponent},
     
 ];
 
