@@ -26,7 +26,7 @@ import { SidebarOrderComponent } from '../SidebarOrder/SidebarOrder.component';
   standalone: true,
   templateUrl: './tableManagement.component.html',
   styleUrls: ['./tableManagement.component.css'],
-  imports: [CommonModule, FormsModule, NgxPaginationModule,SidebarOrderComponent, CurrencyFormatPipe, MenuComponent, HeaderOrderStaffComponent],
+  imports: [CommonModule, FormsModule, NgxPaginationModule, SidebarOrderComponent, CurrencyFormatPipe, MenuComponent, HeaderOrderStaffComponent],
   providers: [DatePipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
@@ -121,22 +121,12 @@ export class TableManagementComponent implements OnInit {
   dateTime: any;
   constructor(private tableService: TableService, private dialog: MatDialog, private reservationService: ReservationService,
     private router: Router, private checkoutService: CheckoutService,
-    private route: ActivatedRoute, private notificationService: NotificationService, private accountService: AccountService) { }
-
-  ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.currentView = params['section'] || 'table-layout'; // Default section
-    });
+    private route: ActivatedRoute, private notificationService: NotificationService, private accountService: AccountService) {
     const today = new Date();
     this.dateFrom = this.formatDate(today);
     this.dateTo = this.formatDate(today);
     this.dateNow = this.formatDate(today);
     this.dateString = this.dateNow.toString();
-    this.getTableData();
-    this.searchTermSubject.pipe(debounceTime(300)).subscribe(searchTerm => {
-      this.getSearchList();
-    });
-    this.updateTimes();
     this.minDate = this.formatDate(today);
     const maxDate = new Date();
     maxDate.setDate(today.getDate() + 7);
@@ -150,6 +140,22 @@ export class TableManagementComponent implements OnInit {
       people: 2,
       notes: ''
     };
+    this.generateAvailableHours();
+  }
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.currentView = params['section'] || 'table-layout'; // Default section
+    });
+
+    this.getTableData();
+    this.searchTermSubject.pipe(debounceTime(300)).subscribe(searchTerm => {
+      this.getSearchList();
+    });
+    console.log(this.availableHours);
+
+    this.updateTimes();
+
     this.cartSubscription = this.reservationService.getCart().subscribe(cartItems => {
       this.cartItems = cartItems;
       this.calculateItemQuantity();
@@ -188,7 +194,15 @@ export class TableManagementComponent implements OnInit {
     });
 
   }
-
+  generateAvailableHours() {
+    this.availableHours = [];
+    for (let hour = 9; hour <= 21; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const formattedHour = hour.toString().padStart(2, '0') + ':' + minute.toString().padStart(2, '0');
+        this.availableHours.push(formattedHour);
+      }
+    }
+  }
   addSuccessMessage(message: string) {
     this.notifications.push(message);
     this.isVisible.push(true);
@@ -1378,6 +1392,7 @@ export class TableManagementComponent implements OnInit {
         this.ishas = false;
         this.totalCapacity = 0;
         this.getReservationData();
+        this.updateTimes();
       },
       error: error => {
         if (error.error instanceof ErrorEvent) {

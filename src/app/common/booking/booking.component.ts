@@ -72,6 +72,7 @@ export class BookingComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateTimes();
+    console.log(this.availableHours);
 
     this.cartSubscription = this.reservationService.getCart().subscribe(cartItems => {
       this.cartItems = cartItems;
