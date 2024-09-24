@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
-import { CommonModule, formatDate } from '@angular/common';
+import { CommonModule, CurrencyPipe, formatDate } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Address, AddNewAddress } from '../../../../models/address.model';
 import { ListAllCombo } from '../../../../models/combo.model';
@@ -27,6 +27,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap/modal/modal.module';
 import { SettingService } from '../../../../service/setting.service';
 import { NotificationService } from '../../../../service/notification.service';
 import { Title } from '@angular/platform-browser';
+import { CategoryService } from '../../../../service/category.service';
 
 @Component({
   selector: 'app-CreateTakeAwayOrder',
@@ -40,7 +41,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   constructor(private router: Router, private dishService: ManagerDishService, private comboService: ManagerComboService,
     private orderService: ManagerOrderService, private cd: ChangeDetectorRef, private invoiceService: InvoiceService,
     private route: ActivatedRoute, private dialog: MatDialog, private notificationService: NotificationService, private discountService: DiscountService, private checkoutService: CheckoutService,
-    private settingService: SettingService,  private titleService: Title) { }
+    private settingService: SettingService,  private titleService: Title, private categoryService: CategoryService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   @ViewChild('checkDishModal') checkDishModal!: ElementRef;
 
@@ -119,6 +120,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   private reservationQueue: any[] = [];
   ngOnInit() {
     this.titleService.setTitle('Tạo đơn | Eating House');
+    this.getAllCategories();
     this.loadListDishes();
     this.loadListCombo();
     this.loadAddresses();
@@ -1145,4 +1147,50 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     const backdrops = document.querySelectorAll('.modal-backdrop');
     backdrops.forEach(backdrop => document.body.removeChild(backdrop));
   }
+  onCustomerPaidInput(event: Event): void {
+    const input = (event.target as HTMLInputElement).value;
+    const sanitizedInput = input.replace(/[^\d]/g, ''); // Chỉ cho phép số
+  
+    // Kiểm tra chiều dài của sanitizedInput
+    if (sanitizedInput.length > 12) {
+      // Cắt sanitizedInput về tối đa 12 ký tự
+      const truncatedInput = sanitizedInput.slice(0, 12);
+      // Cập nhật giá trị của input để ngăn chặn việc nhập thêm
+      (event.target as HTMLInputElement).value = truncatedInput;
+      // Cập nhật customerPaid
+      this.customerPaid = parseFloat(truncatedInput);
+      console.log("Vượt quá giới hạn 12 chữ số.");
+      return; // Kết thúc hàm
+    }
+  
+    // Cập nhật customerPaid nếu chiều dài hợp lệ
+    this.customerPaid = sanitizedInput ? parseFloat(sanitizedInput) : null;
+  }
+  
+  
+  
+  // Format the number when the input loses focus
+  formatCurrency(): string {
+    if (this.customerPaid !== null) {
+      // Chuyển đổi số thành chuỗi và định dạng
+      const formattedValue = this.customerPaid.toLocaleString('vi-VN') + 'đ';
+      console.log('Formatted Customer Paid:', formattedValue);
+      return formattedValue; // Trả về giá trị đã định dạng
+    }
+    return ''; // Trả về chuỗi rỗng nếu customerPaid là null
+  }
+  categories: any;
+  getAllCategories() {
+    this.categoryService.getAllCategories().subscribe(
+      (data: any) => {
+        this.categories = data;
+        console.log(this.categories); // Kiểm tra cấu trúc dữ liệu
+      },
+      error => {
+        console.error('Error fetching categories', error);
+      }
+    );
+  }
+  
+  
 }

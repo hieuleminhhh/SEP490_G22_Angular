@@ -20,15 +20,40 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="customerNameForm">Tên khách hàng</label>
-                      <input type="text" [(ngModel)]="addNew.consigneeName" class="form-control" id="customerNameForm"
-                        placeholder="Nhập tên khách hàng" name="consigneeName" required>
+                      <input
+                        type="text"
+                        [(ngModel)]="addNew.consigneeName"
+                        class="form-control"
+                        id="customerNameForm"
+                        placeholder="Nhập tên khách hàng"
+                        name="consigneeName"
+                        required
+                        #consigneeName="ngModel"
+                      >
+                      <!-- Validation message -->
+                      <div *ngIf="consigneeName.invalid && consigneeName.touched" class="text-danger">
+                        Vui lòng nhập tên khách hàng.
+                      </div>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="guestPhone">Số điện thoại</label>
-                      <input type="tel" [(ngModel)]="addNew.guestPhone" class="form-control" id="guestPhone"
-                        placeholder="Nhập số điện thoại" name="guestPhone" required>
+                      <input
+                        type="tel"
+                        [(ngModel)]="addNew.guestPhone"
+                        class="form-control"
+                        id="guestPhone"
+                        placeholder="Nhập số điện thoại"
+                        name="guestPhone"
+                        required
+                        pattern="^[0-9]{10,11}$"
+                        #guestPhone="ngModel"
+                      >
+                      <!-- Validation message -->
+                      <div *ngIf="guestPhone.invalid && guestPhone.touched" class="text-danger">
+                        Vui lòng nhập số điện thoại hợp lệ (10-11 chữ số).
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -36,15 +61,39 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="guestAddress">Địa chỉ nhận hàng</label>
-                      <input type="text" [(ngModel)]="addNew.guestAddress" class="form-control" id="guestAddress"
-                        placeholder="Nhập địa chỉ nhận hàng" name="guestAddress" required>
+                      <input
+                        type="text"
+                        [(ngModel)]="addNew.guestAddress"
+                        class="form-control"
+                        id="guestAddress"
+                        placeholder="Nhập địa chỉ nhận hàng"
+                        name="guestAddress"
+                        required
+                        #guestAddress="ngModel"
+                      >
+                      <!-- Validation message -->
+                      <div *ngIf="guestAddress.invalid && guestAddress.touched" class="text-danger">
+                        Vui lòng nhập địa chỉ nhận hàng.
+                      </div>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="guestEmail">Email</label>
-                      <input type="email" [(ngModel)]="addNew.email" class="form-control" id="guestEmail"
-                        placeholder="Nhập email của bạn" name="guestEmail" required>
+                      <input
+                        type="email"
+                        [(ngModel)]="addNew.email"
+                        class="form-control"
+                        id="guestEmail"
+                        placeholder="Nhập email của bạn"
+                        name="guestEmail"
+                        required
+                        #guestEmail="ngModel"
+                      >
+                      <!-- Validation message -->
+                      <div *ngIf="guestEmail.invalid && guestEmail.touched" class="text-danger">
+                        Vui lòng nhập email hợp lệ.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -175,7 +224,7 @@
 
 
                 <div *ngIf="selectedItems.length > 0" class="d-grid gap-3">
-                  <button type="button" class="btn custom-btn-success btn-lg rounded-pill" (click)="checkDish()">
+                  <button type="button" class="btn custom-btn-success btn-lg rounded-pill" [disabled]="name.invalid || phone.invalid || address.invalid || email.invalid" (click)="checkDish()">
                     Tạo đơn
                   </button>
                   <!-- Nút ẩn để kích hoạt modal -->
@@ -270,25 +319,20 @@
 
             <!-- Right column for dishes and combos -->
             <div class="col-md-6">
-              <div class="category-buttons">
-                <button class="btn" [class.btn-primary]="selectedCategory !== 'Món chính'"
-                  [class.btn-secondary]="selectedCategory === 'Món chính'" (click)="selectCategory('Món chính')">Món
-                  chính
-                </button>
-                <button class="btn" [class.btn-primary]="selectedCategory !== 'Món khai vị'"
-                  [class.btn-secondary]="selectedCategory === 'Món khai vị'" (click)="selectCategory('Món khai vị')">Món
-                  khai vị
-                </button>
-                <button class="btn" [class.btn-primary]="selectedCategory !== 'Món tráng miệng'"
-                  [class.btn-secondary]="selectedCategory === 'Món tráng miệng'"
-                  (click)="selectCategory('Món tráng miệng')">Món tráng miệng
-                </button>
-                <button class="btn" [class.btn-primary]="selectedCategory !== 'Đồ uống'"
-                  [class.btn-secondary]="selectedCategory === 'Đồ uống'" (click)="selectCategory('Đồ uống')">Đồ uống
-                </button>
-                <button class="btn" [class.btn-primary]="!showingCombos" [class.btn-secondary]="showingCombos"
-                  (click)="showCombos()">Combo
-                </button>
+             <div class="category-buttons-container">
+                <div class="category-buttons">
+                  <button *ngFor="let category of categories" class="btn"
+                    [class.btn-primary]="selectCategory !== category.categoryName"
+                    [class.btn-secondary]="selectCategory === category.categoryName" 
+                    (click)="selectCategory(category.categoryName)">
+                    {{ category.categoryName }}
+                  </button>
+                  <button class="btn" 
+                    [class.btn-primary]="!showingCombos" 
+                    [class.btn-secondary]="showingCombos"
+                    (click)="showCombos()">Combo
+                  </button>
+                </div>
               </div>
               <div class="search-bar mt-3">
                 <input type="text" class="form-control" placeholder="Tìm kiếm món ăn..." [(ngModel)]="search"
@@ -332,33 +376,32 @@
               </div>
 
               <!-- Combos Section -->
-              <div class="combos-section" *ngIf="showingCombos && combo">
-                <div class="row">
-                  <ng-container *ngFor="let list of combo">
-                    <div class="col-lg-4 col-md-6 mb-4" *ngFor="let cb of list.items">
-                      <!-- Conditionally add 'out-of-stock' class based on quantityCombo -->
-                      <div class="card h-100" (click)="addItem(cb)">
-                        <div class="image-container">
-                          <img class="card-img-top" [src]="cb.imageUrl" alt="Combo image">
-                        </div>
-                        <div class="card-body text-center">
-                          <div class="combo-details">
-                            <div class="combo-name">{{ cb.nameCombo }}</div>
-                            <div class="combo-price">{{ cb.price | currencyFormat }}</div>
+                  <!-- Combos Section -->
+                  <div class="combos-section" *ngIf="showingCombos && combo">
+                    <div class="scrollable-combos">
+                      <div class="row">
+                        <ng-container *ngFor="let list of combo">
+                          <div class="col-lg-4 col-md-6 mb-4" *ngFor="let cb of list.items">
+                            <div class="card h-100" (click)="addItem(cb)">
+                              <div class="image-container">
+                                <img class="card-img-top" [src]="cb.imageUrl" alt="Combo image">
+                              </div>
+                              <div class="card-body text-center">
+                                <div class="combo-details">
+                                  <div class="combo-name">{{ cb.nameCombo }}</div>
+                                  <div class="combo-price">{{ cb.price | currencyFormat }}</div>
+                                </div>
+                                <!-- Display Remaining Quantity -->
+                                <!-- <div class="remaining-quantity mt-3">
+                    <span *ngIf="cb.quantityCombo > 0" class="text-muted">Còn lại: {{ cb.quantityCombo }} món</span>
+                  </div> -->
+                              </div>
+                            </div>
                           </div>
-                          <!-- Display Remaining Quantity -->
-                          <!-- <div class="remaining-quantity mt-3">
-                            <span *ngIf="cb.quantityCombo > 0" class="text-muted">Còn lại: {{ cb.quantityCombo }}
-                              món</span>
-
-                          </div> -->
-                        </div>
+                        </ng-container>
                       </div>
                     </div>
-                  </ng-container>
-                </div>
-              </div>
-
+                    </div>
 
               <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel"
                 aria-hidden="true">
@@ -372,12 +415,18 @@
                       <div class="row">
                         <div class="col-md-6">
                           <div class="mb-3">
-                            <strong>Tên khách hàng:</strong> {{ addNew.consigneeName }}
+                            <strong>Tên khách hàng:</strong>
+                            <input type="text" class="form-control" [(ngModel)]="addNew.consigneeName" name="consigneeName" required #name="ngModel">
+                            <div *ngIf="name.invalid && name.touched" class="text-danger">
+                              Vui lòng nhập tên khách hàng
+                            </div>
                           </div>
                         </div>
-                        <div class="col-md-6">
-                          <div class="mb-3">
-                            <strong>Số điện thoại:</strong> {{ addNew.guestPhone }}
+                        <div class="mb-3">
+                          <strong>Số điện thoại:</strong>
+                          <input type="text" class="form-control" [(ngModel)]="addNew.guestPhone" name="guestPhone" required #phone="ngModel">
+                          <div *ngIf="phone.invalid && phone.touched" class="text-danger">
+                            Vui lòng nhập số điện thoại
                           </div>
                         </div>
                       </div>
@@ -385,12 +434,20 @@
                       <div class="row">
                         <div class="col-md-6">
                           <div class="mb-3">
-                            <strong>Địa chỉ nhận hàng:</strong> {{ addNew.guestAddress }}
+                            <strong>Địa chỉ nhận hàng:</strong>
+                            <input type="text" class="form-control" [(ngModel)]="addNew.guestAddress" name="guestAddress" required #address="ngModel">
+                            <div *ngIf="address.invalid && address.touched" class="text-danger">
+                              Vui lòng nhập địa chỉ nhận hàng
+                            </div>
                           </div>
                         </div>
                         <div class="col-md-6">
                           <div class="mb-3">
-                            <strong>Email:</strong> {{ addNew.email }}
+                            <strong>Email:</strong>
+                            <input type="email" class="form-control" [(ngModel)]="addNew.email" name="email" required #email="ngModel">
+                            <div *ngIf="email.invalid && email.touched" class="text-danger">
+                              Vui lòng nhập email hợp lệ
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -585,10 +642,12 @@
           </div>
         </div>
 
+        <!-- Payment by cash -->
         <div class="mb-3" *ngIf="paymentMethod === '0'">
           <label for="customerPaid" class="form-label">Tiền khách trả:</label>
-          <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid" name="customerPaid"
-            required min="0" [ngModelOptions]="{ updateOn: 'blur' }">
+          <input type="text" id="customerPaid" class="form-control"
+            [value]="customerPaid !== null ? formatCurrency() : ''" (input)="onCustomerPaidInput($event)"
+            (blur)="formatCurrency()" name="customerPaid" required>
 
           <!-- Error messages -->
           <div

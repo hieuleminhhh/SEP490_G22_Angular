@@ -739,4 +739,28 @@ transform: translateY(-2px); /* Nâng nút lên khi hover */
 .back-icon:hover {
   color: black; /* Màu sắc mới khi hover */
 }
+.scrollable-combos {
+  max-height: 400px; /* Set a maximum height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 15px; /* Optional: add some padding */
+  border: 1px solid #ddd; /* Optional: add a border */
+  border-radius: 5px; /* Optional: round the corners */
+}
+.category-buttons-container {
+  overflow-x: auto; /* Cho phép cuộn ngang */
+}
 
+.category-buttons {
+  display: flex; /* Sử dụng flexbox để sắp xếp */
+  flex-wrap: wrap; /* Cho phép các nút xuống dòng */
+}
+
+.category-buttons .btn {
+  flex: 0 0 auto; /* Cho phép nút không co dãn và có kích thước tự động */
+  margin: 4px; /* Khoảng cách giữa các nút */
+  font-size: 0.8rem; /* Kích thước chữ nhỏ hơn */
+  min-width: 80px; /* Đặt chiều rộng tối thiểu cho nút */
+  white-space: nowrap; /* Ngăn không cho chữ xuống dòng */
+  overflow: visible; /* Hiển thị nội dung đầy đủ */
+  text-overflow: clip; /* Không hiển thị dấu ba chấm */
+}
