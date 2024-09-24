@@ -33,12 +33,6 @@
           </a>
         </li>
         <li class="nav-item mb-3" *ngIf="account?.role === 'Cashier'">
-          <a class="nav-link d-flex align-items-center" [routerLink]="['/createTakeaway']" routerLinkActive="active">
-            <i class="fas fa-walking me-2"></i> <!-- Font Awesome icon -->
-            Đơn mang về
-          </a>
-        </li>
-        <li class="nav-item mb-3" *ngIf="account?.role === 'Cashier'">
           <a class="nav-link d-flex align-items-center" [routerLink]="['/refund']" routerLinkActive="active">
             <i class="fas fa-undo-alt me-2"></i> <!-- Refund icon -->
             Đơn hoàn tiền

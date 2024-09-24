@@ -20,7 +20,7 @@ export class SidebarOrderComponent implements OnInit {
   constructor(private router: Router, private accountService: AccountService) { }
 
   ngOnInit() {
-    
+
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
     if (this.accountId) {
@@ -34,7 +34,35 @@ export class SidebarOrderComponent implements OnInit {
   }
   toggleOrderMenuOrderStaff() {
     this.isMenuCollapsedOrderStaff = !this.isMenuCollapsedOrderStaff; // Toggle the order menu
+    if (this.isMenuCollapsedOrderStaff) {
+      this.isMenuCollapsedOrderStaffBooking = false; // Close the table management menu when opening the order menu
+    }
   }
+
+  toggleTableManagementMenu() {
+    this.isMenuCollapsedOrderStaffBooking = !this.isMenuCollapsedOrderStaffBooking; // Toggle the table management menu
+    if (this.isMenuCollapsedOrderStaffBooking) {
+      this.isMenuCollapsedOrderStaff = false; // Close the order menu when opening the table management menu
+    }
+  }
+
+  isOrderMenuActiveOrderStaff(): boolean {
+    const currentUrl = this.router.url;
+    return this.isMenuCollapsedOrderStaff ||
+      currentUrl.includes('/listTable') ||
+      currentUrl.includes('/createTakeaway') ||
+      currentUrl.includes('/createOnline');
+  }
+
+  isOrderMenuActiveOrderStaffBooking(): boolean {
+    const currentUrl = this.router.url;
+    return this.isMenuCollapsedOrderStaffBooking ||
+      currentUrl.includes('/tableManagement?section=table-layout') ||
+      currentUrl.includes('/tableManagement?section=booking-request') ||
+      currentUrl.includes('/tableManagement?section=booking-schedule') ||
+      currentUrl.includes('/tableManagement?section=booking-history');
+  }
+
   toggleOrderMenuCashier() {
     this.isMenuCollapsedCashier = !this.isMenuCollapsedCashier; // Toggle the order menu
   }
@@ -44,33 +72,23 @@ export class SidebarOrderComponent implements OnInit {
   openOrderMenuCashier() {
     this.isMenuCollapsedCashier = true; // Ensure the order menu is open
   }
+  tableManagementMenuActive: boolean = false;
 
-  isOrderMenuActiveOrderStaff(): boolean {
-    const currentUrl = this.router.url;
-    return this.isMenuCollapsedOrderStaff || // Kiểm tra trạng thái của menu
-           currentUrl.includes('/listTable') ||
-           currentUrl.includes('/createTakeaway') ||
-           currentUrl.includes('/createOnline')
-           
+  isMenuCollapsedOrderStaffBooking: boolean = false;
+
+  isTableManagementMenuActive() {
+    return this.tableManagementMenuActive;
   }
-  isOrderMenuActiveOrderStaffBooking(): boolean {
-    const currentUrl = this.router.url;
-    return this.isMenuCollapsedOrderStaff || // Kiểm tra trạng thái của menu
-           currentUrl.includes('/tableManagement?section=table-layout') ||
-           currentUrl.includes('/tableManagement?section=booking-request') ||
-           currentUrl.includes('/tableManagement?section=booking-schedule') ||
-           currentUrl.includes('/tableManagement?section=booking-history')
-           
-  }
+
   isOrderMenuActiveOrderCashier(): boolean {
     const currentUrl = this.router.url;
     return this.isMenuCollapsedCashier || // Kiểm tra trạng thái của menu
-           currentUrl.includes('/listTable') ||
-           currentUrl.includes('/createTakeaway') ||
-           currentUrl.includes('/createOnline') || 
-           currentUrl.includes('/refund') ||
-           currentUrl.includes('/delivery') ||
-           currentUrl.includes('/managerorder')
+      currentUrl.includes('/listTable') ||
+      currentUrl.includes('/createTakeaway') ||
+      currentUrl.includes('/createOnline') ||
+      currentUrl.includes('/refund') ||
+      currentUrl.includes('/delivery') ||
+      currentUrl.includes('/managerorder')
   }
   account: any;
   showSidebar: boolean = true;
@@ -88,14 +106,5 @@ export class SidebarOrderComponent implements OnInit {
       }
     );
   }
-  tableManagementMenuActive: boolean = false;
-  toggleTableManagementMenu() {
-    this.tableManagementMenuActive = !this.tableManagementMenuActive;
-  }
 
-  isTableManagementMenuActive() {
-    return this.tableManagementMenuActive;
-  }
-
-  
 }

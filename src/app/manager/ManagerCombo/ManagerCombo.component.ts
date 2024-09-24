@@ -10,6 +10,7 @@ import { AddNewDish, Dish, ManagerDish } from '../../../models/dish.model';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
 import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 import { ManagerDishService } from '../../../service/managerdish.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-ManagerCombo',
@@ -70,9 +71,10 @@ export class ManagerComboComponent implements OnInit {
     dishes: null  // or you can initialize it with an empty array: []
   };
   
-  constructor(private comboService: ManagerComboService, private cdr: ChangeDetectorRef, private dishService: ManagerDishService) { }
+  constructor(private comboService: ManagerComboService, private cdr: ChangeDetectorRef, private dishService: ManagerDishService,  private titleService: Title) { }
 
   ngOnInit() {
+    this.titleService.setTitle('Quản lý món ăn | Eating House');
     this.loadListCombo();
     this.loadAllDishes();
     this.loadListComboSetting();
