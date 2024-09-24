@@ -271,24 +271,20 @@
 
             <!-- Right column for dishes and combos -->
             <div class="col-md-6">
-              <div class="category-buttons">
-                <button class="btn" [class.btn-primary]="searchCategory !== 'Món chính'"
-                  [class.btn-secondary]="searchCategory === 'Món chính'" (click)="selectCategory('Món chính')">Món chính
-                </button>
-                <button class="btn" [class.btn-primary]="searchCategory !== 'Món khai vị'"
-                  [class.btn-secondary]="searchCategory === 'Món khai vị'" (click)="selectCategory('Món khai vị')">Món
-                  khai vị
-                </button>
-                <button class="btn" [class.btn-primary]="searchCategory !== 'Món tráng miệng'"
-                  [class.btn-secondary]="searchCategory === 'Món tráng miệng'"
-                  (click)="selectCategory('Món tráng miệng')">Món tráng miệng
-                </button>
-                <button class="btn" [class.btn-primary]="searchCategory !== 'Đồ uống'"
-                  [class.btn-secondary]="searchCategory === 'Đồ uống'" (click)="selectCategory('Đồ uống')">Đồ uống
-                </button>
-                <button class="btn" [class.btn-primary]="!showingCombos" [class.btn-secondary]="showingCombos"
-                  (click)="showCombos()">Combo
-                </button>
+              <div class="category-buttons-container">
+                <div class="category-buttons">
+                  <button *ngFor="let category of categories" class="btn"
+                    [class.btn-primary]="searchCategory !== category.categoryName"
+                    [class.btn-secondary]="searchCategory === category.categoryName" 
+                    (click)="selectCategory(category.categoryName)">
+                    {{ category.categoryName }}
+                  </button>
+                  <button class="btn" 
+                    [class.btn-primary]="!showingCombos" 
+                    [class.btn-secondary]="showingCombos"
+                    (click)="showCombos()">Combo
+                  </button>
+                </div>
               </div>
               <div class="search-bar mt-3">
                 <input type="text" class="form-control" placeholder="Tìm kiếm món ăn..." [(ngModel)]="search"
@@ -335,32 +331,32 @@
 
               <!-- Combos Section -->
               <div class="combos-section" *ngIf="showingCombos && combo">
-                <div class="row">
-                  <ng-container *ngFor="let list of combo">
-                    <div class="col-lg-4 col-md-6 mb-4" *ngFor="let cb of list.items">
-                      <!-- Conditionally add 'out-of-stock' class based on quantityCombo -->
-                      <div class="card h-100"
-                        [ngClass]="{'out-of-stock': cb.quantityCombo === 0 || cb.quantityCombo === null}"
-                        (click)="addItem(cb)">
-                        <div class="image-container">
-                          <img class="card-img-top" [src]="cb.imageUrl" alt="Combo image">
-                        </div>
-                        <div class="card-body text-center">
-                          <div class="combo-details">
-                            <div class="combo-name">{{ cb.nameCombo }}</div>
-                            <div class="combo-price">{{ cb.price | currencyFormat }}</div>
+                <div class="scrollable-combos">
+                  <div class="row">
+                    <ng-container *ngFor="let list of combo">
+                      <div class="col-lg-4 col-md-6 mb-4" *ngFor="let cb of list.items">
+                        <!-- Conditionally add 'out-of-stock' class based on quantityCombo -->
+                        <div class="card h-100" 
+                             [ngClass]="{'out-of-stock': cb.quantityCombo === 0 || cb.quantityCombo === null}"
+                             (click)="addItem(cb)">
+                          <div class="image-container">
+                            <img class="card-img-top" [src]="cb.imageUrl" alt="Combo image">
                           </div>
-                          <!-- Display Remaining Quantity -->
-                          <div class="remaining-quantity mt-3">
-                            <span *ngIf="cb.quantityCombo > 0" class="text-muted">Còn lại: {{ cb.quantityCombo }}
-                              món</span>
-                            <span *ngIf="cb.quantityCombo === 0 || cb.quantityCombo === null" class="text-danger">Hết
-                              hàng</span>
+                          <div class="card-body text-center">
+                            <div class="combo-details">
+                              <div class="combo-name">{{ cb.nameCombo }}</div>
+                              <div class="combo-price">{{ cb.price | currencyFormat }}</div>
+                            </div>
+                            <!-- Display Remaining Quantity -->
+                            <div class="remaining-quantity mt-3">
+                              <span *ngIf="cb.quantityCombo > 0" class="text-muted">Còn lại: {{ cb.quantityCombo }} món</span>
+                              <span *ngIf="cb.quantityCombo === 0 || cb.quantityCombo === null" class="text-danger">Hết hàng</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </ng-container>
+                    </ng-container>
+                  </div>
                 </div>
               </div>
             </div>

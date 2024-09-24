@@ -531,11 +531,13 @@
               <label for="cashOnDelivery">Thanh toán khi nhận hàng</label>
             </div>
           </div>
-
+             <!-- Payment by cash -->
           <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="customerPaid" class="form-label">Tiền khách trả:</label>
-            <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid" name="customerPaid"
-              required min="0" [ngModelOptions]="{ updateOn: 'blur' }">
+            <input type="text" id="customerPaid" class="form-control"
+            [value]="customerPaid !== null ? formatCurrency1() : ''" (input)="onCustomerPaidInput($event)"
+            (blur)="formatCurrency1()" name="customerPaid" required>
+
 
             <!-- Error messages -->
             <div *ngIf="customerPaid !== null && customerPaid < DiscountedTotalAmount()" class="text-danger">
@@ -592,8 +594,9 @@
 
           <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="customerPaid" class="form-label">Tiền khách trả:</label>
-            <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid" name="customerPaid"
-              required min="0" [ngModelOptions]="{ updateOn: 'blur' }">
+            <input type="text" id="customerPaid" class="form-control"
+            [value]="customerPaid !== null ? formatCurrency1() : ''" (input)="onCustomerPaidInput($event)"
+            (blur)="formatCurrency1()" name="customerPaid" required>
 
             <!-- Error messages -->
             <div *ngIf="customerPaid !== null && customerPaid < DiscountedTotalAmount()" class="text-danger">
@@ -652,8 +655,9 @@
 
           <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="customerPaid" class="form-label">Tiền khách trả:</label>
-            <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid" name="customerPaid"
-              required min="0" [ngModelOptions]="{ updateOn: 'blur' }">
+            <input type="text" id="customerPaid" class="form-control"
+            [value]="customerPaid !== null ? formatCurrency1() : ''" (input)="onCustomerPaidInput($event)"
+            (blur)="formatCurrency1()" name="customerPaid" required>
 
             <!-- Error messages -->
             <div *ngIf="customerPaid !== null && customerPaid < DiscountedTotalAmount()" class="text-danger">
@@ -712,8 +716,9 @@
 
           <div class="mb-3" *ngIf="paymentMethod === '0'">
             <label for="customerPaid" class="form-label">Tiền khách trả:</label>
-            <input type="number" id="customerPaid" class="form-control" [(ngModel)]="customerPaid" name="customerPaid"
-              required min="0" [ngModelOptions]="{ updateOn: 'blur' }">
+            <input type="text" id="customerPaid" class="form-control"
+            [value]="customerPaid !== null ? formatCurrency1() : ''" (input)="onCustomerPaidInput($event)"
+            (blur)="formatCurrency1()" name="customerPaid" required>
 
             <!-- Error messages -->
             <div *ngIf="customerPaid !== null && customerPaid < DiscountedTotalAmount()" class="text-danger">

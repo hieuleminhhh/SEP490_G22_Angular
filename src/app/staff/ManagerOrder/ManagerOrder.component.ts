@@ -1147,5 +1147,36 @@ ${this.orderDetail?.discountId !== undefined ? `
       this.printInvoiceAll(true);  // Hóa đơn chính thức
     }
   }
-
+  onCustomerPaidInput(event: Event): void {
+    const input = (event.target as HTMLInputElement).value;
+    const sanitizedInput = input.replace(/[^\d]/g, ''); // Chỉ cho phép số
+  
+    // Kiểm tra chiều dài của sanitizedInput
+    if (sanitizedInput.length > 12) {
+      // Cắt sanitizedInput về tối đa 12 ký tự
+      const truncatedInput = sanitizedInput.slice(0, 12);
+      // Cập nhật giá trị của input để ngăn chặn việc nhập thêm
+      (event.target as HTMLInputElement).value = truncatedInput;
+      // Cập nhật customerPaid
+      this.customerPaid = parseFloat(truncatedInput);
+      console.log("Vượt quá giới hạn 12 chữ số.");
+      return; // Kết thúc hàm
+    }
+  
+    // Cập nhật customerPaid nếu chiều dài hợp lệ
+    this.customerPaid = sanitizedInput ? parseFloat(sanitizedInput) : null;
+  }
+  
+  
+  
+  // Format the number when the input loses focus
+  formatCurrency1(): string {
+    if (this.customerPaid !== null) {
+      // Chuyển đổi số thành chuỗi và định dạng
+      const formattedValue = this.customerPaid.toLocaleString('vi-VN') + 'đ';
+      return formattedValue; // Trả về giá trị đã định dạng
+    }
+    return ''; // Trả về chuỗi rỗng nếu customerPaid là null
+  }
+  
 }

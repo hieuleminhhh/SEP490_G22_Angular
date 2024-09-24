@@ -25,6 +25,8 @@ import { CheckoutService } from '../../../../service/checkout.service';
 import { AccountService } from '../../../../service/account.service';
 import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.component";
 import { NotificationService } from '../../../../service/notification.service';
+import { Title } from '@angular/platform-browser';
+import { CategoryService } from '../../../../service/category.service';
 @Component({
   selector: 'app-UpdateOfflineOrder',
   templateUrl: './UpdateOfflineOrder.component.html',
@@ -87,9 +89,11 @@ export class UpdateOfflineOrderComponent implements OnInit {
   private reservationQueue: any[] = [];
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute, private dishService: ManagerDishService,
     private comboService: ManagerComboService, private orderDetailService: ManagerOrderDetailService, private invoiceService: InvoiceService, private discountService: DiscountService,
-    private checkoutService: CheckoutService, private notificationService: NotificationService,private accountService: AccountService) { }
+    private checkoutService: CheckoutService, private notificationService: NotificationService,private accountService: AccountService, private titleService: Title, private categoryService: CategoryService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   ngOnInit() {
+    this.titleService.setTitle('Cập nhập đơn | Eating House');
+    this.getAllCategories();
     this.loadListDishes();
     this.loadListCombo();
     this.loadAddresses();
@@ -1240,7 +1244,18 @@ validateQuantity(index: number): void {
       }
     );
   }
-
+  categories: any;
+  getAllCategories() {
+    this.categoryService.getAllCategories().subscribe(
+      (data: any) => {
+        this.categories = data;
+        console.log(this.categories); // Kiểm tra cấu trúc dữ liệu
+      },
+      error => {
+        console.error('Error fetching categories', error);
+      }
+    );
+  }
 }
 
 
