@@ -57,9 +57,21 @@ export class NavbarComponent implements OnInit {
       }
     };
     this.socket.onclose = () => {
+      console.log('WebSocket connection closed, attempting to reconnect...');
+      setTimeout(() => {
+        this.initializeWebSocket(); // Hàm khởi tạo WebSocket
+      }, 5000); // Thử lại sau 5 giây
     };
     this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
     };
+  }
+  initializeWebSocket() {
+    this.socket = new WebSocket('wss://localhost:7188/ws');
+    this.socket.onopen = () => { /* xử lý onopen */ };
+    this.socket.onmessage = (event) => { /* xử lý onmessage */ };
+    this.socket.onclose = () => { /* xử lý onclose */ };
+    this.socket.onerror = (error) => { /* xử lý onerror */ };
   }
   getAccountDetails(accountId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
