@@ -61,8 +61,13 @@ export class InvoiceService {
     return this.http.post<any>(url, invoiceData, this.getHttpOptions());
   }
 
-  getStatistics(dateStart:any, dateEnd:any): Observable<any> {
-    const url = `https://localhost:7188/api/orders/statistics?startDate=${dateStart}&endDate=${dateEnd}`;
+  getStatistics(dateStart: any, dateEnd: any, id: number): Observable<any> {
+    let url;
+    if (id !== null) {
+      url = `https://localhost:7188/api/orders/statistics?startDate=${dateStart}&endDate=${dateEnd}&collectedById=${id}`;
+    } else {
+      url = `https://localhost:7188/api/orders/statistics?startDate=${dateStart}&endDate=${dateEnd}`;
+    }
     return this.http.get<any>(url, this.getHttpOptions());
   }
   getCancelOrder(): Observable<any> {
@@ -74,7 +79,7 @@ export class InvoiceService {
     return this.http.get<any>(url, this.getHttpOptions());
   }
 
-  updatePayment(id:number, data: any): Observable<any> {
+  updatePayment(id: number, data: any): Observable<any> {
     const url = `https://localhost:7188/api/Invoice/updatePaymentStatus/${id}`;
     return this.http.put<any>(url, data, this.getHttpOptions());
   }
@@ -83,12 +88,12 @@ export class InvoiceService {
     const url = `https://localhost:7188/api/orders/${orderId}/Updatestatus`;
     return this.http.put(url, status, this.getHttpOptions());
   }
-  getOrderDetail(id:number): Observable<any> {
+  getOrderDetail(id: number): Observable<any> {
     const url = `https://localhost:7188/api/orders/${id}`;
     return this.http.get<any>(url, this.getHttpOptions());
   }
 
-  getOrderExport(request:any): Observable<any> {
+  getOrderExport(request: any): Observable<any> {
     const url = `https://localhost:7188/api/orders/order/export/cashier?exportorderIds=${request}`;
     return this.http.get<any>(url, this.getHttpOptions());
   }
