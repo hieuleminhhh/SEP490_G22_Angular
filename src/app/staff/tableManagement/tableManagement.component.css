@@ -2050,73 +2050,72 @@ button:focus {
   background-color: #218838;
   /* Màu nền tối hơn khi hover */
 }
-
-/* Custom Modal styles */
+/* Modal container */
 .custom-modal {
-  display: none;
-  /* Ẩn modal mặc định */
-  position: fixed;
-  /* Hiển thị modal cố định khi cuộn trang */
-  z-index: 1000;
-  /* Độ sâu của modal */
-  width: 100%;
-  /* Thay đổi chiều rộng về 100% */
-  height: 100%;
-  /* Thay đổi chiều cao về 100% */
-  overflow: auto;
-  /* Cho phép cuộn khi modal dài hơn trang */
-  background-color: rgba(0, 0, 0, 0.5);
-  /* Màu nền mờ */
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1200; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.6); /* Black background with opacity */
+
 }
 
+/* Modal open state */
+.custom-show-menu {
+  display: block; /* Display when modal is triggered */
+}
+
+/* Modal dialog */
 .custom-modal-dialog {
-  display: flex;
-  justify-content: center;
-  /* Căn giữa theo chiều ngang */
-  align-items: center;
-  /* Căn giữa theo chiều dọc */
-  height: 100%;
-  /* Đảm bảo chiều cao 100% cho dialog */
-}
-
-.custom-modal-content {
-  background-color: #fefefe;
-  /* Màu nền của modal */
-  padding: 20px;
-  border: 1px solid #ccc;
-  /* Viền xung quanh */
-  width: 100%;
-  max-width: 1400px;
-  /* Chiều rộng tối đa cho modal thông thường */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  /* Đổ bóng cho modal */
-  border-radius: 8px;
-  /* Bo góc */
+  position: relative;
   margin: auto;
-  /* Đảm bảo tự động căn giữa */
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  max-width: 1450px;
+  width: 100%;
+  top: 10%; /* Modal appears slightly down from the top */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a slight shadow */
 }
 
-/* Để nút đóng được căn đúng vị trí */
+/* Modal content */
+.custom-modal-content {
+  position: relative;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  width: 1400px;
+}
+
+/* Close button */
 .custom-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
   color: #aaa;
-  float: right;
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;
+  transition: color 0.3s;
 }
 
+/* Close button hover effect */
 .custom-close:hover,
 .custom-close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
+  color: #000;
 }
 
-/* Show class for modal */
-.custom-show {
-  display: block;
-  /* Hiện modal */
+/* Add responsive design for smaller screens */
+@media screen and (max-width: 600px) {
+  .custom-modal-dialog {
+    width: 90%; /* Adjust width for smaller devices */
+  }
 }
+
 
 /* Bố cục cho giỏ hàng */
 .dish {

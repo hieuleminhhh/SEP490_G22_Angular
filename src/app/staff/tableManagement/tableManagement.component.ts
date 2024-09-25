@@ -145,7 +145,7 @@ export class TableManagementComponent implements OnInit {
     this.generateAvailableHours();
   }
   ngAfterViewInit() {
-    this.titleService.setTitle('Đặt bàn | Eating House'); 
+    this.titleService.setTitle('Đặt bàn | Eating House');
   }
   ngOnInit(): void {
     this.getTableData();
@@ -611,23 +611,25 @@ export class TableManagementComponent implements OnInit {
   }
   validMessage: string = '';
   openConfirmSaveModal() {
-    const modal = document.getElementById('updateTimeModal');
-    if (modal) {
-      modal.classList.remove('show');
-      modal.style.display = 'none';
-    }
+
     if (this.ishas === true) {
       const confirmModal = document.getElementById('confirmSaveModal');
       if (confirmModal) {
         confirmModal.classList.add('show');
         confirmModal.style.display = 'block';
       }
+       const modal = document.getElementById('updateTimeModal');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
     } else {
       this.validMessage = 'Chưa xếp đủ bàn cho số lượng khách';
       setTimeout(() => {
         this.validMessage = '';
       }, 3000);
     }
+
     console.log(this.selectedTableIds);
 
   }
@@ -1467,20 +1469,32 @@ export class TableManagementComponent implements OnInit {
     this.getTableOFFloorEmpty(this.selectedFloor, dateTime);
   }
   closeTableAssignPopup() {
-    const modal = document.getElementById('updateTimeModal');
+    if (this.ishas === true) {
+      const confirmModal = document.getElementById('confirmSaveModal');
+      if (confirmModal) {
+        confirmModal.classList.add('show');
+        confirmModal.style.display = 'block';
+      }
+       const modal = document.getElementById('updateTimeModal');
     if (modal) {
       modal.classList.remove('show');
       modal.style.display = 'none';
     }
-    this.showPersonalInfo = false;
+    } else {
+      this.validMessage = 'Chưa xếp đủ bàn cho số lượng khách';
+      setTimeout(() => {
+        this.validMessage = '';
+      }, 3000);
+    }
+    // this.showPersonalInfo = false;
   }
-
   openMenuPopup(): void {
     this.isMenuPopupOpen = true;
-    console.log(this.isMenuPopupOpen);
+    console.log('Modal Opened:', this.isMenuPopupOpen);
   }
   closeMenuPopup(): void {
     this.isMenuPopupOpen = false;
+    console.log('Modal Closed:', this.isMenuPopupOpen);
   }
   decreaseQuantity(item: any) {
     if (item.quantity > 1) {

@@ -80,7 +80,6 @@ export class NavbarComponent implements OnInit {
         this.currentPassword = response.password;
       },
       error => {
-        console.error('Error fetching account details:', error);
       }
     );
   }
@@ -92,7 +91,6 @@ export class NavbarComponent implements OnInit {
         this.itemCountNoti = unseenNotifications.length;
       },
       error => {
-        console.error('Error fetching account details:', error);
       }
     );
   }
@@ -125,7 +123,6 @@ export class NavbarComponent implements OnInit {
     this.accountService.changePassword(this.accountId ?? 0, passwordData)
       .subscribe({
         next: (response) => {
-          console.log('Password changed successfully:', response);
           this.successMessage = 'Đổi mật khẩu thành công.';
           this.errorMessage = '';
           setTimeout(() => {
@@ -155,7 +152,6 @@ export class NavbarComponent implements OnInit {
     if (this.accountId) {
       this.accountService.changeProfile(this.accountId, this.account).subscribe({
         next: (updatedAccount) => {
-          console.log('Profile updated successfully:', updatedAccount);
           window.location.reload();
         },
         error: (error) => {

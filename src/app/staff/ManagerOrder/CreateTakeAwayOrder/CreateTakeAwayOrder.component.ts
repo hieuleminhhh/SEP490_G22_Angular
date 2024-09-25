@@ -163,7 +163,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
     };
   }
   initializeWebSocket() {
-    this.socket = new WebSocket('ws://yourserver.com');
+    this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => { /* xử lý onopen */ };
     this.socket.onmessage = (event) => { /* xử lý onmessage */ };
     this.socket.onclose = () => { /* xử lý onclose */ };
@@ -191,18 +191,14 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   }
   makeReservation(reservationData: any) {
     const message = JSON.stringify(reservationData);
-
-    // Check if the WebSocket connection (this.socket) is defined
     if (!this.socket) {
       console.error('WebSocket is not initialized.');
-      return; // Exit the function if socket is not defined
+      return;
     }
-
-    // Check the WebSocket readyState
     if (this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(message); // Send the reservation request if WebSocket is open
+      this.socket.send(message);
     } else if (this.socket.readyState === WebSocket.CONNECTING) {
-      this.reservationQueue.push(message); // Queue the message if WebSocket is connecting
+      this.reservationQueue.push(message);
     } else {
       console.log('WebSocket is not open. Current state:', this.socket.readyState);
     }
@@ -930,7 +926,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
         console.log('Order created successfully:', response);
         this.lastOrderId = response.orderId;
         console.log(this.lastOrderId);
-        this.createNotification(this.lastOrderId);
+
         setTimeout(() => this.successMessage = '', 5000);
       },
       error => {
@@ -969,6 +965,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
         response => {
           console.log('Order status updated and invoice created:', response);
           this.loadInvoice(this.lastOrderId!);
+          this.createNotification(this.lastOrderId);
         },
         error => {
           console.error('Error updating order status and creating invoice:', error);
