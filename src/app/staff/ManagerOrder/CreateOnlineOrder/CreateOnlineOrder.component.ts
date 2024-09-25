@@ -986,8 +986,10 @@ clearErrorMessageAfterTimeout() {
       const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : totalAmount;
       const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - totalAmount : 0;
       let status = 0;
+      let deposite = 0
       if (paymentMethod === 0 || paymentMethod === 1) {
         status = 1;
+        deposite = totalAmount
       }
 
       const updateData = {
@@ -1000,7 +1002,8 @@ clearErrorMessageAfterTimeout() {
         amountReceived,
         returnAmount,
         paymentMethods: paymentMethod,
-        description: ""
+        description: "",
+        deposits: deposite,
       };
 
       console.log('Update Data:', updateData);

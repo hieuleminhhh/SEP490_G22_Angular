@@ -14,6 +14,7 @@ import { AccountService } from '../../../service/account.service';
 })
 export class SidebarOrderComponent implements OnInit {
   isMenuCollapsedOrderStaff: boolean = false;
+  isMenuCollapsedOrderStaff2: boolean = false;
   isMenuCollapsedCashier: boolean = false;
   accountId: number | null = null;
 
@@ -45,11 +46,23 @@ export class SidebarOrderComponent implements OnInit {
       this.isMenuCollapsedOrderStaff = false; // Close the order menu when opening the table management menu
     }
   }
+  toggleOrderMenuOrderStaff2() {
+    this.isMenuCollapsedOrderStaff2 = !this.isMenuCollapsedOrderStaff2; // Toggle the table management menu
+    if (this.isMenuCollapsedOrderStaff2) {
+      this.isMenuCollapsedCashier = false; // Close the order menu when opening the table management menu
+    }
+  }
 
   isOrderMenuActiveOrderStaff(): boolean {
     const currentUrl = this.router.url;
     return this.isMenuCollapsedOrderStaff ||
       currentUrl.includes('/listTable') ||
+      currentUrl.includes('/createTakeaway') ||
+      currentUrl.includes('/createOnline');
+  }
+  isOrderMenuActiveOrderStaff2(): boolean {
+    const currentUrl = this.router.url;
+    return this.isMenuCollapsedOrderStaff2 ||
       currentUrl.includes('/createTakeaway') ||
       currentUrl.includes('/createOnline');
   }
@@ -64,13 +77,17 @@ export class SidebarOrderComponent implements OnInit {
   }
 
   toggleOrderMenuCashier() {
-    this.isMenuCollapsedCashier = !this.isMenuCollapsedCashier; // Toggle the order menu
+    this.isMenuCollapsedCashier = !this.isMenuCollapsedCashier;
+    if (this.isMenuCollapsedCashier) {
+      this.isMenuCollapsedOrderStaff2 = false; // Close the order menu when opening the table management menu
+    } // Toggle the order menu
   }
   openOrderMenuOrderStaff() {
     this.isMenuCollapsedOrderStaff = true; // Ensure the order menu is open
   }
   openOrderMenuCashier() {
-    this.isMenuCollapsedCashier = true; // Ensure the order menu is open
+    this.isMenuCollapsedCashier = true; 
+    // Ensure the order menu is open
   }
   tableManagementMenuActive: boolean = false;
 
@@ -82,10 +99,7 @@ export class SidebarOrderComponent implements OnInit {
 
   isOrderMenuActiveOrderCashier(): boolean {
     const currentUrl = this.router.url;
-    return this.isMenuCollapsedCashier || // Kiểm tra trạng thái của menu
-      currentUrl.includes('/listTable') ||
-      currentUrl.includes('/createTakeaway') ||
-      currentUrl.includes('/createOnline') ||
+    return this.isMenuCollapsedCashier || 
       currentUrl.includes('/refund') ||
       currentUrl.includes('/delivery') ||
       currentUrl.includes('/managerorder')
