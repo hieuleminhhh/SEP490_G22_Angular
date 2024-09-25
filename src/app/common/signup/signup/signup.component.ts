@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AccountService } from '../../../../service/account.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-signup',
@@ -13,7 +14,7 @@ import { AccountService } from '../../../../service/account.service';
 })
 export class SignupComponent implements OnInit {
 
-  constructor(private router: Router, private accountService: AccountService) { }
+  constructor(private router: Router, private accountService: AccountService, private titleService: Title) { }
   username: string = '';
   email: string = '';
   password: string = '';
@@ -23,6 +24,7 @@ export class SignupComponent implements OnInit {
   errorMessage: string | null = null;
   passwordError: string | null = null;
   ngOnInit() {
+    this.titleService.setTitle('Đăng ký | Eating House');
   }
 
   loginWithGoogle() {

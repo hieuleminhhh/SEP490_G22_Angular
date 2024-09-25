@@ -11,6 +11,7 @@ import { Combo } from '../../../models/combo.model';
 import { ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-menu',
@@ -20,6 +21,7 @@ import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.co
   imports: [HttpClientModule, AsyncPipe, CommonModule, FormsModule, CurrencyFormatPipe]
 })
 export class MenuComponent {
+  @Input() modalTitle: string = ''; 
   http = inject(HttpClient);
   successMessages: string[] = [];
 
@@ -46,11 +48,12 @@ export class MenuComponent {
   ngOnInit(): void {
     this.loadDishes();
     sessionStorage.removeItem('isReser');
+    this.titleService.setTitle('Thực đơn | Eating House');
 
   }
 
   constructor(private cartService: CartService, private reservationService: ReservationService,
-    private categoryService: CategoryService, private cdr: ChangeDetectorRef,
+    private categoryService: CategoryService, private cdr: ChangeDetectorRef, private titleService: Title
   ) {
     this.dishs$ = this.getDish();
     this.category$ = this.getCategory();

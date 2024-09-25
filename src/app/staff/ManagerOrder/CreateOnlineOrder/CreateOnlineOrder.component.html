@@ -518,7 +518,7 @@
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                       <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#paymentModalOnline" (click)="createOrder()">Xác nhận</button>
+                        data-bs-target="#paymentModalOnline" (click)="createOrder()"  [disabled]="name.invalid || phone.invalid || address.invalid || email.invalid">Xác nhận</button>
                     </div>
                   </div>
                 </div>

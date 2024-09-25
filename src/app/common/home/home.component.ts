@@ -8,6 +8,7 @@ import { Dish } from '../../../models/dish.model';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Category } from '../../../models/category.model';
 import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-home',
@@ -24,8 +25,10 @@ export class HomeComponent {
   selectedItem: any;
   selectedCategory: string | null = null;
 
-  constructor(private cartService: CartService, private cdr: ChangeDetectorRef, private http: HttpClient) {}
-
+  constructor(private cartService: CartService, private cdr: ChangeDetectorRef, private http: HttpClient, private titleService: Title) {}
+  ngOnInit(): void {
+    this.titleService.setTitle('Trang chủ | Eating House');
+  }
   addToCart(item: any, itemType: string) {
     const successMessage = 'Đã thêm sản phẩm vào giỏ hàng!';
 
