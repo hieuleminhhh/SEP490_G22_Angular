@@ -22,8 +22,6 @@ export class ManageInvoiceComponent implements OnInit {
   data: any;
   orderCancel: any;
   orderShip: any;
-  selectedItem: any;
-
   filteredOrders: any[] = [];
   filteredOrdersCancel: any[] = [];
   selectedEmployee: string = '';
@@ -46,9 +44,9 @@ export class ManageInvoiceComponent implements OnInit {
     this.dateFrom = this.formatDate(today);
     this.dateTo = this.formatDate(today);
     this.dateNow = this.formatDate(today);
-    this.getOrdersStatic();
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
+    this.getNotificationByType(this.accountId);
     this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => {
       while (this.reservationQueue.length > 0) {
@@ -64,9 +62,10 @@ export class ManageInvoiceComponent implements OnInit {
     this.socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
+    this.getOrdersStatic();
   }
   initializeWebSocket() {
-    this.socket = new WebSocket('ws://yourserver.com');
+    this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => { /* xử lý onopen */ };
     this.socket.onmessage = (event) => { /* xử lý onmessage */ };
     this.socket.onclose = () => { /* xử lý onclose */ };
@@ -128,9 +127,14 @@ export class ManageInvoiceComponent implements OnInit {
   }
 
   getOrdersStatic(): void {
-    this.invoiceService.getStatistics(this.dateFrom, this.dateTo).subscribe(
+    console.log(this.accountId);
+    if(this.role!==3){
+      this.accountId=null;
+    }
+    this.invoiceService.getStatistics(this.dateFrom, this.dateTo, this.accountId).subscribe(
       response => {
         this.data = response;
+        console.log(this.data);
       },
       error => {
         console.error('Error:', error);
@@ -141,7 +145,17 @@ export class ManageInvoiceComponent implements OnInit {
   exportData(): void {
     this.getOrderExport();
   }
-
+  role:any;
+  getNotificationByType(accountId: number): void {
+    this.notificationService.getType(accountId).subscribe(
+      response => {
+        this.role=response;
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
   getOrderExport(): void {
     this.invoiceService.getOrderExport(this.data.orderIds).subscribe(
       response => {
@@ -209,5 +223,17 @@ export class ManageInvoiceComponent implements OnInit {
       hour12: false // Không sử dụng định dạng 12 giờ
     });
   }
+  selectedItem: any;
+  showDetails(order: any) {
+    console.log(order);
+    this.selectedItem = order;
+  }
+  showDetailsCashier:boolean=false;
 
+  showDetailCashier(){
+    this.showDetailsCashier=true;
+  }
+  goBack(){
+    this.showDetailsCashier=false;
+  }
 }

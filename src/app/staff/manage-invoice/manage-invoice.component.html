@@ -5,7 +5,7 @@
       <app-SidebarOrder></app-SidebarOrder>
     </nav>
     <div class="app-body-main-content">
-      <section class="service-section">
+      <section class="service-section" *ngIf="role==3">
         <br><br>
         <div *ngIf="selectedTab === 'overview'" class="overview-section">
           <div class="date-filters">
@@ -24,7 +24,6 @@
               </div>
             </div>
           </div>
-
           <div class="tiles">
             <article class="tile">
               <div class="tile-header">
@@ -32,7 +31,7 @@
                 <h3>
                   <span>Số đơn hoàn thành</span>
                   <hr>
-                  <span>{{data?.totalOrders}}</span>
+                  <span>{{data[0]?.totalOrders}}</span>
                 </h3>
               </div>
             </article>
@@ -42,14 +41,14 @@
                 <h3>
                   <span>Doanh thu</span>
                   <hr>
-                  <span>{{data?.totalRevenue | currencyFormat }}</span>
+                  <span>{{data[0]?.totalRevenue | currencyFormat }}</span>
                 </h3>
               </div>
             </article>
           </div>
         </div>
 
-        <section class="payment-section" *ngIf="selectedTab === 'overview'">
+        <section class="payment-section">
           <h2>Phương thức thanh toán</h2>
           <br>
           <div class="row">
@@ -57,22 +56,179 @@
               <div class="payments">
                 <div class="payment">
                   <div class="payment-details">
-                    <p>Tiền mặt: ({{data?.orderCountByPaymentMethod0+data?.orderCountByPaymentMethod2}}) đơn</p>
+                    <p>Tiền mặt: ({{data[0]?.orderCountByPaymentMethod0+data[0]?.orderCountByPaymentMethod2}}) đơn</p>
                     <div>
-                      <span>{{(data?.revenueByPaymentMethod0+data?.revenueByPaymentMethod2) | currencyFormat }} </span>
+                      <span>{{(data[0]?.revenueByPaymentMethod0+data[0]?.revenueByPaymentMethod2) | currencyFormat }}
+                      </span>
                     </div>
                   </div>
                 </div>
                 <div class="payment">
                   <div class="payment-details">
-                    <p>Chuyển khoản: ({{data?.orderCountByPaymentMethod1}}) đơn</p>
+                    <p>Chuyển khoản: ({{data[0]?.orderCountByPaymentMethod1}}) đơn</p>
                     <div>
-                      <span>{{(data?.revenueByPaymentMethod1) | currencyFormat }}</span>
+                      <span>{{(data[0]?.revenueByPaymentMethod1) | currencyFormat }}</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+          <br>
+          <div class="payment-section-footer">
+            <button class="save-button" (click)="exportData()">
+              Xuất file báo cáo
+            </button>
+          </div>
+        </section>
+      </section>
+      <!-- *ngIf="role!==3" -->
+      <section class="service-section" *ngIf="!showDetailsCashier">
+        <br><br>
+        <div *ngIf="selectedTab === 'overview'" class="overview-section">
+          <div class="date-filters">
+            <div class="date-filter" style="max-width: 250px;">
+              <div class="input-group">
+                <label class="input-group-text" for="dateFrom">Từ ngày</label>
+                <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom" [max]="dateTo"
+                  (change)="onDateFromChange()">
+              </div>
+            </div>
+            <div class="date-filter" style="max-width: 250px;">
+              <div class="input-group">
+                <label class="input-group-text" for="dateTo">Đến ngày</label>
+                <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo" [max]="dateNow"
+                  (change)="onDateToChange()">
+              </div>
+            </div>
+          </div>
+        </div>
+        <section class="payment-section">
+          <h2>Phương thức thanh toán</h2>
+          <br>
+          <div class="row">
+            <div class="col-md-3">
+              <div class="payments">
+                <div class="payment">
+                  <div class="payment-details">
+                    <p>Tiền mặt: ({{data[0]?.orderCountByPaymentMethod0+data[0]?.orderCountByPaymentMethod2}}) đơn</p>
+                    <div>
+                      <span>{{(data[0]?.revenueByPaymentMethod0+data[0]?.revenueByPaymentMethod2) | currencyFormat }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="payment">
+                  <div class="payment-details">
+                    <p>Chuyển khoản: ({{data[0]?.orderCountByPaymentMethod1}}) đơn</p>
+                    <div>
+                      <span>{{(data[0]?.revenueByPaymentMethod1) | currencyFormat }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br>
+        </section>
+        <hr>
+        <section class="payment-section">
+          <h2>Danh sách thu ngân và dòng tiền</h2>
+          <br>
+          <div class="row">
+            <table id="cashier-table">
+              <thead>
+                <tr>
+                  <th>Nhân viên</th>
+                  <th>Số đơn đã thu tiền</th>
+                  <th>Số đơn đã hoàn tiền</th>
+                  <th>Doanh thu</th>
+                  <th>Số tiền đã hoàn trả</th>
+                  <th>Số tiền cần nộp lại</th>
+                  <th></th>
+                  <!-- <th>Tình trạng</th> -->
+                </tr>
+              </thead>
+              <tbody id="cashier-table-body">
+                <ng-container *ngFor="let item of data">
+                  <tr>
+                    <td>{{ item.collectedByFirstName }} {{ item.collectedByLastName }}</td>
+                    <td>{{ item.totalOrders }}</td>
+                    <td>{{ item.totalOrders }}</td>
+                    <td>{{ item.totalOrders }}</td>
+                    <td>{{ item.totalOrders }}</td>
+                    <td>{{ item.revenueByPaymentMethod0 | currencyFormat }}</td>
+                    <td><button (click)="showDetailCashier()">Chi tiết</button></td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+          </div>
+          <br>
+          <div class="payment-section-footer">
+            <button class="save-button" (click)="exportData()">
+              Xuất file báo cáo
+            </button>
+          </div>
+        </section>
+      </section>
+
+      <section class="service-section" *ngIf="showDetailsCashier">
+        <br><br>
+        <div *ngIf="selectedTab === 'overview'" class="overview-section">
+          <div class="date-filters">
+            <div class="date-filter" style="max-width: 250px;">
+              <div class="input-group">
+                <label class="input-group-text" for="dateFrom">Từ ngày</label>
+                <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom" [max]="dateTo"
+                  (change)="onDateFromChange()">
+              </div>
+            </div>
+            <div class="date-filter" style="max-width: 250px;">
+              <div class="input-group">
+                <label class="input-group-text" for="dateTo">Đến ngày</label>
+                <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo" [max]="dateNow"
+                  (change)="onDateToChange()">
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr>
+        <section class="payment-section">
+          <div style="display: flex;align-items: center;justify-content: center;">
+            <a (click)="goBack()" class="back-link">
+              <i class="fas fa-arrow-left back-icon"></i>
+            </a>
+            <h2>Đơn hàng nhân viên xử lý</h2>
+          </div>
+
+          <br>
+          <div class="row">
+            <table id="cashier-table">
+              <thead>
+                <tr>
+                  <th>Mã đơn hàng</th>
+                  <th>Trạng thái đơn hàng</th>
+                  <th>Ngày đặt hàng</th>
+                  <th>Tổng tiền</th>
+                  <th></th>
+                  <!-- <th>Tình trạng</th> -->
+                </tr>
+              </thead>
+              <tbody id="cashier-table-body">
+                <ng-container *ngFor="let item of data">
+                  <tr>
+                    <td>{{ item.collectedByFirstName }} {{ item.collectedByLastName }}</td>
+                    <td>{{ item.totalOrders }}</td>
+                    <td>{{ item.totalOrders }}</td>
+                    <td>{{ item.revenueByPaymentMethod0 | currencyFormat }}</td>
+                    <td><button class="action-button view-button" (click)="showDetails(item)">
+                        <i class="fas fa-eye"></i>
+                      </button></td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
           </div>
           <br>
           <div class="payment-section-footer">
