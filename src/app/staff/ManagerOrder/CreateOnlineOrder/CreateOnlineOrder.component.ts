@@ -482,7 +482,7 @@ clearErrorMessageAfterTimeout() {
       response => {
         console.log('Order created successfully:', response);
         this.successMessage = 'Đơn hàng đã được tạo thành công!';
-        this.createNotification(response.orderId);
+
         this.lastOrderId = response.orderId;
         setTimeout(() => this.successMessage = '', 5000);
       },
@@ -1013,7 +1013,7 @@ clearErrorMessageAfterTimeout() {
         async response => {
           console.log('Order status updated and invoice created:', response);
           this.loadInvoice(this.lastOrderId!);
-
+          this.createNotification(response.orderId);
           // Gửi email thông báo cho khách hàng
           try {
             const emailResponse = await this.orderService.sendOrderEmail(this.lastOrderId).toPromise();

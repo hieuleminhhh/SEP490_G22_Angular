@@ -926,7 +926,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
         console.log('Order created successfully:', response);
         this.lastOrderId = response.orderId;
         console.log(this.lastOrderId);
-        this.createNotification(this.lastOrderId);
+
         setTimeout(() => this.successMessage = '', 5000);
       },
       error => {
@@ -965,6 +965,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
         response => {
           console.log('Order status updated and invoice created:', response);
           this.loadInvoice(this.lastOrderId!);
+          this.createNotification(this.lastOrderId);
         },
         error => {
           console.error('Error updating order status and creating invoice:', error);

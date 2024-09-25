@@ -46,7 +46,6 @@ export class CookingManagementComponent implements OnInit {
       console.log(data);
       try {
         this.getOrders('Current');
-
       } catch (error) {
         console.error('Error parsing reservation data:', error);
       }
