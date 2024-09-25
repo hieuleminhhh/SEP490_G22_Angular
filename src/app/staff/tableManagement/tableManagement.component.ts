@@ -1472,15 +1472,15 @@ export class TableManagementComponent implements OnInit {
       modal.classList.remove('show');
       modal.style.display = 'none';
     }
-    this.showPersonalInfo = false;
+    // this.showPersonalInfo = false;
   }
-
   openMenuPopup(): void {
     this.isMenuPopupOpen = true;
-    console.log(this.isMenuPopupOpen);
+    console.log('Modal Opened:', this.isMenuPopupOpen);
   }
   closeMenuPopup(): void {
     this.isMenuPopupOpen = false;
+    console.log('Modal Closed:', this.isMenuPopupOpen);
   }
   decreaseQuantity(item: any) {
     if (item.quantity > 1) {
