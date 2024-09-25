@@ -133,7 +133,7 @@ export class CreateOfflineOrderComponent implements OnInit {
     };
   }
   initializeWebSocket() {
-    this.socket = new WebSocket('ws://yourserver.com');
+    this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => { /* xử lý onopen */ };
     this.socket.onmessage = (event) => { /* xử lý onmessage */ };
     this.socket.onclose = () => { /* xử lý onclose */ };

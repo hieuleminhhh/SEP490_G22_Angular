@@ -258,4 +258,9 @@ export class ManageInvoiceComponent implements OnInit {
   goBack(){
     this.showDetailsCashier=false;
   }
+
+  closePopup() {
+    this.selectedItem = null;
+  }
+
 }

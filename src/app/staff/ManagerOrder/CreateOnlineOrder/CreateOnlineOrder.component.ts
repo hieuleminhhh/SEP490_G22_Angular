@@ -151,7 +151,7 @@ export class CreateOnlineOrderComponent implements OnInit {
     };
   }
   initializeWebSocket() {
-    this.socket = new WebSocket('ws://yourserver.com');
+    this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => { /* xử lý onopen */ };
     this.socket.onmessage = (event) => { /* xử lý onmessage */ };
     this.socket.onclose = () => { /* xử lý onclose */ };
@@ -438,7 +438,7 @@ clearErrorMessageAfterTimeout() {
 
 
     // Calculate total amount and set various properties
-   
+
     let receivingTime: string = '';
     if (this.date && this.time) {
       receivingTime = this.formatDateTime(this.date, this.time);

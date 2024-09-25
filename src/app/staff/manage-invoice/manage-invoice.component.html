@@ -1,7 +1,8 @@
 <div class="app">
   <app-HeaderOrderStaff></app-HeaderOrderStaff>
   <div class="app-body">
-    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="padding: 12px;"  *ngIf="account?.role === 'Cashier'">
+    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="padding: 12px;"
+      *ngIf="account?.role === 'Cashier'">
       <app-SidebarOrder></app-SidebarOrder>
     </nav>
     <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light collapse" *ngIf="account?.role === 'Manager'">
@@ -85,8 +86,8 @@
           </div>
         </section>
       </section>
-      <!-- *ngIf="role!==3" -->
-      <section class="service-section" *ngIf="!showDetailsCashier">
+
+      <section class="service-section" *ngIf="!showDetailsCashier && role!==3">
         <br><br>
         <div *ngIf="selectedTab === 'overview'" class="overview-section">
           <div class="date-filters">
@@ -198,12 +199,13 @@
         </div>
         <hr>
         <section class="payment-section">
-          <div style="display: flex;align-items: center;justify-content: center;">
-            <a (click)="goBack()" class="back-link">
+          <div style="position: relative; display: flex; align-items: center; justify-content: center;">
+            <a (click)="goBack()" class="back-link" style="position: absolute; left: 0;">
               <i class="fas fa-arrow-left back-icon"></i>
             </a>
             <h2>Đơn hàng nhân viên xử lý</h2>
           </div>
+
 
           <br>
           <div class="row">
@@ -241,6 +243,77 @@
           </div>
         </section>
       </section>
+
+      <!-- Popup for item details -->
+      <div *ngIf="selectedItem" class="popup" (click)="closePopup()">
+        <div class="popup-content" (click)="$event.stopPropagation()">
+          <span class="close" (click)="closePopup()">&times;</span>
+          <div class="details-container">
+            <h3>Đơn hàng: {{selectedItem.orderId}}</h3>
+            <p>Loại đơn: {{ selectedItem.orderType === 1 ? "Mang về" : "Giao hàng" }}</p>
+            <p>Tình trạng: {{selectedItem.status === 1 ? "Hoàn thành" : "Chưa hoàn thành"}}</p>
+            <p>Tên người nhận: {{selectedItem.consigneeName}}</p>
+            <p>Số điện thoại: {{selectedItem.guestPhone}}</p>
+            <p>Địa chỉ: {{selectedItem.guestAddress}}</p>
+            <p>Thời gian dự kiến nhận hàng: {{ selectedItem.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</p>
+
+            <table class="table table-bordered table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>Món ăn</th>
+                  <th>Số lượng</th>
+                  <th>Hoàn thành</th>
+                  <th>Tổng số tiền</th>
+                </tr>
+              </thead>
+              <tbody>
+                <ng-container *ngFor="let item of selectedItem.itemInOrderDetails">
+                  <tr>
+                    <td>{{ item.nameCombo || item.itemName }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.dishesServed }}</td>
+                    <td>{{ item.unitPrice | currencyFormat }}</td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+            <div class="summary-section mt-4">
+              <div class="row">
+                <!-- First Column -->
+                <div class="col-md-6">
+                  <div class="d-flex justify-content-between" *ngIf="selectedItem.discountPercent">
+                    <span class="fw-bold">Tạm tính:</span>
+                    <span>{{ selectedItem.totalAmount | currencyFormat }}</span>
+                  </div>
+                  <div *ngIf="selectedItem.discountPercent" class="d-flex justify-content-between">
+                    <span class="fw-bold">Giảm giá:</span>
+                    <span>{{ selectedItem.totalAmount*selectedItem.discountPercent/100 | currencyFormat }}</span>
+                  </div>
+                  <hr>
+                  <div class="d-flex justify-content-between">
+                    <span class="fw-bold">Tổng cộng:</span>
+                    <span>{{ selectedItem.totalAmount - (selectedItem.totalAmount*selectedItem.discountPercent/100) |
+                      currencyFormat }}</span>
+                  </div>
+                </div>
+                <!-- Row for the payment status badge -->
+                <div class="col-md-2"></div>
+                <div class="col-md-3">
+                  <div class="col-md-6 offset-md-6 d-flex align-items-center justify-content-end">
+                    <div *ngIf="selectedItem.deposits > 0" class="badge bg-success" style="font-size: 18px;">
+                      Đã thanh toán
+                    </div>
+                    <div *ngIf="selectedItem.deposits === 0" class="badge bg-danger" style="font-size: 18px;">
+                      Chưa thanh toán
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
