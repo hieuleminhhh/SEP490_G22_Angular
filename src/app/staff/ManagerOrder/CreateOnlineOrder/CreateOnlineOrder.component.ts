@@ -438,7 +438,7 @@ clearErrorMessageAfterTimeout() {
 
 
     // Calculate total amount and set various properties
-    const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
+   
     let receivingTime: string = '';
     if (this.date && this.time) {
       receivingTime = this.formatDateTime(this.date, this.time);
@@ -449,17 +449,21 @@ clearErrorMessageAfterTimeout() {
       const currentTimeStr = currentTime.toTimeString().split(' ')[0].substring(0, 5);
       receivingTime = this.formatDateTime(currentDate, currentTimeStr);
     }
+    const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
     const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
-    const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0; // Convert paymentMethod to number
-
+    const paymentMethod = parseInt(this.paymentMethod, 10); // Convert paymentMethod to number
+    let deposit = 0;
+    if (paymentMethod === 0 || paymentMethod === 1) {
+      deposit = this.totalAmount;
+    }
     this.addNew = {
       ...this.addNew, // Spread existing properties if any
       totalAmount,
       orderDetails,
       orderDate: this.getVietnamTime(),
       recevingOrder: receivingTime,
-      deposits: 0,
-      paymentMethods: paymentMethodValue,
+      deposits: deposit,
+      paymentMethods: paymentMethod,
       description: 'Order payment description',
       discountId: this.selectedDiscount,
       taxcode: 'ABCD',

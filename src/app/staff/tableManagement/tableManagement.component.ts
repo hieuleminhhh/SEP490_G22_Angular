@@ -144,7 +144,9 @@ export class TableManagementComponent implements OnInit {
     };
     this.generateAvailableHours();
   }
-
+  ngAfterViewInit() {
+    this.titleService.setTitle('Đặt bàn | Eating House'); 
+  }
   ngOnInit(): void {
     this.getTableData();
     this.searchTermSubject.pipe(debounceTime(300)).subscribe(searchTerm => {

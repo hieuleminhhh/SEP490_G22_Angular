@@ -4,7 +4,7 @@
     <app-SideBar></app-SideBar>
   </nav>
   <div class="content">
-    <h1>Quản Lý Danh Mục</h1>
+    <h1>Quản Lý Thể loại</h1>
     <table>
       <thead>
         <tr>
@@ -28,8 +28,7 @@
   </div>
 
   <!-- Modal -->
-  <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel"
-    aria-hidden="true">
+  <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -40,13 +39,22 @@
           <!-- Form for adding a new category -->
           <form (ngSubmit)="onSubmit()" #categoryForm="ngForm">
             <div class="mb-3">
-              <label for="categoryName" class="form-label">Tên Danh Mục</label>
+              <label for="categoryName" class="form-label">Tên thể loại</label>
               <input type="text" class="form-control" id="categoryName" name="categoryName" [(ngModel)]="categoryName"
-                required />
+                required #categoryNameInput="ngModel" />
+  
+              <!-- Validation message for required field -->
+              <div *ngIf="categoryNameInput.invalid && (categoryNameInput.dirty || categoryNameInput.touched)"
+                   class="text-danger">
+                Bạn phải nhập tên thể loại?
+              </div>
             </div>
-            <!-- Add more fields as necessary -->
-            <button type="submit" class="btn btn-primary" (click)="addCategory()">Thêm</button>
+  
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary" [disabled]="categoryForm.invalid">Thêm</button>
           </form>
+  
+          <!-- Success message -->
           <div *ngIf="successMessage" class="alert alert-success mt-3">
             {{ successMessage }}
           </div>
@@ -54,3 +62,4 @@
       </div>
     </div>
   </div>
+  

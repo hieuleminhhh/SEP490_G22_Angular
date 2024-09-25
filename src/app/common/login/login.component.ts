@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SettingService } from '../../../service/setting.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-login',
@@ -21,10 +22,11 @@ export class LoginComponent implements OnInit {
   successMessage: string | null = null;
   logoUrl: string = '';
   settings: any;
-  constructor(private accountService: AccountService,  private router: Router, private settingService: SettingService) { 
+  constructor(private accountService: AccountService,  private router: Router, private settingService: SettingService, private titleService: Title) { 
   }
   ngOnInit() {
       this.getInfo();
+      this.titleService.setTitle('Đăng nhập | Eating House');
   }
   login() {
     this.accountService.login(this.username, this.password).subscribe({

@@ -11,6 +11,7 @@ import { MenuComponent } from '../menu/menu.component';
 import { CheckoutService } from '../../../service/checkout.service';
 import { NotificationService } from '../../../service/notification.service';
 import { HttpClient } from '@angular/common/http';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-booking',
@@ -52,7 +53,8 @@ export class BookingComponent implements OnInit {
   private reservationQueue: any[] = [];
 
   constructor(private reservationService: ReservationService, private http: HttpClient,
-     private notificationService: NotificationService, private router: Router, public dialog: MatDialog, private checkoutService: CheckoutService) {
+     private notificationService: NotificationService, private router: Router, public dialog: MatDialog, private checkoutService: CheckoutService
+     ,private titleService: Title) {
     const today = new Date();
     this.minDate = this.formatDate(today);
     const maxDate = new Date();
@@ -69,11 +71,12 @@ export class BookingComponent implements OnInit {
     };
     this.generateAvailableHours();
   }
-
+  ngAfterViewInit() {
+    this.titleService.setTitle('Đặt bàn | Eating House'); 
+  }
   ngOnInit(): void {
     this.updateTimes();
     console.log(this.availableHours);
-
     this.cartSubscription = this.reservationService.getCart().subscribe(cartItems => {
       this.cartItems = cartItems;
       this.calculateItemQuantity();
