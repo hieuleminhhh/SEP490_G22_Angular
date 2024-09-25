@@ -119,7 +119,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   private socket!: WebSocket;
   private reservationQueue: any[] = [];
   ngOnInit() {
-    this.titleService.setTitle('Tạo đơn | Eating House');
+    this.titleService.setTitle('Bán hàng | Eating House');
     this.getAllCategories();
     this.loadListDishes();
     this.loadListCombo();
