@@ -9,6 +9,7 @@ import { JwtInterceptor } from '../../../../jwt.interceptor';
 import { HTTP_INTERCEPTORS, HttpErrorResponse } from '@angular/common/http';
 import { HeaderOrderStaffComponent } from '../HeaderOrderStaff/HeaderOrderStaff.component';
 import { ManagerOrderService } from '../../../../service/managerorder.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-ViewTableOrder',
@@ -37,10 +38,10 @@ export class ViewTableOrderComponent implements OnInit {
 
   constructor(private tableService: TableService, private router: Router,
     private route: ActivatedRoute, private accountService: AccountService,
-    private orderService: ManagerOrderService) { }
+    private orderService: ManagerOrderService,  private titleService: Title) { }
 
   ngOnInit() {
-
+    this.titleService.setTitle('Danh sách bàn | Eating House');
     // Retrieve accountId from localStorage and convert to number
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;

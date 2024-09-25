@@ -30,6 +30,7 @@ import { SelectedItem } from '../../../../models/order.model';
 import { NotificationService } from '../../../../service/notification.service';
 import { Title } from '@angular/platform-browser';
 import { CategoryService } from '../../../../service/category.service';
+import { TableService } from '../../../../service/table.service';
 @Component({
   selector: 'app-create-offline-order',
   templateUrl: './CreateOfflineOrder.component.html',
@@ -92,12 +93,13 @@ export class CreateOfflineOrderComponent implements OnInit {
     private comboService: ManagerComboService, private orderDetailService: ManagerOrderDetailService, private invoiceService: InvoiceService, private dialog: MatDialog
     , private discountService: DiscountService, private notificationService: NotificationService,
     private checkoutService: CheckoutService, private accountService: AccountService,
-    private reservationService: ReservationService, private titleService: Title,  private categoryService: CategoryService) { }
+    private reservationService: ReservationService, private titleService: Title, private categoryService: CategoryService, private tableService: TableService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   ngOnInit() {
-    this.titleService.setTitle('Tạo đơn | Eating House');
+    this.titleService.setTitle('Bán hàng | Eating House');
     this.getAllCategories();
     this.loadListDishes();
+
     this.loadListCombo();
     this.loadAddresses();
     this.selectedAddress = "Khách lẻ"
@@ -105,6 +107,8 @@ export class CreateOfflineOrderComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.tableId = +params['tableId'];
       this.getReservationByTableId(this.tableId);
+      this.getLableTable(this.tableId);
+
     });
     this.LoadActiveDiscounts();
     this.calculateAndSetTotalAmount();
@@ -625,7 +629,7 @@ export class CreateOfflineOrderComponent implements OnInit {
     );
     this.createNotification(this.orderonlineId);
   }
-  orderonlineId:any;
+  orderonlineId: any;
   createOrderReservation(tableId: number): void {
     this.getTableReser(this.reservationData?.reservationId);
     console.log(this.reservationData?.reservationId);
@@ -875,5 +879,21 @@ export class CreateOfflineOrderComponent implements OnInit {
       }
     );
   }
+  tableLable: string = '';
+  getLableTable(tableId: number) {
+    this.tableService.getTablesById(tableId).subscribe(
+      (response: any) => {
+        // Giả sử response chứa thuộc tính 'label'
+
+        console.log('Table Label:', response.lable);
+        // Bạn có thể gán giá trị này vào biến trong component để hiển thị trong template
+        this.tableLable = response.lable;
+      },
+      (error: any) => {
+        console.error('Error fetching table label:', error);
+      }
+    );
+  }
+
 
 }
