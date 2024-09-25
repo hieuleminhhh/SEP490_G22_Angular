@@ -292,8 +292,9 @@
         </form>
       </div>
     </section>
+
     <!-- Modal -->
-    <div id="menuModal" class="custom-modal" [ngClass]="{'custom-show': isMenuPopupOpen}">
+    <div id="menuModal" class="custom-modal" [ngClass]="{'custom-show-menu': isMenuPopupOpen===true}">
       <div class="custom-modal-dialog" role="document">
         <div class="custom-modal-content">
           <span class="custom-close" (click)="closeMenuPopup()">&times;</span>
