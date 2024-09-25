@@ -133,9 +133,21 @@ export class ManagerOrderComponent implements OnInit {
     };
 
     this.socket.onclose = () => {
+      console.log('WebSocket connection closed, attempting to reconnect...');
+      setTimeout(() => {
+        this.initializeWebSocket(); // Hàm khởi tạo WebSocket
+      }, 5000); // Thử lại sau 5 giây
     };
     this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
     };
+  }
+  initializeWebSocket() {
+    this.socket = new WebSocket('ws://yourserver.com');
+    this.socket.onopen = () => { /* xử lý onopen */ };
+    this.socket.onmessage = (event) => { /* xử lý onmessage */ };
+    this.socket.onclose = () => { /* xử lý onclose */ };
+    this.socket.onerror = (error) => { /* xử lý onerror */ };
   }
   addSuccessMessage(message: string) {
     this.notifications.push(message);
@@ -1112,7 +1124,7 @@ export class ManagerOrderComponent implements OnInit {
             <td style="border: 1px solid black;">${this.formatCurrency(item.unitPrice)}</td>
           </tr>
         `).join('')}
-        
+
         </tbody>
       </table>
        <p><strong>Tạm tính:</strong> ${this.formatCurrency(this.orderDetail?.totalAmount)}</p>
@@ -1150,7 +1162,7 @@ ${this.orderDetail?.discountId !== undefined ? `
   onCustomerPaidInput(event: Event): void {
     const input = (event.target as HTMLInputElement).value;
     const sanitizedInput = input.replace(/[^\d]/g, ''); // Chỉ cho phép số
-  
+
     // Kiểm tra chiều dài của sanitizedInput
     if (sanitizedInput.length > 12) {
       // Cắt sanitizedInput về tối đa 12 ký tự
@@ -1162,13 +1174,13 @@ ${this.orderDetail?.discountId !== undefined ? `
       console.log("Vượt quá giới hạn 12 chữ số.");
       return; // Kết thúc hàm
     }
-  
+
     // Cập nhật customerPaid nếu chiều dài hợp lệ
     this.customerPaid = sanitizedInput ? parseFloat(sanitizedInput) : null;
   }
-  
-  
-  
+
+
+
   // Format the number when the input loses focus
   formatCurrency1(): string {
     if (this.customerPaid !== null) {
@@ -1178,5 +1190,5 @@ ${this.orderDetail?.discountId !== undefined ? `
     }
     return ''; // Trả về chuỗi rỗng nếu customerPaid là null
   }
-  
+
 }

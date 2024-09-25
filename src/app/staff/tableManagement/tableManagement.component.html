@@ -25,7 +25,7 @@
   </aside> -->
   <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar" style="padding: 12px;">
     <app-SidebarOrder></app-SidebarOrder>
-</nav>
+  </nav>
 
   <main class="main-content">
     <header>
@@ -153,7 +153,7 @@
                 <div *ngIf="availableTimes.length < 1" class="error-message-new">
                   <small class="text-danger-new">Đã hết giờ đặt bàn ngày hôm nay!</small>
                 </div>
-                <div *ngIf="time.invalid && (time.dirty || time.touched || formSubmitted) && availableTimes.length>1">
+                <div *ngIf="(time.invalid && (time.dirty || time.touched || formSubmitted) && availableTimes.length>1&&reset)||errorTime">
                   <small class="text-danger">Vui lòng chọn giờ ăn!</small>
                 </div>
               </div>
@@ -306,7 +306,7 @@
     <div id="confirmReservationModal" class="modal-custom" [ngClass]="{'show': isConfirmModalOpen}">
       <div class="modal-dialog-custom">
         <div class="modal-content-custom">
-          <span class="close" (click)="closeConfirmModal()">&times;</span>
+          <span class="custom-close" (click)="closeConfirmModal()">&times;</span>
           <h2>Xác nhận đặt bàn</h2>
 
           <div class="modal-body-custom">
@@ -370,8 +370,8 @@
                   <span style="font-weight: bold; font-size: 24px; cursor: pointer;"
                     (click)="openTableModal(i)">...</span>
                 </div>
-                <div class="custom-modal" *ngIf="showModals[i]">
-                  <div class="custom-modal-content">
+                <div class="custom-modal-detail" *ngIf="showModals[i]">
+                  <div class="custom-modal-detail-content">
                     <h2>Danh sách các bàn đã xếp </h2>
                     <div *ngFor="let table of reservation.tableOfReservation">
                       <span class="number-table">{{ table.lable }}</span>
@@ -379,7 +379,7 @@
                     <button (click)="closeTableModal(i)">Đóng</button>
                   </div>
                 </div>
-                <div class="custom-modal-overlay" *ngIf="showModals[i]"></div>
+                <div class="custom-modal-detail-overlay" *ngIf="showModals[i]"></div>
 
                 <div class="col-md-3" style="display: flex;justify-content: center;align-items: center;"
                   *ngIf="reservation.tableOfReservation && reservation.tableOfReservation.length === 1">
@@ -426,7 +426,7 @@
                         bàn</a>
                       <a *ngIf="reservation.tableOfReservation.length>0"
                         (click)="getReservationById(reservation.reservationId)">Chi tiết</a>
-                      <a (click)="openCancelModal(reservation.reservationId)">Hủy đặt bàn</a>
+                      <a (click)="openCancelModal(reservation)">Hủy đặt bàn</a>
                     </div>
                   </div>
                 </div>
@@ -488,7 +488,7 @@
 
       <!-- Confirm Save Modal -->
       <div class="modal fade" id="confirmSaveModal" tabindex="-1" role="dialog" aria-labelledby="confirmSaveModalLabel"
-        aria-hidden="true">
+        >
         <div class="modal-dialog" role="document">
           <div class="modal-content" style="width: 110%;margin: 60% 110%;">
             <div class="modal-header">
@@ -598,9 +598,11 @@
           <div class="modal-footer">
             <button type="button" style="background-color: red;" class="btn btn-secondary"
               (click)="closePopup()">Đóng</button>
-            <button *ngIf="!showPersonalInfo" type="button" class="btn btn-primary" (click)="openConfirmSaveModal()">Lưu
+            <button *ngIf="showPersonalInfo === false" type="button" class="btn btn-primary"
+              (click)="openConfirmSaveModal()">Lưu
               thay đổi</button>
-            <button *ngIf="showPersonalInfo" type="button" class="btn btn-primary" (click)="closeTableAssignPopup()">Lưu
+            <button *ngIf="showPersonalInfo===true" type="button" class="btn btn-primary"
+              (click)="closeTableAssignPopup()">Lưu
               thay đổi</button>
           </div>
         </div>

@@ -153,11 +153,21 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       }
     };
     this.socket.onclose = () => {
-      console.log('WebSocket connection closed');
+      console.log('WebSocket connection closed, attempting to reconnect...');
+      setTimeout(() => {
+        this.initializeWebSocket(); // Hàm khởi tạo WebSocket
+      }, 5000); // Thử lại sau 5 giây
     };
     this.socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
+  }
+  initializeWebSocket() {
+    this.socket = new WebSocket('ws://yourserver.com');
+    this.socket.onopen = () => { /* xử lý onopen */ };
+    this.socket.onmessage = (event) => { /* xử lý onmessage */ };
+    this.socket.onclose = () => { /* xử lý onclose */ };
+    this.socket.onerror = (error) => { /* xử lý onerror */ };
   }
   createNotification(orderId: number) {
     let description;
@@ -1150,7 +1160,7 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   onCustomerPaidInput(event: Event): void {
     const input = (event.target as HTMLInputElement).value;
     const sanitizedInput = input.replace(/[^\d]/g, ''); // Chỉ cho phép số
-  
+
     // Kiểm tra chiều dài của sanitizedInput
     if (sanitizedInput.length > 12) {
       // Cắt sanitizedInput về tối đa 12 ký tự
@@ -1162,13 +1172,13 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       console.log("Vượt quá giới hạn 12 chữ số.");
       return; // Kết thúc hàm
     }
-  
+
     // Cập nhật customerPaid nếu chiều dài hợp lệ
     this.customerPaid = sanitizedInput ? parseFloat(sanitizedInput) : null;
   }
-  
-  
-  
+
+
+
   // Format the number when the input loses focus
   formatCurrency(): string {
     if (this.customerPaid !== null) {
@@ -1191,6 +1201,6 @@ export class CreateTakeAwayOrderComponent implements OnInit {
       }
     );
   }
-  
-  
+
+
 }
