@@ -97,7 +97,6 @@ export class HeaderOrderStaffComponent implements OnInit {
             this.notifications = response.filter((notification: { isView: boolean; }) => notification.isView === false);
             const unseenNotifications = this.notifications.filter(notification => notification.isView === false);
             this.itemCountNoti = unseenNotifications.length;
-            console.log(this.itemCountNoti);
 
           },
           error => {
@@ -134,7 +133,6 @@ export class HeaderOrderStaffComponent implements OnInit {
     if (this.accountId) {
       this.accountService.changeProfile(this.accountId, this.account).subscribe({
         next: (updatedAccount) => {
-          console.log('Profile updated successfully:', updatedAccount);
           // Reload the page
           window.location.reload();
         },
@@ -160,7 +158,6 @@ export class HeaderOrderStaffComponent implements OnInit {
       };
       this.accountService.changePassword(this.accountId, passwordData).subscribe({
         next: (response) => {
-          console.log('Password changed successfully:', response);
           this.successMessage = 'Đổi mật khẩu thành công';
           this.errorMessage = ''; // Clear error message on success
 
@@ -188,9 +185,7 @@ export class HeaderOrderStaffComponent implements OnInit {
     this.settingService.getInfo().subscribe(
       response => {
         this.settings = response;
-        console.log(response);
         this.logoUrl = this.settings[0].logo;
-        console.log('URL Logo', this.logoUrl);
       },
       error => {
         console.error('Error:', error);
