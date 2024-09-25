@@ -25,7 +25,7 @@ export class AuthGuard implements CanActivate {
         return true; 
       }
       //Cashier
-      if (url === 'invoice' && user.role === 'Cashier') {
+      if (url === 'invoice' &&  (user.role === 'Cashier' || user.role === 'Manager')) {
         return true; 
       }
       //Order Staff

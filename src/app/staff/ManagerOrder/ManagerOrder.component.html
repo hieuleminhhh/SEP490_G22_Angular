@@ -171,9 +171,6 @@
                   <div class="mb-3" *ngIf="orderDetail.cancelationReason">
                     <span class="fw-bold">Lý do hủy:</span> {{ orderDetail.cancelationReason}}
                   </div>
-                  <div class="mb-3" *ngIf="orderDetail.cancelationReason">
-                    <span class="fw-bold">Thời gian hủy:</span> {{ orderDetail.cancelDate |dateFormat}}
-                  </div>
                   <div class="mb-3">
                     <span class="fw-bold">Tên khách hàng:</span> {{ orderDetail.consigneeName || 'Khách lẻ' }}
                   </div>
@@ -191,7 +188,7 @@
                     <span class="fw-bold">Thời gian giao hàng:</span> {{ orderDetail.recevingOrder | dateFormat }}
                   </div>
                   <div class="mb-3"
-                    *ngIf="orderDetail.cancelDate && (orderDetail?.type === 2 || orderDetail?.type === 1) && orderDetail?.status === 5">
+                    *ngIf="orderDetail.cancelDate">
                     <span class="fw-bold">Thời gian hủy</span> {{ orderDetail.cancelDate| dateFormat }}
                   </div>
                   <div class="mb-3" *ngIf="orderDetail?.type === 4 && orderDetail?.status !== 5">
@@ -306,7 +303,7 @@
                           <span class="fw-bold">Tổng cộng:</span>
                           <span>{{ DiscountedTotalAmount() | currencyFormat }}</span>
                         </div> -->
-                        <div *ngIf="orderDetail.deposits" class="d-flex justify-content-between">
+                        <div *ngIf="orderDetail.deposits && (orderDetail.type !== 1 && orderDetail.type !== 2 )" class="d-flex justify-content-between">
                           <span class="fw-bold">Thanh toán trước:</span>
                           <span>{{ orderDetail.deposits | currencyFormat }}</span>
                         </div>
@@ -314,9 +311,13 @@
                           <span class="fw-bold">Khách phải trả:</span>
                           <span>{{ DiscountedTotalAmount()| currencyFormat }}</span>
                         </div>
-                        <div *ngIf="orderDetail?.paymentStatus ===1" class="d-flex justify-content-between">
+                        <div *ngIf="orderDetail?.paymentStatus ===1 && (orderDetail.type !== 1 && orderDetail.type !== 2 )" class="d-flex justify-content-between">
                           <span class="fw-bold">Khách đã thanh toán:</span>
                           <span>{{ DiscountedTotalAmount() | currencyFormat }}</span>
+                        </div>
+                        <div *ngIf="orderDetail?.paymentStatus ===1 && (orderDetail.type === 1 || orderDetail.type === 2 )" class="d-flex justify-content-between">
+                          <span class="fw-bold">Khách đã thanh toán:</span>
+                          <span>{{  orderDetail.deposits | currencyFormat }}</span>
                         </div>
                       </div>
 

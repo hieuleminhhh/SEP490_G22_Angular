@@ -6,6 +6,7 @@ import { Dish } from '../../../models/dish.model';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-cart',
@@ -24,9 +25,10 @@ export class CartComponent implements OnInit, OnDestroy {
   private cartSubscription!: Subscription;
   private itemCountSubscription!: Subscription;
 
-  constructor(private cartService: CartService, private router: Router) { }
+  constructor(private cartService: CartService, private router: Router, private titleService: Title) { }
 
   ngOnInit() {
+    this.titleService.setTitle('Giỏ hàng | Eating House');
     const isReorder = sessionStorage.getItem('isReorder');
 
     if (isReorder) {

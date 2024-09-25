@@ -908,14 +908,13 @@ export class CreateTakeAwayOrderComponent implements OnInit {
 
     const customerPaidAmount = this.customerPaid ?? 0;
     const paymentMethodValue = parseInt(this.paymentMethod, 10) ?? 0;
-
     this.addNew = {
       ...this.addNew,
       totalAmount,
       orderDetails,
       orderDate: this.getVietnamTime(),
       recevingOrder: receivingTime,
-      deposits: 0,
+      deposits: totalAmount,
       paymentMethods: paymentMethodValue,
       description: '',
       discountId: this.selectedDiscount,

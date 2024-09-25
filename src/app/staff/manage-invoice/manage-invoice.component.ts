@@ -9,13 +9,15 @@ import { CookingService } from '../../../service/cooking.service';
 import { ExportService } from '../../../service/export.service';
 import { NotificationService } from '../../../service/notification.service';
 import { Title } from '@angular/platform-browser';
+import { AccountService } from '../../../service/account.service';
+import { SideBarComponent } from "../../manager/SideBar/SideBar.component";
 
 @Component({
   selector: 'app-manage-invoice',
   templateUrl: './manage-invoice.component.html',
   styleUrls: ['./manage-invoice.component.css'],
   standalone: true,
-  imports: [HeaderOrderStaffComponent, SidebarOrderComponent, FormsModule, CommonModule, CurrencyFormatPipe]
+  imports: [HeaderOrderStaffComponent, SidebarOrderComponent, FormsModule, CommonModule, CurrencyFormatPipe, SideBarComponent]
 })
 export class ManageInvoiceComponent implements OnInit {
   selectedTab: string = 'overview';
@@ -36,7 +38,7 @@ export class ManageInvoiceComponent implements OnInit {
   private reservationQueue: any[] = [];
   private socket!: WebSocket;
 
-  constructor(private invoiceService: InvoiceService, private notificationService: NotificationService, private cookingService: CookingService, private exportService: ExportService, private titleService: Title) { }
+  constructor(private invoiceService: InvoiceService, private notificationService: NotificationService, private cookingService: CookingService, private exportService: ExportService, private titleService: Title, private accountService: AccountService) { }
   @ViewChild('collectAllModal') collectAllModal!: ElementRef;
   ngOnInit() {
     this.titleService.setTitle('Thống kê | Eating House');
@@ -46,6 +48,12 @@ export class ManageInvoiceComponent implements OnInit {
     this.dateNow = this.formatDate(today);
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
+    if (this.accountId) {
+      this.getAccountDetails(this.accountId);
+    } else {
+      console.error('Account ID is not available');
+    }
+
     this.getNotificationByType(this.accountId);
     this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => {
@@ -222,6 +230,20 @@ export class ManageInvoiceComponent implements OnInit {
       minute: '2-digit',
       hour12: false // Không sử dụng định dạng 12 giờ
     });
+  }
+  account : any;
+  getAccountDetails(accountId: number): void {
+    this.accountService.getAccountById(accountId).subscribe(
+      response => {
+        this.account = response;
+        console.log('Account details:', this.account);
+        console.log('Account role:', this.account.role);
+
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
   }
   selectedItem: any;
   showDetails(order: any) {

@@ -3,6 +3,7 @@ import { ArticleService } from '../../../service/news.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.component';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-news',
@@ -14,10 +15,11 @@ import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.co
 export class NewsComponent implements OnInit {
   articles :any; // Danh sách bài viết
   selectedArticle: any = null; // Bài viết được chọn
-  constructor(private articleService: ArticleService) {}
+  constructor(private articleService: ArticleService, private titleService: Title) {}
 
   ngOnInit() {
     this.selectArticle();
+    this.titleService.setTitle('Bài viết | Eating House');
   }
   selectArticle() {
     this.articleService.getArticle().subscribe(
