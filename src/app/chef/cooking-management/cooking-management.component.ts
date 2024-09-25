@@ -46,6 +46,7 @@ export class CookingManagementComponent implements OnInit {
       console.log(data);
       try {
         this.getOrders('Current');
+
       } catch (error) {
         console.error('Error parsing reservation data:', error);
       }
@@ -53,20 +54,45 @@ export class CookingManagementComponent implements OnInit {
     this.socket.onclose = () => {
       console.log('WebSocket connection closed, attempting to reconnect...');
       setTimeout(() => {
-        this.initializeWebSocket(); // Hàm khởi tạo WebSocket
-      }, 5000); // Thử lại sau 5 giây
+        this.initializeWebSocket();
+      }, 5000);
     };
     this.socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
   }
   initializeWebSocket() {
+    console.log("Initializing WebSocket...");
     this.socket = new WebSocket('wss://localhost:7188/ws');
-    this.socket.onopen = () => { /* xử lý onopen */ };
-    this.socket.onmessage = (event) => { /* xử lý onmessage */ };
-    this.socket.onclose = () => { /* xử lý onclose */ };
-    this.socket.onerror = (error) => { /* xử lý onerror */ };
+
+    this.socket.onopen = () => {
+      console.log("WebSocket connection opened.");
+      while (this.reservationQueue.length > 0) {
+        this.socket.send(this.reservationQueue.shift());
+      }
+    };
+
+    this.socket.onmessage = (event) => {
+      console.log("WebSocket message received: ", event.data);
+      try {
+        this.getOrders('Current');
+      } catch (error) {
+        console.error('Error parsing reservation data:', error);
+      }
+    };
+
+    this.socket.onclose = (event) => {
+      console.log('WebSocket connection closed, attempting to reconnect...', event);
+      setTimeout(() => {
+        this.initializeWebSocket(); // Thử lại sau 5 giây
+      }, 5000);
+    };
+
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
   }
+
   setView(view: string) {
     this.currentView = view;
   }
@@ -88,17 +114,16 @@ export class CookingManagementComponent implements OnInit {
     this.cookingService.getOrders(type).subscribe(
       response => {
         this.order = response.data || [];
-        console.log(this.order);
         this.order.forEach((o: { orderDetailId: number; quantity: number; dishesServed: number }) => {
           o.dishesServed = o.dishesServed || 0;
           this.initializeForm(o.orderDetailId, o.quantity);
         });
         this.filterOrdersByDate();
         this.loadCompletedDishes();
+        console.log(response.data);
 
       },
       error => {
-        console.error('Error:', error);
         this.order = [];
         this.filteredOrders = [];
       }

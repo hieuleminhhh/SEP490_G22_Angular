@@ -191,18 +191,14 @@ export class CreateTakeAwayOrderComponent implements OnInit {
   }
   makeReservation(reservationData: any) {
     const message = JSON.stringify(reservationData);
-
-    // Check if the WebSocket connection (this.socket) is defined
     if (!this.socket) {
       console.error('WebSocket is not initialized.');
-      return; // Exit the function if socket is not defined
+      return;
     }
-
-    // Check the WebSocket readyState
     if (this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(message); // Send the reservation request if WebSocket is open
+      this.socket.send(message);
     } else if (this.socket.readyState === WebSocket.CONNECTING) {
-      this.reservationQueue.push(message); // Queue the message if WebSocket is connecting
+      this.reservationQueue.push(message);
     } else {
       console.log('WebSocket is not open. Current state:', this.socket.readyState);
     }
