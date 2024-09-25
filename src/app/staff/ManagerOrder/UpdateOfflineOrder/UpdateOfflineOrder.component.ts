@@ -27,6 +27,7 @@ import { HeaderOrderStaffComponent } from "../HeaderOrderStaff/HeaderOrderStaff.
 import { NotificationService } from '../../../../service/notification.service';
 import { Title } from '@angular/platform-browser';
 import { CategoryService } from '../../../../service/category.service';
+import { TableService } from '../../../../service/table.service';
 @Component({
   selector: 'app-UpdateOfflineOrder',
   templateUrl: './UpdateOfflineOrder.component.html',
@@ -89,10 +90,11 @@ export class UpdateOfflineOrderComponent implements OnInit {
   private reservationQueue: any[] = [];
   constructor(private router: Router, private orderService: ManagerOrderService, private route: ActivatedRoute, private dishService: ManagerDishService,
     private comboService: ManagerComboService, private orderDetailService: ManagerOrderDetailService, private invoiceService: InvoiceService, private discountService: DiscountService,
-    private checkoutService: CheckoutService, private notificationService: NotificationService,private accountService: AccountService, private titleService: Title, private categoryService: CategoryService) { }
+    private checkoutService: CheckoutService, private notificationService: NotificationService,private accountService: AccountService, private titleService: Title, private categoryService: CategoryService,
+    private tableService: TableService) { }
   @ViewChild('formModal') formModal!: ElementRef;
   ngOnInit() {
-    this.titleService.setTitle('Cập nhập đơn | Eating House');
+    this.titleService.setTitle('Cập nhật đơn | Eating House');
     this.getAllCategories();
     this.loadListDishes();
     this.loadListCombo();
@@ -102,6 +104,7 @@ export class UpdateOfflineOrderComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.tableId = +params['tableId'];
       this.loadListOrderByTable(this.tableId);
+      this.getLableTable(this.tableId);
     });
     this.LoadActiveDiscounts();
     this.calculateAndSetTotalAmount();
@@ -1263,6 +1266,21 @@ validateQuantity(index: number): void {
       },
       error => {
         console.error('Error fetching categories', error);
+      }
+    );
+  }
+  tableLable: string = '';
+  getLableTable(tableId: number) {
+    this.tableService.getTablesById(tableId).subscribe(
+      (response: any) => {
+        // Giả sử response chứa thuộc tính 'label'
+
+        console.log('Table Label:', response.lable);
+        // Bạn có thể gán giá trị này vào biến trong component để hiển thị trong template
+        this.tableLable = response.lable;
+      },
+      (error: any) => {
+        console.error('Error fetching table label:', error);
       }
     );
   }

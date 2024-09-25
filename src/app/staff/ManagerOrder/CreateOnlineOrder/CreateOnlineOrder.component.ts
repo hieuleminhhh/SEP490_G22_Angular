@@ -114,7 +114,7 @@ export class CreateOnlineOrderComponent implements OnInit {
   private reservationQueue: any[] = [];
   @ViewChild('paymentModal') paymentModal!: ElementRef;
   ngOnInit() {
-    this.titleService.setTitle('Tạo đơn | Eating House');
+    this.titleService.setTitle('Bán hàng | Eating House');
     this.getAllCategories();
     this.loadListDishes();
     this.loadListCombo();
@@ -452,17 +452,13 @@ clearErrorMessageAfterTimeout() {
     const totalAmount = this.selectedDiscount ? this.totalAmountAfterDiscount : this.calculateTotalAmount();
     const customerPaidAmount = this.customerPaid ?? 0; // Default to 0 if customerPaid is null
     const paymentMethod = parseInt(this.paymentMethod, 10); // Convert paymentMethod to number
-    let deposit = 0;
-    if (paymentMethod === 0 || paymentMethod === 1) {
-      deposit = this.totalAmount;
-    }
     this.addNew = {
       ...this.addNew, // Spread existing properties if any
       totalAmount,
       orderDetails,
       orderDate: this.getVietnamTime(),
       recevingOrder: receivingTime,
-      deposits: deposit,
+      deposits: 0,
       paymentMethods: paymentMethod,
       description: 'Order payment description',
       discountId: this.selectedDiscount,
@@ -990,8 +986,10 @@ clearErrorMessageAfterTimeout() {
       const amountReceived = paymentMethod === 0 ? (this.customerPaid ?? 0) : totalAmount;
       const returnAmount = paymentMethod === 0 ? (this.customerPaid ?? 0) - totalAmount : 0;
       let status = 0;
+      let deposite = 0
       if (paymentMethod === 0 || paymentMethod === 1) {
         status = 1;
+        deposite = totalAmount
       }
 
       const updateData = {
@@ -1004,7 +1002,8 @@ clearErrorMessageAfterTimeout() {
         amountReceived,
         returnAmount,
         paymentMethods: paymentMethod,
-        description: ""
+        description: "",
+        deposits: deposite,
       };
 
       console.log('Update Data:', updateData);

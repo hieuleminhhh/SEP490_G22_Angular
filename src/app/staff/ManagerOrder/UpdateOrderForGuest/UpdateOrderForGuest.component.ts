@@ -90,7 +90,7 @@ export class UpdateOrderForGuestComponent implements OnInit {
   private socket!: WebSocket;
   private reservationQueue: any[] = [];
   ngOnInit() {
-    this.titleService.setTitle('Cập nhập đơn | Eating House');
+    this.titleService.setTitle('Cập nhật đơn | Eating House');
     this.getAllCategories();
     this.loadListDishes();
     this.loadListCombo();
