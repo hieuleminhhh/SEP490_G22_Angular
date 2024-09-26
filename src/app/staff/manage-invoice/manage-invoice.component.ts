@@ -53,7 +53,7 @@ export class ManageInvoiceComponent implements OnInit {
     } else {
       console.error('Account ID is not available');
     }
-
+    this.getReport();
     this.getNotificationByType(this.accountId);
     this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => {
@@ -82,8 +82,8 @@ export class ManageInvoiceComponent implements OnInit {
   createNotification(orderId: number, accountId: number, check: boolean) {
     let description;
     if (check === true) {
-       description = `Kính gửi Quý Khách. Chúng tôi xin thông báo rằng đơn hàng của Quý Khách tại Eating House với mã đơn hàng ${orderId} đã được hoàn tiền thành công. Số tiền sẽ được hoàn lại qua phương thức thanh toán mà Quý Khách đã sử dụng khi đặt hàng. Xin vui lòng kiểm tra tài khoản của mình để xác nhận giao dịch. Chúng tôi thành thật xin lỗi vì bất kỳ sự bất tiện nào mà điều này có thể đã gây ra. Nếu Quý Khách có bất kỳ thắc mắc nào liên quan đến việc hoàn tiền, vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã tin tưởng và sử dụng dịch vụ của Eating House. Chúng tôi hy vọng sẽ có cơ hội được phục vụ Quý Khách trong tương lai!`;
-    }else{
+      description = `Kính gửi Quý Khách. Chúng tôi xin thông báo rằng đơn hàng của Quý Khách tại Eating House với mã đơn hàng ${orderId} đã được hoàn tiền thành công. Số tiền sẽ được hoàn lại qua phương thức thanh toán mà Quý Khách đã sử dụng khi đặt hàng. Xin vui lòng kiểm tra tài khoản của mình để xác nhận giao dịch. Chúng tôi thành thật xin lỗi vì bất kỳ sự bất tiện nào mà điều này có thể đã gây ra. Nếu Quý Khách có bất kỳ thắc mắc nào liên quan đến việc hoàn tiền, vui lòng liên hệ với chúng tôi qua số điện thoại 0123456789 hoặc email eattinghouse@gmail.com. Cảm ơn Quý Khách đã tin tưởng và sử dụng dịch vụ của Eating House. Chúng tôi hy vọng sẽ có cơ hội được phục vụ Quý Khách trong tương lai!`;
+    } else {
       description = `Đã nhận tiền giao hàng cho đơn hàng ${orderId}`;
     }
     const body = {
@@ -136,8 +136,8 @@ export class ManageInvoiceComponent implements OnInit {
 
   getOrdersStatic(): void {
     console.log(this.accountId);
-    if(this.role!==3){
-      this.accountId=null;
+    if (this.role !== 3) {
+      this.accountId = null;
     }
     this.invoiceService.getStatistics(this.dateFrom, this.dateTo, this.accountId).subscribe(
       response => {
@@ -150,14 +150,28 @@ export class ManageInvoiceComponent implements OnInit {
       }
     );
   }
+  report: any;
+  getReport(): void {
+    this.invoiceService.getReport(this.dateFrom, this.dateTo).subscribe(
+      response => {
+        this.report = response;
+        console.log(response);
+
+      },
+      error => {
+        console.error('Error:', error);
+
+      }
+    );
+  }
   exportData(): void {
     this.getOrderExport();
   }
-  role:any;
+  role: any;
   getNotificationByType(accountId: number): void {
     this.notificationService.getType(accountId).subscribe(
       response => {
-        this.role=response;
+        this.role = response;
       },
       error => {
         console.error('Error fetching account details:', error);
@@ -231,7 +245,7 @@ export class ManageInvoiceComponent implements OnInit {
       hour12: false // Không sử dụng định dạng 12 giờ
     });
   }
-  account : any;
+  account: any;
   getAccountDetails(accountId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
       response => {
@@ -250,13 +264,13 @@ export class ManageInvoiceComponent implements OnInit {
     console.log(order);
     this.selectedItem = order;
   }
-  showDetailsCashier:boolean=false;
+  showDetailsCashier: boolean = false;
 
-  showDetailCashier(){
-    this.showDetailsCashier=true;
+  showDetailCashier() {
+    this.showDetailsCashier = true;
   }
-  goBack(){
-    this.showDetailsCashier=false;
+  goBack() {
+    this.showDetailsCashier = false;
   }
 
   closePopup() {

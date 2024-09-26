@@ -70,6 +70,11 @@ export class InvoiceService {
     }
     return this.http.get<any>(url, this.getHttpOptions());
   }
+
+  getReport(dateStart: any, dateEnd: any): Observable<any> {
+    const url = `https://localhost:7188/api/orders/cashier-report?startDate=${dateStart}&endDate=${dateEnd}`;
+    return this.http.get<any>(url, this.getHttpOptions());
+  }
   getCancelOrder(): Observable<any> {
     const url = `https://localhost:7188/api/Invoice/GetCancelOrder`;
     return this.http.get<any>(url, this.getHttpOptions());
