@@ -107,7 +107,7 @@
             </div>
           </div>
         </div>
-        <section class="payment-section">
+        <!-- <section class="payment-section">
           <h2>Phương thức thanh toán</h2>
           <br>
           <div class="row">
@@ -135,7 +135,7 @@
           </div>
           <br>
         </section>
-        <hr>
+        <hr> -->
         <section class="payment-section">
           <h2>Danh sách thu ngân và dòng tiền</h2>
           <br>
@@ -150,18 +150,17 @@
                   <th>Số tiền đã hoàn trả</th>
                   <th>Số tiền cần nộp lại</th>
                   <th></th>
-                  <!-- <th>Tình trạng</th> -->
                 </tr>
               </thead>
               <tbody id="cashier-table-body">
-                <ng-container *ngFor="let item of data">
+                <ng-container *ngFor="let item of report">
                   <tr>
-                    <td>{{ item.collectedByFirstName }} {{ item.collectedByLastName }}</td>
-                    <td>{{ item.totalOrders }}</td>
-                    <td>{{ item.totalOrders }}</td>
-                    <td>{{ item.totalOrders }}</td>
-                    <td>{{ item.totalOrders }}</td>
-                    <td>{{ item.revenueByPaymentMethod0 | currencyFormat }}</td>
+                    <td>{{ item.firstName }} {{ item.lastName }}</td>
+                    <td>{{ item.completedOrderCount }}</td>
+                    <td>{{ item.refundOrderCount }}</td>
+                    <td>{{ item.revenue | currencyFormat }}</td>
+                    <td>{{ item.totalRefunds | currencyFormat }}</td>
+                    <td>{{ item.totalCashToSubmit | currencyFormat }}</td>
                     <td><button (click)="showDetailCashier()">Chi tiết</button></td>
                   </tr>
                 </ng-container>

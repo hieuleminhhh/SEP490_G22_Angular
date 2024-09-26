@@ -184,17 +184,17 @@
                     <span class="fw-bold">Thời gian đặt hàng:</span> {{ orderDetail.orderDate | dateFormat }}
                   </div>
                   <div class="mb-3"
-                    *ngIf="orderDetail.recevingOrder && (orderDetail?.type === 2 || orderDetail?.type === 1) && orderDetail?.status !== 5">
+                    *ngIf="orderDetail.recevingOrder && (orderDetail?.type === 2 || orderDetail?.type === 1) && orderDetail?.status !== 5&&orderDetail?.status !== 8">
                     <span class="fw-bold">Thời gian giao hàng:</span> {{ orderDetail.recevingOrder | dateFormat }}
                   </div>
                   <div class="mb-3"
                     *ngIf="orderDetail.cancelDate">
                     <span class="fw-bold">Thời gian hủy</span> {{ orderDetail.cancelDate| dateFormat }}
                   </div>
-                  <div class="mb-3" *ngIf="orderDetail?.type === 4 && orderDetail?.status !== 5">
+                  <div class="mb-3" *ngIf="orderDetail?.type === 4 && (orderDetail?.status !== 5&&orderDetail?.status !== 8)">
                     <span class="fw-bold">Thời gian vào:</span> {{ orderDetail.orderDate | dateFormat }}
                   </div>
-                  <div class="mb-3" *ngIf="orderDetail?.type === 3 && orderDetail?.status !== 5">
+                  <div class="mb-3" *ngIf="orderDetail?.type === 3 && (orderDetail?.status !== 5&&orderDetail?.status !== 8)">
                     <span class="fw-bold">Thời gian vào:</span> {{ timeIn | dateFormat }}
                   </div>
                   <div class="mb-3"
@@ -233,9 +233,9 @@
                       </ng-container>
 
                       <!-- Final invoice button -->
-                      <ng-container *ngIf="((orderDetail?.paymentStatus === 1 && 
-              (orderDetail?.type === 4 || orderDetail?.type === 3 || orderDetail?.type === 1 || orderDetail?.type === 2)) || 
-              (orderDetail?.paymentStatus === 0 && orderDetail?.type === 2)) && 
+                      <ng-container *ngIf="((orderDetail?.paymentStatus === 1 &&
+              (orderDetail?.type === 4 || orderDetail?.type === 3 || orderDetail?.type === 1 || orderDetail?.type === 2)) ||
+              (orderDetail?.paymentStatus === 0 && orderDetail?.type === 2)) &&
               orderDetail?.status !== 5">
                         <button type="button" class="btn btn-primary me-2" (click)="printFinalInvoice()"
                           *ngIf="account?.role === 'Cashier'">
@@ -329,11 +329,14 @@
                           class="badge bg-danger ms-auto badge-circle">Chưa thanh toán
                         </div>
                         <div
-                          *ngIf=" orderDetail.deposits === 0 && orderDetail.type ===2 && orderDetail.paymentStatus===1"
+                          *ngIf=" orderDetail.deposits === 0 && orderDetail.type ===2 && orderDetail.paymentStatus===1 &&orderDetail.status !==8"
                           class="badge bg-success ms-auto badge-circle">Đã thanh toán
                         </div>
-                        <div *ngIf=" orderDetail.deposits > 0 && orderDetail.type ===2"
+                        <div *ngIf=" orderDetail.deposits > 0 && orderDetail.type ===2 &&orderDetail.status !==8"
                           class="badge bg-success ms-auto badge-circle">Đã thanh toán
+                        </div>
+                        <div *ngIf=" orderDetail.deposits > 0 && orderDetail.type ===2 &&orderDetail.status ===8"
+                          class="badge bg-success ms-auto badge-circle">Đã hoàn tiền
                         </div>
                         <!-- Mang ve -->
                         <div *ngIf="orderDetail.type === 1 && orderDetail.status!==5"
@@ -347,7 +350,7 @@
                         </div>
                         <!-- Tại quan -->
                         <div
-                          *ngIf="(orderDetail.type === 4 || orderDetail.type === 3) && orderDetail.deposits > 0 && orderDetail.status !== 4"
+                          *ngIf="(orderDetail.type === 4 || orderDetail.type === 3) && orderDetail.deposits > 0 && (orderDetail.status !== 4&&orderDetail.status !== 8)"
                           class="badge bg-success ms-auto badge-circle">Đã trả 1 phần
                         </div>
                         <div
@@ -356,6 +359,9 @@
                         </div>
                         <div *ngIf="(orderDetail.type === 4 || orderDetail.type === 3) && orderDetail.status === 4"
                           class="badge bg-success ms-auto badge-circle">Đã thanh toán
+                        </div>
+                        <div *ngIf="(orderDetail.type === 4 || orderDetail.type === 3) && orderDetail.status === 8"
+                          class="badge bg-success ms-auto badge-circle">Đã hoàn tiền
                         </div>
                       </div>
                     </div>
@@ -377,11 +383,11 @@
                   <!-- Online guest -->
                   <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 1">
                     <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
-                      data-bs-target="#acceptOrderModal" *ngIf="account?.role === 'OrderStaff'">
+                      data-bs-target="#acceptOrderModal" *ngIf="account?.role === 'OrderStaff'  || account?.role === 'Cashier'">
                       Chấp nhận đơn hàng
                     </button>
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
-                      *ngIf="account?.role === 'OrderStaff'" data-bs-toggle="modal">Hủy đơn</button>
+                      *ngIf="account?.role === 'OrderStaff'  || account?.role === 'Cashier'" data-bs-toggle="modal">Hủy đơn</button>
                   </ng-container>
                   <!-- Online staff -->
 
@@ -390,13 +396,13 @@
                     <!-- <button type="button" class="btn btn-success me-2" data-bs-target="#paymentModalOnline"
                       data-bs-toggle="modal" *ngIf="!orderDetail?.invoiceId">Thanh toán</button> -->
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
-                      data-bs-toggle="modal" *ngIf="account?.role === 'OrderStaff'">Hủy đơn</button>
+                      data-bs-toggle="modal" *ngIf="account?.role === 'Cashier'">Hủy đơn</button>
                   </ng-container>
 
                   <!-- Mang ve -->
                   <ng-container *ngIf="orderDetail?.type === 1 && orderDetail?.status === 2">
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
-                      data-bs-toggle="modal" *ngIf="account?.role === 'OrderStaff' || account?.role === 'Cashier'">Hủy
+                      data-bs-toggle="modal" *ngIf="account?.role === 'Cashier'">Hủy
                       đơn</button>
                   </ng-container>
 
