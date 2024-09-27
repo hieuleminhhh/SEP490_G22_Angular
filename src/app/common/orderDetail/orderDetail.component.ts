@@ -11,6 +11,7 @@ import { PaymentService } from '../../../service/payment.service';
 import { ReservationService } from '../../../service/reservation.service';
 import { NotificationService } from '../../../service/notification.service';
 import { AccountService } from '../../../service/account.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-orderDetail',
@@ -44,10 +45,11 @@ export class OrderDetailComponent implements OnInit {
     private location: Location, private router: Router, private cookingService: CookingService,
     private paymentService: PaymentService, private http: HttpClient,
     private notificationService: NotificationService, private reservationService: ReservationService,
-    private accountService: AccountService
+    private accountService: AccountService, private titleService: Title
   ) { }
 
   ngOnInit() {
+    this.titleService.setTitle('Chi tiết đơn hàng | Eating House');
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
     if (this.accountId) {

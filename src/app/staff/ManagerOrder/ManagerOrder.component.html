@@ -226,19 +226,17 @@
                     <h5>Thông tin chi tiết đơn hàng</h5>
                     <div>
                       <ng-container
-                        *ngIf="orderDetail?.type === 4 && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2)">
+                        *ngIf="(orderDetail?.type === 4 || orderDetail?.type === 3) && (orderDetail?.paymentStatus == 0 || orderDetail?.paymentStatus == 2)">
                         <button type="button" class="btn"
                           [ngStyle]="{'background-color': '#ff6600', 'color': '#ffffff'}"
                           (click)="printTemporaryInvoice()" *ngIf="account?.role === 'Cashier'">In hóa đơn tạm</button>
                       </ng-container>
 
                       <!-- Final invoice button -->
-                      <ng-container *ngIf="((orderDetail?.paymentStatus === 1 &&
-              (orderDetail?.type === 4 || orderDetail?.type === 3 || orderDetail?.type === 1 || orderDetail?.type === 2)) ||
-              (orderDetail?.paymentStatus === 0 && orderDetail?.type === 2)) &&
-              orderDetail?.status !== 5">
-                        <button type="button" class="btn btn-primary me-2" (click)="printFinalInvoice()"
-                          *ngIf="account?.role === 'Cashier'">
+                      <ng-container>
+                        <button  *ngIf="((orderDetail?.paymentStatus === 1 &&
+                        (orderDetail?.type === 4 || orderDetail?.type === 3 || orderDetail?.type === 1 || orderDetail?.type === 2))) &&
+                        orderDetail?.status !== 5 && account?.role === 'Cashier'" type="button" class="btn btn-primary me-2" (click)="printFinalInvoice()" >
                           In hóa đơn
                         </button>
                       </ng-container>
@@ -387,11 +385,11 @@
                   <!-- Online guest -->
                   <ng-container *ngIf="orderDetail?.type === 2 && orderDetail?.status === 1">
                     <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
-                      data-bs-target="#acceptOrderModal" *ngIf="account?.role === 'OrderStaff'  || account?.role === 'Cashier'">
+                      data-bs-target="#acceptOrderModal" *ngIf="account?.role === 'OrderStaff'">
                       Chấp nhận đơn hàng
                     </button>
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
-                      *ngIf="account?.role === 'OrderStaff'  || account?.role === 'Cashier'" data-bs-toggle="modal">Hủy đơn</button>
+                      *ngIf="account?.role === 'OrderStaff'" data-bs-toggle="modal">Hủy đơn</button>
                   </ng-container>
                   <!-- Online staff -->
 
