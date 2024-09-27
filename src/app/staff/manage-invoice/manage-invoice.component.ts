@@ -155,7 +155,9 @@ export class ManageInvoiceComponent implements OnInit {
     this.invoiceService.getReport(this.dateFrom, this.dateTo).subscribe(
       response => {
         this.report = response;
+
         console.log(response);
+        console.log(response[1].listOrder);
 
       },
       error => {
