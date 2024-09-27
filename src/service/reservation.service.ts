@@ -209,4 +209,14 @@ export class ReservationService {
     });
     return this.http.put(url, body, { headers });
   }
+  getGuestEmailByReservationId(reservationId: number): Observable<any> {
+    const url = `https://localhost:7188/api/Reservations/${reservationId}/guest-email`;
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'accept': '*/*'
+    });
+    return this.http.get(url, { headers });
+  }
+  
 }

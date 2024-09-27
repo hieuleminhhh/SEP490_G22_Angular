@@ -425,3 +425,59 @@ ul {
 .view-all-btn:hover {
   background-color: #e0e0e0;
 }
+.custom-modal .modal-dialog {
+  max-width: 500px; /* Tùy chỉnh kích thước modal */
+}
+
+.custom-modal .modal-content {
+  background-color: white; /* Đặt lại màu nền nếu bị ảnh hưởng */
+  padding: 20px; /* Thêm padding nếu cần */
+}
+
+.custom-modal .modal-header,
+.custom-modal .modal-footer {
+  border: none; /* Loại bỏ border nếu class trước đó thêm */
+}
+.custom-modal-footer {
+  display: flex;        /* Đảm bảo các nút hiển thị ngang */
+  justify-content: end; /* Canh phải các nút */
+  padding: 10px 20px;   /* Tùy chỉnh khoảng cách */
+}
+
+.custom-modal-footer .btn {
+  margin-left: 10px;    /* Tạo khoảng cách giữa các nút */
+}
+
+.custom-modal-footer .btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.custom-modal-footer .btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+.custom-modal .modal-dialog {
+  max-width: 600px;    /* Đặt lại chiều rộng modal */
+  margin: 1.75rem auto; /* Đảm bảo modal nằm ở giữa màn hình */
+}
+
+.custom-modal .modal {
+  display: block;       /* Đảm bảo modal hiển thị */
+}
+
+.custom-modal {
+  position: relative;    /* Đảm bảo modal không bị ảnh hưởng bởi các thuộc tính CSS global */
+}
+
+.custom-modal .modal-content {
+  background-color: white;
+  padding: 15px;
+  border-radius: 0.5rem;
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5); /* Hiệu ứng shadow */
+}
+body.modal-open {
+  padding-right: 0 !important; /* Xóa padding-right để tránh giãn body */
+  overflow: hidden;  /* Đảm bảo không có thanh cuộn khi modal mở */
+}
+

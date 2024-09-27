@@ -619,7 +619,7 @@
           {{ errorMessage }}
         </div>
         <div style="margin-top: 20px;">
-          <button class="confirm-button" (click)="confirmCancel()">Xác nhận</button>
+          <button class="confirm-button" (click)="confirmCancel($event)">Xác nhận</button>
           <button class="cancel-button" (click)="closeCancelModal()">Đóng</button>
         </div>
       </div>
@@ -639,7 +639,8 @@
           {{ message }}
         </div>
         <div style="margin-top: 20px;">
-          <button class="confirm-button" (click)="confirmAccept()">Xác nhận</button>
+          <button class="confirm-button" (click)="confirmAccept($event)">Xác nhận</button>
+
           <button class="cancel-button" (click)="closeAcceptModal()">Đóng</button>
         </div>
       </div>

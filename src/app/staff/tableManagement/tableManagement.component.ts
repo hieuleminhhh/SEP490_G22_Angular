@@ -1,5 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { TableService } from '../../../service/table.service';
 import { FormsModule } from '@angular/forms';
 import moment from 'moment';
@@ -20,6 +20,8 @@ import { CheckoutService } from '../../../service/checkout.service';
 import { MenuComponent } from '../../common/menu/menu.component';
 import { SidebarOrderComponent } from '../SidebarOrder/SidebarOrder.component';
 import { Title } from '@angular/platform-browser';
+import { ManagerOrderService } from '../../../service/managerorder.service';
+import { firstValueFrom } from 'rxjs';
 
 
 @Component({
@@ -123,7 +125,7 @@ export class TableManagementComponent implements OnInit {
   constructor(private tableService: TableService, private dialog: MatDialog, private reservationService: ReservationService,
     private router: Router, private checkoutService: CheckoutService,
     private route: ActivatedRoute, private notificationService: NotificationService, private accountService: AccountService,
-    private titleService: Title) {
+    private titleService: Title, private orderService: ManagerOrderService) {
     const today = new Date();
     this.dateFrom = this.formatDate(today);
     this.dateTo = this.formatDate(today);
@@ -509,27 +511,151 @@ export class TableManagementComponent implements OnInit {
     this.accountGuestId = reservation?.accountId;
     this.showAcceptModal = true;
   }
+  transform(value: string | Date, format: string = 'dd/MM/yyyy HH:mm', locale: string = 'vi-VN'): string {
+    if (!value) return '';
 
+    let date: Date;
+    if (typeof value === 'string') {
+      date = new Date(value);
+      if (isNaN(date.getTime())) {
+        return value;
+      }
+    } else {
+      date = value;
+    }
+    return formatDate(date, format, locale);
+  }
+  formatDateForPrint(date: Date | string | null): string {
+    if (!date) return 'N/A';
+    return this.transform(date, 'dd/MM/yyyy HH:mm');
+  }
   closeAcceptModal(): void {
     this.showAcceptModal = false;
     this.currentReservationId = undefined;
   }
-  confirmAccept(): void {
+  async confirmAccept(event: Event): Promise<void> { 
+    event.preventDefault(); // Ngăn chặn hành động mặc định
+  
     if (this.currentReservationId) {
       const reservation = this.dataReservationPending.find((reservation: { reservationId: any }) => reservation.reservationId === this.currentReservationId);
-      this.updateStatusReservationById(this.currentReservationId, 2, reservation?.reservationTime, reservation?.guestNumber);
-      this.createNotification(this.orderOfReserId, 1, this.accountGuestId);
+  
+      if (reservation) {
+        // Update reservation status
+        await this.updateStatusReservationById(this.currentReservationId, 2, reservation.reservationTime, reservation.guestNumber);
+        console.log('ReserID', this.currentReservationId);
+  
+        // Create notification
+        this.createNotification(this.orderOfReserId, 1, this.accountGuestId);
+        console.log('OrderID', this.orderOfReserId);
+  
+        // Fetch customer email and other details
+        try {
+          const emailResponse = await this.reservationService.getGuestEmailByReservationId(this.currentReservationId).toPromise();
+  
+          const customerEmail = emailResponse.email;
+          const consigneeName = emailResponse.consigneeName;
+          const supportPhone = emailResponse.settingPhone; 
+          const supportEmail = emailResponse.settingEmail; 
+          const companyName = emailResponse.eateryName; 
+          const reservationTime = emailResponse.reservationTime;
+          console.log('LISSTTTTT', emailResponse);
+          const orderId = emailResponse.orderId;
+  
+          // Tạo nội dung email
+          let orderDetailsLink = '';
+          if (orderId) {
+            orderDetailsLink = `
+              <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau: 
+              <a href="http://localhost:4200/orderDetail/${orderId}" style="color: blue; text-decoration: underline;">Xem chi tiết đơn hàng tại đây</a>.</p>`;
+          }
+  
+          // Gửi email ngay lập tức
+          await firstValueFrom(this.orderService.sendEmail(
+            customerEmail,
+            'Xác Nhận Đặt Chỗ Thành Công Từ Eating House',
+            `<div style="font-family: Arial, sans-serif; line-height: 1.5;">
+              <p>Kính gửi <strong>${consigneeName}</strong>,</p>
+              <p>Chúng tôi xin xác nhận rằng đặt chỗ của bạn đã được chấp nhận.</p>
+              <p>Thời gian đặt chỗ: <strong>${this.formatDateForPrint(reservationTime)}</strong>.</p>
+              ${orderDetailsLink}
+              <p>Nếu có bất kỳ thắc mắc hoặc phản hồi nào, xin vui lòng liên hệ với chúng tôi qua số điện thoại <strong>${supportPhone}</strong> hoặc email <strong>${supportEmail}</strong>.</p>
+              <p>Cảm ơn quý khách đã tin tưởng và sử dụng dịch vụ của chúng tôi.</p>
+              <p>Trân trọng,<br>${companyName}<br>${supportPhone}</p>
+            </div>`
+          ));
+  
+          console.log('Confirmation email sent successfully');
+        } catch (error) {
+          console.error('Error sending email:', error);
+        }
+      }
     }
   }
-  confirmCancel(): void {
+  
+  
+  
+  
+  async confirmCancel(event: Event): Promise<void> {
+    event.preventDefault(); // Ngăn chặn hành động mặc định
+    
     if (this.currentReservationId && this.cancelReason.trim()) {
-      this.updateStatusReservation(this.currentReservationId, this.cancelReason);
+      // Cập nhật trạng thái hủy đơn
+      await this.updateStatusReservation(this.currentReservationId, this.cancelReason);
+      console.log('ReserID', this.currentReservationId);
+      
+      // Tạo thông báo cho hủy đơn
       this.createNotification(this.orderOfReserId, 2, this.accountGuestId);
-      this.closeCancelModal();
+      console.log('OrderID', this.orderOfReserId);
+  
+      // Lấy thông tin email khách hàng
+      try {
+        const emailResponse = await this.reservationService.getGuestEmailByReservationId(this.currentReservationId).toPromise();
+        
+        const customerEmail = emailResponse.email;
+        const consigneeName = emailResponse.consigneeName;
+        const supportPhone = emailResponse.settingPhone; 
+        const supportEmail = emailResponse.settingEmail; 
+        const companyName = emailResponse.eateryName; 
+        const reservationTime = emailResponse.reservationTime; // Lấy thời gian đặt chỗ
+        const orderId = emailResponse.orderId; // Lấy orderId
+        const cancellationTime = new Date().toLocaleString(); // Lấy thời gian hủy đơn
+  
+        // Tạo nội dung email
+        let orderDetailsLink = '';
+        if (orderId) {
+          orderDetailsLink = `
+            <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau: 
+            <a href="http://localhost:4200/orderDetail/${orderId}" style="color: blue; text-decoration: underline;">Xem chi tiết đơn hàng tại đây</a>.</p>`;
+        }
+  
+        // Gửi email thông báo hủy đơn
+        await firstValueFrom(this.orderService.sendEmail(
+          customerEmail,
+          'Thông Báo Hủy Đơn Đặt Chỗ Từ Eating House',
+          `<div style="font-family: Arial, sans-serif; line-height: 1.5;">
+            <p>Kính gửi <strong>${consigneeName}</strong>,</p>
+            <p>Chúng tôi xin thông báo rằng đặt chỗ của bạn vào thời gian <strong>${this.formatDateForPrint(reservationTime)}</strong> đã bị hủy với lý do: <strong>${this.cancelReason}</strong>.</p>
+            ${orderDetailsLink}
+            <p>Nếu có bất kỳ thắc mắc hoặc phản hồi nào, xin vui lòng liên hệ với chúng tôi qua số điện thoại <strong>${supportPhone}</strong> hoặc email <strong>${supportEmail}</strong>.</p>
+            <p>Cảm ơn quý khách đã tin tưởng và sử dụng dịch vụ của chúng tôi.</p>
+            <p>Trân trọng,<br>${companyName}<br>${supportPhone}</p>
+          </div>`
+        ));
+  
+        console.log('Cancellation email sent successfully');
+  
+        // Đóng modal hủy đơn
+        this.closeCancelModal();
+      } catch (error) {
+        console.error('Error sending cancellation email:', error);
+        this.errorMessage = 'Có lỗi xảy ra khi gửi email hủy đơn.';
+      }
     } else {
       this.errorMessage = 'Vui lòng nhập lý do hủy';
     }
   }
+  
+  
 
   getReservationId(id: any) {
     this.reservationService.getReservation(id).subscribe(
