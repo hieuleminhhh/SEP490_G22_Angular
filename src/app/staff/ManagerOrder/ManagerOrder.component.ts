@@ -679,14 +679,25 @@ export class ManagerOrderComponent implements OnInit {
           // Gọi sendOrderEmail để lấy địa chỉ email của khách hàng
           const emailResponse = await this.orderService.sendOrderEmail(orderId).toPromise();
           const customerEmail = emailResponse.email;
+          const consigneeName = emailResponse.consigneeName;
+          const supportPhone = emailResponse.phone// Thay thế bằng số điện thoại hỗ trợ thực tế
+          const supportEmail = emailResponse.settingEmail; // Thay thế bằng địa chỉ email hỗ trợ thực tế
+          const companyName = emailResponse.eateryName; // Tên công ty
+          console.log(consigneeName);
+          console.log(customerEmail); 
 
           // Gửi email thông báo (chạy không đồng bộ, không chờ đợi)
           this.orderService.sendEmail(
             customerEmail,
-            'Thông báo hủy đơn hàng từ Eating House',
-            `Xin chào quý khách,<br><br>
-  Rất tiếc, đơn hàng của bạn đã bị hủy. Lý do: ${cancelationReason}.<br>
-  Cảm ơn bạn đã tin tưởng và lựa chọn Eating House!`
+            'Thông Báo Hủy Đơn Hàng Từ Eating House',
+            `<div style="font-family: Arial, sans-serif; line-height: 1.5;">
+              <p>Kính gửi <strong>${consigneeName}</strong>,</p>
+              <p>Chúng tôi rất tiếc phải thông báo rằng đơn hàng của bạn đã bị hủy với lý do hủy: <strong>${cancelationReason}</strong>.</p>
+              <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau: <a href="http://localhost:4200/orderDetail/${orderId}" style="color: blue; text-decoration: underline;">Xem chi tiết đơn hàng tại đây</a>.</p>
+              <p>Nếu quý khách có bất kỳ thắc mắc hoặc yêu cầu nào, xin vui lòng liên hệ với chúng tôi qua số điện thoại <strong>${supportPhone}</strong> hoặc email <strong>${supportEmail}</strong>.</p>
+              <p>Chúng tôi hy vọng có cơ hội phục vụ quý khách trong tương lai.</p>
+              <p>Trân trọng,<br>${companyName}<br>${supportPhone}</p>
+            </div>`
           ).subscribe(
             emailSentResponse => {
               console.log('Email thông báo hủy đơn hàng đã được gửi thành công:', emailSentResponse);
@@ -963,24 +974,33 @@ export class ManagerOrderComponent implements OnInit {
         // Gọi sendOrderEmail để lấy địa chỉ email của khách hàng
         const emailResponse = await this.orderService.sendOrderEmail(orderId).toPromise();
         const customerEmail = emailResponse.email;
+        const consigneeName = emailResponse.consigneeName;
+        const supportPhone = emailResponse.phone// Thay thế bằng số điện thoại hỗ trợ thực tế
+        const supportEmail = emailResponse.settingEmail; // Thay thế bằng địa chỉ email hỗ trợ thực tế
+        const companyName = emailResponse.eateryName; // Tên công ty
+        console.log(consigneeName);
         console.log(customerEmail); // Điều chỉnh dựa trên cấu trúc phản hồi
 
-        // Gửi email thông báo (thực hiện không đồng bộ, không chờ đợi)
         this.orderService.sendEmail(
           customerEmail,
-          'Thông báo đơn hàng từ Eating House',
-          `Xin chào quý khách,<br><br>
-          Đơn hàng của bạn đã được chấp nhận và đang trong quá trình xử lý.<br>
-          Cảm ơn bạn đã tin tưởng và lựa chọn Eating House!`
+          'Thông Báo Xác Nhận Đơn Hàng Thành Công Từ Eating House',
+          `<div style="font-family: Arial, sans-serif; line-height: 1.5;">
+            <p>Kính gửi <strong>${consigneeName}</strong>,</p>
+            <p>Chúng tôi xin thông báo rằng đơn hàng của bạn đã được chấp nhận và đang được xử lý.</p>
+            <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau: <a href="http://localhost:4200/orderDetail/${orderId}" style="color: blue; text-decoration: underline;">Xem chi tiết đơn hàng tại đây</a>.</p>
+            <p>Chúng tôi sẽ tiếp tục cập nhật tình trạng đơn hàng của bạn và thông báo khi hàng được giao.</p>
+            <p>Nếu quý khách có bất kỳ thắc mắc hoặc yêu cầu nào, xin vui lòng liên hệ với chúng tôi qua số điện thoại <strong>${supportPhone}</strong> hoặc email <strong>${supportEmail}</strong>.</p>
+            <p>Chân thành cảm ơn quý khách đã tin tưởng và ủng hộ.</p>
+            <p>Trân trọng,<br>${companyName}<br>${supportPhone}</p>
+          </div>`
         ).subscribe(
           emailSentResponse => {
             console.log('Email sent successfully:', emailSentResponse);
           },
-          emailError => {
-            console.error('Error sending email:', emailError);
+          error => {
+            console.error('Error sending email:', error);
           }
         );
-
 
         // Không cần chờ đợi việc gửi email, reload trang ngay lập tức
         window.location.reload();

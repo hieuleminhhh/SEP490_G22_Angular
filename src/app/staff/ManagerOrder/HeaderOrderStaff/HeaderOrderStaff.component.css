@@ -258,3 +258,6 @@
 .item-count-noti.active {
   display: inline-block;
 }
+.dropdown-item-separator {
+  border-bottom: 1px solid #ddd;
+}

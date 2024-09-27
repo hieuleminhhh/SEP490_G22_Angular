@@ -10,6 +10,7 @@ import { AccountService } from '../../../service/account.service';
 import { SidebarOrderComponent } from "../SidebarOrder/SidebarOrder.component";
 import { NotificationService } from '../../../service/notification.service';
 import { Title } from '@angular/platform-browser';
+import { ManagerOrderService } from '../../../service/managerorder.service';
 
 @Component({
   selector: 'app-fill-dish',
@@ -36,7 +37,7 @@ export class FillDishComponent implements OnInit {
   isPrinted: boolean = false;
   private socket!: WebSocket;
   private reservationQueue: any[] = [];
-  constructor(private cookingService: CookingService, private notificationService: NotificationService, private accountService: AccountService,  private titleService: Title) { }
+  constructor(private cookingService: CookingService, private notificationService: NotificationService, private accountService: AccountService,  private titleService: Title, private orderService: ManagerOrderService) { }
 
   ngOnInit(): void {
     this.titleService.setTitle('Lên món | Eating House');
@@ -338,13 +339,43 @@ export class FillDishComponent implements OnInit {
     };
     const request2 = {
       staffId: aId
-    }
+    };
+    
     console.log(aId);
     this.selectedOrders.forEach(order => {
       this.cookingService.updateAccountForOrder(order.orderId, request2).pipe(
         switchMap(response => {
           console.log(`Order ${order.orderId} account updated successfully`, response);
-          return this.cookingService.updateOrderStatus(order.orderId, request1);
+          
+          // Call the email service after updating the account
+          return this.orderService.sendOrderEmail(order.orderId).pipe(
+            switchMap(emailResponse => {
+              const customerEmail = emailResponse.email;
+              const consigneeName = emailResponse.consigneeName;
+              const supportPhone = emailResponse.phone; // Replace with actual support phone number
+              const supportEmail = emailResponse.settingEmail; // Replace with actual support email
+              const companyName = emailResponse.eateryName; // Company name
+  
+              return this.orderService.sendEmail(
+                customerEmail,
+                'Nhắc Nhở Về Đơn Hàng Đang Giao Từ Eating House',
+                `<div style="font-family: Arial, sans-serif; line-height: 1.5;">
+                  <p>Kính gửi <strong>${consigneeName}</strong>,</p>
+                  <p>Chúng tôi xin thông báo rằng đơn hàng của bạn đang trên đường giao và sẽ đến trong thời gian sớm nhất.</p>
+                  <p>Xin quý khách vui lòng sắp xếp thời gian và chú ý điện thoại để tiện nhận hàng. Nhân viên giao hàng sẽ liên hệ trước khi giao để đảm bảo thuận tiện nhất cho quý khách.</p>
+                  <p>Để xem chi tiết đơn hàng của bạn, vui lòng truy cập vào đường dẫn sau: <a href="http://localhost:4200/orderDetail/${order.orderId}" style="color: blue; text-decoration: underline;">Xem chi tiết đơn hàng tại đây</a>.</p>
+                  <p>Nếu có bất kỳ thắc mắc hoặc yêu cầu nào liên quan đến đơn hàng, vui lòng liên hệ với chúng tôi qua số điện thoại <strong>${supportPhone}</strong> hoặc email <strong>${supportEmail}</strong>.</p>
+                  <p>Chân thành cảm ơn quý khách đã tin tưởng và ủng hộ.</p>
+                  <p>Trân trọng,<br>${companyName}<br>${supportPhone}</p>
+                </div>`
+              );
+              
+            }),
+            switchMap(() => {
+              // Update the order status after sending the email
+              return this.cookingService.updateOrderStatus(order.orderId, request1);
+            })
+          );
         })
       ).subscribe(
         statusResponse => {
@@ -356,9 +387,9 @@ export class FillDishComponent implements OnInit {
           console.error(`Error updating account or status for order ${order.orderId}:`, error);
         }
       );
-
     });
   }
+  
   createNotification(accountId: number, orderId: number, check: number) {
     let description;
     let body;
