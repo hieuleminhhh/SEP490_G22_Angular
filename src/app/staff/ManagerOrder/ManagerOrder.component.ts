@@ -1121,6 +1121,13 @@ export class ManagerOrderComponent implements OnInit {
   }
   printInvoiceAll(isFinal: boolean): void {
     let invoiceContent: string = `
+    <div class="header" style="text-align: center;">
+      <h1>Eating House</h1>
+      <p>Địa chỉ: Khu công nghệ cao Hòa Lạc</p>
+      <p>Hotline: 0393578176 - 0987654321</p>
+      <p>Email: eatinghouse@gmail.com</p>
+      <hr>
+    </div>
     <h2 style="text-align: center;">${isFinal ? 'Hóa đơn' : 'Hóa đơn tạm'}</h2>
       <p><strong>Mã đơn hàng:</strong> ${this.orderDetail?.orderId || 'Khách lẻ'}</p>
       <p><strong>Tên khách hàng:</strong> ${this.orderDetail?.consigneeName || 'Khách lẻ'}</p>
@@ -1153,6 +1160,11 @@ ${this.orderDetail?.discountId !== undefined ? `
   <p><strong>Tổng cộng:</strong> ${this.formatCurrency(this.orderDetail?.totalAmount - (this.getDiscountOrderAmount() || 0))}</p>
 ` : ''}
 
+    <div class="footer" style="text-align: center; margin-top: 20px;">
+      <hr>
+      <p>Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi!</p>
+      <p>Hẹn gặp lại quý khách!</p>
+    </div>
     `;
 
     // Open new window
@@ -1162,7 +1174,9 @@ ${this.orderDetail?.discountId !== undefined ? `
     printWindow?.document.write('</body></html>');
     printWindow?.document.close();
     printWindow?.print();
-  }
+}
+
+
   formatCurrency(amount: number | undefined): string {
     if (amount === undefined) return '0đ';
     return `${amount.toLocaleString('vi-VN')}đ`;
