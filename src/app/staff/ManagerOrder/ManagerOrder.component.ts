@@ -952,7 +952,7 @@ export class ManagerOrderComponent implements OnInit {
       const commonData = {
         paymentAmount: 0,
         taxcode: "string",
-        accountId: 0,
+        accountId: this.accountId,
         amountReceived: 0,
         returnAmount: 0,
         description: "string"

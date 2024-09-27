@@ -10,6 +10,7 @@ import { CurrencyFormatPipe } from '../material/currencyFormat/currencyFormat.co
 import { CookingService } from '../../../service/cooking.service';
 import { PaymentService } from '../../../service/payment.service';
 import { NotificationService } from '../../../service/notification.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-purchaseOrder',
@@ -39,10 +40,12 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private http: HttpClient,
     private router: Router, private cookingService: CookingService, private paymentService: PaymentService,
-    private reservationService: ReservationService, private notificationService: NotificationService
+    private reservationService: ReservationService, private notificationService: NotificationService,
+    private titleService: Title
   ) { }
 
   ngOnInit() {
+    this.titleService.setTitle('Danh sách đơn hàng | Eating House');
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
 

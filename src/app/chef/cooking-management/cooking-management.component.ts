@@ -5,6 +5,7 @@ import { CookingService } from '../../../service/cooking.service';
 import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 import { NotificationService } from '../../../service/notification.service';
 import { HttpClient } from '@angular/common/http';
+import { Title } from '@angular/platform-browser';
 
 
 @Component({
@@ -30,9 +31,10 @@ export class CookingManagementComponent implements OnInit {
   private reservationQueue: any[] = [];
   isSending: boolean = false;
   private intervalId: any;
-  constructor(private cookingService: CookingService,private http: HttpClient, private notificationService: NotificationService, private fb: FormBuilder) { }
+  constructor(private cookingService: CookingService,private http: HttpClient, private notificationService: NotificationService, private fb: FormBuilder, private titleService: Title) { }
 
   ngOnInit(): void {
+    this.titleService.setTitle('Nhà bếp | Eating House');
     const today = new Date();
     this.dateFrom = this.formatDate(today);
     this.dateTo = this.formatDate(today);
