@@ -350,3 +350,56 @@ body {
   color: #333;
   font-weight: bold;
 }
+/* Title Buttons Container */
+.card-header {
+  display: flex;
+  justify-content: flex-start;
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 20px;
+}
+
+.title-btn {
+  font-size: 18px;
+  padding: 10px 20px;
+  color: #888888; /* Gray text color for unselected buttons */
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease, background-color 0.3s ease;
+  margin-right: 20px;
+  outline: none;
+  border-radius: 5px;
+}
+
+.title-btn:hover {
+  color: #28a745; /* Green text on hover */
+}
+
+/* Active Button */
+.title-btn.active {
+  color: white; /* White text color for the active button */
+  background-color: #28a745; /* Green background for the active button */
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.total {
+  background-color: #f9f9f9; /* Light grey background */
+  padding: 10px; /* Add some padding */
+  border-radius: 5px; /* Rounded corners */
+  border: 1px solid #ddd; /* Light border */
+  width: fit-content; /* Adjust width to fit content */
+  margin: 10px 0; /* Add some margin */
+}
+
+.total p {
+  font-size: 16px; /* Adjust the font size */
+  color: #333; /* Dark grey text color */
+  font-weight: bold; /* Make the text bold */
+  margin: 0; /* Remove margin around the paragraph */
+}
+
+.total span {
+  color: #ff5722; /* Highlight the total money in orange */
+  font-weight: bold; /* Make the number bold */
+}

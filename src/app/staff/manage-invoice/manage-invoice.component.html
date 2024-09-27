@@ -220,11 +220,11 @@
                 </tr>
               </thead>
               <tbody id="cashier-table-body">
-                <ng-container *ngFor="let item of data">
+                <ng-container *ngFor="let item of report">
                   <tr>
-                    <td>{{ item.collectedByFirstName }} {{ item.collectedByLastName }}</td>
-                    <td>{{ item.totalOrders }}</td>
-                    <td>{{ item.totalOrders }}</td>
+                    <td>{{ item.orderId}}</td>
+                    <td>{{ item.status }}</td>
+                    <td>{{ item.orderDate | date:'dd/MM/yyyy - HH:mm' }}</td>
                     <td>{{ item.revenueByPaymentMethod0 | currencyFormat }}</td>
                     <td><button class="action-button view-button" (click)="showDetails(item)">
                         <i class="fas fa-eye"></i>

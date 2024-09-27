@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { CookingService } from '../../../service/cooking.service';
 import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 import { NotificationService } from '../../../service/notification.service';
+import { HttpClient } from '@angular/common/http';
+
 
 @Component({
   selector: 'app-cooking-management',
@@ -27,7 +29,8 @@ export class CookingManagementComponent implements OnInit {
   private socket!: WebSocket;
   private reservationQueue: any[] = [];
   isSending: boolean = false;
-  constructor(private cookingService: CookingService, private notificationService: NotificationService, private fb: FormBuilder) { }
+  private intervalId: any;
+  constructor(private cookingService: CookingService,private http: HttpClient, private notificationService: NotificationService, private fb: FormBuilder) { }
 
   ngOnInit(): void {
     const today = new Date();
@@ -59,6 +62,14 @@ export class CookingManagementComponent implements OnInit {
     this.socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
+    this.intervalId = setInterval(() => {
+      this.getOrders('Current');
+    }, 10000);
+  }
+  ngOnDestroy(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   }
   initializeWebSocket() {
     console.log("Initializing WebSocket...");
@@ -348,5 +359,13 @@ export class CookingManagementComponent implements OnInit {
       }
     );
   }
+}
+
+function interval(arg0: number) {
+  throw new Error('Function not implemented.');
+}
+
+function switchMap(arg0: () => any): any {
+  throw new Error('Function not implemented.');
 }
 
