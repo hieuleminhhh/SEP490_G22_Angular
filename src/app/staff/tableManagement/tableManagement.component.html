@@ -313,6 +313,7 @@
           <div class="modal-body-custom">
             <p><strong>Tên người đặt:</strong> {{ consigneeName }}</p>
             <p><strong>Số điện thoại:</strong> {{ guestPhone }}</p>
+            <p><strong>Ngày giờ nhận bàn:</strong> {{ reservation.date }} {{ reservation.time }}</p>
             <p><strong>Email:</strong> {{ emailGuest }}</p>
             <p><strong>Số người:</strong> {{ reservation.people }}</p>
             <p><strong>Ghi chú:</strong> {{ note }}</p>
@@ -341,6 +342,10 @@
                   </tr>
                 </tbody>
               </table>
+              <div class="summary-content">
+                <p style="font-weight: bold;">Tổng cộng: <span id="total">{{ getTotalCartPrice() | currencyFormat }}
+                  </span></p>
+              </div>
             </div>
           </div>
           <!-- Confirmation Buttons -->

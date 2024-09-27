@@ -25,6 +25,7 @@ export class OrderShipComponent implements OnInit {
   errorMessage: string = '';
   private socket!: WebSocket;
   private reservationQueue: any[] = [];
+  activeSection: string = 'undelivered';
 
   ngOnInit() {
     const accountIdString = localStorage.getItem('accountId');
@@ -47,6 +48,7 @@ export class OrderShipComponent implements OnInit {
     this.socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
+    this.setActiveSection(this.activeSection);
   }
   initializeWebSocket() {
     this.socket = new WebSocket('wss://localhost:7188/ws');
@@ -75,6 +77,12 @@ export class OrderShipComponent implements OnInit {
   closePopup() {
     this.selectedItem = null;
   }
+  setActiveSection(section: string) {
+    this.activeSection = section;
+    this.getListShipComplete(this.accountId);
+    this.getListShipCancel(this.accountId);
+    this.getListShip(this.accountId);
+  }
 
   getListShip(accountId: number) {
     this.cookingService.getListShip(7, accountId).subscribe(
@@ -82,6 +90,41 @@ export class OrderShipComponent implements OnInit {
         this.deliveryOrders = response;
         console.log(this.deliveryOrders);
 
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
+  completeOrderShip: any;
+  getListShipComplete(accountId: number) {
+    this.cookingService.getListShip(4, accountId).subscribe(
+      response => {
+        this.completeOrderShip = response;
+        console.log(response);
+      },
+      error => {
+        console.error('Error:', error);
+      }
+    );
+  }
+  totalMoney() {
+    let total = 0;
+    this.completeOrderShip.forEach((order: { totalAmount: any; discountPercent: number; deposits: any; }) => {
+      const totalAmount = order.totalAmount;
+      const discount = (totalAmount * order.discountPercent) / 100;
+      const deposits = order.deposits;
+      total += (totalAmount - discount - deposits);
+    });
+    return total;
+  }
+
+  cancelOrderShip: any;
+  getListShipCancel(accountId: number) {
+    this.cookingService.getListShip(5, accountId).subscribe(
+      response => {
+        this.cancelOrderShip = response;
+        console.log(response);
       },
       error => {
         console.error('Error:', error);
@@ -123,7 +166,7 @@ export class OrderShipComponent implements OnInit {
         `<div style="font-family: Arial, sans-serif; line-height: 1.5;">
           <p>Kính gửi <strong>${consigneeName}</strong>,</p>
           <p>Chúng tôi xin thông báo rằng đơn hàng của bạn đã được giao thành công vào ngày <strong>${deliveryDate}</strong> lúc <strong>${deliveryTime}</strong>.</p>
-          <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau: 
+          <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau:
           <a href="http://localhost:4200/orderDetail/${order.orderId}" style="color: blue; text-decoration: underline;">Xem chi tiết đơn hàng tại đây</a>.</p>
           <p>Chúng tôi rất vui khi được phục vụ bạn và hy vọng bạn hài lòng với sản phẩm. Nếu có bất kỳ thắc mắc hoặc phản hồi nào, xin vui lòng liên hệ với chúng tôi qua số điện thoại <strong>${supportPhone}</strong> hoặc email <strong>${supportEmail}</strong>.</p>
           <p>Cảm ơn quý khách đã tin tưởng và sử dụng dịch vụ của chúng tôi.</p>
