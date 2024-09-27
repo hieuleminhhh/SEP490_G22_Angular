@@ -3,10 +3,26 @@
   <main class="main-content">
     <div class="order-card card fixed-size">
       <div class="card-header">
-        <button class="title-btn">Đơn giao hàng của tôi</button>
+        <!-- Section Titles -->
+        <button class="title-btn" [class.active]="activeSection === 'undelivered'"
+          (click)="setActiveSection('undelivered')">
+          Đơn hàng chưa giao
+        </button>
+
+        <button class="title-btn" [class.active]="activeSection === 'delivered'"
+          (click)="setActiveSection('delivered')">
+          Đơn hàng đã giao
+        </button>
+
+        <button class="title-btn" [class.active]="activeSection === 'failed'" (click)="setActiveSection('failed')">
+          Đơn hàng giao thất bại
+        </button>
       </div>
-      <div class="card-body" *ngIf="deliveryOrders.length > 0">
-        <h5>Thông tin đơn giao hàng:</h5>
+
+
+      <!-- Section Content for Undelivered Orders -->
+      <div class="card-body" *ngIf="activeSection === 'undelivered' && deliveryOrders.length > 0">
+        <h5>Thông tin đơn hàng chưa giao:</h5>
         <table class="order-table">
           <thead>
             <tr>
@@ -24,11 +40,11 @@
               <tr>
                 <td>{{order.orderId}}</td>
                 <td>{{order.consigneeName}}</td>
-                <td>{{ order.guestPhone }}</td>
-                <td>{{ order.guestAddress}}</td>
-                <td>{{ order.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</td>
-                <td>{{ order.totalAmount - (order.totalAmount*order.discountPercent/100) - order.deposits |
-                  currencyFormat}}</td>
+                <td>{{order.guestPhone}}</td>
+                <td>{{order.guestAddress}}</td>
+                <td>{{order.recevingOrder | date:'dd/MM/yyyy - HH:mm'}}</td>
+                <td>{{ order.totalAmount - (order.totalAmount * order.discountPercent / 100) - order.deposits |
+                  currencyFormat }}</td>
                 <td>
                   <button class="action-button view-button" (click)="showDetails(order)">
                     <i class="fas fa-eye"></i>
@@ -41,18 +57,99 @@
                     data-bs-target="#cancelConfirmationModal" (click)="getOrderShip(order)">
                     Hủy đơn
                   </button>
-
                 </td>
-
               </tr>
             </ng-container>
           </tbody>
         </table>
       </div>
-      <!-- Thông báo khi không có đơn hàng -->
-      <div *ngIf="deliveryOrders.length === 0" class="no-orders-container">
+
+      <!-- Delivered Orders Section -->
+      <div class="card-body" *ngIf="activeSection === 'delivered' && completeOrderShip?.length > 0">
+        <h5>Thông tin đơn hàng đã giao:</h5>
+        <table class="order-table">
+          <thead>
+            <tr>
+              <th>Mã đơn hàng</th>
+              <th>Tên người nhận</th>
+              <th>Số điện thoại</th>
+              <th>Địa chỉ người nhận</th>
+              <th>Thời gian nhận hàng</th>
+              <th>Tổng tiền đã thu</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody class="scrollable-tbody">
+            <ng-container *ngFor="let order of completeOrderShip">
+              <tr>
+                <td>{{order.orderId}}</td>
+                <td>{{order.consigneeName}}</td>
+                <td>{{order.guestPhone}}</td>
+                <td>{{order.guestAddress}}</td>
+                <td>{{order.recevingOrder | date:'dd/MM/yyyy - HH:mm'}}</td>
+                <td>{{ order.totalAmount - (order.totalAmount * order.discountPercent / 100) - order.deposits |
+                  currencyFormat }}</td>
+                <td>
+                  <button class="action-button view-button" (click)="showDetails(order)">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table><br>
+        <div class="total">
+          <p>Số tiền phải nộp lại: <span>{{totalMoney() | currencyFormat}}</span></p>
+        </div>
+      </div>
+
+      <!-- Failed Orders Section -->
+      <div class="card-body" *ngIf="activeSection === 'failed' && cancelOrderShip?.length > 0">
+        <h5>Thông tin đơn hàng giao thất bại:</h5>
+        <table class="order-table">
+          <thead>
+            <tr>
+              <th>Mã đơn hàng</th>
+              <th>Tên người nhận</th>
+              <th>Số điện thoại</th>
+              <th>Địa chỉ người nhận</th>
+              <th>Thời gian hủy</th>
+              <th>Lý do hủy</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody class="scrollable-tbody">
+            <ng-container *ngFor="let order of cancelOrderShip">
+              <tr>
+                <td>{{order.orderId}}</td>
+                <td>{{order.consigneeName}}</td>
+                <td>{{order.guestPhone}}</td>
+                <td>{{order.guestAddress}}</td>
+                <td>{{order.cancelDate | date:'dd/MM/yyyy - HH:mm'}}</td>
+                <td>{{ order.cancelationReason }}</td>
+                <td>
+                  <button class="action-button view-button" (click)="showDetails(order)">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No Orders Message -->
+      <div *ngIf="activeSection === 'undelivered' && deliveryOrders?.length === 0" class="no-orders-container">
         <i class="fas fa-box-open no-orders-icon"></i>
-        <p class="no-orders-text">Không có đơn hàng nào</p>
+        <p class="no-orders-text">Không có đơn hàng chưa giao</p>
+      </div>
+      <div *ngIf="activeSection === 'delivered' && completeOrderShip?.length === 0" class="no-orders-container">
+        <i class="fas fa-box-open no-orders-icon"></i>
+        <p class="no-orders-text">Không có đơn hàng đã giao</p>
+      </div>
+      <div *ngIf="activeSection === 'failed' && cancelOrderShip?.length === 0" class="no-orders-container">
+        <i class="fas fa-box-open no-orders-icon"></i>
+        <p class="no-orders-text">Không có đơn hàng giao thất bại</p>
       </div>
     </div>
   </main>
@@ -65,11 +162,24 @@
     <div class="details-container">
       <h3>Đơn hàng: {{selectedItem.orderId}}</h3>
       <p>Loại đơn: {{ selectedItem.orderType === 1 ? "Mang về" : "Giao hàng" }}</p>
-      <p>Tình trạng: {{selectedItem.status === 1 ? "Hoàn thành" : "Chưa hoàn thành"}}</p>
+      <p>Tình trạng:
+        {{
+        selectedItem.statusOrder === 4 ? "Hoàn thành" :
+        selectedItem.statusOrder === 7 ? "Đang giao hàng" :
+        selectedItem.statusOrder === 5 ? "Đã hủy" :
+        "Chưa xác định"
+        }}
+      </p>
+
       <p>Tên người nhận: {{selectedItem.consigneeName}}</p>
       <p>Số điện thoại: {{selectedItem.guestPhone}}</p>
       <p>Địa chỉ: {{selectedItem.guestAddress}}</p>
-      <p>Thời gian dự kiến nhận hàng: {{ selectedItem.recevingOrder | date:'dd/MM/yyyy - HH:mm' }}</p>
+      <p *ngIf="selectedItem.statusOrder===7">Thời gian dự kiến nhận hàng: {{ selectedItem.recevingOrder |
+        date:'dd/MM/yyyy - HH:mm' }}</p>
+      <p *ngIf="selectedItem.statusOrder===4">Thời gian nhận hàng: {{ selectedItem.recevingOrder | date:'dd/MM/yyyy -
+        HH:mm' }}</p>
+      <p *ngIf="selectedItem.statusOrder===5">Thời gian hủy đơn: {{ selectedItem.recevingOrder | date:'dd/MM/yyyy -
+        HH:mm' }}</p>
 
       <table class="table table-bordered table-hover">
         <thead class="table-light">
@@ -114,11 +224,20 @@
           <div class="col-md-2"></div>
           <div class="col-md-3">
             <div class="col-md-6 offset-md-6 d-flex align-items-center justify-content-end">
-              <div *ngIf="selectedItem.deposits > 0" class="badge bg-success" style="font-size: 18px;">
+              <div *ngIf="selectedItem.deposits > 0 && selectedItem.statusOrder!==5 " class="badge bg-success"
+                style="font-size: 18px;">
                 Đã thanh toán
               </div>
-              <div *ngIf="selectedItem.deposits === 0" class="badge bg-danger" style="font-size: 18px;">
+              <div *ngIf="selectedItem.deposits === 0 && selectedItem.statusOrder===7" class="badge bg-danger"
+                style="font-size: 18px;">
                 Chưa thanh toán
+              </div>
+              <div *ngIf="selectedItem.deposits === 0 && selectedItem.statusOrder===4" class="badge bg-success"
+                style="font-size: 18px;">
+                Đã thanh toán
+              </div>
+              <div *ngIf="selectedItem.statusOrder === 5" class="badge bg-danger" style="font-size: 18px;">
+                Đã hủy đơn
               </div>
             </div>
           </div>
