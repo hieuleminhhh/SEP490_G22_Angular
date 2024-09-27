@@ -10,6 +10,7 @@ import { HttpClient } from '@angular/common/http';
 import { PaymentService } from '../../../service/payment.service';
 import { ReservationService } from '../../../service/reservation.service';
 import { NotificationService } from '../../../service/notification.service';
+import { AccountService } from '../../../service/account.service';
 
 @Component({
   selector: 'app-orderDetail',
@@ -20,6 +21,7 @@ import { NotificationService } from '../../../service/notification.service';
 })
 export class OrderDetailComponent implements OnInit {
   orderId: any;
+  accountId: any;
   orderDetail: any;
   deposits: number = 0;
   steps = [
@@ -41,10 +43,18 @@ export class OrderDetailComponent implements OnInit {
     private purchaseOrderService: PurchaseOrderService,
     private location: Location, private router: Router, private cookingService: CookingService,
     private paymentService: PaymentService, private http: HttpClient,
-    private notificationService: NotificationService, private reservationService: ReservationService
+    private notificationService: NotificationService, private reservationService: ReservationService,
+    private accountService: AccountService
   ) { }
 
   ngOnInit() {
+    const accountIdString = localStorage.getItem('accountId');
+    this.accountId = accountIdString ? Number(accountIdString) : null;
+    if (this.accountId) {
+      this.getAccountDetails(this.accountId);
+    } else {
+      console.error('Account ID is not available');
+    }
     this.orderId = this.route.snapshot.paramMap.get('id');
     console.log(this.orderId);
     this.getOrderDetail();
@@ -232,5 +242,19 @@ export class OrderDetailComponent implements OnInit {
     } else {
       console.log('WebSocket is not open. Current state:', this.socket.readyState);
     }
+  }
+  account: any;
+  getAccountDetails(accountId: number): void {
+    this.accountService.getAccountById(accountId).subscribe(
+      response => {
+        this.account = response;
+        console.log('Account details:', this.account);
+        console.log('Account role:', this.account.role);
+
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
   }
 }

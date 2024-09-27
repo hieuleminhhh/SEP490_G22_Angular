@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AccountService } from '../../../../service/account.service';
 import { Title } from '@angular/platform-browser';
-
+  import { HttpErrorResponse } from '@angular/common/http';
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
@@ -40,68 +40,91 @@ export class SignupComponent implements OnInit {
     this.router.navigate(['/signup']); 
   }
   token: string = '';
-  signup() {
-    // Clear previous messages
-    this.successMessage = null;
-    this.errorMessage = null;
+
+
+  async signup() { 
+      // Clear previous messages
+      this.successMessage = null;
+      this.errorMessage = null;
   
-    // Check if passwords match
-    if (this.password !== this.confirmPassword) {
-      this.errorMessage = 'Mật khẩu và xác nhận mật khẩu không khớp.';
-      return;
-    }
+      // Initialize an array to hold error messages
+      const validationErrors: string[] = [];
   
-    // Validate required fields
-    if (this.username && this.email && this.password) {
+      // Check if passwords match
+      if (this.password !== this.confirmPassword) {
+          validationErrors.push('Mật khẩu và xác nhận mật khẩu không khớp.');
+      }
+  
+      // Validate required fields
+      if (!this.username) {
+          validationErrors.push('Vui lòng điền tên đăng nhập.');
+      }
+      if (!this.email) {
+          validationErrors.push('Vui lòng điền email.');
+      }
+      if (!this.password) {
+          validationErrors.push('Vui lòng điền mật khẩu.');
+      }
+  
+      // If there are validation errors, join them and set the error message
+      if (validationErrors.length > 0) {
+          this.errorMessage = validationErrors.join(' ');
+          return; // Early return if there are errors
+      }
+  
       const registrationData = {
-        username: this.username,
-        password: this.password,
-        confirmPassword: this.confirmPassword,
-        email: this.email
+          username: this.username,
+          password: this.password,
+          confirmPassword: this.confirmPassword,
+          email: this.email
       };
   
-      this.accountService.verifyAccount(registrationData).subscribe(
-        response => {
+      try {
+          // Step 1: Validate the registration data before sending OTP
+          const response = await this.accountService.verifyAccount(registrationData).toPromise();
+          
+          // Check for response errors here
           if (response.otp) {
-
-            // Lưu trữ thông tin vào State Service
-            this.accountService.setData({
-              token: this.token,
-              otp: response.otp,
-              email: this.email,
-              username: this.username,
-              password: this.password,
-              confirmPassword: this.confirmPassword
-            });
-      
-            // Điều hướng đến trang OTP Verification
-            this.router.navigate(['/verifyOTPsignin']);
-          }
-        },
-        error => {
-          // Log and parse the error response
-          console.error('Registration error:', error);
+              // If the response has an OTP, proceed to send it
+              const otpResponse = await this.accountService.sendOtp(this.email).toPromise();
+              const generatedOtp = otpResponse.otp; // Capture the OTP from the response
+              console.log('OTP sent successfully to:', this.email, 'Generated OTP:', generatedOtp);
   
-          if (error.status === 400 && error.error) {
-            const errorResponse = error.error;
-            if (errorResponse.Email) {
-              this.errorMessage = errorResponse.Email;
-            } else if (errorResponse.Username) {
-              this.errorMessage = errorResponse.Username;
-            } else if (errorResponse.Password) {
-              this.errorMessage = errorResponse.Password;
-            }
-            else {
-              this.errorMessage = 'Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.';
-            }
-          } else {
-            this.errorMessage = 'Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.';
+              // Store information in State Service
+              this.accountService.setData({
+                  token: this.token,
+                  otp: generatedOtp,
+                  email: this.email,
+                  username: this.username,
+                  password: this.password,
+                  confirmPassword: this.confirmPassword
+              });
+  
+              // Redirect to OTP Verification page with the email
+              this.router.navigate(['/verifyOTPsignin'], { queryParams: { email: this.email } });
           }
-        }
-      );
-    } else {
-      this.errorMessage = 'Vui lòng điền đầy đủ thông tin.';
-    }
+      } catch (error: unknown) {
+          // Type assertion for better error handling
+          const httpError = error as HttpErrorResponse;
+  
+          // Log and parse the error response only if something fails
+          console.error('Error occurred:', httpError);
+  
+          if (httpError.status === 400 && httpError.error) {
+              const errorResponse = httpError.error;
+              if (errorResponse.Email) {
+                  this.errorMessage = errorResponse.Email;
+              } else if (errorResponse.Username) {
+                  this.errorMessage = errorResponse.Username;
+              } else if (errorResponse.Password) {
+                  this.errorMessage = errorResponse.Password;
+              } else {
+                  this.errorMessage = 'Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.';
+              }
+          } else {
+              this.errorMessage = 'Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.';
+          }
+      }
   }
   
   

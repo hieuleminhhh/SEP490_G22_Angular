@@ -186,6 +186,19 @@ export class AccountService {
       })
     );
   }
+  checkAccountIdByOrderId(orderId: number): Observable<any> {
+    const url = `${this.apiUrl}/orders/checkAccountID?orderId=${orderId}`;
+    return this.http.get<any>(url, {
+      headers: new HttpHeaders({
+        'Accept': '*/*'
+      })
+    }).pipe(
+      tap(response => {
+        console.log('Account ID checked for order:', response);
+      })
+    );
+  }
+  
   private userData: any = {};
   setData(data: any) {
     this.userData = data;

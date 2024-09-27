@@ -75,10 +75,10 @@
         <span class="user-name ms-2" (click)="toggleDropdown()">{{account?.username}}</span>
 
         <ul class="dropdown-menu" [class.show]="dropdownOpen">
-          <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">Xem thông tin</a></li>
-          <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Đổi mật khẩu</a>
-          </li>
+          <li class="dropdown-item-separator"><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileModal">Xem thông tin</a></li>
+          <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Đổi mật khẩu</a></li>
         </ul>
+        
 
       </div>
     </div>

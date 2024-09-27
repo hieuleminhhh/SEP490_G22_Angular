@@ -6,7 +6,8 @@ import { CookingService } from '../../../service/cooking.service';
 import { HeaderOrderStaffComponent } from "../../staff/ManagerOrder/HeaderOrderStaff/HeaderOrderStaff.component";
 import { InvoiceService } from '../../../service/invoice.service';
 import { NotificationService } from '../../../service/notification.service';
-
+import { ManagerOrderService } from '../../../service/managerorder.service';
+import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-order-ship',
   standalone: true,
@@ -16,13 +17,13 @@ import { NotificationService } from '../../../service/notification.service';
 })
 export class OrderShipComponent implements OnInit {
 
-  constructor(private cookingService: CookingService, private invoiceService: InvoiceService, private notificationService: NotificationService) { }
+  constructor(private cookingService: CookingService, private invoiceService: InvoiceService, private notificationService: NotificationService, private orderService: ManagerOrderService) { }
   deliveryOrders: any[] = [];
   selectedItem: any;
   accountId: any;
   cancelationReason: string = '';
   errorMessage: string = '';
-   private socket!: WebSocket;
+  private socket!: WebSocket;
   private reservationQueue: any[] = [];
 
   ngOnInit() {
@@ -87,56 +88,121 @@ export class OrderShipComponent implements OnInit {
       }
     );
   }
-  completeOrder(order: any) {
+  async completeOrder(order: any): Promise<void> {
     const request = {
       status: 4
     };
-    this.createNotification(order.orderId, 1, order.accountId);
-    this.createNotification(order.orderId, 3, order.accountId);
-    this.cookingService.updateOrderStatus(order.orderId, request).subscribe(
-      response => {
-        if (order.deposits > 0) {
-          this.update(order.orderId, order.deposits);
-        }
-        window.location.reload();
-      },
-      error => {
-        console.error('Error:', error);
+
+    try {
+      // Tạo thông báo
+      this.createNotification(order.orderId, 1, order.accountId);
+      this.createNotification(order.orderId, 3, order.accountId);
+
+      // Cập nhật trạng thái đơn hàng
+      await firstValueFrom(this.cookingService.updateOrderStatus(order.orderId, request));
+
+      if (order.deposits > 0) {
+        // Nếu `this.update` không trả về `Observable`, gọi trực tiếp mà không sử dụng `firstValueFrom`
+        this.update(order.orderId, order.deposits); // Không cần `await` hoặc `firstValueFrom` nếu nó không phải `Observable`
       }
-    );
+
+      // Gọi API để lấy thông tin email khách hàng
+      const emailResponse = await firstValueFrom(this.orderService.sendOrderEmail(order.orderId));
+      const customerEmail = emailResponse.email;
+      const consigneeName = emailResponse.consigneeName;
+      const deliveryDate = new Date().toLocaleDateString(); // Ngày giao hàng
+      const deliveryTime = new Date().toLocaleTimeString(); // Giờ giao hàng
+      const supportPhone = emailResponse.phone; // Thay thế bằng số điện thoại hỗ trợ thực tế
+      const supportEmail = emailResponse.settingEmail; // Thay thế bằng địa chỉ email hỗ trợ thực tế
+      const companyName = emailResponse.eateryName; // Tên công ty
+
+      // Gửi email thông báo giao hàng thành công
+      await firstValueFrom(this.orderService.sendEmail(
+        customerEmail,
+        'Thông Báo Giao Hàng Thành Công Từ Eating House',
+        `<div style="font-family: Arial, sans-serif; line-height: 1.5;">
+          <p>Kính gửi <strong>${consigneeName}</strong>,</p>
+          <p>Chúng tôi xin thông báo rằng đơn hàng của bạn đã được giao thành công vào ngày <strong>${deliveryDate}</strong> lúc <strong>${deliveryTime}</strong>.</p>
+          <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau: 
+          <a href="http://localhost:4200/orderDetail/${order.orderId}" style="color: blue; text-decoration: underline;">Xem chi tiết đơn hàng tại đây</a>.</p>
+          <p>Chúng tôi rất vui khi được phục vụ bạn và hy vọng bạn hài lòng với sản phẩm. Nếu có bất kỳ thắc mắc hoặc phản hồi nào, xin vui lòng liên hệ với chúng tôi qua số điện thoại <strong>${supportPhone}</strong> hoặc email <strong>${supportEmail}</strong>.</p>
+          <p>Cảm ơn quý khách đã tin tưởng và sử dụng dịch vụ của chúng tôi.</p>
+          <p>Trân trọng,<br>${companyName}<br>${supportPhone}</p>
+        </div>`
+      ));
+
+      console.log('Email sent successfully');
+
+      // Reload trang sau khi hoàn thành
+      window.location.reload();
+
+    } catch (error) {
+      console.error('Error completing order or sending email:', error);
+      // Xử lý lỗi nếu có
+    }
   }
-  cancelOrder(order: any) {
+
+
+  async cancelOrder(order: any): Promise<void> {
     const request = {
       status: 5
     };
+
     if (this.cancelationReason.trim() === '') {
       this.errorMessage = 'Vui lòng nhập lý do hủy đơn hàng';
       return;
     }
+
     this.errorMessage = '';
+
+    // Tạo thông báo
     this.createNotification(order.orderId, 2, order.accountId);
     this.createNotification(order.orderId, 4, order.accountId);
-    this.cookingService.updateOrderStatus(order.orderId, request).subscribe(
-      response => {
-        const body = {
-          cancelationReason: this.cancelationReason,
-          cancelBy: "Nhân viên ship"
-        }
-        this.cookingService.updatecancelReason(order.orderId, body).subscribe(
-          response => {
 
-          },
-          error => {
-            console.error('Error:', error);
-          }
-        );
-        window.location.reload();
-      },
-      error => {
-        console.error('Error:', error);
-      }
-    );
+    try {
+      // Cập nhật trạng thái đơn hàng
+      await firstValueFrom(this.cookingService.updateOrderStatus(order.orderId, request));
+
+      const body = {
+        cancelationReason: this.cancelationReason,
+        cancelBy: "Nhân viên ship"
+      };
+
+      // Cập nhật lý do hủy đơn hàng
+      await firstValueFrom(this.cookingService.updatecancelReason(order.orderId, body));
+
+      // Gọi API để lấy thông tin email khách hàng
+      const emailResponse = await firstValueFrom(this.orderService.sendOrderEmail(order.orderId));
+      const customerEmail = emailResponse.email;
+      const consigneeName = emailResponse.consigneeName;
+      const supportPhone = emailResponse.phone; // Thay thế bằng số điện thoại hỗ trợ thực tế
+      const supportEmail = emailResponse.settingEmail; // Thay thế bằng địa chỉ email hỗ trợ thực tế
+      const companyName = emailResponse.eateryName; // Tên công ty
+
+      // Gửi email thông báo hủy đơn hàng
+      await firstValueFrom(this.orderService.sendEmail(
+        customerEmail,
+        'Thông Báo Hủy Đơn Hàng Từ Eating House',
+        `<div style="font-family: Arial, sans-serif; line-height: 1.5;">
+          <p>Kính gửi <strong>${consigneeName}</strong>,</p>
+          <p>Chúng tôi xin thông báo rằng đơn hàng của bạn đã bị hủy bởi nhân viên giao hàng với lý do: <strong>${this.cancelationReason}</strong>.</p>
+          <p>Nếu quý khách có bất kỳ thắc mắc hoặc yêu cầu nào, vui lòng liên hệ với chúng tôi qua số điện thoại <strong>${supportPhone}</strong> hoặc email <strong>${supportEmail}</strong>.</p>
+          <p>Chân thành cảm ơn quý khách đã tin tưởng và sử dụng dịch vụ của chúng tôi.</p>
+          <p>Trân trọng,<br>${companyName}<br>${supportPhone}</p>
+        </div>`
+      ));
+
+      console.log('Email sent successfully');
+
+      // Reload trang sau khi hoàn thành
+      window.location.reload();
+    } catch (error) {
+      console.error('Error processing cancel order:', error);
+      // Xử lý lỗi nếu có
+    }
   }
+
+
   createNotification(orderId: number, check: number, accountId: number) {
     let description;
     let body;
