@@ -241,6 +241,9 @@ export class ManagerOrderComponent implements OnInit {
   // }
 
   timeIn: string = '';
+  tableLabels: string = '';
+  reservationTime: string = '';  
+  guestNumber: number = 0; 
   loadListOrderDetails(orderId: number) {
     console.log(this.DiscountedTotalAmount());
 
@@ -269,7 +272,15 @@ export class ManagerOrderComponent implements OnInit {
 
         // Directly accessing reservation
         this.timeIn = orderDetail.reservation?.timeIn;  // Using optional chaining for safety
+        this.reservationTime = orderDetail.reservation?.reservationTime;
+        this.guestNumber = orderDetail.reservation?.guestNumber;
         console.log('Reservation timeIn:', this.timeIn);
+        if (orderDetail.reservation?.tablesOfReservation?.length > 0) {
+          this.tableLabels = orderDetail.reservation.tablesOfReservation
+            .map((table: any) => table.lable)
+            .join(', ');
+          console.log('Table Labels:', this.tableLabels);
+        }
       },
       (error) => {
         console.error('Error fetching order detail:', error);
@@ -1073,6 +1084,7 @@ export class ManagerOrderComponent implements OnInit {
     }
     return '';
   }
+  
   onDateFromChange(): void {
 
     this.onSearch();
