@@ -234,8 +234,7 @@
 
                       <!-- Final invoice button -->
                       <ng-container>
-                        <button  *ngIf="((orderDetail?.paymentStatus === 1 &&
-                        (orderDetail?.type === 4 || orderDetail?.type === 3 || orderDetail?.type === 1 || orderDetail?.type === 2))) &&
+                        <button  *ngIf="orderDetail?.paymentStatus === 1 &&
                         orderDetail?.status !== 5 && account?.role === 'Cashier'" type="button" class="btn btn-primary me-2" (click)="printFinalInvoice()" >
                           In hóa đơn
                         </button>
@@ -394,15 +393,15 @@
                   <!-- Online staff -->
 
                   <ng-container
-                    *ngIf="orderDetail?.type === 2 && (orderDetail?.status === 2 || orderDetail?.status === 6)">
+                    *ngIf="orderDetail?.type === 2 && (orderDetail?.status === 2 || orderDetail?.status === 6) && dishesServed === 0">
                     <!-- <button type="button" class="btn btn-success me-2" data-bs-target="#paymentModalOnline"
                       data-bs-toggle="modal" *ngIf="!orderDetail?.invoiceId">Thanh toán</button> -->
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
-                      data-bs-toggle="modal" *ngIf="account?.role === 'Cashier'">Hủy đơn</button>
+                      data-bs-toggle="modal" *ngIf="account?.role === 'OrderStaff'">Hủy đơn</button>
                   </ng-container>
 
                   <!-- Mang ve -->
-                  <ng-container *ngIf="orderDetail?.type === 1 && orderDetail?.status === 2">
+                  <ng-container *ngIf="orderDetail?.type === 1 &&  (orderDetail?.status === 2 || orderDetail?.status === 6) && dishesServed === 0">
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
                       data-bs-toggle="modal" *ngIf="account?.role === 'Cashier'">Hủy
                       đơn</button>
