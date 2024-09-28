@@ -533,42 +533,42 @@ export class TableManagementComponent implements OnInit {
     this.showAcceptModal = false;
     this.currentReservationId = undefined;
   }
-  async confirmAccept(event: Event): Promise<void> {
+  async confirmAccept(event: Event): Promise<void> { 
     event.preventDefault(); // Ngăn chặn hành động mặc định
-
+  
     if (this.currentReservationId) {
       const reservation = this.dataReservationPending.find((reservation: { reservationId: any }) => reservation.reservationId === this.currentReservationId);
-
+  
       if (reservation) {
         // Update reservation status
         await this.updateStatusReservationById(this.currentReservationId, 2, reservation.reservationTime, reservation.guestNumber);
         console.log('ReserID', this.currentReservationId);
-
+  
         // Create notification
         this.createNotification(this.orderOfReserId, 1, this.accountGuestId);
         console.log('OrderID', this.orderOfReserId);
-
+  
         // Fetch customer email and other details
         try {
           const emailResponse = await this.reservationService.getGuestEmailByReservationId(this.currentReservationId).toPromise();
-
+  
           const customerEmail = emailResponse.email;
           const consigneeName = emailResponse.consigneeName;
-          const supportPhone = emailResponse.settingPhone;
-          const supportEmail = emailResponse.settingEmail;
-          const companyName = emailResponse.eateryName;
+          const supportPhone = emailResponse.settingPhone; 
+          const supportEmail = emailResponse.settingEmail; 
+          const companyName = emailResponse.eateryName; 
           const reservationTime = emailResponse.reservationTime;
           console.log('LISSTTTTT', emailResponse);
           const orderId = emailResponse.orderId;
-
+  
           // Tạo nội dung email
           let orderDetailsLink = '';
           if (orderId) {
             orderDetailsLink = `
-              <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau:
+              <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau: 
               <a href="http://localhost:4200/orderDetail/${orderId}" style="color: blue; text-decoration: underline;">Xem chi tiết đơn hàng tại đây</a>.</p>`;
           }
-
+  
           // Gửi email ngay lập tức
           await firstValueFrom(this.orderService.sendEmail(
             customerEmail,
@@ -583,7 +583,7 @@ export class TableManagementComponent implements OnInit {
               <p>Trân trọng,<br>${companyName}<br>${supportPhone}</p>
             </div>`
           ));
-
+  
           console.log('Confirmation email sent successfully');
         } catch (error) {
           console.error('Error sending email:', error);
@@ -591,43 +591,43 @@ export class TableManagementComponent implements OnInit {
       }
     }
   }
-
-
-
-
+  
+  
+  
+  
   async confirmCancel(event: Event): Promise<void> {
     event.preventDefault(); // Ngăn chặn hành động mặc định
-
+    
     if (this.currentReservationId && this.cancelReason.trim()) {
       // Cập nhật trạng thái hủy đơn
       await this.updateStatusReservation(this.currentReservationId, this.cancelReason);
       console.log('ReserID', this.currentReservationId);
-
+      
       // Tạo thông báo cho hủy đơn
       this.createNotification(this.orderOfReserId, 2, this.accountGuestId);
       console.log('OrderID', this.orderOfReserId);
-
+  
       // Lấy thông tin email khách hàng
       try {
         const emailResponse = await this.reservationService.getGuestEmailByReservationId(this.currentReservationId).toPromise();
-
+        
         const customerEmail = emailResponse.email;
         const consigneeName = emailResponse.consigneeName;
-        const supportPhone = emailResponse.settingPhone;
-        const supportEmail = emailResponse.settingEmail;
-        const companyName = emailResponse.eateryName;
+        const supportPhone = emailResponse.settingPhone; 
+        const supportEmail = emailResponse.settingEmail; 
+        const companyName = emailResponse.eateryName; 
         const reservationTime = emailResponse.reservationTime; // Lấy thời gian đặt chỗ
         const orderId = emailResponse.orderId; // Lấy orderId
         const cancellationTime = new Date().toLocaleString(); // Lấy thời gian hủy đơn
-
+  
         // Tạo nội dung email
         let orderDetailsLink = '';
         if (orderId) {
           orderDetailsLink = `
-            <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau:
+            <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau: 
             <a href="http://localhost:4200/orderDetail/${orderId}" style="color: blue; text-decoration: underline;">Xem chi tiết đơn hàng tại đây</a>.</p>`;
         }
-
+  
         // Gửi email thông báo hủy đơn
         await firstValueFrom(this.orderService.sendEmail(
           customerEmail,
@@ -641,9 +641,9 @@ export class TableManagementComponent implements OnInit {
             <p>Trân trọng,<br>${companyName}<br>${supportPhone}</p>
           </div>`
         ));
-
+  
         console.log('Cancellation email sent successfully');
-
+  
         // Đóng modal hủy đơn
         this.closeCancelModal();
       } catch (error) {
@@ -654,8 +654,8 @@ export class TableManagementComponent implements OnInit {
       this.errorMessage = 'Vui lòng nhập lý do hủy';
     }
   }
-
-
+  
+  
 
   getReservationId(id: any) {
     this.reservationService.getReservation(id).subscribe(
@@ -1400,9 +1400,9 @@ export class TableManagementComponent implements OnInit {
         orderDate: new Date().toISOString(),
         status: 2,
         recevingOrder: dateTime,
-        totalAmount: this.getTotalCartPrice(),
+        totalAmount: 0,
         deposits: 0,
-        type: 3,
+        type: 0,
         orderDetails: this.cartItems.map(item => ({
           unitPrice: this.getTotalPrice(item),
           quantity: item.quantity,

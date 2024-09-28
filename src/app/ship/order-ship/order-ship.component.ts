@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CurrencyFormatPipe } from '../../common/material/currencyFormat/currencyFormat.component';
@@ -8,6 +8,7 @@ import { InvoiceService } from '../../../service/invoice.service';
 import { NotificationService } from '../../../service/notification.service';
 import { ManagerOrderService } from '../../../service/managerorder.service';
 import { firstValueFrom } from 'rxjs';
+import { Title } from '@angular/platform-browser';
 @Component({
   selector: 'app-order-ship',
   standalone: true,
@@ -17,7 +18,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class OrderShipComponent implements OnInit {
 
-  constructor(private cookingService: CookingService, private invoiceService: InvoiceService, private notificationService: NotificationService, private orderService: ManagerOrderService) { }
+  constructor(private cookingService: CookingService, private invoiceService: InvoiceService, private notificationService: NotificationService, private orderService: ManagerOrderService, private titleService: Title) { }
   deliveryOrders: any[] = [];
   selectedItem: any;
   accountId: any;
@@ -28,6 +29,7 @@ export class OrderShipComponent implements OnInit {
   activeSection: string = 'undelivered';
 
   ngOnInit() {
+    this.titleService.setTitle('Giao hàng | Eating House');
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
     console.log(this.accountId);
@@ -96,6 +98,24 @@ export class OrderShipComponent implements OnInit {
       }
     );
   }
+  transform(value: string | Date, format: string = 'dd/MM/yyyy HH:mm', locale: string = 'vi-VN'): string {
+    if (!value) return '';
+
+    let date: Date;
+    if (typeof value === 'string') {
+      date = new Date(value);
+      if (isNaN(date.getTime())) {
+        return value;
+      }
+    } else {
+      date = value;
+    }
+    return formatDate(date, format, locale);
+  }
+  formatDateForPrint(date: Date | string | null): string {
+    if (!date) return 'N/A';
+    return this.transform(date, 'dd/MM/yyyy HH:mm');
+  }
   completeOrderShip: any;
   getListShipComplete(accountId: number) {
     this.cookingService.getListShip(4, accountId).subscribe(
@@ -153,8 +173,7 @@ export class OrderShipComponent implements OnInit {
       const emailResponse = await firstValueFrom(this.orderService.sendOrderEmail(order.orderId));
       const customerEmail = emailResponse.email;
       const consigneeName = emailResponse.consigneeName;
-      const deliveryDate = new Date().toLocaleDateString(); // Ngày giao hàng
-      const deliveryTime = new Date().toLocaleTimeString(); // Giờ giao hàng
+      const shipTime = emailResponse.shipTime
       const supportPhone = emailResponse.phone; // Thay thế bằng số điện thoại hỗ trợ thực tế
       const supportEmail = emailResponse.settingEmail; // Thay thế bằng địa chỉ email hỗ trợ thực tế
       const companyName = emailResponse.eateryName; // Tên công ty
@@ -165,8 +184,8 @@ export class OrderShipComponent implements OnInit {
         'Thông Báo Giao Hàng Thành Công Từ Eating House',
         `<div style="font-family: Arial, sans-serif; line-height: 1.5;">
           <p>Kính gửi <strong>${consigneeName}</strong>,</p>
-          <p>Chúng tôi xin thông báo rằng đơn hàng của bạn đã được giao thành công vào ngày <strong>${deliveryDate}</strong> lúc <strong>${deliveryTime}</strong>.</p>
-          <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau:
+          <p>Chúng tôi xin thông báo rằng đơn hàng của bạn đã được giao thành công vào thời gian <strong>${this.formatDateForPrint(shipTime)}</strong>.</p>
+          <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau: 
           <a href="http://localhost:4200/orderDetail/${order.orderId}" style="color: blue; text-decoration: underline;">Xem chi tiết đơn hàng tại đây</a>.</p>
           <p>Chúng tôi rất vui khi được phục vụ bạn và hy vọng bạn hài lòng với sản phẩm. Nếu có bất kỳ thắc mắc hoặc phản hồi nào, xin vui lòng liên hệ với chúng tôi qua số điện thoại <strong>${supportPhone}</strong> hoặc email <strong>${supportEmail}</strong>.</p>
           <p>Cảm ơn quý khách đã tin tưởng và sử dụng dịch vụ của chúng tôi.</p>
