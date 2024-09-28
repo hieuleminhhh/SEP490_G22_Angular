@@ -51,7 +51,7 @@
                 <div class="grid-container">
                   <div *ngFor="let dish of orderDish; let i = index" class="grid-item">
                     <div class="dish-info">
-                      <p>Bàn {{ dish.tableId }} - {{ getOrderTimeHoursMinutes(dish.orderTime) }}</p>
+                      <p>Bàn {{ dish.lable }} - {{ getOrderTimeHoursMinutes(dish.orderTime) }}</p>
                       <p>Số lượng yêu cầu: {{ dish.quantityRequired }}</p>
                       <div class="quantity-container">
                         <p>Phục vụ</p>

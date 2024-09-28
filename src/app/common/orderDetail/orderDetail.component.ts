@@ -92,10 +92,16 @@ export class OrderDetailComponent implements OnInit {
     this.socket.onerror = (error) => { /* xử lý onerror */ };
   }
 
+  isServed:boolean=false;
   getOrderDetail() {
     this.purchaseOrderService.getOrderDetail(this.orderId).subscribe(
       response => {
         this.orderDetail = response;
+        response.orderDetails.forEach((orderDetail: { dishesServed: number; }) => {
+          if (orderDetail.dishesServed !== 0) {
+              this.isServed = true;
+          }
+      });
         console.log(response);
         this.status = this.orderDetail.status;
         this.deposits = this.orderDetail.deposits || 0;

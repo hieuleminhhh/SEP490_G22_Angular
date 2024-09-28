@@ -2,6 +2,23 @@
 <div class="container">
   <main class="main-content">
     <div class="order-card card fixed-size">
+      <header>
+        <div class="col-md-3">
+          <div class="input-group">
+            <label class="input-group-text" for="dateFrom">Từ ngày</label>
+            <input type="date" id="dateFrom" class="form-control" [(ngModel)]="dateFrom" [max]="dateNow"
+              (change)="onDateFromChange()">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="input-group">
+            <label class="input-group-text" for="dateTo">Đến ngày</label>
+            <input type="date" id="dateTo" class="form-control" [(ngModel)]="dateTo" [max]="dateNow"
+              (change)="onDateToChange()">
+          </div>
+        </div>
+      </header>
+      <hr>
       <div class="card-header">
         <!-- Section Titles -->
         <button class="title-btn" [class.active]="activeSection === 'undelivered'"
@@ -21,7 +38,7 @@
 
 
       <!-- Section Content for Undelivered Orders -->
-      <div class="card-body" *ngIf="activeSection === 'undelivered' && deliveryOrders.length > 0">
+      <div class="card-body" *ngIf="activeSection === 'undelivered' && deliveryOrders?.length > 0">
         <h5>Thông tin đơn hàng chưa giao:</h5>
         <table class="order-table">
           <thead>
@@ -100,6 +117,9 @@
         </table><br>
         <div class="total">
           <p>Số tiền phải nộp lại: <span>{{totalMoney() | currencyFormat}}</span></p>
+        </div>
+        <div class="total">
+          <p>Số tiền đã nộp: <span>{{totalMoneys() | currencyFormat}}</span></p>
         </div>
       </div>
 

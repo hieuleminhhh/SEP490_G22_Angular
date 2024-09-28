@@ -19,7 +19,7 @@ import { Title } from '@angular/platform-browser';
 export class OrderShipComponent implements OnInit {
 
   constructor(private cookingService: CookingService, private invoiceService: InvoiceService, private notificationService: NotificationService, private orderService: ManagerOrderService, private titleService: Title) { }
-  deliveryOrders: any[] = [];
+  deliveryOrders: any;
   selectedItem: any;
   accountId: any;
   cancelationReason: string = '';
@@ -28,7 +28,15 @@ export class OrderShipComponent implements OnInit {
   private reservationQueue: any[] = [];
   activeSection: string = 'undelivered';
 
+  dateFrom: string = '';
+  dateTo: string = '';
+  dateNow: string = '';
+
   ngOnInit() {
+    const today = new Date();
+    this.dateFrom = this.formatDate(today);
+    this.dateTo = this.formatDate(today);
+    this.dateNow = this.formatDate(today);
     this.titleService.setTitle('Giao hàng | Eating House');
     const accountIdString = localStorage.getItem('accountId');
     this.accountId = accountIdString ? Number(accountIdString) : null;
@@ -52,6 +60,12 @@ export class OrderShipComponent implements OnInit {
     };
     this.setActiveSection(this.activeSection);
   }
+  formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
   initializeWebSocket() {
     this.socket = new WebSocket('wss://localhost:7188/ws');
     this.socket.onopen = () => { /* xử lý onopen */ };
@@ -70,6 +84,21 @@ export class OrderShipComponent implements OnInit {
       console.log('WebSocket is not open. Current state:', this.socket.readyState);
     }
   }
+  onDateFromChange(): void {
+    this.getListShipComplete(this.accountId);
+    this.getListShipCancel(this.accountId);
+    this.getListShip(this.accountId);
+  }
+
+  onDateToChange(): void {
+    if (this.dateTo < this.dateFrom) {
+      this.dateFrom = this.dateTo;
+    }
+    this.getListShipComplete(this.accountId);
+    this.getListShipCancel(this.accountId);
+    this.getListShip(this.accountId);
+  }
+
 
   showDetails(order: any) {
     console.log(order);
@@ -89,9 +118,15 @@ export class OrderShipComponent implements OnInit {
   getListShip(accountId: number) {
     this.cookingService.getListShip(7, accountId).subscribe(
       response => {
-        this.deliveryOrders = response;
+        this.deliveryOrders = response.filter((order: {
+          recevingOrder: string | number | Date
+        }) => {
+          const orderDate = new Date(order.recevingOrder);
+          const fromDate = new Date(`${this.dateFrom}T00:00:00`);
+          const toDate = new Date(`${this.dateTo}T23:59:59`);
+          return orderDate >= fromDate && orderDate <= toDate;
+        });
         console.log(this.deliveryOrders);
-
       },
       error => {
         console.error('Error:', error);
@@ -120,8 +155,12 @@ export class OrderShipComponent implements OnInit {
   getListShipComplete(accountId: number) {
     this.cookingService.getListShip(4, accountId).subscribe(
       response => {
-        this.completeOrderShip = response;
-        console.log(response);
+        this.completeOrderShip = response.filter((order: { recevingOrder: string | number | Date; }) => {
+          const orderDate = new Date(order.recevingOrder);
+          const fromDate = new Date(`${this.dateFrom}T00:00:00`);
+          const toDate = new Date(`${this.dateTo}T23:59:59`);
+          return orderDate >= fromDate && orderDate <= toDate;
+        });
       },
       error => {
         console.error('Error:', error);
@@ -130,21 +169,41 @@ export class OrderShipComponent implements OnInit {
   }
   totalMoney() {
     let total = 0;
-    this.completeOrderShip.forEach((order: { totalAmount: any; discountPercent: number; deposits: any; }) => {
-      const totalAmount = order.totalAmount;
-      const discount = (totalAmount * order.discountPercent) / 100;
-      const deposits = order.deposits;
-      total += (totalAmount - discount - deposits);
+    this.completeOrderShip.forEach((order: { totalAmount: any; discountPercent: number; deposits: any; isCollected: boolean; }) => {
+      if (order.isCollected === false) {
+        const totalAmount = order.totalAmount;
+        const discount = (totalAmount * order.discountPercent) / 100;
+        const deposits = order.deposits;
+        total += (totalAmount - discount - deposits);
+      }
     });
     return total;
   }
+
+  totalMoneys() {
+    let total = 0;
+    this.completeOrderShip.forEach((order: { totalAmount: any; discountPercent: number; deposits: any; isCollected: boolean; }) => {
+      if (order.isCollected === true) {
+        const totalAmount = order.totalAmount;
+        const discount = (totalAmount * order.discountPercent) / 100;
+        const deposits = order.deposits;
+        total += (totalAmount - discount - deposits);
+      }
+    });
+    return total;
+  }
+
 
   cancelOrderShip: any;
   getListShipCancel(accountId: number) {
     this.cookingService.getListShip(5, accountId).subscribe(
       response => {
-        this.cancelOrderShip = response;
-        console.log(response);
+        this.cancelOrderShip = response.filter((order: { recevingOrder: string | number | Date; }) => {
+          const orderDate = new Date(order.recevingOrder);
+          const fromDate = new Date(`${this.dateFrom}T00:00:00`);
+          const toDate = new Date(`${this.dateTo}T23:59:59`);
+          return orderDate >= fromDate && orderDate <= toDate;
+        });
       },
       error => {
         console.error('Error:', error);
@@ -185,7 +244,7 @@ export class OrderShipComponent implements OnInit {
         `<div style="font-family: Arial, sans-serif; line-height: 1.5;">
           <p>Kính gửi <strong>${consigneeName}</strong>,</p>
           <p>Chúng tôi xin thông báo rằng đơn hàng của bạn đã được giao thành công vào thời gian <strong>${this.formatDateForPrint(shipTime)}</strong>.</p>
-          <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau: 
+          <p>Quý khách có thể xem chi tiết đơn hàng của mình tại đường dẫn sau:
           <a href="http://localhost:4200/orderDetail/${order.orderId}" style="color: blue; text-decoration: underline;">Xem chi tiết đơn hàng tại đây</a>.</p>
           <p>Chúng tôi rất vui khi được phục vụ bạn và hy vọng bạn hài lòng với sản phẩm. Nếu có bất kỳ thắc mắc hoặc phản hồi nào, xin vui lòng liên hệ với chúng tôi qua số điện thoại <strong>${supportPhone}</strong> hoặc email <strong>${supportEmail}</strong>.</p>
           <p>Cảm ơn quý khách đã tin tưởng và sử dụng dịch vụ của chúng tôi.</p>
