@@ -403,3 +403,142 @@ body {
   color: #ff5722; /* Highlight the total money in orange */
   font-weight: bold; /* Make the number bold */
 }
+header {
+  background-color: #f8f9fa; /* Light gray background */
+  padding: 15px;
+  border-bottom: 1px solid #dee2e6; /* Subtle border for separation */
+  margin-bottom: 20px;
+}
+
+.col-md-3 {
+  display: inline-block;
+  vertical-align: top;
+  width: 48%;
+  margin-right: 2%; /* Space between the two input groups */
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+}
+
+.input-group-text {
+  background-color: #6c757d; /* Gray background for label */
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px 0 0 5px;
+  border: none;
+  font-weight: bold;
+}
+
+input[type="date"] {
+  border: 1px solid #ced4da;
+  border-radius: 0 5px 5px 0;
+  padding: 5px 10px;
+  width: 100%;
+  font-size: 1rem;
+}
+
+input[type="date"]:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+
+@media (max-width: 768px) {
+  .col-md-3 {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 15px; /* Space between rows on small screens */
+  }
+}
+/* Header container styles */
+header {
+  background-color: #f3f4f6; /* Soft neutral background for a clean look */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Container for the columns */
+.col-md-3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 48%; /* Adjust width to allow space for two input groups on the same row */
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  flex-grow: 1; /* Make input group take available space */
+}
+
+/* Label styles */
+.input-group-text {
+  background-color: #4e73df; /* Custom primary color (blue) */
+  color: white;
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px 0 0 8px;
+  border: none;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+  display: inline-block;
+  white-space: nowrap; /* Prevent label text from breaking to the next line */
+}
+
+.input-group-text:hover {
+  background-color: #2e59d9; /* Darker blue on hover */
+}
+
+/* Input field styles */
+input[type="date"] {
+  border: 2px solid #ddd;
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  padding: 10px 15px;
+  font-size: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+}
+
+/* Focus state for input */
+input[type="date"]:focus {
+  outline: none;
+  border-color: #4e73df; /* Matching blue for focus */
+  box-shadow: 0 0 8px rgba(78, 115, 223, 0.3); /* Soft glow around input */
+}
+
+/* Media query for responsive behavior */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .col-md-3 {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .input-group {
+    flex-direction: column; /* Stack label and input vertically on small screens */
+  }
+
+  .input-group-text {
+    border-radius: 8px 8px 0 0; /* Adjust rounded corners for vertical layout */
+    width: 100%;
+    text-align: center;
+  }
+
+  input[type="date"] {
+    border-radius: 0 0 8px 8px; /* Adjust corners for vertical layout */
+    width: 100%;
+  }
+}
