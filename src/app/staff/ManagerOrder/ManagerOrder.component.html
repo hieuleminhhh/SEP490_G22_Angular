@@ -151,6 +151,10 @@
                   <div *ngIf="orderDetail.tables && orderDetail.tables.length > 0" class="mb-3">
                     <span class="fw-bold">Bàn:</span> {{ getTablesAsString() }}
                   </div>
+                  <div *ngIf="tableLabels && tableLabels.length > 0" class="mb-3">
+                    <span class="fw-bold">Bàn:</span> {{ this.tableLabels }}
+                  </div>
+
 
 
                   <div class="mb-3">
@@ -187,14 +191,21 @@
                     *ngIf="orderDetail.recevingOrder && (orderDetail?.type === 2 || orderDetail?.type === 1) && orderDetail?.status !== 5&&orderDetail?.status !== 8">
                     <span class="fw-bold">Thời gian giao hàng:</span> {{ orderDetail.recevingOrder | dateFormat }}
                   </div>
-                  <div class="mb-3"
-                    *ngIf="orderDetail.cancelDate">
-                    <span class="fw-bold">Thời gian hủy</span> {{ orderDetail.cancelDate| dateFormat }}
+                  <div class="mb-3" *ngIf="guestNumber > 0">
+                    <span class="fw-bold">Số lượng người:</span> {{ guestNumber  }}
                   </div>
-                  <div class="mb-3" *ngIf="orderDetail?.type === 4 && (orderDetail?.status !== 5&&orderDetail?.status !== 8)">
+                  <div class="mb-3" *ngIf="reservationTime">
+                    <span class="fw-bold">Thời đặt bàn:</span> {{ reservationTime | dateFormat }}
+                  </div>                 
+                  <div class="mb-3" *ngIf="orderDetail.cancelDate">
+                    <span class="fw-bold">Thời gian hủy:</span> {{ orderDetail.cancelDate| dateFormat }}
+                  </div>
+                  <div class="mb-3"
+                    *ngIf="orderDetail.orderDate && orderDetail?.type === 4 && (orderDetail?.status !== 5&&orderDetail?.status !== 8)">
                     <span class="fw-bold">Thời gian vào:</span> {{ orderDetail.orderDate | dateFormat }}
                   </div>
-                  <div class="mb-3" *ngIf="orderDetail?.type === 3 && (orderDetail?.status !== 5&&orderDetail?.status !== 8)">
+                  <div class="mb-3"
+                    *ngIf="timeIn && orderDetail?.type === 3 && (orderDetail?.status !== 5&&orderDetail?.status !== 8)">
                     <span class="fw-bold">Thời gian vào:</span> {{ timeIn | dateFormat }}
                   </div>
                   <div class="mb-3"
@@ -234,8 +245,9 @@
 
                       <!-- Final invoice button -->
                       <ng-container>
-                        <button  *ngIf="orderDetail?.paymentStatus === 1 &&
-                        orderDetail?.status !== 5 && account?.role === 'Cashier'" type="button" class="btn btn-primary me-2" (click)="printFinalInvoice()" >
+                        <button *ngIf="orderDetail?.paymentStatus === 1 &&
+                        orderDetail?.status !== 5 && account?.role === 'Cashier'" type="button"
+                          class="btn btn-primary me-2" (click)="printFinalInvoice()">
                           In hóa đơn
                         </button>
                       </ng-container>
@@ -300,7 +312,8 @@
                           <span class="fw-bold">Tổng cộng:</span>
                           <span>{{ DiscountedTotalAmount() | currencyFormat }}</span>
                         </div> -->
-                        <div *ngIf="orderDetail.deposits && (orderDetail.type !== 1 && orderDetail.type !== 2 )" class="d-flex justify-content-between">
+                        <div *ngIf="orderDetail.deposits && (orderDetail.type !== 1 && orderDetail.type !== 2 )"
+                          class="d-flex justify-content-between">
                           <span class="fw-bold">Thanh toán trước:</span>
                           <span>{{ orderDetail.deposits | currencyFormat }}</span>
                         </div>
@@ -308,17 +321,23 @@
                           <span class="fw-bold">Khách phải trả:</span>
                           <span>{{ DiscountedTotalAmount()| currencyFormat }}</span>
                         </div>
-                        <div *ngIf="orderDetail?.paymentStatus ===1 && (orderDetail.type !== 1 && orderDetail.type !== 2 )" class="d-flex justify-content-between">
+                        <div
+                          *ngIf="orderDetail?.paymentStatus ===1 && (orderDetail.type !== 1 && orderDetail.type !== 2 )"
+                          class="d-flex justify-content-between">
                           <span class="fw-bold">Khách đã thanh toán:</span>
                           <span>{{ DiscountedTotalAmount() | currencyFormat }}</span>
                         </div>
-                        <div *ngIf="orderDetail?.paymentStatus ===1 && orderDetail.deposits!==0 && (orderDetail.type === 1 || orderDetail.type === 2 )" class="d-flex justify-content-between">
+                        <div
+                          *ngIf="orderDetail?.paymentStatus ===1 && orderDetail.deposits!==0 && (orderDetail.type === 1 || orderDetail.type === 2 )"
+                          class="d-flex justify-content-between">
                           <span class="fw-bold">Khách đã thanh toán:</span>
-                          <span>{{  orderDetail.deposits | currencyFormat }}</span>
+                          <span>{{ orderDetail.deposits | currencyFormat }}</span>
                         </div>
-                        <div *ngIf="orderDetail?.paymentStatus ===1 && orderDetail.deposits===0 && (orderDetail.type === 1 || orderDetail.type === 2 )" class="d-flex justify-content-between">
+                        <div
+                          *ngIf="orderDetail?.paymentStatus ===1 && orderDetail.deposits===0 && (orderDetail.type === 1 || orderDetail.type === 2 )"
+                          class="d-flex justify-content-between">
                           <span class="fw-bold">Khách đã thanh toán:</span>
-                          <span>{{  DiscountedTotalAmount() | currencyFormat }}</span>
+                          <span>{{ DiscountedTotalAmount() | currencyFormat }}</span>
                         </div>
                       </div>
 
@@ -401,7 +420,8 @@
                   </ng-container>
 
                   <!-- Mang ve -->
-                  <ng-container *ngIf="orderDetail?.type === 1 &&  (orderDetail?.status === 2 || orderDetail?.status === 6) && dishesServed === 0">
+                  <ng-container
+                    *ngIf="orderDetail?.type === 1 &&  (orderDetail?.status === 2 || orderDetail?.status === 6) && dishesServed === 0">
                     <button type="button" class="btn btn-danger me-2" data-bs-target="#cancelOrderModal"
                       data-bs-toggle="modal" *ngIf="account?.role === 'Cashier'">Hủy
                       đơn</button>
