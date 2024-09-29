@@ -21,7 +21,7 @@ import { SideBarComponent } from "../../manager/SideBar/SideBar.component";
 })
 export class ManageInvoiceComponent implements OnInit {
   selectedTab: string = 'overview';
-  data: any;
+  data: any[] = [];
   orderCancel: any;
   orderShip: any;
   filteredOrders: any[] = [];
@@ -70,7 +70,7 @@ export class ManageInvoiceComponent implements OnInit {
     this.socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
-    this.getOrdersStatic();
+    this.getOrderPaymentOnline();
   }
   initializeWebSocket() {
     this.socket = new WebSocket('wss://localhost:7188/ws');
@@ -123,8 +123,9 @@ export class ManageInvoiceComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
   onDateFromChange(): void {
-
     this.getOrdersStatic();
+    this.getOrderPaymentOnline();
+    this.getReport();
   }
 
   onDateToChange(): void {
@@ -132,6 +133,8 @@ export class ManageInvoiceComponent implements OnInit {
       this.dateFrom = this.dateTo;
     }
     this.getOrdersStatic();
+    this.getOrderPaymentOnline();
+    this.getReport();
   }
 
   getOrdersStatic(): void {
@@ -139,6 +142,10 @@ export class ManageInvoiceComponent implements OnInit {
     if (this.role !== 3) {
       this.accountId = null;
     }
+    console.log(this.role);
+
+    console.log(this.accountId);
+
     this.invoiceService.getStatistics(this.dateFrom, this.dateTo, this.accountId).subscribe(
       response => {
         this.data = response;
@@ -155,10 +162,6 @@ export class ManageInvoiceComponent implements OnInit {
     this.invoiceService.getReport(this.dateFrom, this.dateTo).subscribe(
       response => {
         this.report = response;
-
-        console.log(response);
-        console.log(response[1].listOrder);
-
       },
       error => {
         console.error('Error:', error);
@@ -174,6 +177,7 @@ export class ManageInvoiceComponent implements OnInit {
     this.notificationService.getType(accountId).subscribe(
       response => {
         this.role = response;
+        this.getOrdersStatic();
       },
       error => {
         console.error('Error fetching account details:', error);
@@ -181,10 +185,10 @@ export class ManageInvoiceComponent implements OnInit {
     );
   }
   getOrderExport(): void {
-    this.invoiceService.getOrderExport(this.data.orderIds).subscribe(
+    this.invoiceService.getOrderExport(this.data[0].orderIds).subscribe(
       response => {
         const flattenedData = this.flattenOrderData(response);
-        console.log(flattenedData); // Kiểm tra dữ liệu đã bao gồm orderDetail chưa
+        console.log(flattenedData);
         this.exportService.exportToExcel(flattenedData, 'orders');
       },
       error => {
@@ -261,22 +265,48 @@ export class ManageInvoiceComponent implements OnInit {
       }
     );
   }
-  selectedItem: any;
-  showDetails(order: any) {
-    console.log(order);
-    this.selectedItem = order;
-  }
-  showDetailsCashier: boolean = false;
+  getOrderById(id: number): void {
+    this.invoiceService.getOrderById(id).subscribe(
+      response => {
+        this.selectedItem = response;
+        console.log(response);
 
-  showDetailCashier() {
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
+  selectedItem: any;
+  showDetails(id: any) {
+    this.getOrderById(id);
+  }
+
+  showDetailsCashier: boolean = false;
+  showDetailCashier(cashierId: number) {
     this.showDetailsCashier = true;
+    const updatedReport = this.report.filter((order: any) => order.cashierId === cashierId);
+    this.report = updatedReport;
+    console.log(this.report);
+
   }
   goBack() {
     this.showDetailsCashier = false;
+    this.getReport();
   }
 
   closePopup() {
     this.selectedItem = null;
   }
-
+  totalPaymentOnline: any;
+  getOrderPaymentOnline(): void {
+    this.invoiceService.getOrderPaymentOnline(this.dateFrom, this.dateTo).subscribe(
+      response => {
+        this.totalPaymentOnline = response.totalPaymentAmount;
+      },
+      error => {
+        console.error('Error fetching account details:', error);
+      }
+    );
+  }
 }

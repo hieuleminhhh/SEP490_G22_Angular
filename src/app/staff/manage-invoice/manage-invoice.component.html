@@ -107,7 +107,7 @@
             </div>
           </div>
         </div>
-        <!-- <section class="payment-section">
+        <section class="payment-section">
           <h2>Phương thức thanh toán</h2>
           <br>
           <div class="row">
@@ -115,18 +115,18 @@
               <div class="payments">
                 <div class="payment">
                   <div class="payment-details">
-                    <p>Tiền mặt: ({{data[0]?.orderCountByPaymentMethod0+data[0]?.orderCountByPaymentMethod2}}) đơn</p>
+                    <p>Tiền mặt: </p>
                     <div>
-                      <span>{{(data[0]?.revenueByPaymentMethod0+data[0]?.revenueByPaymentMethod2) | currencyFormat }}
+                      <span>{{totalPaymentOnline| currencyFormat }}
                       </span>
                     </div>
                   </div>
                 </div>
                 <div class="payment">
                   <div class="payment-details">
-                    <p>Chuyển khoản: ({{data[0]?.orderCountByPaymentMethod1}}) đơn</p>
+                    <p>Tiền chuyển khoản: </p>
                     <div>
-                      <span>{{(data[0]?.revenueByPaymentMethod1) | currencyFormat }}</span>
+                      <span>{{totalPaymentOnline | currencyFormat }}</span>
                     </div>
                   </div>
                 </div>
@@ -135,7 +135,7 @@
           </div>
           <br>
         </section>
-        <hr> -->
+        <hr>
         <section class="payment-section">
           <h2>Danh sách thu ngân và dòng tiền</h2>
           <br>
@@ -161,7 +161,8 @@
                     <td>{{ item.revenue | currencyFormat }}</td>
                     <td>{{ item.totalRefunds | currencyFormat }}</td>
                     <td>{{ item.totalCashToSubmit | currencyFormat }}</td>
-                    <td><button (click)="showDetailCashier()">Chi tiết</button></td>
+                    <td *ngIf="item.revenue||item.totalRefunds"><button (click)="showDetailCashier(item.cashierId)">Chi
+                        tiết</button></td>
                   </tr>
                 </ng-container>
               </tbody>
@@ -225,21 +226,14 @@
                     <td>{{ item.orderId}}</td>
                     <td>{{ item.status === 8?'Đã hoàn tiền':'Đã hoàn thành' }}</td>
                     <td>{{ item.orderDate | date:'dd/MM/yyyy - HH:mm' }}</td>
-                    <td *ngIf="item.type!==3">{{ item.totalAmount | currencyFormat }}</td>
-                    <td *ngIf="item.type===3">{{ item.deposits | currencyFormat }}</td>
-                    <td><button class="action-button view-button" (click)="showDetails(item)">
+                    <td>{{ item.totalAmount | currencyFormat }}</td>
+                    <td><button class="action-button view-button" (click)="showDetails(item.orderId)">
                         <i class="fas fa-eye"></i>
                       </button></td>
                   </tr>
                 </ng-container>
               </tbody>
             </table>
-          </div>
-          <br>
-          <div class="payment-section-footer">
-            <button class="save-button" (click)="exportData()">
-              Xuất file báo cáo
-            </button>
           </div>
         </section>
       </section>
@@ -259,22 +253,27 @@
               }}</p>
             <p>Tình trạng:
               {{
-              selectedItem.statusOrder === 4 ? "Hoàn thành" :
-              selectedItem.statusOrder === 5 ? "Đã hủy" :
-              selectedItem.statusOrder === 8 ? "Đã hoàn tiền" :
+              selectedItem.status === 4 ? "Hoàn thành" :
+              selectedItem.status === 5 ? "Đã hủy" :
+              selectedItem.status === 8 ? "Đã hoàn tiền" :
               "Chưa xác định"
               }}
             </p>
 
             <p>Tên người nhận: {{selectedItem.consigneeName}}</p>
             <p>Số điện thoại: {{selectedItem.guestPhone}}</p>
-            <p>Địa chỉ: {{selectedItem.guestAddress}}</p>
-            <p *ngIf="selectedItem.statusOrder===7">Thời gian dự kiến nhận hàng: {{ selectedItem.recevingOrder |
+            <p *ngIf="selectedItem.guestAddress">Địa chỉ: {{selectedItem.guestAddress}}</p>
+            <p *ngIf="selectedItem.status===7">Thời gian dự kiến nhận hàng: {{ selectedItem.recevingOrder |
               date:'dd/MM/yyyy - HH:mm' }}</p>
-            <p *ngIf="selectedItem.statusOrder===4">Thời gian nhận hàng: {{ selectedItem.recevingOrder |
+            <p *ngIf="selectedItem.status===4">Thời gian nhận hàng: {{ selectedItem.recevingOrder |
               date:'dd/MM/yyyy -
               HH:mm' }}</p>
-            <p *ngIf="selectedItem.statusOrder===5">Thời gian hủy đơn: {{ selectedItem.recevingOrder | date:'dd/MM/yyyy
+            <p *ngIf="selectedItem.status===5||selectedItem.status===8">Thời gian hủy đơn: {{ selectedItem.cancelDate
+              | date:'dd/MM/yyyy
+              -
+              HH:mm' }}</p>
+              <p *ngIf="selectedItem.status===5||selectedItem.status===8">Lý do hủy: {{ selectedItem.cancelationReason}}</p>
+            <p *ngIf="selectedItem.status===8">Thời gian hoàn tiền: {{ selectedItem.refundDate | date:'dd/MM/yyyy
               -
               HH:mm' }}</p>
 
@@ -288,7 +287,7 @@
                 </tr>
               </thead>
               <tbody>
-                <ng-container *ngFor="let item of selectedItem.itemInOrderDetails">
+                <ng-container *ngFor="let item of selectedItem.orderDetails">
                   <tr>
                     <td>{{ item.nameCombo || item.itemName }}</td>
                     <td>{{ item.quantity }}</td>
@@ -321,20 +320,12 @@
                 <div class="col-md-2"></div>
                 <div class="col-md-3">
                   <div class="col-md-6 offset-md-6 d-flex align-items-center justify-content-end">
-                    <div *ngIf="selectedItem.deposits > 0 && selectedItem.statusOrder!==5 " class="badge bg-success"
+                    <div *ngIf="selectedItem.status===4" class="badge bg-success"
                       style="font-size: 18px;">
                       Đã thanh toán
                     </div>
-                    <div *ngIf="selectedItem.deposits === 0 && selectedItem.statusOrder===7" class="badge bg-danger"
-                      style="font-size: 18px;">
-                      Chưa thanh toán
-                    </div>
-                    <div *ngIf="selectedItem.deposits === 0 && selectedItem.statusOrder===4" class="badge bg-success"
-                      style="font-size: 18px;">
-                      Đã thanh toán
-                    </div>
-                    <div *ngIf="selectedItem.statusOrder === 5" class="badge bg-danger" style="font-size: 18px;">
-                      Đã hủy đơn
+                    <div *ngIf="selectedItem.status === 8" class="badge bg-success" style="font-size: 18px;">
+                      Đã hoàn tiền
                     </div>
                   </div>
                 </div>

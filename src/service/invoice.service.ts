@@ -118,4 +118,13 @@ export class InvoiceService {
     return this.http.put<any>(url, data, this.getHttpOptions());
   }
 
+  getOrderPaymentOnline(dateStart: any, dateEnd: any): Observable<any> {
+    const url = `https://localhost:7188/api/orders/total-payment-amount?startDate=${dateStart}&endDate=${dateEnd}`;
+    return this.http.get<any>(url, this.getHttpOptions());
+  }
+
+  getOrderById(id:number): Observable<any> {
+    const url = `https://localhost:7188/api/orders/${id}`;
+    return this.http.get<any>(url, this.getHttpOptions());
+  }
 }

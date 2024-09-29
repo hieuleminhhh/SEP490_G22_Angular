@@ -600,8 +600,7 @@ validateQuantity(index: number): void {
       dishId: item.dishId || null,
       comboId: item.comboId || null,
       quantity: item.quantity,
-      note: item.note || '',
-      orderTime: new Date().toISOString()
+      note: item.note || ''
     }));
 
     // Log the data before sending
