@@ -91,7 +91,7 @@
         <button class="btn btn-primary btn-sm" (click)="reorder(orderDetail?.orderId)"
           *ngIf="orderDetail?.status === 4">Mua Lại</button>
         <button class="btn btn-danger btn-sm" data-bs-target="#cancelOrderModal" data-bs-toggle="modal"
-          *ngIf="orderDetail?.status === 1 || orderDetail?.status === 2 || orderDetail?.status === 6">Hủy đơn</button>
+          *ngIf="(orderDetail?.status === 1 || orderDetail?.status === 2 || orderDetail?.status === 6)&&isServed===false">Hủy đơn</button>
       </div>
       <hr>
       <div *ngIf="orderDetail?.status===5 || orderDetail?.status===8">
