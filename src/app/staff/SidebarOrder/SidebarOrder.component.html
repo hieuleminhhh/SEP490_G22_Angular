@@ -11,7 +11,7 @@
       Đơn hàng
     </a>
   </li>
-  
+
   <li class="nav-item mb-3 " *ngIf="account?.role === 'Cashier'">
     <a class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#orderMenu1"
       role="button" aria-expanded="false" aria-controls="orderMenu" (click)="toggleOrderMenuCashier()"
@@ -79,7 +79,7 @@
     </li>
 
 
-<!--   
+<!--
   <li class="nav-item mb-3 " *ngIf="account?.role === 'OrderStaff'">
     <a class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#orderMenu"
       role="button" aria-expanded="false" aria-controls="orderMenu" (click)="toggleOrderMenuOrderStaff()"
@@ -95,7 +95,7 @@
       <ul class="nav flex-column ms-3">
         <li class="nav-item mb-3" *ngIf="account?.role === 'OrderStaff'">
           <a class="nav-link d-flex align-items-center" [routerLink]="['/listTable']" routerLinkActive="active">
-            <i class="fas fa-utensils me-2"></i> 
+            <i class="fas fa-utensils me-2"></i>
             Đơn ăn tại quán
           </a>
         </li>
@@ -107,7 +107,7 @@
         </li>
         <li class="nav-item mb-3" *ngIf="account?.role === 'OrderStaff'">
           <a class="nav-link d-flex align-items-center" [routerLink]="['/createOnline']" routerLinkActive="active">
-            <i class="fas fa-globe me-2"></i> 
+            <i class="fas fa-globe me-2"></i>
             Đơn đặt ship
           </a>
         </li>
@@ -116,7 +116,7 @@
     </li> -->
     <li class="nav-item mb-3" *ngIf="account?.role === 'OrderStaff'">
       <a class="nav-link d-flex align-items-center" [routerLink]="['/listTable']" routerLinkActive="active">
-        <i class="fas fa-concierge-bell me-2"></i> <!-- Icon for service -->
+        <i class="fas fa-table me-2"></i> <!-- Icon for table list -->
         Danh sách bàn
       </a>
     </li>

@@ -38,7 +38,7 @@ export class ViewTableOrderComponent implements OnInit {
 
   constructor(private tableService: TableService, private router: Router,
     private route: ActivatedRoute, private accountService: AccountService,
-    private orderService: ManagerOrderService,  private titleService: Title) { }
+    private orderService: ManagerOrderService, private titleService: Title) { }
 
   ngOnInit() {
     this.titleService.setTitle('Danh sách bàn | Eating House');
@@ -62,6 +62,8 @@ export class ViewTableOrderComponent implements OnInit {
         this.selectedFloor = this.originalDataTable[0].floor;
         this.dataTable = [...this.originalDataTable];
         this.filterTablesByFloorAndStatus(this.selectedTable);
+        console.log(this.dataTable);
+
       },
       error => {
         console.error('Error:', error);
@@ -87,19 +89,55 @@ export class ViewTableOrderComponent implements OnInit {
     this.selectedFloor = floor;
     this.filterTablesByFloorAndStatus(this.selectedTable);
   }
-
   filterTablesByFloorAndStatus(selectedTable: string): void {
     const currentFloor = this.selectedFloor;
-    if (selectedTable === 'all') {
-      // Nếu chọn 'all', hiển thị tất cả các bàn của tầng đang chọn
-      this.dataTable = this.originalDataTable.filter(table => table.floor === currentFloor);
-    } else if (selectedTable === 'empty') {
-      // Nếu chọn 'empty', chỉ hiển thị các bàn trống của tầng đang chọn
-      this.dataTable = this.originalDataTable.filter(table => table.floor === currentFloor && table.status === 0);
-    }
+    const currentTime = new Date();
+    this.dataTable = this.originalDataTable.filter(table => {
+      let isAvailable = true;
+
+      if (selectedTable === 'all') {
+        if (table.floor === currentFloor) {
+          if (table.tableReservations.length > 0) {
+            for (let reservation of table.tableReservations) {
+              const reservationTime = new Date(reservation.reservationTime); // Chuyển đổi thời gian đặt thành dạng Date
+              const timeDifference = (reservationTime.getTime() - currentTime.getTime()) / (1000 * 60 * 60); // Chênh lệch thời gian theo giờ
+              if (timeDifference < 3 && timeDifference > 0) {
+                isAvailable = false; // Nếu có đặt chỗ cách hiện tại < 3 tiếng, đặt bàn là không sẵn sàng
+                break; // Dừng vòng lặp
+              }
+            }
+          }
+          // Gán biến isAvailable vào mỗi bàn
+          table.isAvailable = isAvailable;
+          return true;
+        }
+      } else if (selectedTable === 'empty') {
+        // Nếu chọn 'empty', chỉ kiểm tra các bàn trống
+        if (table.floor === currentFloor && table.status === 0) {
+          if (table.tableReservations.length > 0) {
+            for (let reservation of table.tableReservations) {
+              const reservationTime = new Date(reservation.reservationTime);
+              const timeDifference = (reservationTime.getTime() - currentTime.getTime()) / (1000 * 60 * 60);
+              if (timeDifference < 3 && timeDifference > 0) {
+                isAvailable = false;
+                break;
+              }
+            }
+          }
+          // Gán biến isAvailable cho mỗi bàn
+          table.isAvailable = isAvailable;
+          return isAvailable;
+        }
+      }
+      return false;
+    });
   }
-  navigateToOrder(tableId: number, status: number): void {
-    this.loadOrderIdByTable(tableId, status);
+
+  navigateToOrder(tableId: number, status: number, isAvailable?:any): void {
+    if(isAvailable===true){
+      this.loadOrderIdByTable(tableId, status);
+    }
+
   }
   getAccountDetails(accountId: number): void {
     this.accountService.getAccountById(accountId).subscribe(
@@ -175,7 +213,7 @@ export class ViewTableOrderComponent implements OnInit {
     } else {
       console.error('No tables selected');
     }
-  } 
+  }
   isModalVisible: boolean = false;
   isModalVisibles: boolean = false;
   selectedReservations: any[] = [];
@@ -185,8 +223,8 @@ export class ViewTableOrderComponent implements OnInit {
     this.selectedReservations = reservations; // Set reservations for the modal
     this.isModalVisibles = true; // Show modal
   }
-   // Function to close the modal
-   closeModalSchedule() {
+  // Function to close the modal
+  closeModalSchedule() {
     this.isModalVisibles = false; // Hide modal
   }
   closeModal(): void {
