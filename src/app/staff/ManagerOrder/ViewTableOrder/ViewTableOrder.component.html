@@ -36,9 +36,10 @@
             <div class="card">
               <div class="table-grid">
                 <div class="table" *ngFor="let table of dataTable" [class.in-use]="table.status === 0"
-                  (click)="navigateToOrder(table.tableId, table.status)">
+                  (click)="navigateToOrder(table.tableId, table.status, table.isAvailable)">
                   <div class="table-id">{{ table.lable }}</div>
-                  <div class="table-status">{{ table.status === 0 ? 'Bàn trống' : 'Đang sử dụng' }}</div>
+                  <div *ngIf="table.isAvailable===true" class="table-status">{{ table.status === 0 ? 'Bàn trống' : 'Đang sử dụng' }}</div>
+                  <div *ngIf="table.isAvailable===false" class="table-status">Bàn đã đặt</div>
                   <div class="table-capacity">
                     <i class="fas fa-chair"></i>{{ table.capacity }}
                   </div>
