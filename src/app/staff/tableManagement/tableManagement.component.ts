@@ -608,8 +608,7 @@ export class TableManagementComponent implements OnInit {
       console.log('OrderID', this.orderOfReserId);
 
       try {
-        // Đóng modal hủy đơn
-        this.closeCancelModal();
+        this.showCancelModal = false;
         const emailResponse = await this.reservationService.getGuestEmailByReservationId(this.currentReservationId).toPromise();
 
         const customerEmail = emailResponse.email;
