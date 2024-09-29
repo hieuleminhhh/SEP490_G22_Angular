@@ -227,7 +227,7 @@ export class OrderShipComponent implements OnInit {
         // Nếu `this.update` không trả về `Observable`, gọi trực tiếp mà không sử dụng `firstValueFrom`
         this.update(order.orderId, order.deposits); // Không cần `await` hoặc `firstValueFrom` nếu nó không phải `Observable`
       }
-
+      this.getListShip(this.accountId);
       // Gọi API để lấy thông tin email khách hàng
       const emailResponse = await firstValueFrom(this.orderService.sendOrderEmail(order.orderId));
       const customerEmail = emailResponse.email;
@@ -284,6 +284,7 @@ export class OrderShipComponent implements OnInit {
       // Cập nhật trạng thái đơn hàng
       await firstValueFrom(this.cookingService.updateOrderStatus(order.orderId, request));
 
+      this.getListShip(this.accountId);
       const body = {
         cancelationReason: this.cancelationReason,
         cancelBy: "Nhân viên ship"

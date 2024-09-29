@@ -188,7 +188,7 @@ export class ManageInvoiceComponent implements OnInit {
     this.invoiceService.getOrderExport(this.data[0].orderIds).subscribe(
       response => {
         const flattenedData = this.flattenOrderData(response);
-        console.log(flattenedData); // Kiểm tra dữ liệu đã bao gồm orderDetail chưa
+        console.log(flattenedData);
         this.exportService.exportToExcel(flattenedData, 'orders');
       },
       error => {
