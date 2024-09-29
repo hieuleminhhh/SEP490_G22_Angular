@@ -607,8 +607,9 @@ export class TableManagementComponent implements OnInit {
       this.createNotification(this.orderOfReserId, 2, this.accountGuestId);
       console.log('OrderID', this.orderOfReserId);
 
-      // Lấy thông tin email khách hàng
       try {
+        // Đóng modal hủy đơn
+        this.closeCancelModal();
         const emailResponse = await this.reservationService.getGuestEmailByReservationId(this.currentReservationId).toPromise();
 
         const customerEmail = emailResponse.email;
@@ -644,8 +645,6 @@ export class TableManagementComponent implements OnInit {
 
         console.log('Cancellation email sent successfully');
 
-        // Đóng modal hủy đơn
-        this.closeCancelModal();
       } catch (error) {
         console.error('Error sending cancellation email:', error);
         this.errorMessage = 'Có lỗi xảy ra khi gửi email hủy đơn.';

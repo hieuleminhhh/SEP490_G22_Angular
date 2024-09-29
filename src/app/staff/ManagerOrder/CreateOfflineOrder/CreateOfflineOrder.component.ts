@@ -593,7 +593,6 @@ export class CreateOfflineOrderComponent implements OnInit {
       unitPrice: item.unitPrice,
       quantity: item.quantity,
       discountedPrice: item.discountedPrice,
-      orderTime: new Date(),
       note: item.note
     }));
     const guestPhone = this.addNew.guestPhone ? this.addNew.guestPhone : '';
@@ -640,7 +639,6 @@ export class CreateOfflineOrderComponent implements OnInit {
       unitPrice: item.unitPrice,
       quantity: item.quantity,
       discountedPrice: item.discountedPrice,
-      orderTime: new Date(),
       note: item.note
     }));
 
